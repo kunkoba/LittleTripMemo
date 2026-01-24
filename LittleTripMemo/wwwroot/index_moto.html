@@ -1,0 +1,627 @@
+﻿
+<!-- @{
+    // ngrok http https://192.168.11.12:5001
+    var test_ngrok = "https://1a09-119-231-184-89.ngrok-free.app/";
+    test_ngrok = "/";
+} -->
+
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <!-- <base href="~/" /> -->
+    <base href="@test_ngrok" />
+
+
+
+    <meta charset="UTF-8">
+    <title>ルートメモ</title>
+    <!-- ビューポート設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"> -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="css/leaflet.css" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap-icons.css" />
+
+    <!-- フォント -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+
+    <!-- ＱＲコード -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- Firebase SDK (compat版) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="css/appMain.css" />
+
+    <!-- マニフェスト -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Stylesセクション -->
+    <!-- @RenderSection("MyStyles", required: false) -->
+
+</head>
+
+<body class="h-100 d-flex flex-column ">
+
+
+    <!-- 各ビュー -->
+<!-- ヘッダー -->
+<header id="mainHeader" class="w-100 text-light d-flex align-items-center justify-content-between z-1000 " style="height: 30px;">
+    <div class="ms-2" id="viewTitle"></div>
+    <div class="me-2 text-warning" id="textInfoMsg"></div>
+</header>
+
+<!-- メインコンテンツ -->
+<div id="mapArea" class="h-100 " >
+    <!-- トースト -->
+    <div class="toast-container w-100 mt-2">
+        <div id="liveToast" class="toast mx-auto bg-black text-white" >
+            <div class="toast-body d-flex justify-content-center text-break " >
+            </div>
+        </div>
+    </div>
+    <!-- アイコン群 -->
+    <div class="d-flex flex-column justify-content-between w-100 h-100 border p-2 ">
+
+        <!-- 画面上部 -->
+        <div id="topArea" class=" ">
+            <div class="d-flex flex-column ">
+                <!-- 左右アイコン群 -->
+                <div class="d-flex justify-content-between ">
+                    <!-- 左端アイコン群 -->
+                    <div class="d-flex flex-column">
+                        <div class="optionGroup">
+                            <!-- お知らせ -->
+                            <div id="appNewsBtn" type="button" class="map-group ">
+                                <div class="shadow-1 icon-circle bg-primary-subtle text-dark m-2 ">
+                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-message"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 9h8" /><path d="M8 13h6" /><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z" />
+                                    </svg>
+                                </div>
+                                <!-- NEW マーク -->
+                                <span id="badgeNews" class="position-relative badge bg-danger" style="top: -25px; right: 25px; display: none;">
+                                    NEW
+                                </span>
+                            </div>
+                            <!-- フィードバック -->
+                            <div id="appFeedbackBtn" type="button" class="map-group ">
+                                <div class="shadow-1 icon-circle bg-danger-subtle text-dark m-2 ">
+                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <!-- 地点移動 -->
+                            <div id="pointMoveIcon" type="button" class="map-group d-none">
+                                <div class="shadow-1 icon-circle bg-dark m-2 ">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-crosshair2" viewBox="0 0 16 16">
+                                        <path d="M8 0a.5.5 0 0 1 .5.5v.518A7 7 0 0 1 14.982 7.5h.518a.5.5 0 0 1 0 1h-.518A7 7 0 0 1 8.5 14.982v.518a.5.5 0 0 1-1 0v-.518A7 7 0 0 1 1.018 8.5H.5a.5.5 0 0 1 0-1h.518A7 7 0 0 1 7.5 1.018V.5A.5.5 0 0 1 8 0m-.5 2.02A6 6 0 0 0 2.02 7.5h1.005A5 5 0 0 1 7.5 3.025zm1 1.005A5 5 0 0 1 12.975 7.5h1.005A6 6 0 0 0 8.5 2.02zM12.975 8.5A5 5 0 0 1 8.5 12.975v1.005a6 6 0 0 0 5.48-5.48zM7.5 12.975A5 5 0 0 1 3.025 8.5H2.02a6 6 0 0 0 5.48 5.48zM10 8a2 2 0 1 0-4 0 2 2 0 0 0 4 0"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 右端アイコン群 -->
+                    <div class="d-flex flex-column align-items-end">
+                        <!-- ガイド -->
+                        <div id="appGuideBtn" type="button" class="map-group ">
+                            <div class="shadow-1 icon-circle-sm bg-dark-subtle m-2 text-dark">
+                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-question-mark"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 8a3.5 3 0 0 1 3.5 -3h1a3.5 3 0 0 1 3.5 3a3 3 0 0 1 -2 3a3 4 0 0 0 -2 4" /><path d="M12 19l0 .01" />
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- アイコン表示切替え（表示状態） -->
+                        <button id="toggleOption" class="optionGroup d-flex justify-content-center p-0">
+                            <div id=" " class="_shadow-1 _icon-circle _bg-primary-subtle text-dark map-group p-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-toggle-on" viewBox="0 0 16 16">
+                                    <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8"/>
+                                </svg>
+                            </div>
+                        </button>
+                        <!-- アイコン表示切替え2（非表示状態） -->
+                        <button id="toggleOption2" class="optionGroup2 d-flex justify-content-center p-0 d-none">
+                            <div id=" " class="_shadow-1 _icon-circle _bg-primary-subtle text-dark map-group p-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-toggle-off" viewBox="0 0 16 16">
+                                    <path d="M11 4a4 4 0 0 1 0 8H8a5 5 0 0 0 2-4 5 5 0 0 0-2-4zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8M0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5"/>
+                                </svg>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 画面下部 -->
+        <div id="bottomArea" class="mb-2 ">
+            <div class="d-flex justify-content-between align-items-end mb-2 ">
+                <!-- 左端アイコン群 -->
+                <div class="optionGroup_ d-flex flex-column-reverse mb-4">
+                    <!-- 縮小 -->
+                    <div id="zoopDownBtn" type="button" class="map-group ">
+                        <div class="shadow-1 icon-circle bg-info m-2 ">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24"  height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line>
+                            </svg>
+                        </div>
+                    </div>
+                    <!-- 拡大 -->
+                    <div id="zoopUpBtn" type="button" class="map-group ">
+                        <div class="shadow-1 icon-circle bg-info m-2 ">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24"  height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line>
+                            </svg>
+                        </div>
+                    </div>
+                    <!-- ドアップ -->
+                    <div id="zoopMaxBtn" type="button" class="map-group ">
+                        <div class="shadow-1 icon-circle bg-info m-2 ">
+                            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8""  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-zoom-scan"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 8v-2a2 2 0 0 1 2 -2h2" /><path d="M4 16v2a2 2 0 0 0 2 2h2" /><path d="M16 4h2a2 2 0 0 1 2 2v2" /><path d="M16 20h2a2 2 0 0 0 2 -2v-2" /><path d="M8 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M16 16l-2.5 -2.5" />
+                            </svg>
+                        </div>
+                    </div>
+                    <!-- リフレッシュ -->
+                    <div id="refreshBtn" type="button" class="map-group ">
+                        <div class="shadow-1 icon-circle bg-info m-2 ">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24"  height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <!-- 中央アイコン -->
+                <div class="text-center w-100">
+                    <div class="d-flex flex-column-reverse">
+                        <!-- 移動グループ -->
+                        <div id="moveGroup" class="d-flex justify-content-center d-none ">
+                            <div id="startBtn" type="button" class="map-group ">
+                                <div class="shadow-1 icon-circle bg-primary m-2 ">
+                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-skip-back"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.496 4.136l-12 7a1 1 0 0 0 0 1.728l12 7a1 1 0 0 0 1.504 -.864v-14a1 1 0 0 0 -1.504 -.864z" /><path d="M4 4a1 1 0 0 1 .993 .883l.007 .117v14a1 1 0 0 1 -1.993 .117l-.007 -.117v-14a1 1 0 0 1 1 -1z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div id="prevBtn" type="button" class="map-group ">
+                                <div class="shadow-1 icon-circle bg-primary m-2 ">
+                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-track-prev"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20.341 4.247l-8 7a1 1 0 0 0 0 1.506l8 7c.647 .565 1.659 .106 1.659 -.753v-14c0 -.86 -1.012 -1.318 -1.659 -.753z" /><path d="M9.341 4.247l-8 7a1 1 0 0 0 0 1.506l8 7c.647 .565 1.659 .106 1.659 -.753v-14c0 -.86 -1.012 -1.318 -1.659 -.753z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div id="nextBtn" type="button" class="map-group ">
+                                <div class="shadow-1 icon-circle bg-primary m-2 ">
+                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-track-next"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M2 5v14c0 .86 1.012 1.318 1.659 .753l8 -7a1 1 0 0 0 0 -1.506l-8 -7c-.647 -.565 -1.659 -.106 -1.659 .753z" /><path d="M13 5v14c0 .86 1.012 1.318 1.659 .753l8 -7a1 1 0 0 0 0 -1.506l-8 -7c-.647 -.565 -1.659 -.106 -1.659 .753z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div id="endBtn" type="button" class="map-group ">
+                                <div class="shadow-1 icon-circle bg-primary m-2 ">
+                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-skip-forward"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 5v14a1 1 0 0 0 1.504 .864l12 -7a1 1 0 0 0 0 -1.728l-12 -7a1 1 0 0 0 -1.504 .864z" /><path d="M20 4a1 1 0 0 1 .993 .883l.007 .117v14a1 1 0 0 1 -1.993 .117l-.007 -.117v-14a1 1 0 0 1 1 -1z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 新規入力 -->
+                        <div>
+                            <div id="inputBtn" type="button" class="shadow-1 icon-circle-lg bg-primary m-2 map-group d-none">
+                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" />
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- 地点検索 -->
+                        <div>
+                            <div id="searchPointBtn" type="button" class="shadow-1 icon-circle-lg bg-info m-2 map-group d-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24"  height="24" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 右端アイコン群 -->
+                <div style="min-width: 56px;">
+                    <div class="optionGroup d-flex flex-column-reverse mb-4">
+                        <!-- 現在地 -->
+                        <div id="recenterBtn" type="button" class="map-group ">
+                            <div class="shadow-1 icon-circle bg-primary m-2 ">
+                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-location"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 3l-6.5 18a.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a.55 .55 0 0 1 0 -1l18 -6.5" />
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- ユーザ画面 -->
+                        <div id="userInfoBtn" type="button" class="map-group ">
+                            <div class="shadow-1 icon-circle bg-primary m-2 ">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24"  height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- データリスト -->
+                        <div id="dataListBtn" type="button" class="map-group ">
+                            <div class="shadow-1 icon-circle bg-primary m-2 ">
+                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-baseline-density-small"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 3h16" /><path d="M4 9h16" /><path d="M4 15h16" /><path d="M4 21h16" />
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- アクション -->
+                        <div id="actionListBtn" type="button" class="map-group ">
+                            <div class="shadow-1 icon-circle bg-primary m-2 ">
+                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-dots-vertical"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- タイトル -->
+            <div class="d-flex">
+                <div id="archiveTitleBtn" class="map-group btn btn-dark opacity-50 shadow d-flex justify-content-start mx-auto d-none " style="width: 500px; max-width: 90vw;">
+                    <span id="archiveTitleIcon" class="mx-1">
+                    </span>
+                    <span id="archiveTitleLabel" class="ms-1 text-truncate text-start ">
+                    </span>
+                </div>
+            </div>
+            <!-- 並び替えボタン群 -->
+            <div class="d-flex ">
+                <!-- 地点検索用 並び替え選択ボタン -->
+                <div id="sortGroup" class="map-group d-flex d-none mx-auto ">
+                    <!-- 公開、非公開 -->
+                    <div id="GroupPublish" class="btn-group me-2 _row g-0 ">
+                        <button id="btnPrivate" type="button" class="col btn btn-outline-success text-sm3 px-2 " data-value="0">
+                            <!-- <svg  xmlns="http://www.w3.org/2000/svg"  width="30"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye-off"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" /><path d="M3 3l18 18" />
+                            </svg> -->
+                            非公開
+                        </button>
+                        <button id="btnPublish" type="button" class="col btn btn-outline-success text-sm3 px-3 active " data-value="1">
+                            <!-- <svg  xmlns="http://www.w3.org/2000/svg"  width="30"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+                            </svg> -->
+                            公開
+                        </button>
+                    </div>
+                    <!-- 並び順 -->
+                    <div id="GroupSortId" class="btn-group me-2 ">
+                        <button type="button" class="btn btn-outline-primary text-sm3 px-2 " id="btnSortId-1" data-value="1">日付順</button>
+                        <button type="button" class="btn btn-outline-primary text-sm3 px-2 " id="btnSortId-3" data-value="3">評価順</button>
+                        <button type="button" class="btn btn-outline-primary text-sm3 px-2 active " id="btnSortId-2" data-value="2">更新順</button>
+                    </div>
+                    <!-- 並び順 -->
+                    <div id="GroupOrderBy" class="btn-group me-2 ">
+                        <button type="button" class="btn btn-outline-info text-sm3 px-2 " id="btnOrderAsc" data-value="1">
+                            昇順
+                        </button>
+                        <button type="button" class="btn btn-outline-info text-sm3 px-2 active " id="btnOrderDesc" data-value="2">
+                            降順
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ローディングモーダル -->
+<div class="modal" id="loadingModal" >
+    <div class="modal-dialog modal-dialog-centered z-1100">
+        <div class="modal-content bg-transparent border-0">
+            <div class="d-flex justify-content-center">
+                <img src="loading.gif" class="loading-img" alt="Loading..." style="width: 50px; height: 50px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- フッター -->
+<footer>
+</footer>
+
+<!-- 画面モード（主にデバッグ用） -->
+<div id="appMode" class="top-0 position-absolute z-1000 opacity-50 bg-info mt-5">
+</div>
+
+
+<!-- Leaflet本体を先に読み込む -->
+<!-- <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script> -->
+<script src="js/leaflet.js"></script>
+<!-- Leaflet arrowheadプラグイン -->
+<script src="js/leaflet-arrowheads.js"></script>
+<script src="js/leaflet.geometryutil.js"></script>
+
+    <!-- jquery -->
+    <!-- <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script> -->
+    <script src="js/jquery-3.7.1.slim.min.js"></script>
+    <!-- Bootstrap JS (必要に応じて) -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script> -->
+    <script src="js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        var serviceWorker_on = 0;
+        // ■Service Worker登録
+        if (serviceWorker_on == 1) {
+            if ('serviceWorker' in navigator) {     // ブラウザがService Workerをサポートしているか
+                console.log('serviceWorker >> start');
+                const test = '@test_ngrok';
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register(test + '/service-worker.js')
+                    .then(registration => {
+                        console.log('スコープに登録されたサービスワーカー：', registration.scope);
+                        // displayToast('サービスワーカー成功！<br>' + registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('サービスワーカーの登録に失敗しました：', error);
+                        errorProc("サービスワーカー失敗！", error);
+                    });
+                });
+                console.log('serviceWorker >> end');
+            }
+        }
+
+    </script>
+
+    <!-- カスタムスクリプト -->
+    <script src="js/myApp/app-context.js" asp-append-version="true"></script>
+    <script src="js/myApp/app-common.js" asp-append-version="true"></script>
+    <script src="js/myApp/app-map.js" asp-append-version="true"></script>
+    <script src="js/myApp/app-data.js" asp-append-version="true"></script>
+    <script src="js/myApp/app-indexedDB.js" asp-append-version="true"></script>
+    <script src="js/myApp/app-useLocalDB.js" asp-append-version="true"></script>
+    <script src="js/myApp/app-dialog.js" asp-append-version="true"></script>
+    <script src="js/myApp/app-form.js" asp-append-version="true"></script>
+
+
+<!--Scriptsセクション -->
+    <!-- 独自スクリプト -->
+    <script>
+        // 初期表示
+        $(document).ready(function () {
+            // 長押しによる右クリックメニューを防ぐ
+            mapArea.addEventListener("contextmenu", function(event) {
+                event.preventDefault();
+            });
+
+            // ■■■■■　テスト用　■■■■■
+            if (AppContext.dubug_mode) DebugProc();
+            // 画面サイズ調整
+            updateSize();
+            window.addEventListener('resize', updateSize);
+            console.log("◆◆ Main >> start");
+            // トーストクリックで閉じるイベント
+            $('#liveToast').on('click', function() {
+                $(this).removeClass('show'); // 非表示にする
+            });
+            // ユーザ情報取得
+            UserContext.userName = @Html.Raw(Json.Serialize(Model?.UserInfo?.NickName ?? ""));
+            // 匿名判定
+            AppStatus.isAnonymous = UserContext.userName == "";
+            AppStatus.archive = @Html.Raw(Json.Serialize(Model.ResArchive));
+            AppStatus.archiveId = AppStatus.archive.archiveId;
+            if (AppStatus.archiveId > 0) {
+                AppStatus.memos = @Html.Raw(Json.Serialize(Model.ResMemos));
+                AppStatus.isPublish = true;
+                console.log("AppStatus", AppStatus);
+            }
+            // 【画面表示】初回読み込み時
+            initLoad();
+            console.log("◆◆ Main >> end");
+        });
+
+        // ダブルクリック無効化
+        document.addEventListener("dblclick", function(event) {
+            event.preventDefault();
+        });
+
+        // オンライン復帰時（ページ）
+        window.addEventListener("online", (event) => {
+            OnlineProc();
+        });
+
+        // オフライン時（ページ）
+        window.addEventListener("offline", (event) => {
+            OfflineProc();
+        });
+        // 点滅メッセージ（ページ）
+        (function blinkText() {
+            const textElement = document.getElementById("textInfoMsg");
+            let isVisible = true;
+            setInterval(() => {
+                if (isVisible) {
+                    textElement.style.visibility = "hidden"; // 非表示
+                } else {
+                    textElement.style.visibility = "visible"; // 表示
+                }
+                isVisible = !isVisible;
+            }, 1500); // 1秒表示 + 0.5秒非表示 = 1.5秒周期
+        })();
+
+        // オンライン復帰処理（ページ）
+        setInterval(async () => {
+            if (AppStatus.isOnLine) { // オンラインかを判定
+                // サーバ更新処理
+                await UploadRouteMemo();
+            }
+        }, AppContext.interval_upload_routeMemo * 1000 * 60);
+
+        // リアクション更新処理（ページ）
+        setInterval(async () => {
+            if (AppStatus.isOnLine) { // オンラインかを判定
+                // サーバ更新処理
+                await UploadReAction();
+            }
+        }, AppContext.interval_upload_reAction * 1000 * 60);
+
+
+        // アイコン群　表示切替え
+        $("#toggleOption").on("click", function(event) {
+            // console.log("#toggleOption");
+            event.stopPropagation(); // イベントが親要素に伝播しないようにする
+            $(".optionGroup").toggleClass("d-none");
+            $(".optionGroup2").toggleClass("d-none");
+        });
+        // アイコン群　表示切替え
+        $("#toggleOption2").on("click", function(event) {
+            // console.log("#toggleOption2");
+            event.stopPropagation(); // イベントが親要素に伝播しないようにする
+            $(".optionGroup").toggleClass("d-none");
+            $(".optionGroup2").toggleClass("d-none");
+        });
+
+
+
+
+
+
+        // 現在位置ボタン（ページ）
+        $('#recenterBtn').on('click', function () {
+            getLocation();
+            drawMainArrow();
+        });
+        // 画面更新ボタン（ページ）
+        $('#refreshBtn').on('click', function () {
+            event.stopPropagation(); // 親要素のイベントを止める！
+            RefreshScreen();
+        });
+        // データリストアイコン（ページ）
+        $('#dataListBtn').on('click', function () {
+            // リスト表示
+            if (AppStatus.screenId == DEF_SCREEN_SEARCH) openDialogPointList(_PointList);
+            else openDialogTimeLine(_PointList);
+        });
+        // アクションリスト（ページ）
+        $('#actionListBtn').on('click', function () {
+            // ダイアログを表示
+            openDialogActionList();
+        });
+        // ユーザ情報リスト（ページ）
+        $('#userInfoBtn').on('click', function () {
+            // ダイアログを表示
+            openDialogUserInfoList();
+        });
+
+        // 縮小ボタン
+        $('#zoopDownBtn').on('click', function () {
+            zoomDownMap();
+        });
+        // 拡大ボタン
+        $('#zoopUpBtn').on('click', function () {
+            zoomUpMap();
+        });
+        // ドアップボタン
+        $('#zoopMaxBtn').on('click', async function () {
+            setZoom(18);
+        });
+        // ガイド（使い方）ボタン
+        $('#appGuideBtn').on('click', function () {
+            openDialogAppGuide(AppStatus.screenId);
+        });
+
+        // ニュース（お知らせ）ボタン
+        $('#appNewsBtn').on('click', function () {
+            openDialogAppNews();
+        });
+        // フィードバックボタン
+        $('#appFeedbackBtn').on('click', function () {
+            openDialogFeedback();
+        });
+
+        // 地点移動アイコン　非表示切り替え
+        $('#pointMoveIcon').click(function() {
+            openPointMoveForm();
+        });
+        // まとめ情報開く
+        $("#archiveTitleBtn").click(function() {
+            const isOwnData = AppStatus.archive.isOwnData;
+            // 画面を開く
+            openDialogArchiveShow();
+        });
+
+        // 新規入力ボタン
+        $('#inputBtn').on('click', async function (event) {
+            event.stopPropagation(); // イベントが親要素に伝播しないようにする
+            // フォームを開く
+            openInputForm(true);
+        });
+
+        // マーカーポイント移動（前へ）
+        $("#prevBtn").click(function() {
+            event.stopPropagation(); // イベントが親要素に伝播しないようにする
+            // インデックスを加算（過去へ戻る）
+            moveMarkerPrev();
+        });
+        // マーカーポイント移動（次へ）
+        $("#nextBtn").click(function() {
+            event.stopPropagation(); // イベントが親要素に伝播しないようにする
+            // インデックスを減算（未来へ進む）
+            moveMarkerNext();
+        });
+        // マーカーポイント移動（先頭へ）
+        $("#startBtn").click(function() {
+            event.stopPropagation(); // イベントが親要素に伝播しないようにする
+            // インデックスを減算（未来へ進む）
+            moveMarkerStart();
+        });
+        // マーカーポイント移動（末尾へ）
+        $("#endBtn").click(function() {
+            event.stopPropagation(); // イベントが親要素に伝播しないようにする
+            // インデックスを減算（未来へ進む）
+            moveMarkerEnd();
+        });
+
+
+        // 地点検索（検索）
+        $('#searchPointBtn').on('click', function () {
+            // オフラインチェック
+            if (!OfflineCheck()) return false;
+            // 
+            const isPublish = $('#GroupPublish .btn.active').data('value');
+            AppStatus.isPublish = isPublish == 1 ? true: false;
+            const sortId = $('#GroupSortId .btn.active').data('value');
+            const orderBy = $('#GroupOrderBy .btn.active').data('value');
+            // 地点検索
+            searchByPointData(sortId, orderBy);
+        });
+        // 公開非公開ボタン（検索）
+        $('#GroupPublish .btn').on('click', function() {
+            let $this = $(this);
+            $('#GroupPublish .btn').removeClass('active');
+            $this.addClass('active');
+            // クリックされたボタンの data-value を取得
+            let value = $this.data('value');
+            // 公開 (1) の場合は非表示、非公開 (0) の場合は表示
+            if (value === 1) {
+                toggleElementDisabled('#btnSortId-3', true);
+            } else {
+                toggleElementDisabled('#btnSortId-3', false);
+
+                // 非公開選択時、かつ評価順選択時
+                if ($('#btnSortId-3').hasClass('active')) {
+                    $('#GroupSortId .btn').removeClass('active'); // すべてのアクティブを解除
+                    $('#btnSortId-1').addClass('active'); // 日付順をアクティブにする
+                }
+            }
+        });
+        // ソート区分ボタン（検索）
+        $('#GroupSortId .btn').on('click', function() {
+            let $this = $(this);
+            $('#GroupSortId .btn').removeClass('active');
+            $this.addClass('active');
+        });
+        // オーダーボタン（検索）
+        $('#GroupOrderBy .btn').on('click', function() {
+            let $this = $(this);
+            $('#GroupOrderBy .btn').removeClass('active');
+            $this.addClass('active');
+        });
+
+    </script>
+
+</body>
+
+</html>
+
+
