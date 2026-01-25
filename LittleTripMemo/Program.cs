@@ -2,9 +2,10 @@ using LittleTripMemo.Configs;
 using LittleTripMemo.Data;
 using LittleTripMemo.DataAccess;
 using LittleTripMemo.Exceptions;
+using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
-using LittleTripMemo.Models.Common;
 using LittleTripMemo.Services;
+using LittleTripMemo.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json;
 
@@ -153,6 +155,7 @@ builder.Services.Configure<JwtSettings>(
 // =====================
 // JWT 認証（唯一・正）
 // =====================
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 var jwt = builder.Configuration
     .GetSection(JwtSettings.SectionName)
     .Get<JwtSettings>()!;

@@ -1,5 +1,8 @@
-﻿namespace LittleTripMemo.Models.Common;
+﻿namespace LittleTripMemo.Common;
 
+/// <summary>
+/// 自前のユーザコンテキスト
+/// </summary>
 public class UserContext
 {
     // ユーザー固有の識別子

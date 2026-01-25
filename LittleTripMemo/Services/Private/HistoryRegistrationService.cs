@@ -1,7 +1,7 @@
 ﻿using LittleTripMemo.DataAccess;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
-using LittleTripMemo.Models.Common;
+using LittleTripMemo.Common;
 using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services;

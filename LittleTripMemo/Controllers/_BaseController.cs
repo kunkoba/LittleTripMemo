@@ -1,45 +1,52 @@
-﻿using System.Security.Claims;
-using LittleTripMemo.Models.Common;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using LittleTripMemo.Common;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
+
 
 namespace LittleTripMemo.Controllers;
 
 [ApiController]
-public abstract class _BaseController : ControllerBase, IAsyncActionFilter
+public abstract class _BaseController : ControllerBase
 {
     protected readonly UserContext _user;
 
-    protected _BaseController(UserContext userContext)
+    protected _BaseController(UserContext userContext, IHttpContextAccessor httpContextAccessor)
     {
         _user = userContext;
-    }
 
-    // 非同期アクションフィルタの実装（jwt取得⇒HTTPコンテキストの後に処理）
-    [NonAction]
-    public async Task OnActionExecutionAsync(
-        ActionExecutingContext context,
-        ActionExecutionDelegate next)
-    {
-        // 実行前の処理：User (Claims) から値を抽出
-        var user = context.HttpContext.User;
-        if (user.Identity?.IsAuthenticated == true)
+        // Authorization ヘッダーから JWT トークンを取得
+        var httpContext = httpContextAccessor.HttpContext;
+        var token = httpContext?.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+        if (!string.IsNullOrEmpty(token))
         {
-            var rawUserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (Guid.TryParse(rawUserId, out var guidUserId))
+            try
             {
-                _user.UserId = guidUserId;
-            }
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadJwtToken(token);
 
-            var rawTableId = user.FindFirst("TableId")?.Value;
-            if (int.TryParse(rawTableId, out var tableId))
+                // UserId を取得
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c =>
+                    c.Type == ClaimTypes.NameIdentifier ||
+                    c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+                if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
+                {
+                    _user.UserId = userId;
+                }
+
+                // TableId を取得
+                var tableIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "TableId");
+                if (tableIdClaim != null && int.TryParse(tableIdClaim.Value, out var tableId))
+                {
+                    _user.TableId = tableId;
+                }
+            }
+            catch (Exception ex)
             {
-                _user.TableId = tableId;
+                // JWT デコードに失敗した場合（トークンが無効など）
+                Console.WriteLine($"JWT decode failed: {ex.Message}");
             }
         }
-
-        // 本来のアクション（子クラスのメソッド）を実行
-        await next();
     }
 }
-

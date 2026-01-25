@@ -2,6 +2,7 @@
 
 using LittleTripMemo.Configs;
 using LittleTripMemo.DataAccess;
+using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;

@@ -1,7 +1,6 @@
-﻿using Dapper;
+﻿
 using LittleTripMemo.Models;
-using LittleTripMemo.Models.Common;
-using Microsoft.Extensions.Logging;
+using LittleTripMemo.Common;
 
 namespace LittleTripMemo.DataAccess;
 
@@ -11,8 +10,8 @@ namespace LittleTripMemo.DataAccess;
 /// </summary>
 public class HistoryRepository : _BaseRepository
 {
-    private readonly Guid _userId;
-    private readonly int _tableId;
+    //private readonly Guid _userId;
+    //private readonly int _tableId;
 
     // コンストラクタ
     public HistoryRepository(
@@ -30,11 +29,11 @@ public class HistoryRepository : _BaseRepository
     /// </summary>
     public async Task<int> InsertAsync(TMemoHistory history)
     {
-        history.user_id = _userId;
+        history.user_id = _user.UserId;
 
         // _tableId を用いて物理テーブル名を指定
         string sql = $@"
-            INSERT INTO t_memo_detail_{_tableId} (
+            INSERT INTO t_memo_detail_{_user.TableId.ToString()} (
                 archive_id, user_id, latitude, longitude, title, body, 
                 memo_date, memo_time, face_id, weather_id, link_url, 
                 memo_price, create_tim, update_tim
@@ -52,10 +51,10 @@ public class HistoryRepository : _BaseRepository
     /// </summary>
     public async Task<int> UpdateAsync(TMemoHistory history)
     {
-        history.user_id = _userId;
+        history.user_id = _user.UserId;
 
         string sql = $@"
-            UPDATE t_memo_detail_{_tableId} SET
+            UPDATE t_memo_detail_{_user.TableId.ToString()} SET
                 latitude = @latitude,
                 longitude = @longitude,
                 title = @title,
@@ -80,14 +79,14 @@ public class HistoryRepository : _BaseRepository
     public async Task<int> DeleteAsync(int seq)
     {
         string sql = $@"
-            UPDATE t_memo_detail_{_tableId} SET
+            UPDATE t_memo_detail_{_user.TableId.ToString()} SET
                 del_flg = true,
                 update_tim = CURRENT_TIMESTAMP
             WHERE 
                 seq = @seq 
                 AND user_id = @user_id";
 
-        return await ExecuteAsync(sql, new { seq, user_id = _userId });
+        return await ExecuteAsync(sql, new { seq, user_id = _user.UserId });
     }
 
     #endregion
@@ -100,12 +99,12 @@ public class HistoryRepository : _BaseRepository
     public async Task<IEnumerable<TMemoHistory>> GetAllAsync()
     {
         string sql = $@"
-            SELECT * FROM t_memo_detail_{_tableId} 
+            SELECT * FROM t_memo_detail_{_user.TableId.ToString()} 
             WHERE user_id = @user_id 
               AND del_flg = false 
             ORDER BY memo_date ASC, memo_time ASC";
 
-        return await QueryAsync<TMemoHistory>(sql, new { user_id = _userId });
+        return await QueryAsync<TMemoHistory>(sql, new { user_id = _user.UserId });
     }
 
     /// <summary>
@@ -114,13 +113,13 @@ public class HistoryRepository : _BaseRepository
     public async Task<IEnumerable<TMemoHistory>> GetByArchiveIdAsync(int archiveId)
     {
         string sql = $@"
-            SELECT * FROM t_memo_detail_{_tableId} 
+            SELECT * FROM t_memo_detail_{_user.TableId.ToString()} 
             WHERE archive_id = @archive_id 
               AND user_id = @user_id 
               AND del_flg = false 
             ORDER BY memo_date ASC, memo_time ASC";
 
-        return await QueryAsync<TMemoHistory>(sql, new { archive_id = archiveId, user_id = _userId });
+        return await QueryAsync<TMemoHistory>(sql, new { archive_id = archiveId, user_id = _user.UserId });
     }
 
     #endregion

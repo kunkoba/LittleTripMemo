@@ -51,6 +51,18 @@ public class ExceptionHandling
             };
             _logger.LogWarning("業務エラーが発生: {Message}", bEx.Message);
         }
+        else if (ex is Npgsql.PostgresException pgEx)
+        {
+            // 【SQL・DBエラー】ここを追加
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            errorRes = new ErrorResponse
+            {
+                Message = "データベース操作に失敗しました。",
+                ErrorCode = $"DB_ERROR_{pgEx.SqlState}", // 42P01 等のSQLステートを付与
+                DebugInfo = ex.ToString() // スタックトレース
+            };
+            _logger.LogError(pgEx, "SQLエラーが発生 (State: {SqlState}): {Message}", pgEx.SqlState, pgEx.MessageText);
+        }
         else
         {
             // 【想定外のエラー】バグや障害 -> 500を返す
@@ -58,7 +70,7 @@ public class ExceptionHandling
             errorRes = new ErrorResponse
             {
                 Message = "予期せぬシステムエラーが発生しました。",
-                DebugInfo = ex.ToString() // 再構築中のため詳細はレスポンスに含める
+                DebugInfo = ex.ToString() // スタックトレース
             };
             _logger.LogError(ex, "予期せぬ例外をキャッチしました。");
         }

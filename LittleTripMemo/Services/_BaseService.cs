@@ -1,4 +1,5 @@
-﻿using LittleTripMemo.Models.Common;
+﻿
+using LittleTripMemo.Common;
 
 namespace LittleTripMemo.Services;
 

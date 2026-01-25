@@ -1,6 +1,5 @@
-﻿using Dapper;
-using LittleTripMemo.Models.Common;
-using Microsoft.Extensions.Logging;
+﻿
+using LittleTripMemo.Common;
 
 namespace LittleTripMemo.DataAccess;
 

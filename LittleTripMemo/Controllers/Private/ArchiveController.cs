@@ -1,5 +1,5 @@
-﻿using LittleTripMemo.Models.Common;
-using LittleTripMemo.Services;
+﻿using LittleTripMemo.Services;
+using LittleTripMemo.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LittleTripMemo.Controllers;
@@ -13,8 +13,11 @@ public class ArchiveController : _BaseController
 {
     private readonly ArchiveUpdateService _updateService;
 
-    public ArchiveController(UserContext userContext, ArchiveUpdateService updateService)
-        : base(userContext)
+    public ArchiveController(
+        UserContext userContext,
+        IHttpContextAccessor httpContextAccessor,  // ← 追加
+        ArchiveUpdateService updateService)
+        : base(userContext, httpContextAccessor)  // ← 追加
     {
         _updateService = updateService;
     }

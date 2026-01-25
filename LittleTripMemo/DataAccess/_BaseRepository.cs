@@ -1,7 +1,6 @@
-﻿// DataAccess/_BaseRepository.cs
+﻿
 using Dapper;
-using LittleTripMemo.Models.Common;
-using Microsoft.Extensions.Logging;
+using LittleTripMemo.Common;
 using System.Data;
 
 namespace LittleTripMemo.DataAccess;

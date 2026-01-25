@@ -1,5 +1,6 @@
-﻿using LittleTripMemo.Models.Common;
-using LittleTripMemo.Services;
+﻿using LittleTripMemo.Services;
+using LittleTripMemo.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LittleTripMemo.Controllers;
@@ -9,12 +10,16 @@ namespace LittleTripMemo.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class HistoryController : _BaseController
 {
     private readonly HistoryRegistrationService _insertService;
 
-    public HistoryController(UserContext userContext, HistoryRegistrationService insertService)
-            : base(userContext)
+    public HistoryController(
+        UserContext userContext,
+        IHttpContextAccessor httpContextAccessor,  // ← 追加
+        HistoryRegistrationService insertService)
+        : base(userContext, httpContextAccessor)  // ← 追加
     {
         _insertService = insertService;
     }
