@@ -6,25 +6,6 @@ using System.Data;
 namespace LittleTripMemo.DataAccess;
 
 /// <summary>
-/// トランザクションとDB接続の状態を一元管理するインターフェース。
-/// サービス層（ユースケース）単位で同一の接続・トランザクションを使い回すために使用。
-/// </summary>
-public interface ITransactionProvider : IDisposable
-{
-    /// <summary> 現在有効なDB接続。サービス層のライフサイクル中、常に同一のインスタンスを保持する </summary>
-    IDbConnection Connection { get; }
-
-    /// <summary> 実行中のトランザクション。未開始の場合は null を返す </summary>
-    IDbTransaction? Transaction { get; }
-
-    /// <summary> 
-    /// トランザクションを明示的に開始する。
-    /// 開始されたトランザクションは、このインターフェースを参照する全リポジトリで共有される。
-    /// </summary>
-    IDbTransaction BeginTransaction();
-}
-
-/// <summary>
 /// 全リポジトリの共通基底クラス。
 /// Dapper実行時の共通ログ出力、例外ハンドリング、トランザクションの自動適用を担当。
 /// </summary>
@@ -94,5 +75,25 @@ public abstract class _BaseRepository
         => await WrapAsync(sql, param, () => _db.QuerySingleOrDefaultAsync<T>(sql, param, _transaction));
 
     #endregion
+}
+
+
+/// <summary>
+/// トランザクションとDB接続の状態を一元管理するインターフェース。
+/// サービス層（ユースケース）単位で同一の接続・トランザクションを使い回すために使用。
+/// </summary>
+public interface ITransactionProvider : IDisposable
+{
+    /// <summary> 現在有効なDB接続。サービス層のライフサイクル中、常に同一のインスタンスを保持する </summary>
+    IDbConnection Connection { get; }
+
+    /// <summary> 実行中のトランザクション。未開始の場合は null を返す </summary>
+    IDbTransaction? Transaction { get; }
+
+    /// <summary> 
+    /// トランザクションを明示的に開始する。
+    /// 開始されたトランザクションは、このインターフェースを参照する全リポジトリで共有される。
+    /// </summary>
+    IDbTransaction BeginTransaction();
 }
 
