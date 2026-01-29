@@ -1,40 +1,81 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace LittleTripMemo.JWT;
 
 public class JwtMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly IConfiguration _configuration;
 
-    public JwtMiddleware(RequestDelegate next)
+    public JwtMiddleware(RequestDelegate next, IConfiguration configuration)
     {
         _next = next;
+        _configuration = configuration;
     }
 
     public async Task Invoke(HttpContext context)
     {
-        // Authorizationヘッダーからトークン取得
-        var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+        var token = context.Request.Headers["Authorization"]
+            .FirstOrDefault()?.Split(" ").Last();
 
-        if (token != null)
+        if (!string.IsNullOrEmpty(token))
         {
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                // トークンデコード（検証ロジックはプロジェクトのセキュリティ要件に合わせて追加）
-                var jwtToken = tokenHandler.ReadJwtToken(token);
+                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
 
-                // 独自クレーム「table_id」等を含むClaimsIdentityを作成
-                var claims = jwtToken.Claims;
-                var identity = new ClaimsIdentity(claims, "TableId");
+                // ✅ ちゃんと検証する
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidIssuer = _configuration["Jwt:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = _configuration["Jwt:Audience"],
+                    ValidateLifetime = true, // ✅ 有効期限チェック
+                    ClockSkew = TimeSpan.Zero // トークン期限のズレ許容なし
+                };
 
-                // HttpContext.Userにセットすることで、以降の処理でUser.FindFirstが有効になる
-                context.User = new ClaimsPrincipal(identity);
+                // ValidateToken で署名・有効期限をすべて検証
+                var principal = tokenHandler.ValidateToken(
+                    token,
+                    validationParameters,
+                    out SecurityToken validatedToken);
+
+                // 検証成功 → HttpContext.User にセット
+                context.User = principal;
             }
-            catch
+            catch (SecurityTokenExpiredException)
             {
-                // デコード失敗時は何もしない（後続のAuthorizationFilter等で401にする想定）
+                // 有効期限切れ
+                context.Response.StatusCode = 401;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(
+                    "{\"message\":\"Token has expired\"}");
+                return;
+            }
+            catch (SecurityTokenException)
+            {
+                // 署名が無効など
+                context.Response.StatusCode = 401;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(
+                    "{\"message\":\"Invalid token\"}");
+                return;
+            }
+            catch (Exception ex)
+            {
+                // その他のエラー
+                context.Response.StatusCode = 401;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(
+                    $"{{\"message\":\"Token validation failed: {ex.Message}\"}}");
+                return;
             }
         }
 

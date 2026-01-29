@@ -1,7 +1,9 @@
-﻿namespace LittleTripMemo.Common;
+﻿using System.Security.Claims;
+
+namespace LittleTripMemo.Common;
 
 /// <summary>
-/// 自前のユーザコンテキスト
+/// ユーザー情報を保持するコンテキストクラス
 /// </summary>
 public class UserContext
 {
@@ -10,6 +12,9 @@ public class UserContext
 
     // 動的テーブル作成に使用するID
     public int TableId { get; set; } = 0;
+
+    // 料金プラン（権限９
+    public string Plan { get; set; } = "free";
 
 }
 

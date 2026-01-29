@@ -10,7 +10,7 @@ namespace LittleTripMemo.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[CustomAuthorize]  // [Authorize] の代わり
 public class HistoryController : _BaseController
 {
     private readonly HistoryRegistrationService _insertService;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LittleTripMemo.Models;
 
@@ -8,9 +9,16 @@ namespace LittleTripMemo.Models;
 /// </summary>
 public class MyAppUser : IdentityUser<Guid>
 {
+    [Column(Order = 1)]
     /// <summary>
     /// テーブル分散用のID (例: 0〜9)
     /// </summary>
     public int TableId { get; set; }
+
+    [Column(Order = 2)]
+    /// <summary>
+    /// ユーザの料金プラン (例: free, standard, premium, admin)
+    /// </summary>
+    public string Plan { get; set; } = "free";
 }
 
