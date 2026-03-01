@@ -27,7 +27,7 @@ public class HistoryRepository : _BaseRepository
     /// <summary>
     /// 明細登録。モデルのスネークケース（user_id等）をそのままSQLパラメータに使用。
     /// </summary>
-    public async Task<int> InsertAsync(TMemoHistory history)
+    public async Task<int> InsertAsync(TMemoDetail history)
     {
         history.user_id = _user.UserId;
 
@@ -35,11 +35,11 @@ public class HistoryRepository : _BaseRepository
         string sql = $@"
             INSERT INTO t_memo_detail_{_user.TableId.ToString()} (
                 archive_id, user_id, latitude, longitude, title, body, 
-                memo_date, memo_time, face_id, weather_id, link_url, 
+                memo_date, memo_time, face_emoji, weather_emoji, link_url, 
                 memo_price, create_tim, update_tim
             ) VALUES (
                 @archive_id, @user_id, @latitude, @longitude, @title, @body, 
-                @memo_date, @memo_time, @face_id, @weather_id, @link_url, 
+                @memo_date, @memo_time, @face_emoji, @weather_emoji, @link_url, 
                 @memo_price, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
             ) RETURNING seq";
 
@@ -49,7 +49,7 @@ public class HistoryRepository : _BaseRepository
     /// <summary>
     /// 明細更新。
     /// </summary>
-    public async Task<int> UpdateAsync(TMemoHistory history)
+    public async Task<int> UpdateAsync(TMemoDetail history)
     {
         history.user_id = _user.UserId;
 
@@ -61,8 +61,8 @@ public class HistoryRepository : _BaseRepository
                 body = @body,
                 memo_date = @memo_date,
                 memo_time = @memo_time,
-                face_id = @face_id,
-                weather_id = @weather_id,
+                face_emoji = @face_emoji,
+                weather_emoji = @weather_emoji,
                 link_url = @link_url,
                 memo_price = @memo_price,
                 update_tim = CURRENT_TIMESTAMP
@@ -96,7 +96,7 @@ public class HistoryRepository : _BaseRepository
     /// <summary>
     /// 全明細取得。モデルがスネークケースなので SELECT * でそのまま受ける。
     /// </summary>
-    public async Task<IEnumerable<TMemoHistory>> GetAllAsync()
+    public async Task<IEnumerable<TMemoDetail>> GetAllAsync()
     {
         string sql = $@"
             SELECT * FROM t_memo_detail_{_user.TableId.ToString()} 
@@ -104,13 +104,13 @@ public class HistoryRepository : _BaseRepository
               AND del_flg = false 
             ORDER BY memo_date ASC, memo_time ASC";
 
-        return await QueryAsync<TMemoHistory>(sql, new { user_id = _user.UserId });
+        return await QueryAsync<TMemoDetail>(sql, new { user_id = _user.UserId });
     }
 
     /// <summary>
     /// 親ID（archive_id）紐づき取得。
     /// </summary>
-    public async Task<IEnumerable<TMemoHistory>> GetByArchiveIdAsync(int archiveId)
+    public async Task<IEnumerable<TMemoDetail>> GetByArchiveIdAsync(int archiveId)
     {
         string sql = $@"
             SELECT * FROM t_memo_detail_{_user.TableId.ToString()} 
@@ -119,7 +119,7 @@ public class HistoryRepository : _BaseRepository
               AND del_flg = false 
             ORDER BY memo_date ASC, memo_time ASC";
 
-        return await QueryAsync<TMemoHistory>(sql, new { archive_id = archiveId, user_id = _user.UserId });
+        return await QueryAsync<TMemoDetail>(sql, new { archive_id = archiveId, user_id = _user.UserId });
     }
 
     #endregion

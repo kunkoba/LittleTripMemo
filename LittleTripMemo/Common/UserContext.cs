@@ -13,8 +13,8 @@ public class UserContext
     // 動的テーブル作成に使用するID
     public int TableId { get; set; } = 0;
 
-    // 料金プラン（権限９
-    public string Plan { get; set; } = "free";
+    // 料金プラン（権限）
+    public string Plan { get; set; } = PlanType.Free.ToString();
 
 }
 

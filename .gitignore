@@ -332,6 +332,16 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
+
+
+wwwroot*
+_old1/
+_old2/
+Migrations/
+
+
+
+
 # OpenCover UI analysis results
 OpenCover/
 

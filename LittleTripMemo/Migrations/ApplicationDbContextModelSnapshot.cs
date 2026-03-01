@@ -67,13 +67,15 @@ namespace LittleTripMemo.Migrations
 
                     b.Property<string>("Plan")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnOrder(2);
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
                     b.Property<int>("TableId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnOrder(1);
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");

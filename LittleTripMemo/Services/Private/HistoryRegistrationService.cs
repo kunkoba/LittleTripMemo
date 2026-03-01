@@ -24,8 +24,8 @@ public class HistoryRegistrationService : _BaseService
         [Required(ErrorMessage = "本文は必須です")] string body,
         [Required(ErrorMessage = "日付は必須です")] string memo_date,
         [Required(ErrorMessage = "時間は必須です")] string memo_time,
-        [Required(ErrorMessage = "表情IDは必須です")] int face_id,
-        [Required(ErrorMessage = "天気IDは必須です")] int weather_id,
+        [Required(ErrorMessage = "表情IDは必須です")] string face_emoji,
+        [Required(ErrorMessage = "天気IDは必須です")] string weather_emoji,
         [Required(ErrorMessage = "URLは必須です")][Url] string link_url,
         [Required(ErrorMessage = "金額は必須です")][Range(0, int.MaxValue)] int memo_price
     );
@@ -79,9 +79,9 @@ public class HistoryRegistrationService : _BaseService
     /// <summary>
     /// 2. マッピング（Entityへの詰め替え）
     /// </summary>
-    private TMemoHistory MapToEntity(HistoryRegistrationRequest req)
+    private TMemoDetail MapToEntity(HistoryRegistrationRequest req)
     {
-        return new TMemoHistory
+        return new TMemoDetail
         {
             archive_id = req.archive_id,
             latitude = req.latitude,
@@ -90,8 +90,8 @@ public class HistoryRegistrationService : _BaseService
             body = req.body,
             memo_date = req.memo_date,
             memo_time = req.memo_time,
-            face_id = req.face_id,
-            weather_id = req.weather_id,
+            face_emoji = req.face_emoji,
+            weather_emoji = req.weather_emoji,
             link_url = req.link_url,
             memo_price = req.memo_price,
             del_flg = false

@@ -5,7 +5,7 @@ namespace LittleTripMemo.Models;
 
 public class TMemoArchive
 {
-    public int archive_id { get; set; }
+    public int archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
     public string title { get; set; } = string.Empty;
     public string memo { get; set; } = string.Empty;
@@ -15,10 +15,10 @@ public class TMemoArchive
     public DateTime update_tim { get; set; }
 }
 
-public class TMemoHistory
+public class TMemoDetail
 {
     public int seq { get; set; }
-    public int archive_id { get; set; }
+    public int archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
     public decimal latitude { get; set; }
     public decimal longitude { get; set; }
@@ -26,8 +26,8 @@ public class TMemoHistory
     public string body { get; set; } = string.Empty;
     public string memo_date { get; set; } = string.Empty;
     public string memo_time { get; set; } = string.Empty;
-    public int face_id { get; set; }
-    public int weather_id { get; set; }
+    public string face_emoji { get; set; }
+    public string weather_emoji { get; set; }
     public string? link_url { get; set; } = string.Empty;
     public int memo_price { get; set; } = 0;
     public bool del_flg { get; set; } = false;
@@ -41,7 +41,7 @@ public class TMemoHistory
 
 public class TMemoArchivePub
 {
-    public int archive_id { get; set; }
+    public int archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
     public string title { get; set; } = string.Empty;
     public string memo { get; set; } = string.Empty;
@@ -54,7 +54,7 @@ public class TMemoArchivePub
 
 public class TMemoDetailPub
 {
-    public int archive_id { get; set; }
+    public int archive_id { get; set; } = 0;
     public int seq { get; set; }
     public Guid user_id { get; set; }
     public decimal latitude { get; set; }
@@ -63,8 +63,8 @@ public class TMemoDetailPub
     public string? body { get; set; } = string.Empty;
     public string memo_date { get; set; } = string.Empty;
     public string memo_time { get; set; } = string.Empty;
-    public int face_id { get; set; }
-    public int weather_id { get; set; }
+    public string face_emoji { get; set; }
+    public string weather_emoji { get; set; }
     public int count_good { get; set; } = 0;
     public int count_bad { get; set; } = 0;
     public string? link_url { get; set; } = string.Empty;
@@ -77,7 +77,7 @@ public class TMemoDetailPub
 
 public class TReactionPublish
 {
-    public int archive_id { get; set; }
+    public int archive_id { get; set; } = 0;
     public int seq { get; set; }
     public Guid user_id { get; set; }
     public byte good { get; set; } = 0;
@@ -94,7 +94,7 @@ public class TAppFeedback
     public byte rating { get; set; }
     public int send_category_id { get; set; }
     public string body { get; set; } = string.Empty;
-    public int archive_id { get; set; }
+    public int archive_id { get; set; } = 0;
     public int seq { get; set; }
     public Guid sender_user_id { get; set; }
     public bool del_flg { get; set; } = false;

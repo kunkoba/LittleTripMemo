@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using LittleTripMemo.Common;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LittleTripMemo.Models;
@@ -19,6 +20,6 @@ public class MyAppUser : IdentityUser<Guid>
     /// <summary>
     /// ユーザの料金プラン (例: free, standard, premium, admin)
     /// </summary>
-    public string Plan { get; set; } = "free";
+    public string Plan { get; set; } = PlanType.Free.ToString();
 }
 

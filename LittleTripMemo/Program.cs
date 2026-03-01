@@ -107,8 +107,9 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         // JSON プロパティ名を camelCase に統一
-        options.JsonSerializerOptions.PropertyNamingPolicy =
-            JsonNamingPolicy.CamelCase;
+        //options.JsonSerializerOptions.PropertyNamingPolicy =
+        //    JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
     })
     .ConfigureApiBehaviorOptions(options =>
     {
@@ -187,7 +188,9 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:5500",
-                "http://127.0.0.1:5500")
+                "http://127.0.0.1:5500",
+                "http://localhost:5501",
+                "http://127.0.0.1:5501")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });

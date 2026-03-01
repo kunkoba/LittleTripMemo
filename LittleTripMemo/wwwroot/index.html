@@ -1,627 +1,499 @@
-﻿
-<!-- @{
-    // ngrok http https://192.168.11.12:5001
-    var test_ngrok = "https://1a09-119-231-184-89.ngrok-free.app/";
-    test_ngrok = "/";
-} -->
-
 <!DOCTYPE html>
-<html lang="ja">
-
+<html lang="ja" data-theme="blue">
 <head>
-    <!-- <base href="~/" /> -->
-    <base href="@test_ngrok" />
-
-
-
     <meta charset="UTF-8">
-    <title>ルートメモ</title>
-    <!-- ビューポート設定 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"> -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="css/leaflet.css" />
+    <title>りとめも - Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="css/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/bootstrap-icons.css" />
-
-    <!-- フォント -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-
-    <!-- ＱＲコード -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-    <!-- Firebase SDK (compat版) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-
-    <!-- スタイルシート -->
-    <link rel="stylesheet" href="css/appMain.css" />
-
-    <!-- マニフェスト -->
-    <link rel="manifest" href="manifest.json">
-
-    <!-- Stylesセクション -->
-    <!-- @RenderSection("MyStyles", required: false) -->
-
+    <!-- Leaflet関連 -->
+    <script src="js/leaflet/leaflet.js"></script>
+    <script src="js/leaflet/leaflet.geometryutil.js"></script>
+    <script src="js/leaflet/leaflet-arrowheads.js"></script>
+    <link rel="stylesheet" href="css/leaflet.css">
+    <!-- その他 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/app-style.css">
+    <link rel="stylesheet" href="css/component-style.css">
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { brand: { 1: 'var(--brand-lvl1)', 2: 'var(--brand-lvl2)', 3: 'var(--brand-lvl3)', 4: 'var(--brand-lvl4)', 5: 'var(--brand-lvl5)', } } } }
+        }
+    </script>
 </head>
 
-<body class="h-100 d-flex flex-column ">
+<!-- index.html の body タグ -->
+<body class="overflow-hidden bg-brand-1 fixed inset-0 touch-none">
 
+<!-- アプリ全体のルートコンテナ -->
+<div id="app-root" class="mb-10">
 
-    <!-- 各ビュー -->
-<!-- ヘッダー -->
-<header id="mainHeader" class="w-100 text-light d-flex align-items-center justify-content-between z-1000 " style="height: 30px;">
-    <div class="ms-2" id="viewTitle"></div>
-    <div class="me-2 text-warning" id="textInfoMsg"></div>
-</header>
-
-<!-- メインコンテンツ -->
-<div id="mapArea" class="h-100 " >
-    <!-- トースト -->
-    <div class="toast-container w-100 mt-2">
-        <div id="liveToast" class="toast mx-auto bg-black text-white" >
-            <div class="toast-body d-flex justify-content-center text-break " >
-            </div>
-        </div>
+    <!-- （テスト用）ボタン -->
+    <div class="absolute top-40 left-0 z-[1001] h-screen flex items-start pointer-events-none">
+        <button id="btn-test" class="shadow-brand pointer-events-auto bg-white/70 p-2 shadow-md border border-black-2">
+            テスト
+        </button>
     </div>
-    <!-- アイコン群 -->
-    <div class="d-flex flex-column justify-content-between w-100 h-100 border p-2 ">
 
-        <!-- 画面上部 -->
-        <div id="topArea" class=" ">
-            <div class="d-flex flex-column ">
-                <!-- 左右アイコン群 -->
-                <div class="d-flex justify-content-between ">
-                    <!-- 左端アイコン群 -->
-                    <div class="d-flex flex-column">
-                        <div class="optionGroup">
-                            <!-- お知らせ -->
-                            <div id="appNewsBtn" type="button" class="map-group ">
-                                <div class="shadow-1 icon-circle bg-primary-subtle text-dark m-2 ">
-                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-message"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 9h8" /><path d="M8 13h6" /><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z" />
-                                    </svg>
-                                </div>
-                                <!-- NEW マーク -->
-                                <span id="badgeNews" class="position-relative badge bg-danger" style="top: -25px; right: 25px; display: none;">
-                                    NEW
-                                </span>
-                            </div>
-                            <!-- フィードバック -->
-                            <div id="appFeedbackBtn" type="button" class="map-group ">
-                                <div class="shadow-1 icon-circle bg-danger-subtle text-dark m-2 ">
-                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <!-- 地点移動 -->
-                            <div id="pointMoveIcon" type="button" class="map-group d-none">
-                                <div class="shadow-1 icon-circle bg-dark m-2 ">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-crosshair2" viewBox="0 0 16 16">
-                                        <path d="M8 0a.5.5 0 0 1 .5.5v.518A7 7 0 0 1 14.982 7.5h.518a.5.5 0 0 1 0 1h-.518A7 7 0 0 1 8.5 14.982v.518a.5.5 0 0 1-1 0v-.518A7 7 0 0 1 1.018 8.5H.5a.5.5 0 0 1 0-1h.518A7 7 0 0 1 7.5 1.018V.5A.5.5 0 0 1 8 0m-.5 2.02A6 6 0 0 0 2.02 7.5h1.005A5 5 0 0 1 7.5 3.025zm1 1.005A5 5 0 0 1 12.975 7.5h1.005A6 6 0 0 0 8.5 2.02zM12.975 8.5A5 5 0 0 1 8.5 12.975v1.005a6 6 0 0 0 5.48-5.48zM7.5 12.975A5 5 0 0 1 3.025 8.5H2.02a6 6 0 0 0 5.48 5.48zM10 8a2 2 0 1 0-4 0 2 2 0 0 0 4 0"/>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 右端アイコン群 -->
-                    <div class="d-flex flex-column align-items-end">
-                        <!-- ガイド -->
-                        <div id="appGuideBtn" type="button" class="map-group ">
-                            <div class="shadow-1 icon-circle-sm bg-dark-subtle m-2 text-dark">
-                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-question-mark"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 8a3.5 3 0 0 1 3.5 -3h1a3.5 3 0 0 1 3.5 3a3 3 0 0 1 -2 3a3 4 0 0 0 -2 4" /><path d="M12 19l0 .01" />
-                                </svg>
-                            </div>
-                        </div>
-                        <!-- アイコン表示切替え（表示状態） -->
-                        <button id="toggleOption" class="optionGroup d-flex justify-content-center p-0">
-                            <div id=" " class="_shadow-1 _icon-circle _bg-primary-subtle text-dark map-group p-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-toggle-on" viewBox="0 0 16 16">
-                                    <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8"/>
-                                </svg>
-                            </div>
-                        </button>
-                        <!-- アイコン表示切替え2（非表示状態） -->
-                        <button id="toggleOption2" class="optionGroup2 d-flex justify-content-center p-0 d-none">
-                            <div id=" " class="_shadow-1 _icon-circle _bg-primary-subtle text-dark map-group p-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-toggle-off" viewBox="0 0 16 16">
-                                    <path d="M11 4a4 4 0 0 1 0 8H8a5 5 0 0 0 2-4 5 5 0 0 0-2-4zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8M0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5"/>
-                                </svg>
-                            </div>
+    <!-- メインコンテンツ -->
+    <div>
+        <!-- ■　アプリ上部 -->
+        <div id="ui-top-bar" class="absolute top-0 left-0 right-0 z-[1001]">
+            <!-- ■　通知バー -->
+            <div class="h-6 shadow-brand bg-brand-2 flex items-center justify-center px-3">
+                <div id="notice-bar-text" class="text-[12px] font-bold "></div>
+            </div>
+            <!-- ■　アイコンバー -->
+            <div class="mx-2 bg-transparent flex justify-between mt-2">
+                <div class="flex-1 min-w-0">
+                    <!-- まとめタイトル -->
+                    <div class="p-0 mr-2">
+                        <button id="ui-archive-title" class="hidden shadow-brand px-2 bg-brand-1 block text-[16px] font-bold truncate max-w-full">
+                            RitomemoXXXXXXXXXXXXRitomemoXXXXXXXXXXXXRRitomemoXXXXXXXXXXXXR
                         </button>
                     </div>
+                    <!-- 地点検索関連 -->
+                    <div id="ui-sort-group" class="flex flex-col">
+                        <!-- 公開／非公開 -->
+                        <div id="sort-kbn" class="shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-3">
+                            <button data-value="0" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-0 ">
+                                Private
+                            </button>
+                            <button data-value="1" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-3">
+                                Publish
+                            </button>
+                        </div>
+                        <!-- 並び順 -->
+                        <div id="sort-field"  class="shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-3">
+                            <button data-value="1" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-0 ">
+                                New
+                            </button>
+                            <button data-value="2" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-0 ">
+                                Update
+                            </button>
+                            <button data-value="3" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-3 ">
+                                Rating
+                            </button>
+                        </div>
+                        <!-- 昇順／降順 -->
+                        <div id="sort-order" class="hidden shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-2 text-black-3">
+                            <button data-value="1" class="ui-btn h-full px-3 text-[10px] font-bold border bg-brand-0 ">
+                                Asc
+                            </button>
+                            <button data-value="2" class="ui-btn h-full px-3 text-[10px] font-bold border bg-brand-3  border-brand-3">
+                                Desc
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- システムメニュー -->
+                <div>
+                    <button id="btn-sys-menu" class="shadow-brand text-[12px] w-10 h-10 bg-black text-white">
+                        sys
+                    </button>
+                        <!-- ポップアップ -->
+                        <div id="pop-sys-menu" class="hidden shadow-brand absolute top-16 right-0 w-32 bg-brand-0 border border-brand-3 shadow-xl z-[1100]">
+                            <div id="sys-menu-1" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
+                                system menu 1
+                            </div>
+                            <div id="sys-menu-2" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
+                                system menu 2
+                            </div>
+                            <div id="sys-menu-3" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
+                                system menu 3
+                            </div>
+                            <div id="sys-menu-4" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
+                                system menu 4
+                            </div>
+                        </div>
                 </div>
             </div>
         </div>
-
-        <!-- 画面下部 -->
-        <div id="bottomArea" class="mb-2 ">
-            <div class="d-flex justify-content-between align-items-end mb-2 ">
-                <!-- 左端アイコン群 -->
-                <div class="optionGroup_ d-flex flex-column-reverse mb-4">
-                    <!-- 縮小 -->
-                    <div id="zoopDownBtn" type="button" class="map-group ">
-                        <div class="shadow-1 icon-circle bg-info m-2 ">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24"  height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line>
-                            </svg>
-                        </div>
-                    </div>
-                    <!-- 拡大 -->
-                    <div id="zoopUpBtn" type="button" class="map-group ">
-                        <div class="shadow-1 icon-circle bg-info m-2 ">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24"  height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line>
-                            </svg>
-                        </div>
-                    </div>
-                    <!-- ドアップ -->
-                    <div id="zoopMaxBtn" type="button" class="map-group ">
-                        <div class="shadow-1 icon-circle bg-info m-2 ">
-                            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8""  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-zoom-scan"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 8v-2a2 2 0 0 1 2 -2h2" /><path d="M4 16v2a2 2 0 0 0 2 2h2" /><path d="M16 4h2a2 2 0 0 1 2 2v2" /><path d="M16 20h2a2 2 0 0 0 2 -2v-2" /><path d="M8 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M16 16l-2.5 -2.5" />
-                            </svg>
-                        </div>
-                    </div>
-                    <!-- リフレッシュ -->
-                    <div id="refreshBtn" type="button" class="map-group ">
-                        <div class="shadow-1 icon-circle bg-info m-2 ">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24"  height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
-                        </div>
+        <!-- ■　メイン画面：地図＋詳細パネル -->
+        <div class="absolute bottom-0 flex h-screen w-screen overflow-hidden flex-col md:flex-row">
+            <!-- ■　地図エリア -->
+            <div id="ui-map-id" class="w-full h-full z-0"></div>
+            <!-- ■　詳細パネル（右側スライド表示） -->
+            <div id="ui-detail-frame-id" class="translate-y-full flex flex-col bg-brand-1 overflow-hidden shrink-0 h-0 w-full md:h-full md:w-0 border-brand-5 transition-all duration-400">
+                <!-- 詳細パネルのヘッダー -->
+                <div class="shadow-brand bg-brand-2 h-16 ps-6 pe-1 flex justify-between items-center">
+                    <h2 id="detail-title" class="text-xl font-black uppercase">Details</h2>
+                    <div>
+                        <button id="detail-btn-A"     class="mr-1 w-10 h-10 border-2 text-black-3 text-[16px] font-bold">▼</button>
+                        <button id="detail-btn-B"     class="mr-1 w-10 h-10 border-2 text-black-3 text-[16px] font-bold">＞</button>
+                        <button id="detail-btn-close" class="mr-1 w-10 h-10 border-2 text-black-3 text-[16px] font-bold">✕</button>
                     </div>
                 </div>
-                <!-- 中央アイコン -->
-                <div class="text-center w-100">
-                    <div class="d-flex flex-column-reverse">
-                        <!-- 移動グループ -->
-                        <div id="moveGroup" class="d-flex justify-content-center d-none ">
-                            <div id="startBtn" type="button" class="map-group ">
-                                <div class="shadow-1 icon-circle bg-primary m-2 ">
-                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-skip-back"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.496 4.136l-12 7a1 1 0 0 0 0 1.728l12 7a1 1 0 0 0 1.504 -.864v-14a1 1 0 0 0 -1.504 -.864z" /><path d="M4 4a1 1 0 0 1 .993 .883l.007 .117v14a1 1 0 0 1 -1.993 .117l-.007 -.117v-14a1 1 0 0 1 1 -1z" />
-                                    </svg>
-                                </div>
+                <!-- 詳細パネルの内容 -->
+                <div id="ui-detail-content-id" class="bg-brand-0 flex-1 text-xs text-black-3 overflow-y-auto p-3">
+                    <!-- 参照用（表示モード） -->
+                    <div id="detail-display" class="hidden mt-3 space-y-5 text-black-4">
+                        <div class="grid grid-cols-10 gap-x-3 items-center">
+                            <div class="col-span-3">
+                                <label class="block font-bold text-black-3 text-[10px] mb-0.5 uppercase">DATE</label>
+                                <div id="detail-display-memo_date" class="text-[16px] leading-tight min-h-[1.25rem]"></div>
                             </div>
-                            <div id="prevBtn" type="button" class="map-group ">
-                                <div class="shadow-1 icon-circle bg-primary m-2 ">
-                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-track-prev"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20.341 4.247l-8 7a1 1 0 0 0 0 1.506l8 7c.647 .565 1.659 .106 1.659 -.753v-14c0 -.86 -1.012 -1.318 -1.659 -.753z" /><path d="M9.341 4.247l-8 7a1 1 0 0 0 0 1.506l8 7c.647 .565 1.659 .106 1.659 -.753v-14c0 -.86 -1.012 -1.318 -1.659 -.753z" />
-                                    </svg>
-                                </div>
+                            <div class="col-span-2">
+                                <label class="block font-bold text-black-3 text-[10px] mb-0.5 text-center uppercase">TIME</label>
+                                <div id="detail-display-memo_time" class="text-[16px] text-center leading-tight min-h-[1.25rem]"></div>
                             </div>
-                            <div id="nextBtn" type="button" class="map-group ">
-                                <div class="shadow-1 icon-circle bg-primary m-2 ">
-                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-track-next"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M2 5v14c0 .86 1.012 1.318 1.659 .753l8 -7a1 1 0 0 0 0 -1.506l-8 -7c-.647 -.565 -1.659 -.106 -1.659 .753z" /><path d="M13 5v14c0 .86 1.012 1.318 1.659 .753l8 -7a1 1 0 0 0 0 -1.506l-8 -7c-.647 -.565 -1.659 -.106 -1.659 .753z" />
-                                    </svg>
-                                </div>
+                            <div class="col-span-1">
                             </div>
-                            <div id="endBtn" type="button" class="map-group ">
-                                <div class="shadow-1 icon-circle bg-primary m-2 ">
-                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-player-skip-forward"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 5v14a1 1 0 0 0 1.504 .864l12 -7a1 1 0 0 0 0 -1.728l-12 -7a1 1 0 0 0 -1.504 .864z" /><path d="M20 4a1 1 0 0 1 .993 .883l.007 .117v14a1 1 0 0 1 -1.993 .117l-.007 -.117v-14a1 1 0 0 1 1 -1z" />
-                                    </svg>
-                                </div>
+                            <div class="col-span-2 flex flex-col items-center">
+                                <label class="font-bold text-black-3 text-[10px] mb-0.5 uppercase">FACE</label>
+                                <div id="detail-display-face_emoji" class="text-[32px] h-10 flex items-center justify-center"></div>
+                            </div>
+                            <div class="col-span-2 flex flex-col items-center">
+                                <label class="font-bold text-black-3 text-[10px] mb-0.5 uppercase">WEATHER</label>
+                                <div id="detail-display-weather_emoji" class="text-[32px] h-10 flex items-center justify-center leading-none"></div>
                             </div>
                         </div>
-                        <!-- 新規入力 -->
+                        <!-- タイトル -->
                         <div>
-                            <div id="inputBtn" type="button" class="shadow-1 icon-circle-lg bg-primary m-2 map-group d-none">
-                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" />
-                                </svg>
-                            </div>
+                            <label class="block font-bold text-black-3 text-[10px] mb-1 uppercase">TITLE</label>
+                            <div id="detail-display-title" class="w-full p-1 text-[16px] font-bold break-all min-h-[1.5rem]"></div>
                         </div>
-                        <!-- 地点検索 -->
+                        <!-- 本文 -->
                         <div>
-                            <div id="searchPointBtn" type="button" class="shadow-1 icon-circle-lg bg-info m-2 map-group d-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24"  height="24" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                                </svg>
+                            <label class="block font-bold text-black-3 text-[10px] mb-1 uppercase">BODY</label>
+                            <div id="detail-display-body" class="w-full px-1 text-[16px] leading-relaxed whitespace-pre-wrap overflow-y-auto border border-transparent"></div>
+                        </div>
+                        <!-- 金額 -->
+                        <div>
+                            <label class="block font-bold text-black-3 text-[10px] mb-1 uppercase">PRICE (JPY)</label>
+                            <div class="w-full p-1 text-[16px] font-bold flex items-center">
+                                <span id="detail-display-price_symbol" class="mr-1"></span>
+                                <span id="detail-display-memo_price">0</span>
+                            </div>
+                        </div>
+                        <!-- URL -->
+                        <div>
+                            <label class="block font-bold text-black-3 text-[10px] mb-1 uppercase">URL</label>
+                            <div class="w-full p-1 truncate">
+                                <a id="detail-display-link_url" href="" target="_blank" class="text-[12px] text-blue-500 underline break-all"></a>
                             </div>
                         </div>
                     </div>
+                    <!-- 編集用（編集モード） -->
+                    <form id="detail-edit" class="hidden mt-3 space-y-5 text-black-4">
+                        <div class="grid grid-cols-10 gap-x-3 items-center border-b border-brand-3 pb-2">
+                            <!-- 日付 -->
+                            <div class="col-span-4">
+                                <label class="block font-bold text-black-3 text-[10px] mb-0.5">DATE</label>
+                                <input name="memo_date" id="detail-edit-memo_date" type="date"
+                                    class="w-full bg-transparent outline-none text-[16px] px-0 leading-tight">
+                            </div>
+                            <!-- 時刻 -->
+                            <div class="col-span-3">
+                                <label class="block font-bold text-black-3 text-[10px] mb-0.5">TIME</label>
+                                <input name="memo_time" id="detail-edit-memo_time" type="time"
+                                    class="w-full bg-transparent outline-none text-[16px] px-0 leading-tight">
+                            </div>
+                            <!-- 表情 -->
+                            <div class="col-span-1 flex flex-col items-center">
+                                <label class="font-bold text-black-3 text-[10px] mb-0.5">FACE</label>
+                                <button id="btn-face-trigger" type="button" class="h-10 w-10 border border-slate-200 bg-white active:scale-95 flex items-center justify-center">
+                                    <span id="span-face-preview" class="text-[32px] leading-none"></span>
+                                    <input name="face_emoji" id="detail-edit-face_emoji" type="hidden">
+                                </button>
+                            </div>
+                            <!-- 天気 -->
+                            <div class="col-span-2 flex flex-col items-center">
+                                <label class="font-bold text-black-3 text-[10px] mb-0.5">WEATHER</label>
+                                <button id="btn-weather-trigger" type="button" class="h-10 w-10 border border-slate-200 bg-white active:scale-95 flex items-center justify-center">
+                                    <span id="span-weather-preview" class="text-[32px] leading-none"></span>
+                                    <input name="weather_emoji" id="detail-edit-weather_emoji" type="hidden">
+                                </button>
+                            </div>
+                        </div>
+                        <!-- タイトル -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="font-bold text-black-3 text-[10px]">TITLE</label>
+                                <div class="text-[10px] text-black-2"><span id="detail-count-title">0</span>/50</div>
+                            </div>
+                            <input name="title" id="detail-edit-title" type="text" maxlength="50" 
+                                placeholder="タイトルを入力"
+                                class="w-full py-1 bg-transparent border-b border-brand-3 rounded-none focus:border-brand-5 outline-none text-[16px] px-0">
+                        </div>
+                        <!-- 本文 -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="font-bold text-black-3 text-[10px]">BODY</label>
+                                <div class="text-[10px] text-black-2"><span id="detail-count-body">0</span>/500</div>
+                            </div>
+                            <textarea name="body" id="detail-edit-body" maxlength="500" 
+                                placeholder="本文を入力してください"
+                                class="w-full p-2 bg-white border border-brand-3 rounded h-32 focus:border-brand-5 outline-none text-[16px] resize-none"></textarea>
+                        </div>
+                        <!-- 金額 -->
+                        <div>
+                            <label class="block font-bold text-black-3 text-[10px] mb-1">PRICE (JPY)</label>
+                            <div class="grid grid-cols-2 gap-x-3">
+                                <!-- 金額（プラス） -->
+                                <div class="relative flex items-center">
+                                    <span class="absolute left-2 text-blue-500 font-bold text-[16px]">＋</span>
+                                    <input id="detail-edit-price_plus" type="number" placeholder="0"
+                                        class="text-right w-full pr-2 py-1 bg-blue-50/50 border-b border-blue-300 rounded-t focus:bg-blue-50 focus:border-blue-500 outline-none text-[16px] text-blue-700 transition-colors">
+                                </div>
+                                <!-- 金額（マイナス） -->
+                                <div class="relative flex items-center">
+                                    <span class="absolute left-2 text-red-500 font-bold text-[16px]">－</span>
+                                    <input id="detail-edit-price_minus" type="number" placeholder="0"
+                                        class="text-right w-full pr-2 py-1 bg-red-50/50 border-b border-red-300 rounded-t focus:bg-red-50 focus:border-red-500 outline-none text-[16px] text-red-700 transition-colors">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- URL -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="font-bold text-black-3 text-[10px]">URL</label>
+                                <div class="text-[10px] text-black-2"><span id="detail-count-url">0</span>/200</div>
+                            </div>
+                            <input name="link_url" id="detail-edit-link_url" type="url" maxlength="200"
+                                placeholder="https://..."
+                                class="w-full py-1 bg-transparent border-b border-brand-3 rounded-none focus:border-brand-5 outline-none text-[16px] px-0 text-blue-600">
+                        </div>
+                        <!-- 隠しフィールド -->
+                        <div class="hidden">
+                            <input name="archive_id" id="detail-edit-archive_id" type="hidden" value="">
+                            <input name="seq" id="detail-edit-seq" type="hidden" value="">
+                            <input name="latitude" id="detail-edit-latitude" type="hidden" value="">
+                            <input name="longitude" id="detail-edit-longitude" type="hidden" value="">
+                            <input name="memo_price" id="detail-edit-memo_price" type="hidden" value="0">
+                        </div>
+                    </form>
                 </div>
-                <!-- 右端アイコン群 -->
-                <div style="min-width: 56px;">
-                    <div class="optionGroup d-flex flex-column-reverse mb-4">
-                        <!-- 現在地 -->
-                        <div id="recenterBtn" type="button" class="map-group ">
-                            <div class="shadow-1 icon-circle bg-primary m-2 ">
-                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-location"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 3l-6.5 18a.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a.55 .55 0 0 1 0 -1l18 -6.5" />
-                                </svg>
-                            </div>
-                        </div>
-                        <!-- ユーザ画面 -->
-                        <div id="userInfoBtn" type="button" class="map-group ">
-                            <div class="shadow-1 icon-circle bg-primary m-2 ">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24"  height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                            </div>
-                        </div>
-                        <!-- データリスト -->
-                        <div id="dataListBtn" type="button" class="map-group ">
-                            <div class="shadow-1 icon-circle bg-primary m-2 ">
-                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-baseline-density-small"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 3h16" /><path d="M4 9h16" /><path d="M4 15h16" /><path d="M4 21h16" />
-                                </svg>
-                            </div>
-                        </div>
-                        <!-- アクション -->
-                        <div id="actionListBtn" type="button" class="map-group ">
-                            <div class="shadow-1 icon-circle bg-primary m-2 ">
-                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-dots-vertical"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-                                </svg>
-                            </div>
-                        </div>
+                <!-- 詳細パネルのフッター -->
+                <div class="shadow-brand ">
+                    <!-- （いいねボタン） -->
+                    <div id="detail-group-reaction" class="shrink-0 flex h-10 bg-brand-2">
+                        <button id="detail-btn-amazing" class="flex-1 text-black text-[16px]">Amazing</button>
+                        <button id="detail-btn-helpful" class="flex-1 text-black text-[16px]">Helpful</button>
+                        <button id="detail-btn-funny"   class="flex-1 text-black text-[16px]">Funny</button>
+                        <button id="detail-btn-try"     class="flex-1 text-black text-[16px]">Wanna Try</button>
+                    </div>
+                    <!-- （マーカー移動） -->
+                    <div id="detail-group-move" class="shrink-0 flex h-10 bg-brand-3">
+                        <button id="detail-btn-first" class="flex-1 text-black text-[16px]">◀◀</button>
+                        <button id="detail-btn-prev"  class="flex-1 text-black text-[16px]">◀</button>
+                        <button id="detail-btn-next"  class="flex-1 text-black text-[16px]">▶</button>
+                        <button id="detail-btn-last"  class="flex-1 text-black text-[16px]">▶▶</button>
+                    </div>
+                    <!-- （キャンセル・保存） -->
+                    <div class="shrink-0 flex h-16">
+                        <button id="detail-btn-cancel" class="flex-1 bg-brand-close text-white font-bold text-[16px]">CANCEL</button>
+                        <button id="detail-btn-save" class="flex-1 bg-brand-4 text-white font-bold text-[16px]">SAVE DATA</button>
                     </div>
                 </div>
+                <div class="h-4 bg-brand-0"></div>
             </div>
-            <!-- タイトル -->
-            <div class="d-flex">
-                <div id="archiveTitleBtn" class="map-group btn btn-dark opacity-50 shadow d-flex justify-content-start mx-auto d-none " style="width: 500px; max-width: 90vw;">
-                    <span id="archiveTitleIcon" class="mx-1">
-                    </span>
-                    <span id="archiveTitleLabel" class="ms-1 text-truncate text-start ">
-                    </span>
+        </div>
+        <!-- ■　アプリ下部 -->
+        <div class="absolute bottom-4 left-0 right-0 z-[1001]">
+            <!-- ■　アイコンバー -->
+            <div id="ui-bottom-bar" class="mx-2 bg-transparent flex items-end justify-between mb-3">
+                <!-- 左 -->
+                <div>
+                    <div class="w-10"></div>
                 </div>
-            </div>
-            <!-- 並び替えボタン群 -->
-            <div class="d-flex ">
-                <!-- 地点検索用 並び替え選択ボタン -->
-                <div id="sortGroup" class="map-group d-flex d-none mx-auto ">
-                    <!-- 公開、非公開 -->
-                    <div id="GroupPublish" class="btn-group me-2 _row g-0 ">
-                        <button id="btnPrivate" type="button" class="col btn btn-outline-success text-sm3 px-2 " data-value="0">
-                            <!-- <svg  xmlns="http://www.w3.org/2000/svg"  width="30"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye-off"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" /><path d="M3 3l18 18" />
-                            </svg> -->
-                            非公開
-                        </button>
-                        <button id="btnPublish" type="button" class="col btn btn-outline-success text-sm3 px-3 active " data-value="1">
-                            <!-- <svg  xmlns="http://www.w3.org/2000/svg"  width="30"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.8"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
-                            </svg> -->
-                            公開
-                        </button>
+                <!-- 中央 -->
+                <div>
+                    <!-- 新規登録ボタン -->
+                    <button id="btn-create" class="shadow-brand w-16 h-16 bg-brand-5 text-white font-black text-[12px]">
+                        create
+                    </button>
+                    <!-- まとめ親 -->
+                    <div id="bot-group-move" class="space-x-2">
+                        <button id="btn-bot-move-prev" class="shadow-brand h-10 w-10 bg-brand-3 text-[12px]">◀</button>
+                        <button id="btn-bot-move-open" class="shadow-brand h-10 w-10 bg-brand-3 text-[12px]">●</button>
+                        <button id="btn-bot-move-next" class="shadow-brand h-10 w-10 bg-brand-3 text-[12px]">▶</button>
                     </div>
-                    <!-- 並び順 -->
-                    <div id="GroupSortId" class="btn-group me-2 ">
-                        <button type="button" class="btn btn-outline-primary text-sm3 px-2 " id="btnSortId-1" data-value="1">日付順</button>
-                        <button type="button" class="btn btn-outline-primary text-sm3 px-2 " id="btnSortId-3" data-value="3">評価順</button>
-                        <button type="button" class="btn btn-outline-primary text-sm3 px-2 active " id="btnSortId-2" data-value="2">更新順</button>
-                    </div>
-                    <!-- 並び順 -->
-                    <div id="GroupOrderBy" class="btn-group me-2 ">
-                        <button type="button" class="btn btn-outline-info text-sm3 px-2 " id="btnOrderAsc" data-value="1">
-                            昇順
-                        </button>
-                        <button type="button" class="btn btn-outline-info text-sm3 px-2 active " id="btnOrderDesc" data-value="2">
-                            降順
-                        </button>
-                    </div>
+                    <!-- 地点検索ボタン -->
+                    <button id="btn-search" class="hidden shadow-brand w-16 h-16 bg-brand-5 text-white font-black text-[12px]">
+                        Search
+                    </button>
+                </div>
+                <!-- 右 -->
+                <div>
+                    <!-- アプリメニュー -->
+                    <button id="btn-app-menu" class="shadow-brand bg-brand-1 text-brand-5 w-10 h-10 border-2 border-brand-4 text-[12px] font-bold">
+                        app
+                    </button>
+                        <!-- ポップアップ -->
+                        <div id="pop-app-menu" class="hidden shadow-brand absolute bottom-12 right-0 w-32 bg-brand-0 border border-brand-3 shadow-xl z-[1100]">
+                            <div id="app-menu-1" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
+                                system menu 1
+                            </div>
+                            <div id="app-menu-2" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
+                                system menu 2
+                            </div>
+                            <div id="app-menu-3" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
+                                system menu 3
+                            </div>
+                            <div id="app-menu-4" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
+                                system menu 4
+                            </div>
+                        </div>
                 </div>
             </div>
         </div>
-
     </div>
-</div>
 
-<!-- ローディングモーダル -->
-<div class="modal" id="loadingModal" >
-    <div class="modal-dialog modal-dialog-centered z-1100">
-        <div class="modal-content bg-transparent border-0">
-            <div class="d-flex justify-content-center">
-                <img src="loading.gif" class="loading-img" alt="Loading..." style="width: 50px; height: 50px;">
-            </div>
+    <!-- その他 -->
+    <div>
+        <!-- ■　ダイアログ -->
+        <div id="ui-dialog-root">
+            <!-- ダイアログ生成物 -->
         </div>
+        <!-- ■　テンプレート -->
+        <div id="ui-template-root">
+            <!-- テンプレート生成物 -->
+        </div>
+        <!-- ■　共通バックドロップ -->
+        <div id="ui-dialog-backdrop" class="z-[1999] fixed inset-0 hidden backdrop-blur-[4px] "></div>
+
+        <!-- ■　Toast を積み上げるコンテナ -->
+        <div id="toast-container" class="fixed bottom-20 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-[9999]"></div>
+
+        <!-- 【マップ】ポップアップ -->
+        <template id="tpl-marker-popup">
+            <div class="w-[150px] p-1 grid grid-cols-10">
+                <!-- index（上段2） -->
+                <div class="col-span-10 flex items-center text-[12px] font-bold justify-center_">
+                    <span class="index"></span>
+                </div>
+                <!-- 日時（上段8） -->
+                <div class="col-span-10 flex items-center text-[12px] font-bold justify-center_">
+                    <span class="time"></span>
+                </div>
+                <!-- タイトル（下段8） -->
+                <div class="col-span-10 p-1 flex items-center text-[10px] font-bold">
+                    <span class="title"></span>
+                </div>
+            </div>
+        </template>
+        <!-- ローディング用 -->
+        <template id="tpl-loading">
+            <div class="
+                fixed inset-0 bg-black/40 flex items-center justify-center
+                opacity-0 pointer-events-none transition-all duration-300
+                z-[9998]
+            ">
+                <div class="text-3xl font-bold text-white inline-block wait-dots">
+                    Wait
+                </div>
+            </div>
+        </template>
+
     </div>
+
 </div>
 
-<!-- フッター -->
-<footer>
-</footer>
+<!-- テスト用データ -->
+<script type="module" src="./js/test-data.js"></script>
+<!-- アプリモジュール -->
+<script type="module" src="./js/app-const.js"></script>
+<script type="module" src="./js/common.js"></script>
+<script type="module" src="./js/app-data.js"></script>
 
-<!-- 画面モード（主にデバッグ用） -->
-<div id="appMode" class="top-0 position-absolute z-1000 opacity-50 bg-info mt-5">
-</div>
+<!-- UI部品 -->
+<script type="module">
+    // UI管理
+    import UI from "./js/component/ui-manager.js";
+    window.$UI = UI;
+    // 上部バー
+    import TopBar from "./js/component/top-bar-controller.js";
+    window.$TopBar = TopBar;
+    // 下部バー
+    import BotBar from "./js/component/bottom-bar-controller.js";
+    window.$BotBar = BotBar;
+    // 詳細画面（フレーム）
+    import DetailFrame from "./js/component/detail-frame-controller.js";
+    window.$DetailFrame = DetailFrame;
+    // 詳細画面（項目群）
+    import DetailContent from "./js/component/detail-content-controller.js";
+    window.$DetailContent = DetailContent;
+    // 地図
+    import Map from "./js/component/map-controller.js";
+    window.$Map = Map;
+    // 地図
+    import Marker from "./js/component/marker-controller.js";
+    window.$Marker = Marker;
+</script>
+<!-- アプリ基幹部品 -->
+<script type="module">
+    // ローカル㏈（indexedDB）
+    import db from "./js/local-db-controller.js";
+    window.$Db = db;
+    // 通知管理
+    import Notice from "./js/notice-manager.js";
+    window.$Notice = Notice;
+    // ダイアログ管理
+    import Dialog from "./js/dialog-manager.js";
+    window.$Dialog = Dialog;
+    // ローカル㏈（indexedDB）
+    import polling from "./js/polling-manager.js";
+    window.$Polling = polling;
+    // アプリ管理
+    import app from "./js/app-manager.js";
+    window.$App = app;
+    // setTimeout(() => $Notice.Info("保存しました"), 3000);
+</script>
+<!-- アプリ起動前処理 -->
+<script>
+    // テンプレートファイルの読み込み
+    (async () => {
+        const res = await fetch("./component/template.html");
+        const html = await res.text();
+        // 読み込んだ HTML を DOM に追加
+        const div = document.createElement("div");
+        div.innerHTML = html;
+        document.body.appendChild(div);
+    })();
+</script>
 
+<!-- （テスト用） -->
+<script>
+    // テストボタン
+    document.getElementById("btn-test").onclick = () => {
+        // const items = $Data.GetAllDetails();
+        // $Dialog.Test_SelectList({ items, title: "テスト表示" });
+        $Dialog.Test_ModeSelect();
+        // $Dialog.ShowThemeConfig();
+        // $Dialog.ShowMapStyleConfig();
+        // $Dialog.ShowDetailsTimeLine();
+        // $Dialog.ShowMultiSelectTimeline({
+        //     onOk: (seqList) => {
+        //         console.log("SQL用SEQリスト:", seqList); // 例: [10, 9, 5]
+        //         // ここからサーバへ一括保存処理などを呼ぶ
+        //     }
+        // });
+    };
+    // （テスト用）ローカル㏈保存
+    async function debugLocalDbTest() {
+        // // ローカル㏈の初期化
+        // await $Db.Init();
+        // 2. テスト用データ（dbidは持たせない）
+        const newData = {
+            title: "テスト投稿",
+            content: "これは自動採番のテストですテストです。",
+            seq: 0,
+            // dbid: 0,
+        };
+        console.log(newData);
+        // 3. 保存実行
+        const success = await $Db.Detail.Save(newData);
+        const details = await $Db.Detail.GetAll();
+        console.log(newData);
+        console.log(details);
+        // const success2 = await $Db.Detail.DeleteAll();
+        // const details2 = await $Db.Detail.GetAll();
+        // console.log(details2);
+    }
 
-<!-- Leaflet本体を先に読み込む -->
-<!-- <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script> -->
-<script src="js/leaflet.js"></script>
-<!-- Leaflet arrowheadプラグイン -->
-<script src="js/leaflet-arrowheads.js"></script>
-<script src="js/leaflet.geometryutil.js"></script>
-
-    <!-- jquery -->
-    <!-- <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script> -->
-    <script src="js/jquery-3.7.1.slim.min.js"></script>
-    <!-- Bootstrap JS (必要に応じて) -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script> -->
-    <script src="js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        var serviceWorker_on = 0;
-        // ■Service Worker登録
-        if (serviceWorker_on == 1) {
-            if ('serviceWorker' in navigator) {     // ブラウザがService Workerをサポートしているか
-                console.log('serviceWorker >> start');
-                const test = '@test_ngrok';
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register(test + '/service-worker.js')
-                    .then(registration => {
-                        console.log('スコープに登録されたサービスワーカー：', registration.scope);
-                        // displayToast('サービスワーカー成功！<br>' + registration.scope);
-                    })
-                    .catch(error => {
-                        console.error('サービスワーカーの登録に失敗しました：', error);
-                        errorProc("サービスワーカー失敗！", error);
-                    });
-                });
-                console.log('serviceWorker >> end');
-            }
-        }
-
-    </script>
-
-    <!-- カスタムスクリプト -->
-    <script src="js/myApp/app-context.js" asp-append-version="true"></script>
-    <script src="js/myApp/app-common.js" asp-append-version="true"></script>
-    <script src="js/myApp/app-map.js" asp-append-version="true"></script>
-    <script src="js/myApp/app-data.js" asp-append-version="true"></script>
-    <script src="js/myApp/app-indexedDB.js" asp-append-version="true"></script>
-    <script src="js/myApp/app-useLocalDB.js" asp-append-version="true"></script>
-    <script src="js/myApp/app-dialog.js" asp-append-version="true"></script>
-    <script src="js/myApp/app-form.js" asp-append-version="true"></script>
-
-
-<!--Scriptsセクション -->
-    <!-- 独自スクリプト -->
-    <script>
-        // 初期表示
-        $(document).ready(function () {
-            // 長押しによる右クリックメニューを防ぐ
-            mapArea.addEventListener("contextmenu", function(event) {
-                event.preventDefault();
-            });
-
-            // ■■■■■　テスト用　■■■■■
-            if (AppContext.dubug_mode) DebugProc();
-            // 画面サイズ調整
-            updateSize();
-            window.addEventListener('resize', updateSize);
-            console.log("◆◆ Main >> start");
-            // トーストクリックで閉じるイベント
-            $('#liveToast').on('click', function() {
-                $(this).removeClass('show'); // 非表示にする
-            });
-            // ユーザ情報取得
-            UserContext.userName = @Html.Raw(Json.Serialize(Model?.UserInfo?.NickName ?? ""));
-            // 匿名判定
-            AppStatus.isAnonymous = UserContext.userName == "";
-            AppStatus.archive = @Html.Raw(Json.Serialize(Model.ResArchive));
-            AppStatus.archiveId = AppStatus.archive.archiveId;
-            if (AppStatus.archiveId > 0) {
-                AppStatus.memos = @Html.Raw(Json.Serialize(Model.ResMemos));
-                AppStatus.isPublish = true;
-                console.log("AppStatus", AppStatus);
-            }
-            // 【画面表示】初回読み込み時
-            initLoad();
-            console.log("◆◆ Main >> end");
-        });
-
-        // ダブルクリック無効化
-        document.addEventListener("dblclick", function(event) {
-            event.preventDefault();
-        });
-
-        // オンライン復帰時（ページ）
-        window.addEventListener("online", (event) => {
-            OnlineProc();
-        });
-
-        // オフライン時（ページ）
-        window.addEventListener("offline", (event) => {
-            OfflineProc();
-        });
-        // 点滅メッセージ（ページ）
-        (function blinkText() {
-            const textElement = document.getElementById("textInfoMsg");
-            let isVisible = true;
-            setInterval(() => {
-                if (isVisible) {
-                    textElement.style.visibility = "hidden"; // 非表示
-                } else {
-                    textElement.style.visibility = "visible"; // 表示
-                }
-                isVisible = !isVisible;
-            }, 1500); // 1秒表示 + 0.5秒非表示 = 1.5秒周期
-        })();
-
-        // オンライン復帰処理（ページ）
-        setInterval(async () => {
-            if (AppStatus.isOnLine) { // オンラインかを判定
-                // サーバ更新処理
-                await UploadRouteMemo();
-            }
-        }, AppContext.interval_upload_routeMemo * 1000 * 60);
-
-        // リアクション更新処理（ページ）
-        setInterval(async () => {
-            if (AppStatus.isOnLine) { // オンラインかを判定
-                // サーバ更新処理
-                await UploadReAction();
-            }
-        }, AppContext.interval_upload_reAction * 1000 * 60);
-
-
-        // アイコン群　表示切替え
-        $("#toggleOption").on("click", function(event) {
-            // console.log("#toggleOption");
-            event.stopPropagation(); // イベントが親要素に伝播しないようにする
-            $(".optionGroup").toggleClass("d-none");
-            $(".optionGroup2").toggleClass("d-none");
-        });
-        // アイコン群　表示切替え
-        $("#toggleOption2").on("click", function(event) {
-            // console.log("#toggleOption2");
-            event.stopPropagation(); // イベントが親要素に伝播しないようにする
-            $(".optionGroup").toggleClass("d-none");
-            $(".optionGroup2").toggleClass("d-none");
-        });
-
-
-
-
-
-
-        // 現在位置ボタン（ページ）
-        $('#recenterBtn').on('click', function () {
-            getLocation();
-            drawMainArrow();
-        });
-        // 画面更新ボタン（ページ）
-        $('#refreshBtn').on('click', function () {
-            event.stopPropagation(); // 親要素のイベントを止める！
-            RefreshScreen();
-        });
-        // データリストアイコン（ページ）
-        $('#dataListBtn').on('click', function () {
-            // リスト表示
-            if (AppStatus.screenId == DEF_SCREEN_SEARCH) openDialogPointList(_PointList);
-            else openDialogTimeLine(_PointList);
-        });
-        // アクションリスト（ページ）
-        $('#actionListBtn').on('click', function () {
-            // ダイアログを表示
-            openDialogActionList();
-        });
-        // ユーザ情報リスト（ページ）
-        $('#userInfoBtn').on('click', function () {
-            // ダイアログを表示
-            openDialogUserInfoList();
-        });
-
-        // 縮小ボタン
-        $('#zoopDownBtn').on('click', function () {
-            zoomDownMap();
-        });
-        // 拡大ボタン
-        $('#zoopUpBtn').on('click', function () {
-            zoomUpMap();
-        });
-        // ドアップボタン
-        $('#zoopMaxBtn').on('click', async function () {
-            setZoom(18);
-        });
-        // ガイド（使い方）ボタン
-        $('#appGuideBtn').on('click', function () {
-            openDialogAppGuide(AppStatus.screenId);
-        });
-
-        // ニュース（お知らせ）ボタン
-        $('#appNewsBtn').on('click', function () {
-            openDialogAppNews();
-        });
-        // フィードバックボタン
-        $('#appFeedbackBtn').on('click', function () {
-            openDialogFeedback();
-        });
-
-        // 地点移動アイコン　非表示切り替え
-        $('#pointMoveIcon').click(function() {
-            openPointMoveForm();
-        });
-        // まとめ情報開く
-        $("#archiveTitleBtn").click(function() {
-            const isOwnData = AppStatus.archive.isOwnData;
-            // 画面を開く
-            openDialogArchiveShow();
-        });
-
-        // 新規入力ボタン
-        $('#inputBtn').on('click', async function (event) {
-            event.stopPropagation(); // イベントが親要素に伝播しないようにする
-            // フォームを開く
-            openInputForm(true);
-        });
-
-        // マーカーポイント移動（前へ）
-        $("#prevBtn").click(function() {
-            event.stopPropagation(); // イベントが親要素に伝播しないようにする
-            // インデックスを加算（過去へ戻る）
-            moveMarkerPrev();
-        });
-        // マーカーポイント移動（次へ）
-        $("#nextBtn").click(function() {
-            event.stopPropagation(); // イベントが親要素に伝播しないようにする
-            // インデックスを減算（未来へ進む）
-            moveMarkerNext();
-        });
-        // マーカーポイント移動（先頭へ）
-        $("#startBtn").click(function() {
-            event.stopPropagation(); // イベントが親要素に伝播しないようにする
-            // インデックスを減算（未来へ進む）
-            moveMarkerStart();
-        });
-        // マーカーポイント移動（末尾へ）
-        $("#endBtn").click(function() {
-            event.stopPropagation(); // イベントが親要素に伝播しないようにする
-            // インデックスを減算（未来へ進む）
-            moveMarkerEnd();
-        });
-
-
-        // 地点検索（検索）
-        $('#searchPointBtn').on('click', function () {
-            // オフラインチェック
-            if (!OfflineCheck()) return false;
-            // 
-            const isPublish = $('#GroupPublish .btn.active').data('value');
-            AppStatus.isPublish = isPublish == 1 ? true: false;
-            const sortId = $('#GroupSortId .btn.active').data('value');
-            const orderBy = $('#GroupOrderBy .btn.active').data('value');
-            // 地点検索
-            searchByPointData(sortId, orderBy);
-        });
-        // 公開非公開ボタン（検索）
-        $('#GroupPublish .btn').on('click', function() {
-            let $this = $(this);
-            $('#GroupPublish .btn').removeClass('active');
-            $this.addClass('active');
-            // クリックされたボタンの data-value を取得
-            let value = $this.data('value');
-            // 公開 (1) の場合は非表示、非公開 (0) の場合は表示
-            if (value === 1) {
-                toggleElementDisabled('#btnSortId-3', true);
-            } else {
-                toggleElementDisabled('#btnSortId-3', false);
-
-                // 非公開選択時、かつ評価順選択時
-                if ($('#btnSortId-3').hasClass('active')) {
-                    $('#GroupSortId .btn').removeClass('active'); // すべてのアクティブを解除
-                    $('#btnSortId-1').addClass('active'); // 日付順をアクティブにする
-                }
-            }
-        });
-        // ソート区分ボタン（検索）
-        $('#GroupSortId .btn').on('click', function() {
-            let $this = $(this);
-            $('#GroupSortId .btn').removeClass('active');
-            $this.addClass('active');
-        });
-        // オーダーボタン（検索）
-        $('#GroupOrderBy .btn').on('click', function() {
-            let $this = $(this);
-            $('#GroupOrderBy .btn').removeClass('active');
-            $this.addClass('active');
-        });
-
-    </script>
+</script>
 
 </body>
 
 </html>
-
-
