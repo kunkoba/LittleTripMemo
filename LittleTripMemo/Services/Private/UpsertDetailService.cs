@@ -1,23 +1,24 @@
-﻿using LittleTripMemo.Exceptions;
+﻿using LittleTripMemo.Common;
+using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
-using LittleTripMemo.Common;
-using System.ComponentModel.DataAnnotations;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Repository.Private;
+using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services;
 
 /// <summary>
-/// 明細登録（Historyの新規作成）ユースケース。
-/// 全項目必須。リクエストからエンティティへマッピングしてリポジトリへ渡す。
+/// 明細の登録・更新ユースケース。
+/// seq=0 で INSERT、seq>0 で UPDATE。
 /// </summary>
-public class HistoryRegistrationService : _BaseService
+public class UpsertDetailService : _BaseService
 {
     private readonly ITransactionProvider _provider;
-    private readonly DetailRepository _historyRepo;
+    private readonly DetailRepository _detailRepo;
 
     // --- 専用DTO：全項目必須のアノテーション ---
-    public record HistoryRegistrationRequest(
+    public record Request(
+        [Required(ErrorMessage = "seqは必須です")][Range(0, int.MaxValue)] int seq,
         [Required(ErrorMessage = "旅の記録IDは必須です")] int archive_id,
         [Required(ErrorMessage = "緯度は必須です")] decimal latitude,
         [Required(ErrorMessage = "経度は必須です")] decimal longitude,
@@ -33,17 +34,20 @@ public class HistoryRegistrationService : _BaseService
 
     public record Response(int seq);
 
-    public HistoryRegistrationService(UserContext userContext, ITransactionProvider provider, DetailRepository repository)
+    public UpsertDetailService(
+        UserContext userContext,
+        ITransactionProvider provider,
+        DetailRepository detailRepo)
         : base(userContext)
     {
         _provider = provider;
-        _historyRepo = repository;
+        _detailRepo = detailRepo;
     }
 
     /// <summary>
     /// 実行（1.検証 → 2.マッピング → 3.実行 の順に整理）
     /// </summary>
-    public async Task<Response> ExecuteAsync(HistoryRegistrationRequest req)
+    public async Task<Response> ExecuteAsync(Request req)
     {
         // 1. 検証
         await ValidateAsync(req);
@@ -55,10 +59,22 @@ public class HistoryRegistrationService : _BaseService
         using var tran = _provider.BeginTransaction();
         try
         {
-            var newSeq = await _historyRepo.InsertAsync(entity);
+            int seq;
+
+            if (req.seq == 0)
+            {
+                // 新規登録：採番されたseqを返す
+                seq = await _detailRepo.InsertAsync(entity);
+            }
+            else
+            {
+                // 更新：リクエストのseqをそのまま返す
+                await _detailRepo.UpdateByKeyAsync(entity);
+                seq = req.seq;
+            }
 
             tran.Commit();
-            return new Response(newSeq);
+            return new Response(seq);
         }
         catch
         {
@@ -69,21 +85,21 @@ public class HistoryRegistrationService : _BaseService
     /// <summary>
     /// 1. 検証（業務チェック用）
     /// </summary>
-    private async Task ValidateAsync(HistoryRegistrationRequest req)
+    private async Task ValidateAsync(Request req)
     {
-        // ユーザIDのチェック（基本）
-        BusinessException.ThrowIf(_user.TableId == 0, "テーブルIDが無効です（ログイン異常？）");
-
+        BusinessException.ThrowIf(_user.TableId == 0, "テーブルIDが無効です");
+        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
         await Task.CompletedTask;
     }
 
     /// <summary>
     /// 2. マッピング（Entityへの詰め替え）
     /// </summary>
-    private TMemoDetail MapToEntity(HistoryRegistrationRequest req)
+    private TMemoDetail MapToEntity(Request req)
     {
         return new TMemoDetail
         {
+            seq = req.seq,
             archive_id = req.archive_id,
             latitude = req.latitude,
             longitude = req.longitude,
@@ -99,4 +115,3 @@ public class HistoryRegistrationService : _BaseService
         };
     }
 }
-

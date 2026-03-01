@@ -1,8 +1,9 @@
-﻿using LittleTripMemo.DataAccess;
-using LittleTripMemo.Exceptions;
+﻿using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Common;
 using System.ComponentModel.DataAnnotations;
+using LittleTripMemo.Repository;
+using LittleTripMemo.Repository.Private;
 
 namespace LittleTripMemo.Services;
 

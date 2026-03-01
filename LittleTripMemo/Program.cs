@@ -6,6 +6,9 @@ using LittleTripMemo.DbContext;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
+using LittleTripMemo.Repository;
+using LittleTripMemo.Repository.Account;
+using LittleTripMemo.Repository.Private;
 using LittleTripMemo.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -87,15 +90,16 @@ builder.Services.AddScoped<JwtService>();
 // Service からのみ使用され、Controller からは直接触らせない
 builder.Services.AddScoped<AccountRepository>();
 builder.Services.AddScoped<ArchiveRepository>();
-builder.Services.AddScoped<HistoryRepository>();
+builder.Services.AddScoped<DetailRepository>();
 
 
 // ---- Service（業務ロジック層） ----
 
 // Controller は必ず Service 経由で処理を行う
 builder.Services.AddScoped<AccountService>();
-builder.Services.AddScoped<ArchiveUpdateService>();
-builder.Services.AddScoped<HistoryRegistrationService>();
+//builder.Services.AddScoped<ArchiveUpdateService>();
+//builder.Services.AddScoped<HistoryRegistrationService>();
+builder.Services.AddScoped<UpsertDetailService>();
 
 
 // ======================================================================

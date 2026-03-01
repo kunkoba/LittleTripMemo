@@ -1,4 +1,5 @@
-﻿using Npgsql; // PostgreSQLの場合
+﻿using LittleTripMemo.Repository;
+using Npgsql; // PostgreSQLの場合
 using System.Data;
 
 namespace LittleTripMemo.DataAccess;

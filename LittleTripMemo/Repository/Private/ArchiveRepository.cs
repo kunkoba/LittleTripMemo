@@ -1,7 +1,8 @@
 ﻿using LittleTripMemo.Models;
 using LittleTripMemo.Common;
+using LittleTripMemo.Repository;
 
-namespace LittleTripMemo.DataAccess;
+namespace LittleTripMemo.Repository.Private;
 
 /// <summary>
 /// 旅の記録（親）のリポジトリ。

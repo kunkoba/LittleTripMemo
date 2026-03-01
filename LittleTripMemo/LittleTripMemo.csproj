@@ -8,9 +8,29 @@
 
   <ItemGroup>
     <Compile Remove="ViewModels\**" />
+    <Compile Remove="wwwroot - コピー %282%29\**" />
+    <Compile Remove="wwwroot - コピー %283%29\**" />
+    <Compile Remove="wwwroot - コピー %284%29\**" />
+    <Compile Remove="wwwroot - コピー %285%29\**" />
+    <Compile Remove="wwwroot - コピー\**" />
     <Content Remove="ViewModels\**" />
+    <Content Remove="wwwroot - コピー %282%29\**" />
+    <Content Remove="wwwroot - コピー %283%29\**" />
+    <Content Remove="wwwroot - コピー %284%29\**" />
+    <Content Remove="wwwroot - コピー %285%29\**" />
+    <Content Remove="wwwroot - コピー\**" />
     <EmbeddedResource Remove="ViewModels\**" />
+    <EmbeddedResource Remove="wwwroot - コピー %282%29\**" />
+    <EmbeddedResource Remove="wwwroot - コピー %283%29\**" />
+    <EmbeddedResource Remove="wwwroot - コピー %284%29\**" />
+    <EmbeddedResource Remove="wwwroot - コピー %285%29\**" />
+    <EmbeddedResource Remove="wwwroot - コピー\**" />
     <None Remove="ViewModels\**" />
+    <None Remove="wwwroot - コピー %282%29\**" />
+    <None Remove="wwwroot - コピー %283%29\**" />
+    <None Remove="wwwroot - コピー %284%29\**" />
+    <None Remove="wwwroot - コピー %285%29\**" />
+    <None Remove="wwwroot - コピー\**" />
   </ItemGroup>
 
   <ItemGroup>

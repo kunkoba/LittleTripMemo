@@ -1,9 +1,9 @@
 ﻿// Services/AccountService.cs
 
 using LittleTripMemo.Configs;
-using LittleTripMemo.DataAccess;
 using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
+using LittleTripMemo.Repository.Account;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 

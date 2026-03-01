@@ -1,41 +1,36 @@
 ﻿using LittleTripMemo.Services;
 using LittleTripMemo.Common;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LittleTripMemo.Controllers;
 
 /// <summary>
-/// 旅の明細（履歴）に関する操作を提供するAPIコントローラー。
+/// アプリケーション全体のリクエストを受け付けるAPIコントローラー。
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
-[CustomAuthorize]  // [Authorize] の代わり
+[CustomAuthorize]
 public class AppController : _BaseController
 {
-    private readonly HistoryRegistrationService _insertService;
+    private readonly UpsertDetailService _upsertDetailService;
 
     public AppController(
         UserContext userContext,
-        IHttpContextAccessor httpContextAccessor,  // ← 追加
-        HistoryRegistrationService insertService)
-        : base(userContext, httpContextAccessor)  // ← 追加
+        IHttpContextAccessor httpContextAccessor,
+        UpsertDetailService upsertDetailService)
+        : base(userContext, httpContextAccessor)
     {
-        _insertService = insertService;
+        _upsertDetailService = upsertDetailService;
     }
 
     /// <summary>
-    /// 明細を新規登録します。
-    /// 全項目必須のバリデーションは、サービス内の Request record の定義に基づき自動実行されます。
+    /// 明細の登録・更新。
+    /// seq=0 で INSERT、seq>0 で UPDATE。
+    /// バリデーションはサービス内の Request record の定義に基づき自動実行されます。
     /// </summary>
-    [HttpPost("insert")]
-    public async Task<IActionResult> Insert([FromBody] HistoryRegistrationService.HistoryRegistrationRequest req)
+    [HttpPost("api/UpsertDetail")]
+    public async Task<IActionResult> UpsertDetail([FromBody] UpsertDetailService.Request req)
     {
-        // サービス実行（バリデーション、マッピング、トランザクション、DB登録を一括処理）
-        var result = await _insertService.ExecuteAsync(req);
-
-        // 成功時は採番された SEQ を含むレスポンスを返却
+        var result = await _upsertDetailService.ExecuteAsync(req);
         return Ok(result);
     }
 }
-

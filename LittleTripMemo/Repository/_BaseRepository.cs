@@ -3,7 +3,7 @@ using Dapper;
 using LittleTripMemo.Common;
 using System.Data;
 
-namespace LittleTripMemo.DataAccess;
+namespace LittleTripMemo.Repository;
 
 /// <summary>
 /// 全リポジトリの共通基底クラス。
