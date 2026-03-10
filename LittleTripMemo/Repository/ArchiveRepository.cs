@@ -1,8 +1,7 @@
 ﻿using LittleTripMemo.Models;
 using LittleTripMemo.Common;
-using LittleTripMemo.Repository;
 
-namespace LittleTripMemo.Repository.Private;
+namespace LittleTripMemo.Repository;
 
 /// <summary>
 /// 旅の記録（親）のリポジトリ。
@@ -41,17 +40,17 @@ public class ArchiveRepository : _BaseRepository
     }
 
     /// <summary>
-    /// 更新。
+    /// 主キー（archive_id）による単一更新。
     /// </summary>
-    public async Task<int> UpdateAsync(TMemoArchive archive)
+    public async Task<int> UpdateByKeyAsync(TMemoArchive archive)
     {
         archive.user_id = _user.UserId;
 
         const string sql = @"
             UPDATE t_memo_archive SET
-                title = @title,
-                memo = @memo,
-                link_url = @link_url,
+                title      = @title,
+                memo       = @memo,
+                link_url   = @link_url,
                 update_tim = CURRENT_TIMESTAMP
             WHERE 
                 archive_id = @archive_id 
@@ -61,16 +60,17 @@ public class ArchiveRepository : _BaseRepository
     }
 
     /// <summary>
-    /// 論理削除。
+    /// 主キー（archive_id）による論理削除。
     /// </summary>
-    public async Task<int> DeleteAsync(int archiveId)
+    public async Task<int> DeleteByKeyAsync(int archiveId)
     {
         const string sql = @"
             UPDATE t_memo_archive 
-            SET del_flg = true,
+            SET del_flg    = true,
                 update_tim = CURRENT_TIMESTAMP
-            WHERE archive_id = @archive_id 
-              AND user_id = @user_id";
+            WHERE 
+                archive_id = @archive_id 
+                AND user_id = @user_id";
 
         return await ExecuteAsync(sql, new
         {
@@ -90,8 +90,8 @@ public class ArchiveRepository : _BaseRepository
     {
         const string sql = @"
             SELECT * FROM t_memo_archive 
-            WHERE user_id = @user_id 
-              AND del_flg = false 
+            WHERE user_id  = @user_id 
+              AND del_flg  = false 
             ORDER BY create_tim DESC";
 
         // 取得系も継承元のラッパーを使用
@@ -99,15 +99,15 @@ public class ArchiveRepository : _BaseRepository
     }
 
     /// <summary>
-    /// 1件取得。
+    /// 主キー（archive_id）による1件取得。
     /// </summary>
-    public async Task<TMemoArchive?> GetByArchiveIdAsync(int archiveId)
+    public async Task<TMemoArchive?> GetByKeyAsync(int archiveId)
     {
         const string sql = @"
             SELECT * FROM t_memo_archive 
             WHERE archive_id = @archive_id 
-              AND user_id = @user_id 
-              AND del_flg = false";
+              AND user_id    = @user_id 
+              AND del_flg    = false";
 
         return await QuerySingleOrDefaultAsync<TMemoArchive>(sql, new
         {
@@ -118,4 +118,3 @@ public class ArchiveRepository : _BaseRepository
 
     #endregion
 }
-

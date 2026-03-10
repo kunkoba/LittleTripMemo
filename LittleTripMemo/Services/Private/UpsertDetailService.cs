@@ -2,7 +2,6 @@
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
-using LittleTripMemo.Repository.Private;
 using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services;
@@ -17,7 +16,7 @@ public class UpsertDetailService : _BaseService
     private readonly DetailRepository _detailRepo;
 
     // --- 専用DTO：全項目必須のアノテーション ---
-    public record Request(
+    public record UpsertDetailReq(
         [Required(ErrorMessage = "seqは必須です")][Range(0, int.MaxValue)] int seq,
         [Required(ErrorMessage = "旅の記録IDは必須です")] int archive_id,
         [Required(ErrorMessage = "緯度は必須です")] decimal latitude,
@@ -28,7 +27,8 @@ public class UpsertDetailService : _BaseService
         [Required(ErrorMessage = "時間は必須です")] string memo_time,
         [Required(ErrorMessage = "表情IDは必須です")] string face_emoji,
         [Required(ErrorMessage = "天気IDは必須です")] string weather_emoji,
-        [Required(ErrorMessage = "URLは必須です")][Url] string link_url,
+        //[Required(ErrorMessage = "URLは必須です")][Url] string link_url,
+        [Url] string link_url,
         [Required(ErrorMessage = "金額は必須です")][Range(0, int.MaxValue)] int memo_price
     );
 
@@ -47,7 +47,7 @@ public class UpsertDetailService : _BaseService
     /// <summary>
     /// 実行（1.検証 → 2.マッピング → 3.実行 の順に整理）
     /// </summary>
-    public async Task<Response> ExecuteAsync(Request req)
+    public async Task<Response> ExecuteAsync(UpsertDetailReq req)
     {
         // 1. 検証
         await ValidateAsync(req);
@@ -85,7 +85,7 @@ public class UpsertDetailService : _BaseService
     /// <summary>
     /// 1. 検証（業務チェック用）
     /// </summary>
-    private async Task ValidateAsync(Request req)
+    private async Task ValidateAsync(UpsertDetailReq req)
     {
         BusinessException.ThrowIf(_user.TableId == 0, "テーブルIDが無効です");
         BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
@@ -95,7 +95,7 @@ public class UpsertDetailService : _BaseService
     /// <summary>
     /// 2. マッピング（Entityへの詰め替え）
     /// </summary>
-    private TMemoDetail MapToEntity(Request req)
+    private TMemoDetail MapToEntity(UpsertDetailReq req)
     {
         return new TMemoDetail
         {

@@ -3,7 +3,6 @@ using LittleTripMemo.Models;
 using LittleTripMemo.Common;
 using System.ComponentModel.DataAnnotations;
 using LittleTripMemo.Repository;
-using LittleTripMemo.Repository.Private;
 
 namespace LittleTripMemo.Services;
 
@@ -51,7 +50,7 @@ public class ArchiveUpdateService : _BaseService
         using var tran = _provider.BeginTransaction();
         try
         {
-            int affected = await _archiveRepo.UpdateAsync(entity);
+            int affected = await _archiveRepo.UpdateByKeyAsync(entity);
             if (affected == 0) return new Response(false, "対象が見つかりません。");
 
             tran.Commit();

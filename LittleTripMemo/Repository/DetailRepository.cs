@@ -1,8 +1,7 @@
 ﻿using LittleTripMemo.Models;
 using LittleTripMemo.Common;
-using LittleTripMemo.Repository;
 
-namespace LittleTripMemo.Repository.Private;
+namespace LittleTripMemo.Repository;
 
 /// <summary>
 /// 旅の詳細履歴（t_memo_detail_n）用リポジトリ。
@@ -152,4 +151,43 @@ public class DetailRepository : _BaseRepository
     }
 
     #endregion
+
+    /// <summary>
+    /// 指定された seq リストの明細に archive_id をセット。
+    /// 条件：seq IN (@seqs) AND archive_id = 0 AND user_id = @user_id
+    /// </summary>
+    public async Task<int> UpdateArchiveIdBySeqsAsync(int archiveId, int[] seqs)
+    {
+        string sql = $@"
+        UPDATE t_memo_detail_{_user.TableId} SET
+            archive_id = @archive_id,
+            update_tim = CURRENT_TIMESTAMP
+        WHERE 
+            seq        = ANY(@seqs)
+            AND archive_id = 0
+            AND user_id    = @user_id";
+
+        return await ExecuteAsync(sql, new
+        {
+            archive_id = archiveId,
+            seqs,
+            user_id = _user.UserId
+        });
+    }
+
+    /// <summary>
+    /// 未まとめ明細取得（archive_id = 0）。
+    /// </summary>
+    public async Task<IEnumerable<TMemoDetail>> GetUnMergedAsync()
+    {
+        string sql = $@"
+        SELECT * FROM t_memo_detail_{_user.TableId} 
+        WHERE archive_id = 0
+          AND user_id    = @user_id 
+          AND del_flg    = false 
+        ORDER BY memo_date ASC, memo_time ASC";
+
+        return await QueryAsync<TMemoDetail>(sql, new { user_id = _user.UserId });
+    }
+
 }

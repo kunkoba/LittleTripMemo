@@ -7,8 +7,6 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
-using LittleTripMemo.Repository.Account;
-using LittleTripMemo.Repository.Private;
 using LittleTripMemo.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -100,6 +98,8 @@ builder.Services.AddScoped<AccountService>();
 //builder.Services.AddScoped<ArchiveUpdateService>();
 //builder.Services.AddScoped<HistoryRegistrationService>();
 builder.Services.AddScoped<UpsertDetailService>();
+builder.Services.AddScoped<MergeDetailsService>();
+builder.Services.AddScoped<GetUnMergeDetailsService>();
 
 
 // ======================================================================
@@ -281,14 +281,13 @@ if (app.Environment.IsDevelopment())
 // ■ SPA エントリーポイント設定
 // ======================================================================
 
-// ルートアクセス時に index.html を返す（SPA の起点）
-app.UseDefaultFiles(new DefaultFilesOptions
-{
-    DefaultFileNames = { "index.html" }
-});
-
-// 静的ファイル配信
-app.UseStaticFiles();
+//// ルートアクセス時に index.html を返す（SPA の起点）
+//app.UseDefaultFiles(new DefaultFilesOptions
+//{
+//    DefaultFileNames = { "index.html" }
+//});
+//// 静的ファイル配信
+//app.UseStaticFiles();
 
 // HTTPS 強制（ngrok 使用時は問題になる場合あり）
 app.UseHttpsRedirection();

@@ -3,7 +3,7 @@
 using LittleTripMemo.Configs;
 using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
-using LittleTripMemo.Repository.Account;
+using LittleTripMemo.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 

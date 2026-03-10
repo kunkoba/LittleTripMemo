@@ -1,7 +1,7 @@
-﻿using LittleTripMemo.Services; 
+﻿using LittleTripMemo.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LittleTripMemo.Controllers.Account;
+namespace LittleTripMemo.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -27,11 +27,11 @@ public class AccountController : ControllerBase
         if (!result.is_success)
         {
             // エラー時はメッセージを返却
-            return BadRequest(new { message = result.message });
+            return BadRequest(new { result.message });
         }
 
         // 成功時はサービスが生成したトークンを返却
-        return Ok(new { token = result.token });
+        return Ok(new { result.token });
     }
 }
 

@@ -1,7 +1,6 @@
 ﻿using LittleTripMemo.Common;
-using LittleTripMemo.Repository;
 
-namespace LittleTripMemo.Repository.Account;
+namespace LittleTripMemo.Repository;
 
 /// <summary>
 /// ユーザー関連の独自DB操作を担当するリポジトリ。
