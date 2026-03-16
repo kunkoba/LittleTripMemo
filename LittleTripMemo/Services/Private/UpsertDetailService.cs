@@ -27,9 +27,8 @@ public class UpsertDetailService : _BaseService
         [Required(ErrorMessage = "時間は必須です")] string memo_time,
         [Required(ErrorMessage = "表情IDは必須です")] string face_emoji,
         [Required(ErrorMessage = "天気IDは必須です")] string weather_emoji,
-        //[Required(ErrorMessage = "URLは必須です")][Url] string link_url,
-        [Url] string link_url,
-        [Required(ErrorMessage = "金額は必須です")][Range(0, int.MaxValue)] int memo_price
+        string? link_url,
+        [Required(ErrorMessage = "金額は必須です")] int memo_price
     );
 
     public record Response(int seq);

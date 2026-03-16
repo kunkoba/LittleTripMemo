@@ -1,9 +1,11 @@
 ﻿
+using LittleTripMemo.Common;
+
 namespace LittleTripMemo.Models;
 
 #region "非公開関連"
 
-public class TMemoArchive
+public class TMemoArchive : IAppRecord
 {
     public int archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
@@ -13,9 +15,11 @@ public class TMemoArchive
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }
     public DateTime update_tim { get; set; }
+    public bool is_public { get; set; } = false;
+    public bool is_owner { get; set; } = true;
 }
 
-public class TMemoDetail
+public class TMemoDetail : IAppRecord
 {
     public int seq { get; set; }
     public int archive_id { get; set; } = 0;
@@ -33,13 +37,15 @@ public class TMemoDetail
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }
     public DateTime update_tim { get; set; }
+    public bool is_public { get; set; } = false;
+    public bool is_owner { get; set; } = true;
 }
 
 #endregion
 
 #region "公開関連"
 
-public class TMemoArchivePub
+public class TMemoArchivePub : IAppRecord
 {
     public int archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
@@ -50,9 +56,11 @@ public class TMemoArchivePub
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }
     public DateTime update_tim { get; set; }
+    public bool is_public { get; set; } = true;
+    public bool is_owner { get; set; } = false;
 }
 
-public class TMemoDetailPub
+public class TMemoDetailPub : IAppRecord
 {
     public int archive_id { get; set; } = 0;
     public int seq { get; set; }
@@ -73,6 +81,8 @@ public class TMemoDetailPub
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }
     public DateTime update_tim { get; set; }
+    public bool is_public { get; set; } = true;
+    public bool is_owner { get; set; } = false;
 }
 
 public class TReactionPublish

@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Remove="Controllers\Account\**" />
     <Compile Remove="Controllers\Private\**" />
+    <Compile Remove="Logs\**" />
     <Compile Remove="Repository\Account\**" />
     <Compile Remove="Repository\Private\**" />
     <Compile Remove="ViewModels\**" />
@@ -16,9 +17,12 @@
     <Compile Remove="wwwroot - コピー %283%29\**" />
     <Compile Remove="wwwroot - コピー %284%29\**" />
     <Compile Remove="wwwroot - コピー %285%29\**" />
+    <Compile Remove="wwwroot - コピー %286%29\**" />
     <Compile Remove="wwwroot - コピー\**" />
+    <Compile Remove="_DEL\**" />
     <Content Remove="Controllers\Account\**" />
     <Content Remove="Controllers\Private\**" />
+    <Content Remove="Logs\**" />
     <Content Remove="Repository\Account\**" />
     <Content Remove="Repository\Private\**" />
     <Content Remove="ViewModels\**" />
@@ -26,9 +30,12 @@
     <Content Remove="wwwroot - コピー %283%29\**" />
     <Content Remove="wwwroot - コピー %284%29\**" />
     <Content Remove="wwwroot - コピー %285%29\**" />
+    <Content Remove="wwwroot - コピー %286%29\**" />
     <Content Remove="wwwroot - コピー\**" />
+    <Content Remove="_DEL\**" />
     <EmbeddedResource Remove="Controllers\Account\**" />
     <EmbeddedResource Remove="Controllers\Private\**" />
+    <EmbeddedResource Remove="Logs\**" />
     <EmbeddedResource Remove="Repository\Account\**" />
     <EmbeddedResource Remove="Repository\Private\**" />
     <EmbeddedResource Remove="ViewModels\**" />
@@ -36,9 +43,12 @@
     <EmbeddedResource Remove="wwwroot - コピー %283%29\**" />
     <EmbeddedResource Remove="wwwroot - コピー %284%29\**" />
     <EmbeddedResource Remove="wwwroot - コピー %285%29\**" />
+    <EmbeddedResource Remove="wwwroot - コピー %286%29\**" />
     <EmbeddedResource Remove="wwwroot - コピー\**" />
+    <EmbeddedResource Remove="_DEL\**" />
     <None Remove="Controllers\Account\**" />
     <None Remove="Controllers\Private\**" />
+    <None Remove="Logs\**" />
     <None Remove="Repository\Account\**" />
     <None Remove="Repository\Private\**" />
     <None Remove="ViewModels\**" />
@@ -46,7 +56,14 @@
     <None Remove="wwwroot - コピー %283%29\**" />
     <None Remove="wwwroot - コピー %284%29\**" />
     <None Remove="wwwroot - コピー %285%29\**" />
+    <None Remove="wwwroot - コピー %286%29\**" />
     <None Remove="wwwroot - コピー\**" />
+    <None Remove="_DEL\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Services\Private\_ArchiveUpdateService.cs" />
+    <Compile Remove="Services\Private\_HistoryRegistrationService.cs" />
   </ItemGroup>
 
   <ItemGroup>

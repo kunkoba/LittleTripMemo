@@ -14,6 +14,7 @@ public class AppController : _BaseController
     private readonly UpsertDetailService _upsertDetailService;
     private readonly MergeDetailsService _mergeDetailsService;
     private readonly GetUnMergeDetailsService _getUnMergeDetailsService;
+    private readonly GetArchiveDetailsService _getArchiveDetailsService;
 
     public AppController(
         UserContext userContext,
@@ -37,7 +38,7 @@ public class AppController : _BaseController
     public async Task<IActionResult> UpsertDetail([FromBody] UpsertDetailService.UpsertDetailReq req)
     {
         var result = await _upsertDetailService.ExecuteAsync(req);
-        return Ok(result);
+        return OkWithBase(result);
     }
 
     /// <summary>
@@ -47,16 +48,28 @@ public class AppController : _BaseController
     public async Task<IActionResult> MergeDetails([FromBody] MergeDetailsService.MergeDetailsReq req)
     {
         var result = await _mergeDetailsService.ExecuteAsync(req);
-        return Ok(result);
+        return OkWithBase(result);
     }
 
     /// <summary>
-    /// 未まとめ明細一覧取得。
+    /// 未まとめ明細一覧取得
     /// </summary>
     [HttpPost("api/GetUnMergeDetails")]
     public async Task<IActionResult> GetUnMergeDetails([FromBody] GetUnMergeDetailsService.GetUnMergeDetailsReq req)
     {
         var result = await _getUnMergeDetailsService.ExecuteAsync(req);
-        return Ok(result);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// まとめ明細一覧取得
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("api/GetArchiveDetails")]
+    public async Task<IActionResult> GetArchiveDetails([FromBody] GetArchiveDetailsService.GetArchiveDetailsReq req)
+    {
+        var result = await _getArchiveDetailsService.ExecuteAsync(req);
+        return OkWithBase(result);
     }
 }

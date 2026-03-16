@@ -15,6 +15,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/app-style.css">
     <link rel="stylesheet" href="css/component-style.css">
+    <!-- Firebase SDK (compat版) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script>
         tailwind.config = {
             theme: { extend: { colors: { brand: { 1: 'var(--brand-lvl1)', 2: 'var(--brand-lvl2)', 3: 'var(--brand-lvl3)', 4: 'var(--brand-lvl4)', 5: 'var(--brand-lvl5)', } } } }
@@ -119,9 +122,12 @@
                 <div class="shadow-brand bg-brand-2 h-16 ps-6 pe-1 flex justify-between items-center">
                     <h2 id="detail-title" class="text-xl font-black uppercase">Details</h2>
                     <div>
-                        <button id="detail-btn-A"     class="mr-1 w-10 h-10 border-2 text-black-3 text-[16px] font-bold">▼</button>
-                        <button id="detail-btn-B"     class="mr-1 w-10 h-10 border-2 text-black-3 text-[16px] font-bold">＞</button>
-                        <button id="detail-btn-close" class="mr-1 w-10 h-10 border-2 text-black-3 text-[16px] font-bold">✕</button>
+                        <!-- ▼ Aをマップ連携ボタンにする -->
+                        <button id="detail-btn-map"   class="mr-1 w-10 h-10 border-1 bg-brand-1 shadow-brand text-black-3 text-[20px] font-bold">🗺️</button>
+                        <!-- ▼ Bを編集ボタンにする -->
+                        <button id="detail-btn-edit"  class="mr-1 w-10 h-10 border-1 bg-brand-1 shadow-brand text-black-3 text-[20px] font-bold">✏️</button>
+                        <!-- 閉じるボタン -->
+                        <button id="detail-btn-close" class="mr-1 w-10 h-10 border-1 bg-brand-1 shadow-brand text-black-3 text-[20px] font-bold">✕</button>
                     </div>
                 </div>
                 <!-- 詳細パネルの内容 -->
@@ -438,6 +444,9 @@
     // ローカル㏈（indexedDB）
     import polling from "./js/polling-manager.js";
     window.$Polling = polling;
+    // 認証管理
+    import Auth from "./js/auth-manager.js";
+    window.$Auth = Auth;
     // アプリ管理
     import app from "./js/app-manager.js";
     window.$App = app;

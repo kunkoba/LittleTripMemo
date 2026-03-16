@@ -31,7 +31,14 @@ public class AccountController : ControllerBase
         }
 
         // 成功時はサービスが生成したトークンを返却
-        return Ok(new { result.token });
+        //return Ok(new { result.token });
+        return Ok(new
+        {
+            data = new { token = result.token },
+            is_logged_in = true,
+            is_owner = false,
+            is_public = false,
+        });
     }
 }
 

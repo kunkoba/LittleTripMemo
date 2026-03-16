@@ -36,6 +36,7 @@ public class GetUnMergeDetailsService : _BaseService
 
         // 2. 取得
         var details = await _detailRepo.GetUnMergedAsync();
+        //SetAppFlags(details);
 
         return new Response(details);
     }

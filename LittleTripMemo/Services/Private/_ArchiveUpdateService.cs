@@ -10,7 +10,7 @@ namespace LittleTripMemo.Services;
 /// 旅の記録更新ユースケース。
 /// テンプレ通り、バリデーション・トランザクション・マッピングを分離。
 /// </summary>
-public class ArchiveUpdateService : _BaseService
+public class _ArchiveUpdateService : _BaseService
 {
     private readonly ITransactionProvider _provider;
     private readonly ArchiveRepository _archiveRepo;
@@ -19,15 +19,17 @@ public class ArchiveUpdateService : _BaseService
     public record ArchiveUpdateRequest(
         [Required(ErrorMessage = "IDは必須です")] int archive_id,
         [Required(ErrorMessage = "タイトルは必須です")][StringLength(100)] string title,
-        [Required(ErrorMessage = "メモは必須です")][StringLength(1000)] string memo,
-        [Required(ErrorMessage = "URLは必須です")][Url] string link_url
+        //[Required(ErrorMessage = "メモは必須です")][StringLength(1000)] string memo,
+        //[Required(ErrorMessage = "URLは必須です")][Url] string link_url
+        string memo,
+        string link_url
     );
 
     // レスポンス
     public record Response(bool is_success, string message);
 
     // コンストラクタ
-    public ArchiveUpdateService(UserContext userContext, ITransactionProvider provider, ArchiveRepository archiveRepo)
+    public _ArchiveUpdateService(UserContext userContext, ITransactionProvider provider, ArchiveRepository archiveRepo)
         : base(userContext)
     {
         _provider = provider;

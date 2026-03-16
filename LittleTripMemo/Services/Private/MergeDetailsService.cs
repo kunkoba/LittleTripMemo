@@ -20,8 +20,8 @@ public class MergeDetailsService : _BaseService
     public record MergeDetailsReq(
         [Required(ErrorMessage = "seqリストは必須です")] int[] seqs,
         [Required(ErrorMessage = "タイトルは必須です")][StringLength(100)] string title,
-        string memo,
-        string link_url
+        string? memo,
+        string? link_url
     );
 
     public record Response(int archive_id, int updated_count);

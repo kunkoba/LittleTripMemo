@@ -10,7 +10,7 @@ namespace LittleTripMemo.Services;
 /// 明細登録（Historyの新規作成）ユースケース。
 /// 全項目必須。リクエストからエンティティへマッピングしてリポジトリへ渡す。
 /// </summary>
-public class HistoryRegistrationService : _BaseService
+public class _HistoryRegistrationService : _BaseService
 {
     private readonly ITransactionProvider _provider;
     private readonly DetailRepository _historyRepo;
@@ -32,7 +32,7 @@ public class HistoryRegistrationService : _BaseService
 
     public record Response(int seq);
 
-    public HistoryRegistrationService(UserContext userContext, ITransactionProvider provider, DetailRepository repository)
+    public _HistoryRegistrationService(UserContext userContext, ITransactionProvider provider, DetailRepository repository)
         : base(userContext)
     {
         _provider = provider;

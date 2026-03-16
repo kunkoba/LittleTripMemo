@@ -10,6 +10,8 @@ namespace LittleTripMemo.Controllers;
 public abstract class _BaseController : ControllerBase
 {
     protected readonly UserContext _user;
+    protected bool IsLoggedIn => HttpContext.User.Identity?.IsAuthenticated ?? false;
+
 
     /// <summary>
     /// 基底クラスでJWTトークンからユーザ情報を抽出して UserContext にセットする
@@ -40,5 +42,15 @@ public abstract class _BaseController : ControllerBase
         {
             _user.Plan = plan;
         }
+    }
+
+    // レスポンス共通化
+    protected OkObjectResult OkWithBase(object result)
+    {
+        return Ok(new
+        {
+            is_logged_in = IsLoggedIn,
+            data = result
+        });
     }
 }
