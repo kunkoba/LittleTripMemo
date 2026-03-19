@@ -12,6 +12,7 @@ public class TMemoArchive : IAppRecord
     public string title { get; set; } = string.Empty;
     public string memo { get; set; } = string.Empty;
     public string link_url { get; set; } = string.Empty;
+    public bool closed_flg { get; set; } = false;  // 追加
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }
     public DateTime update_tim { get; set; }

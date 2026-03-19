@@ -19,12 +19,10 @@ public class MergeDetailsService : _BaseService
 
     public record MergeDetailsReq(
         [Required(ErrorMessage = "seqリストは必須です")] int[] seqs,
-        [Required(ErrorMessage = "タイトルは必須です")][StringLength(100)] string title,
-        string? memo,
-        string? link_url
+        [Required(ErrorMessage = "タイトルは必須です")][StringLength(100)] string title
     );
 
-    public record Response(int archive_id, int updated_count);
+    public record Response(int archiveId, int updatedCount);
 
     public MergeDetailsService(
         UserContext userContext,
@@ -54,8 +52,8 @@ public class MergeDetailsService : _BaseService
             var archiveId = await _archiveRepo.InsertAsync(new TMemoArchive
             {
                 title    = req.title,
-                memo     = req.memo,
-                link_url = req.link_url
+                memo     = "",
+                link_url = ""
             });
 
             // 2-2. 対象の明細に archive_id をセット

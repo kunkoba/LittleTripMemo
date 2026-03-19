@@ -13,20 +13,28 @@ public class AppController : _BaseController
 {
     private readonly UpsertDetailService _upsertDetailService;
     private readonly MergeDetailsService _mergeDetailsService;
+    private readonly DeleteArchiveService _deleteArchiveService;
     private readonly GetUnMergeDetailsService _getUnMergeDetailsService;
     private readonly GetArchiveDetailsService _getArchiveDetailsService;
+    private readonly GetArchiveListService _getArchiveListService;
 
     public AppController(
         UserContext userContext,
         IHttpContextAccessor httpContextAccessor,
         UpsertDetailService upsertDetailService,
         MergeDetailsService mergeDetailsService,
-        GetUnMergeDetailsService getUnMergeDetailsService)
+        DeleteArchiveService deleteArchiveService,
+        GetUnMergeDetailsService getUnMergeDetailsService,
+        GetArchiveDetailsService getArchiveDetailsService,
+        GetArchiveListService getArchiveListService)
         : base(userContext, httpContextAccessor)
     {
         _upsertDetailService = upsertDetailService;
         _mergeDetailsService = mergeDetailsService;
+        _deleteArchiveService = deleteArchiveService;
         _getUnMergeDetailsService = getUnMergeDetailsService;
+        _getArchiveDetailsService = getArchiveDetailsService;
+        _getArchiveListService = getArchiveListService;
     }
 
     /// <summary>
@@ -70,6 +78,28 @@ public class AppController : _BaseController
     public async Task<IActionResult> GetArchiveDetails([FromBody] GetArchiveDetailsService.GetArchiveDetailsReq req)
     {
         var result = await _getArchiveDetailsService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// まとめ親一覧取得
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("api/GetArchiveList")]
+    public async Task<IActionResult> GetArchiveList([FromBody] GetArchiveListService.GetArchiveListReq req)
+    {
+        var result = await _getArchiveListService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// まとめ削除（解除）
+    /// </summary>
+    [HttpPost("api/DeleteArchive")]
+    public async Task<IActionResult> DeleteArchive([FromBody] DeleteArchiveService.DeleteArchiveReq req)
+    {
+        var result = await _deleteArchiveService.ExecuteAsync(req);
         return OkWithBase(result);
     }
 }

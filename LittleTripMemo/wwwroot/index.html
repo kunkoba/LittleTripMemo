@@ -31,13 +31,6 @@
 <!-- アプリ全体のルートコンテナ -->
 <div id="app-root" class="mb-10">
 
-    <!-- （テスト用）ボタン -->
-    <div class="absolute top-40 left-0 z-[1001] h-screen flex items-start pointer-events-none">
-        <button id="btn-test" class="shadow-brand pointer-events-auto bg-white/70 p-2 shadow-md border border-black-2">
-            テスト
-        </button>
-    </div>
-
     <!-- メインコンテンツ -->
     <div>
         <!-- ■　アプリ上部 -->
@@ -119,15 +112,15 @@
             <!-- ■　詳細パネル（右側スライド表示） -->
             <div id="ui-detail-frame-id" class="translate-y-full flex flex-col bg-brand-1 overflow-hidden shrink-0 h-0 w-full md:h-full md:w-0 border-brand-5 transition-all duration-400">
                 <!-- 詳細パネルのヘッダー -->
-                <div class="shadow-brand bg-brand-2 h-16 ps-6 pe-1 flex justify-between items-center">
+                <div class="bg-brand-2 h-16 ps-6 pe-1 flex justify-between items-center">
                     <h2 id="detail-title" class="text-xl font-black uppercase">Details</h2>
                     <div>
                         <!-- ▼ Aをマップ連携ボタンにする -->
-                        <button id="detail-btn-map"   class="mr-1 w-10 h-10 border-1 bg-brand-1 shadow-brand text-black-3 text-[20px] font-bold">🗺️</button>
+                        <button id="detail-btn-map"   class="mr-1 w-10 h-10 border-1 bg-brand-1 text-black-3 text-[20px] font-bold">🗺️</button>
                         <!-- ▼ Bを編集ボタンにする -->
-                        <button id="detail-btn-edit"  class="mr-1 w-10 h-10 border-1 bg-brand-1 shadow-brand text-black-3 text-[20px] font-bold">✏️</button>
+                        <button id="detail-btn-edit"  class="mr-1 w-10 h-10 border-1 bg-brand-1 text-black-3 text-[20px] font-bold">✏️</button>
                         <!-- 閉じるボタン -->
-                        <button id="detail-btn-close" class="mr-1 w-10 h-10 border-1 bg-brand-1 shadow-brand text-black-3 text-[20px] font-bold">✕</button>
+                        <button id="detail-btn-close" class="mr-1 w-10 h-10 border-1 bg-brand-1 text-black-3 text-[20px] font-bold">✕</button>
                     </div>
                 </div>
                 <!-- 詳細パネルの内容 -->
@@ -401,10 +394,12 @@
 
 <!-- テスト用データ -->
 <script type="module" src="./js/test-data.js"></script>
-<!-- アプリモジュール -->
+
+<!-- アプリ付属モジュール -->
 <script type="module" src="./js/app-const.js"></script>
 <script type="module" src="./js/common.js"></script>
 <script type="module" src="./js/app-data.js"></script>
+<script src="./js/sys_atmosphere.js"></script>
 
 <!-- UI部品 -->
 <script type="module">
@@ -467,21 +462,6 @@
 
 <!-- （テスト用） -->
 <script>
-    // テストボタン
-    document.getElementById("btn-test").onclick = () => {
-        // const items = $Data.GetAllDetails();
-        // $Dialog.Test_SelectList({ items, title: "テスト表示" });
-        $Dialog.Test_ModeSelect();
-        // $Dialog.ShowThemeConfig();
-        // $Dialog.ShowMapStyleConfig();
-        // $Dialog.ShowDetailsTimeLine();
-        // $Dialog.ShowMultiSelectTimeline({
-        //     onOk: (seqList) => {
-        //         console.log("SQL用SEQリスト:", seqList); // 例: [10, 9, 5]
-        //         // ここからサーバへ一括保存処理などを呼ぶ
-        //     }
-        // });
-    };
     // （テスト用）ローカル㏈保存
     async function debugLocalDbTest() {
         // // ローカル㏈の初期化

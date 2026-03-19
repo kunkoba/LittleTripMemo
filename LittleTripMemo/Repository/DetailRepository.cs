@@ -1,5 +1,6 @@
-﻿using LittleTripMemo.Models;
-using LittleTripMemo.Common;
+﻿using LittleTripMemo.Common;
+using LittleTripMemo.Models;
+using Npgsql;
 
 namespace LittleTripMemo.Repository;
 
@@ -188,6 +189,26 @@ public class DetailRepository : _BaseRepository
         ORDER BY memo_date ASC, memo_time ASC";
 
         return await QueryAsync<TMemoDetail>(sql, new { user_id = _user.UserId });
+    }
+
+    /// <summary>
+    /// 指定されたアーカイブIDに紐づく明細を解放（archive_id = 0 に戻す）
+    /// </summary>
+    public async Task<int> ReleaseArchiveIdAsync(int archiveId)
+    {
+        string sql = $@"
+            UPDATE t_memo_detail_{_user.TableId} SET
+                archive_id = 0,
+                update_tim = CURRENT_TIMESTAMP
+            WHERE 
+                archive_id = @archive_id 
+                AND user_id = @user_id";
+
+        return await ExecuteAsync(sql, new
+        {
+            archive_id = archiveId,
+            user_id = _user.UserId
+        });
     }
 
 }

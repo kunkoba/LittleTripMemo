@@ -90,16 +90,16 @@ builder.Services.AddScoped<AccountRepository>();
 builder.Services.AddScoped<ArchiveRepository>();
 builder.Services.AddScoped<DetailRepository>();
 
-
 // ---- Service（業務ロジック層） ----
 
 // Controller は必ず Service 経由で処理を行う
 builder.Services.AddScoped<AccountService>();
-//builder.Services.AddScoped<ArchiveUpdateService>();
-//builder.Services.AddScoped<HistoryRegistrationService>();
 builder.Services.AddScoped<UpsertDetailService>();
 builder.Services.AddScoped<MergeDetailsService>();
+builder.Services.AddScoped<DeleteArchiveService>();
 builder.Services.AddScoped<GetUnMergeDetailsService>();
+builder.Services.AddScoped<GetArchiveDetailsService>();
+builder.Services.AddScoped<GetArchiveListService>();
 
 
 // ======================================================================

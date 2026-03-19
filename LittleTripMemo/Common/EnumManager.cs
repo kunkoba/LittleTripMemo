@@ -9,6 +9,11 @@ public enum PlanType
     Admin       // 管理者
 }
 
-// 今後増える列挙体もここに並べていく
-// public enum UserStatus { ... }
-
+// リアクション種別
+public enum ReactionType
+{
+    Funny = 1, // 笑える
+    Helpful = 2, // 参考になる
+    Surprise = 3, // びっくり
+    Empathy = 4, // 共感する
+}
