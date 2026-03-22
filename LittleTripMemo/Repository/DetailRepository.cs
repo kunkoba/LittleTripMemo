@@ -211,4 +211,36 @@ public class DetailRepository : _BaseRepository
         });
     }
 
+    /// <summary>
+    /// 地点検索用の明細取得。指定された緯度・経度の範囲内にある明細を取得する。
+    /// </summary>
+    /// <param name="latMin"></param>
+    /// <param name="latMax"></param>
+    /// <param name="lngMin"></param>
+    /// <param name="lngMax"></param>
+    /// <param name="limit"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<TMemoDetail>> GetByLocationAsync(
+    decimal latMin, decimal latMax,
+    decimal lngMin, decimal lngMax,
+    int limit = 50)
+    {
+        const string sql = @"
+        SELECT * FROM t_memo_detail
+        WHERE latitude  BETWEEN @lat_min AND @lat_max
+          AND longitude BETWEEN @lng_min AND @lng_max
+          AND user_id   = @user_id
+          AND del_flg   = false
+        LIMIT @limit";
+        return await QueryAsync<TMemoDetail>(sql, new
+        {
+            lat_min = latMin,
+            lat_max = latMax,
+            lng_min = lngMin,
+            lng_max = lngMax,
+            user_id = _user.UserId,
+            limit
+        });
+    }
+
 }

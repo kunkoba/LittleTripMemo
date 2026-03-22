@@ -39,10 +39,8 @@ public class ExceptionHandling
     {
         context.Response.ContentType = "application/json";
         var errorRes = new ErrorResponse();
-
         if (ex is BusinessException bEx)
         {
-            // 【業務エラー】Check()等で意図的に投げたもの -> 400を返す
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             errorRes = new ErrorResponse
             {
@@ -53,29 +51,25 @@ public class ExceptionHandling
         }
         else if (ex is Npgsql.PostgresException pgEx)
         {
-            // 【SQL・DBエラー】ここを追加
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             errorRes = new ErrorResponse
             {
                 Message = "データベース操作に失敗しました。",
-                ErrorCode = $"DB_ERROR_{pgEx.SqlState}", // 42P01 等のSQLステートを付与
-                DebugInfo = ex.ToString() // スタックトレース
+                ErrorCode = $"DB_ERROR_{pgEx.SqlState}",
+                DebugInfo = pgEx.MessageText
             };
             _logger.LogError(pgEx, "SQLエラーが発生 (State: {SqlState}): {Message}", pgEx.SqlState, pgEx.MessageText);
         }
         else
         {
-            // 【想定外のエラー】バグや障害 -> 500を返す
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             errorRes = new ErrorResponse
             {
                 Message = "予期せぬシステムエラーが発生しました。",
-                DebugInfo = ex.ToString() // スタックトレース
+                DebugInfo = ex.Message
             };
             _logger.LogError(ex, "予期せぬ例外をキャッチしました。");
         }
-
-        // 共通の型でJSONとして返却
         await context.Response.WriteAsJsonAsync(errorRes);
     }
 }

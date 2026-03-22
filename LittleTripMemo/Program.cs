@@ -89,17 +89,27 @@ builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<AccountRepository>();
 builder.Services.AddScoped<ArchiveRepository>();
 builder.Services.AddScoped<DetailRepository>();
+builder.Services.AddScoped<ArchivePubRepository>();
+builder.Services.AddScoped<DetailPubRepository>();
+builder.Services.AddScoped<ReactionPubRepository>();
 
 // ---- Service（業務ロジック層） ----
 
 // Controller は必ず Service 経由で処理を行う
 builder.Services.AddScoped<AccountService>();
-builder.Services.AddScoped<UpsertDetailService>();
-builder.Services.AddScoped<MergeDetailsService>();
-builder.Services.AddScoped<DeleteArchiveService>();
 builder.Services.AddScoped<GetUnMergeDetailsService>();
 builder.Services.AddScoped<GetArchiveDetailsService>();
 builder.Services.AddScoped<GetArchiveListService>();
+builder.Services.AddScoped<UpsertDetailService>();
+builder.Services.AddScoped<MergeDetailsService>();
+builder.Services.AddScoped<DeleteArchiveService>();
+builder.Services.AddScoped<UpdateArchiveService>();
+builder.Services.AddScoped<PublishArchiveService>();
+builder.Services.AddScoped<GetArchiveDetailsPubService>();
+builder.Services.AddScoped<UnpublishArchiveService>();
+builder.Services.AddScoped<UpsertReactionService>();
+builder.Services.AddScoped<SearchByLocationService>();
+builder.Services.AddScoped<SearchByLocationPubService>();
 
 
 // ======================================================================

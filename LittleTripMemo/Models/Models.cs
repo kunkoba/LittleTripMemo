@@ -18,6 +18,7 @@ public class TMemoArchive : IAppRecord
     public DateTime update_tim { get; set; }
     public bool is_public { get; set; } = false;
     public bool is_owner { get; set; } = true;
+    public bool is_published { get; set; } = false;  // 公開データが存在するか
 }
 
 public class TMemoDetail : IAppRecord
@@ -84,15 +85,18 @@ public class TMemoDetailPub : IAppRecord
     public DateTime update_tim { get; set; }
     public bool is_public { get; set; } = true;
     public bool is_owner { get; set; } = false;
+    public int count_funny { get; set; } = 0;
+    public int count_helpful { get; set; } = 0;
+    public int count_surprise { get; set; } = 0;
+    public int count_empathy { get; set; } = 0;
 }
 
-public class TReactionPublish
+public class TReactionPub
 {
     public int archive_id { get; set; } = 0;
     public int seq { get; set; }
     public Guid user_id { get; set; }
-    public byte good { get; set; } = 0;
-    public byte bad { get; set; } = 0;
+    public int reaction_type { get; set; } = 0;
 }
 
 #endregion
