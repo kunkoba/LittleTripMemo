@@ -70,6 +70,16 @@ public class DetailPubRepository : _BaseRepository
     }
     #endregion
 
+    // 物理削除
+    public async Task<int> DeletePhysicalByArchiveIdAsync(int archiveId)
+    {
+        const string sql = @"
+        DELETE FROM t_memo_detail_pub
+        WHERE archive_id = @archive_id
+          AND user_id    = @user_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
+    }
+
     // 緯度経度範囲で明細＋リアクション集計取得
     public async Task<IEnumerable<TMemoDetailPub>> GetByLocationAsync(
         decimal latMin, decimal latMax,
@@ -84,24 +94,16 @@ public class DetailPubRepository : _BaseRepository
                 COUNT(CASE WHEN r.reaction_type = 3 THEN 1 END) as count_surprise,
                 COUNT(CASE WHEN r.reaction_type = 4 THEN 1 END) as count_empathy
             FROM t_memo_detail_pub d
+            INNER JOIN t_memo_archive_pub a ON d.archive_id = a.archive_id
             LEFT JOIN t_reaction_pub r ON d.archive_id = r.archive_id AND d.seq = r.seq
             WHERE d.latitude  BETWEEN @lat_min AND @lat_max
               AND d.longitude BETWEEN @lng_min AND @lng_max
               AND d.del_flg   = false
-              AND d.closed_flg = false
+              AND a.closed_flg = false
             GROUP BY d.archive_id, d.seq
             LIMIT @limit";
 
         return await QueryAsync<TMemoDetailPub>(sql, new { lat_min = latMin, lat_max = latMax, lng_min = lngMin, lng_max = lngMax, limit });
-    }
-
-    public async Task<int> DeletePhysicalByArchiveIdAsync(int archiveId)
-    {
-        const string sql = @"
-        DELETE FROM t_memo_detail_pub
-        WHERE archive_id = @archive_id
-          AND user_id    = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
     }
 
 }

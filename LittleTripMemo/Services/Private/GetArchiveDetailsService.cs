@@ -31,8 +31,8 @@ public class GetArchiveDetailsService : _BaseService
         await ValidateAsync();
         var archive = await _archiveRepo.GetByKeyAsync(req.archive_id);
         var details = await _detailRepo.GetByArchiveIdAsync(req.archive_id);
-        //SetAppFlags(archive);
-        //SetAppFlags(details);
+        SetAppFlags(archive);
+        SetAppFlags(details);
 
         return new Response(archive, details);
     }

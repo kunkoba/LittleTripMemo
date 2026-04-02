@@ -24,6 +24,10 @@ public class AppController : _BaseController
     private readonly GetArchiveDetailsPubService _getArchiveDetailsPubService;
     private readonly UnpublishArchiveService _unpublishArchiveService;
     private readonly UpsertReactionService _upsertReactionService;
+    private readonly OpenArchiveService _openArchiveService;
+    private readonly CloseArchiveService _closeArchiveService;
+    private readonly UpdateArchivePubService _updateArchivePubService;
+    private readonly UpdateDetailPubService _updateDetailPubService;
     private readonly SearchByLocationPubService _searchByLocationPubService;
 
     // コンストラクタに追加
@@ -41,7 +45,11 @@ public class AppController : _BaseController
         SearchByLocationService searchByLocationService,
         GetArchiveDetailsPubService getArchiveDetailsPubService,
         UnpublishArchiveService unpublishArchiveService,
-        UpsertReactionService upsertReactionService, 
+        UpsertReactionService upsertReactionService,
+        OpenArchiveService openArchiveService,
+        CloseArchiveService closeArchiveService,
+        UpdateArchivePubService updateArchivePubService,
+        UpdateDetailPubService updateDetailPubService,
         SearchByLocationPubService searchByLocationPubService)
         : base(userContext, httpContextAccessor)
     {
@@ -57,15 +65,19 @@ public class AppController : _BaseController
         _getArchiveDetailsPubService = getArchiveDetailsPubService;
         _unpublishArchiveService = unpublishArchiveService;
         _upsertReactionService = upsertReactionService;
+        _openArchiveService = openArchiveService;
+        _closeArchiveService = closeArchiveService;
+        _updateArchivePubService = updateArchivePubService;
+        _updateDetailPubService = updateDetailPubService;
         _searchByLocationPubService = searchByLocationPubService;
     }
 
-        /// <summary>
-        /// 明細の登録・更新。
-        /// seq=0 で INSERT、seq>0 で UPDATE。
-        /// バリデーションはサービス内の Request record の定義に基づき自動実行されます。
-        /// </summary>
-        [HttpPost("api/UpsertDetail")]
+    /// <summary>
+    /// 明細の登録・更新。
+    /// seq=0 で INSERT、seq>0 で UPDATE。
+    /// バリデーションはサービス内の Request record の定義に基づき自動実行されます。
+    /// </summary>
+    [HttpPost("api/UpsertDetail")]
     public async Task<IActionResult> UpsertDetail([FromBody] UpsertDetailService.UpsertDetailReq req)
     {
         var result = await _upsertDetailService.ExecuteAsync(req);
@@ -112,7 +124,7 @@ public class AppController : _BaseController
     [HttpPost("api/GetArchiveList")]
     public async Task<IActionResult> GetArchiveList([FromBody] GetArchiveListService.GetArchiveListReq req)
     {
-        var result = await _getArchiveListService.ExecuteAsync(req);
+        var result = await _getArchiveListService.ExecuteAsync();
         return OkWithBase(result);
     }
 
@@ -139,7 +151,7 @@ public class AppController : _BaseController
     }
 
     /// <summary>
-    /// 非公開データを公開する
+    /// 秘密データを公開する
     /// </summary>
     /// <param name="req"></param>
     /// <returns></returns>
@@ -151,7 +163,7 @@ public class AppController : _BaseController
     }
 
     /// <summary>
-    /// 公開済みデータを非公開にする
+    /// 公開済みデータを秘密データにする
     /// </summary>
     /// <param name="req"></param>
     /// <returns></returns>
@@ -163,7 +175,7 @@ public class AppController : _BaseController
     }
 
     /// <summary>
-    /// 地点検索（非公開データ）
+    /// 地点検索（秘密データ）
     /// </summary>
     /// <param name="req"></param>
     /// <returns></returns>
@@ -208,6 +220,55 @@ public class AppController : _BaseController
     public async Task<IActionResult> UpsertReaction([FromBody] UpsertReactionService.UpsertReactionReq req)
     {
         var result = await _upsertReactionService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// 公開（非公開→公開）
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("api/OpenArchive")]
+    public async Task<IActionResult> OpenArchive([FromBody] OpenArchiveService.OpenArchiveReq req)
+    {
+        var result = await _openArchiveService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// 公開（公開→非公開）
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("api/CloseArchive")]
+    public async Task<IActionResult> CloseArchive([FromBody] CloseArchiveService.CloseArchiveReq req)
+    {
+        var result = await _closeArchiveService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+
+    /// <summary>
+    /// まとめ親の更新
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("api/UpdateArchivePub")]
+    public async Task<IActionResult> UpdateArchivePub([FromBody] UpdateArchivePubService.UpdateArchivePubReq req)
+    {
+        var result = await _updateArchivePubService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// 明細の登録・更新。
+    /// seq=0 で INSERT、seq>0 で UPDATE。
+    /// バリデーションはサービス内の Request record の定義に基づき自動実行されます。
+    /// </summary>
+    [HttpPost("api/UpdateDetailPub")]
+    public async Task<IActionResult> UpdateDetailPub([FromBody] UpdateDetailPubService.UpdateDetailPubReq req)
+    {
+        var result = await _updateDetailPubService.ExecuteAsync(req);
         return OkWithBase(result);
     }
 }

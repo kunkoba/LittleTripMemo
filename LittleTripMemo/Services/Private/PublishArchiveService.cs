@@ -39,10 +39,11 @@ public class PublishArchiveService : _BaseService
         using var tran = _provider.BeginTransaction();
         try
         {
-            // ① 非公開アーカイブ取得
+            // ① 秘密アーカイブ取得
             var archive = await _archiveRepo.GetByKeyAsync(req.archive_id);
+            BusinessException.ThrowIf(archive == null, "アーカイブが見つかりません");
 
-            // ①' 既存の公開データがあれば物理削除
+            // ② 既存の公開データがあれば物理削除
             var existingPub = await _archivePubRepo.GetByKeyAsync(req.archive_id);
             if (existingPub != null)
             {
@@ -50,7 +51,7 @@ public class PublishArchiveService : _BaseService
                 await _detailPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
             }
 
-            // ② 公開アーカイブへコピー
+            // ③ 公開アーカイブへコピー
             var pubArchive = new TMemoArchivePub
             {
                 archive_id = archive.archive_id,
@@ -61,10 +62,10 @@ public class PublishArchiveService : _BaseService
             };
             await _archivePubRepo.InsertAsync(pubArchive);
 
-            // ③ 非公開明細取得
+            // ④ 秘密明細取得
             var details = await _detailRepo.GetByArchiveIdAsync(req.archive_id);
 
-            // ④ 公開明細へコピー
+            // ⑤ 公開明細へコピー
             foreach (var detail in details)
             {
                 var pubDetail = new TMemoDetailPub
@@ -82,9 +83,13 @@ public class PublishArchiveService : _BaseService
                     weather_emoji = detail.weather_emoji,
                     link_url = detail.link_url,
                     memo_price = detail.memo_price,
+                    closed_flg = false,     // 初期値はfalse
                 };
                 await _detailPubRepo.InsertAsync(pubDetail);
             }
+
+            // ⑥ 秘密アーカイブを論理削除
+            await _archiveRepo.DeleteByKeyAsync(req.archive_id);
 
             tran.Commit();
             return new Response(archive.archive_id);

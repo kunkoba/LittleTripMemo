@@ -225,12 +225,13 @@ public class DetailRepository : _BaseRepository
     decimal lngMin, decimal lngMax,
     int limit = 50)
     {
-        const string sql = @"
-        SELECT * FROM t_memo_detail
+        string sql = $@"
+        SELECT * FROM t_memo_detail_{_user.TableId}
         WHERE latitude  BETWEEN @lat_min AND @lat_max
           AND longitude BETWEEN @lng_min AND @lng_max
           AND user_id   = @user_id
           AND del_flg   = false
+          AND archive_id > 0
         LIMIT @limit";
         return await QueryAsync<TMemoDetail>(sql, new
         {

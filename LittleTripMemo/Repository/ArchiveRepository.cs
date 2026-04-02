@@ -117,4 +117,21 @@ public class ArchiveRepository : _BaseRepository
     }
 
     #endregion
+
+    /// <summary>
+    /// 秘密データへ戻す（論理削除の復元）。主キー（archive_id）による更新。
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <returns></returns>
+    public async Task<int> RestoreByKeyAsync(int archiveId)
+    {
+        const string sql = @"
+        UPDATE t_memo_archive
+        SET del_flg    = false,
+            update_tim = CURRENT_TIMESTAMP
+        WHERE
+            archive_id = @archive_id
+            AND user_id = @user_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
+    }
 }

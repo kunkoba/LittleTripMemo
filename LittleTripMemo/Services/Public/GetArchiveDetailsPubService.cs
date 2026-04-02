@@ -46,6 +46,8 @@ public class GetArchiveDetailsPubService : _BaseService
             ? await _reactionPubRepo.GetMyReactionsByArchiveIdAsync(req.archive_id)
             : Enumerable.Empty<TReactionPub>();
 
+        SetAppFlags(archive);
+        SetAppFlags(details);
         return new Response(archive, details, myReactions);
     }
 

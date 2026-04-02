@@ -36,6 +36,8 @@ public class SearchByLocationPubService : _BaseService
             req.lat_min, req.lat_max,
             req.lng_min, req.lng_max,
             req.limit);
+
+        SetAppFlags(details);
         return new Response(details);
     }
 

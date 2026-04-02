@@ -105,10 +105,14 @@ builder.Services.AddScoped<MergeDetailsService>();
 builder.Services.AddScoped<DeleteArchiveService>();
 builder.Services.AddScoped<UpdateArchiveService>();
 builder.Services.AddScoped<PublishArchiveService>();
+builder.Services.AddScoped<SearchByLocationService>();
 builder.Services.AddScoped<GetArchiveDetailsPubService>();
 builder.Services.AddScoped<UnpublishArchiveService>();
 builder.Services.AddScoped<UpsertReactionService>();
-builder.Services.AddScoped<SearchByLocationService>();
+builder.Services.AddScoped<OpenArchiveService>();
+builder.Services.AddScoped<CloseArchiveService>();
+builder.Services.AddScoped<UpdateArchivePubService>();
+builder.Services.AddScoped<UpdateDetailPubService>();
 builder.Services.AddScoped<SearchByLocationPubService>();
 
 

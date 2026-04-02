@@ -8,24 +8,64 @@ namespace LittleTripMemo.Services;
 public class GetArchiveListService : _BaseService
 {
     private readonly ArchiveRepository _archiveRepo;
+    private readonly ArchivePubRepository _archivePubRepo;
 
     public class GetArchiveListReq { }
-    public record Response(IEnumerable<TMemoArchive> archiveList);
+    public record Response(IEnumerable<DtoArchive> archiveList);
 
     public GetArchiveListService(
         UserContext userContext,
-        ArchiveRepository archiveRepo)
+        ArchiveRepository archiveRepo,
+        ArchivePubRepository archivePubRepo)
         : base(userContext)
     {
         _archiveRepo = archiveRepo;
+        _archivePubRepo = archivePubRepo;
     }
 
-    public async Task<Response> ExecuteAsync(GetArchiveListReq req)
+    public async Task<Response> ExecuteAsync()
     {
         await ValidateAsync();
         var archives = await _archiveRepo.GetAllAsync();
+        var archives2 = await _archivePubRepo.GetAllAsync();
+        SetAppFlags(archives);
+        SetAppFlags(archives2);
 
-        return new Response(archives);
+        // 共通DTOへ変換
+        var list1 = archives.Select(x => new DtoArchive
+        {
+            archive_id = x.archive_id,
+            user_id = x.user_id,
+            title = x.title,
+            memo = x.memo,
+            link_url = x.link_url,
+            closed_flg = x.closed_flg,
+            del_flg = x.del_flg,
+            create_tim = x.create_tim,
+            update_tim = x.update_tim,
+            is_public = x.is_public,
+            is_owner = x.is_owner
+            // 必要な項目だけ詰める
+        });
+
+        var list2 = archives2.Select(x => new DtoArchive
+        {
+            archive_id = x.archive_id,
+            user_id = x.user_id,
+            title = x.title,
+            memo = x.memo,
+            link_url = x.link_url,
+            closed_flg = x.closed_flg,
+            del_flg = x.del_flg,
+            create_tim = x.create_tim,
+            update_tim = x.update_tim,
+            is_public = x.is_public,
+            is_owner = x.is_owner
+        });
+
+        // 結合
+        var merged = list1.Concat(list2).ToList();
+        return new Response(merged);
     }
 
     private async Task ValidateAsync()
