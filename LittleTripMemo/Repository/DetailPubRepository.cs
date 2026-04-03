@@ -30,17 +30,24 @@ public class DetailPubRepository : _BaseRepository
     public async Task<int> UpdateByKeyAsync(TMemoDetailPub detail)
     {
         detail.user_id = _user.UserId;
+
         const string sql = @"
             UPDATE t_memo_detail_pub SET
-                title      = @title,
-                body       = @body,
-                link_url   = @link_url,
-                memo_price = @memo_price,
-                update_tim = CURRENT_TIMESTAMP
-            WHERE
-                archive_id = @archive_id
-                AND seq    = @seq
-                AND user_id = @user_id";
+                latitude     = @latitude,
+                longitude    = @longitude,
+                title        = @title,
+                body         = @body,
+                memo_date    = @memo_date,
+                memo_time    = @memo_time,
+                face_emoji   = @face_emoji,
+                weather_emoji = @weather_emoji,
+                link_url     = @link_url,
+                memo_price   = @memo_price,
+                update_tim   = CURRENT_TIMESTAMP
+            WHERE   seq         = @seq 
+                AND archive_id  = @archive_id 
+                AND user_id     = @user_id";
+
         return await ExecuteAsync(sql, detail);
     }
 

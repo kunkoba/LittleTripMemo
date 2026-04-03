@@ -90,6 +90,8 @@ public class PublishArchiveService : _BaseService
 
             // ⑥ 秘密アーカイブを論理削除
             await _archiveRepo.DeleteByKeyAsync(req.archive_id);
+            // ⑦ 秘密明細を論理削除
+            await _detailRepo.DeleteByArchiveIdAsync(req.archive_id);
 
             tran.Commit();
             return new Response(archive.archive_id);

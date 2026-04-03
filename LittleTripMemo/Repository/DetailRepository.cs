@@ -176,6 +176,23 @@ public class DetailRepository : _BaseRepository
         });
     }
 
+
+    /// <summary>
+    /// 主キー（seq）による論理削除。
+    /// </summary>
+    public async Task<int> DeleteByArchiveIdAsync(int archive_id)
+    {
+        string sql = $@"
+            UPDATE t_memo_detail_{_user.TableId} SET
+                del_flg    = true,
+                update_tim = CURRENT_TIMESTAMP
+            WHERE 
+                archive_id = @archive_id 
+                AND user_id = @user_id";
+
+        return await ExecuteAsync(sql, new { archive_id, user_id = _user.UserId });
+    }
+
     /// <summary>
     /// 未まとめ明細取得（archive_id = 0）。
     /// </summary>
