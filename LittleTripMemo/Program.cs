@@ -303,6 +303,8 @@ if (app.Environment.IsDevelopment())
 //// 静的ファイル配信
 //app.UseStaticFiles();
 
+
+
 // HTTPS 強制（ngrok 使用時は問題になる場合あり）
 app.UseHttpsRedirection();
 

@@ -421,7 +421,7 @@
 <script type="module" src="./js/app-const.js"></script>
 <script type="module" src="./js/common.js"></script>
 <script type="module" src="./js/app-data.js"></script>
-<script src="./js/sys_atmosphere.js"></script>
+<script src="./js/lib/lib_weather.js"></script>
 
 <!-- UI部品 -->
 <script type="module">
@@ -482,31 +482,6 @@
     })();
 </script>
 
-<!-- （テスト用） -->
-<script>
-    // （テスト用）ローカル㏈保存
-    async function debugLocalDbTest() {
-        // // ローカル㏈の初期化
-        // await $LocalDb.Init();
-        // 2. テスト用データ（dbidは持たせない）
-        const newData = {
-            title: "テスト投稿",
-            content: "これは自動採番のテストですテストです。",
-            seq: 0,
-            // dbid: 0,
-        };
-        console.log(newData);
-        // 3. 保存実行
-        const success = await $LocalDb.Detail.Save(newData);
-        const details = await $LocalDb.Detail.GetAll();
-        console.log(newData);
-        console.log(details);
-        // const success2 = await $LocalDb.Detail.DeleteAll();
-        // const details2 = await $LocalDb.Detail.GetAll();
-        // console.log(details2);
-    }
-
-</script>
 
 </body>
 
