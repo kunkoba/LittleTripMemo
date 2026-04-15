@@ -295,13 +295,13 @@ if (app.Environment.IsDevelopment())
 // ■ SPA エントリーポイント設定
 // ======================================================================
 
-//// ルートアクセス時に index.html を返す（SPA の起点）
-//app.UseDefaultFiles(new DefaultFilesOptions
-//{
-//    DefaultFileNames = { "index.html" }
-//});
-//// 静的ファイル配信
-//app.UseStaticFiles();
+// ルートアクセス時に index.html を返す（SPA の起点）
+app.UseDefaultFiles(new DefaultFilesOptions
+{
+    DefaultFileNames = { "index.html" }
+});
+// 静的ファイル配信
+app.UseStaticFiles();
 
 
 
@@ -311,9 +311,12 @@ app.UseHttpsRedirection();
 // CORS 設定を有効化（フロントエンドからの別オリジン通信を許可）
 app.UseCors();
 
-// 認証ミドルウェア
-// リクエストに含まれる JWT を検証し、ユーザー情報を HttpContext.User に設定
-app.UseAuthentication();
+// JWTミドルウェア実行
+app.UseMiddleware<JwtMiddleware>();
+
+//// 認証ミドルウェア
+//// リクエストに含まれる JWT を検証し、ユーザー情報を HttpContext.User に設定
+//app.UseAuthentication();
 
 // 認可ミドルウェア
 // [Authorize] 属性などを基に、アクセス可否を判定

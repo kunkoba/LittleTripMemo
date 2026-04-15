@@ -26,7 +26,7 @@ public class JwtMiddleware
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+                var key = Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]);
 
                 // ✅ ちゃんと検証する
                 var validationParameters = new TokenValidationParameters
@@ -34,9 +34,9 @@ public class JwtMiddleware
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = true,
-                    ValidIssuer = _configuration["Jwt:Issuer"],
+                    ValidIssuer = _configuration["JwtSettings:Issuer"],
                     ValidateAudience = true,
-                    ValidAudience = _configuration["Jwt:Audience"],
+                    ValidAudience = _configuration["JwtSettings:Audience"],
                     ValidateLifetime = true, // ✅ 有効期限チェック
                     ClockSkew = TimeSpan.Zero // トークン期限のズレ許容なし
                 };
@@ -47,8 +47,15 @@ public class JwtMiddleware
                     validationParameters,
                     out SecurityToken validatedToken);
 
-                // 検証成功 → HttpContext.User にセット
+                //// ★ AuthenticationType を付けて再構築
+                //var identity = new ClaimsIdentity(
+                //    principal.Claims,
+                //    "Bearer" // ←これが重要
+                //);
+
+                // 再セット
                 context.User = principal;
+                //context.User = new ClaimsPrincipal(identity);
             }
             catch (SecurityTokenExpiredException)
             {

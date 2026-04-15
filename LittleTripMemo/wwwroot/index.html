@@ -84,7 +84,7 @@
                 </div>
                 <!-- システムメニュー -->
                 <div>
-                    <button id="btn-sys-menu" class="shadow-brand text-[12px] w-10 h-10 bg-black text-white">
+                    <button id="btn-sys-menu" class="shadow-brand border-2 border-brand-4 text-[12px] w-10 h-10 bg-black text-white">
                         sys
                     </button>
                         <!-- ポップアップ -->
@@ -110,193 +110,213 @@
             <!-- ■　地図エリア -->
             <div id="ui-map-id" class="w-full h-full z-0"></div>
             <!-- ■　詳細パネル（右側スライド表示） -->
-            <div id="ui-detail-frame-id" class="translate-y-full flex flex-col bg-brand-1 overflow-hidden shrink-0 h-0 w-full md:h-full md:w-0 border-brand-5 transition-all duration-400">
+<!-- ■　詳細パネル（右側スライド表示） -->
+            <div id="ui-detail-frame-id" class="translate-y-full flex flex-col bg-brand-0 overflow-hidden shrink-0 h-0 w-full md:h-full md:w-0 border-t md:border-t-0 md:border-l border-brand-2 transition-all duration-400 rounded-t-[2rem] md:rounded-none md:rounded-l-[2rem] shadow-2xl z-[1002]">
+                
                 <!-- 詳細パネルのヘッダー -->
-                <div class="bg-brand-2 h-16 ps-6 pe-1 flex justify-between items-center">
-                    <h2 id="detail-title" class="text-xl font-black uppercase">Details</h2>
-                    <div>
-                        <!-- ▼ Aをマップ連携ボタンにする -->
-                        <button id="detail-btn-map"   class="mr-1 w-10 h-10 border-1 bg-brand-1 text-black-3 text-[20px] font-bold">🗺️</button>
-                        <!-- ▼ Bを編集ボタンにする -->
-                        <button id="detail-btn-edit"  class="mr-1 w-10 h-10 border-1 bg-brand-1 text-black-3 text-[20px] font-bold">✏️</button>
-                        <!-- 閉じるボタン -->
-                        <button id="detail-btn-close" class="mr-1 w-10 h-10 border-1 bg-brand-1 text-black-3 text-[20px] font-bold">✕</button>
+                <div class="bg-brand-1/50 h-16 px-6 flex justify-between items-center shrink-0 border-b border-brand-1">
+                    <h2 id="detail-title" class="text-xl font-black italic text-brand-5 uppercase tracking-wider">Details</h2>
+                    <div class="flex gap-2">
+                        <!-- ▼ ここに追加 -->
+                        <button id="detail-btn-earth" class="w-8 h-8 bg-white rounded-lg shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-lg">🌍</button>
+                        <button id="detail-btn-map"   class="w-8 h-8 bg-white rounded-lg shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-lg">🗺️</button>
+                        <button id="detail-btn-edit"  class="w-8 h-8 bg-white rounded-lg shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-lg">✏️</button>
+                        <button id="detail-btn-close" class="w-8 h-8 bg-white rounded-lg shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-lg">✕</button>
                     </div>
                 </div>
-                <!-- 詳細パネルの内容 -->
-                <div id="ui-detail-content-id" class="bg-brand-0 flex-1 text-xs text-black-3 overflow-y-auto p-3">
-                    <div class="mb-6">
-                        <!-- 参照用（表示モード） -->
-                        <div id="detail-display" class="hidden mt-3 space-y-5 text-black-4">
+
+                <!-- 詳細パネルの内容 (スクロールエリア) -->
+                <div id="ui-detail-content-id" class="flex-1 overflow-y-auto px-4 py-6">
+                    
+                    <!-- ■ 参照用（表示モード） -->
+                    <div id="detail-display" class="hidden space-y-4 text-black-4">
+                        
+                        <!-- 顔アイコン -->
+                        <div class="flex flex-col items-center mb-4">
+                            <div id="detail-display-face_emoji" class="text-[64px] h-16 flex items-center justify-center drop-shadow-sm"></div>
+                        </div>
+
+                        <!-- META ROW (日付・時間・天気) -->
+                        <div class="relative z-10 flex mb-5 border border-slate-100 rounded-2xl overflow-hidden bg-slate-50 shadow-sm">
+                            <div class="flex-1 flex flex-col items-center justify-center text-center py-2.5 px-2 border-r border-slate-200">
+                                <span class="block text-[9px] font-black tracking-[0.1em] uppercase text-slate-400 mb-0.5">Date</span>
+                                <span id="detail-display-memo_date" class="text-[13px] font-black text-black-5"></span>
+                            </div>
+                            <div class="flex-1 flex flex-col items-center justify-center text-center py-2.5 px-2 border-r border-slate-200">
+                                <span class="block text-[9px] font-black tracking-[0.1em] uppercase text-slate-400 mb-0.5">Time</span>
+                                <span id="detail-display-memo_time" class="text-[13px] font-black text-black-5"></span>
+                            </div>
+                            <!-- 参照用 (detail-display) のMETA ROW内 -->
+                            <div class="flex-1 flex flex-col items-center justify-center text-center py-2.5 px-2">
+                                <span class="block text-[9px] font-black tracking-[0.1em] uppercase text-slate-400 mb-0.5">Atmosphere</span>
+                                <span id="detail-display-weather_emoji" class="text-[12px] font-black text-black-5 leading-tight tracking-widest"></span>
+                            </div>
+                        </div>
+
+                        <!-- タイトル・本文 -->
+                        <div class="bg-brand-1 rounded-2xl p-4 shadow-sm">
+                            <div id="detail-display-title" class="text-[16px] font-black text-black-5 break-all mb-3 tracking-wide"></div>
+                            <hr class="border-brand-2 mb-3">
+                            <div id="detail-display-body" class="text-[14px] text-black-4 leading-relaxed whitespace-pre-wrap break-all min-h-[4rem]"></div>
+                        </div>
+
+                        <!-- 金額 -->
+                        <div id="detail-display-price-wrapper" class="bg-brand-1 rounded-2xl p-4 shadow-sm flex justify-between items-center">
+                            <span id="detail-display-price-label" class="text-[10px] font-black uppercase tracking-wider">JPY</span>
+                            <span id="detail-display-memo_price" class="text-xl font-black"></span>
+                        </div>
+
+                        <!-- URL -->
+                        <div id="detail-display-url-wrapper" class="bg-brand-1 rounded-2xl p-4 shadow-sm flex items-center gap-3">
+                            <span class="text-brand-4 text-sm">🔗</span>
+                            <a id="detail-display-link_url" href="" target="_blank" class="flex-1 text-[12px] text-blue-500 underline truncate font-bold"></a>
+                        </div>
+
+                    </div>
+
+                    <!-- ■ 編集用（編集モード） -->
+                    <form id="detail-edit" class="hidden space-y-6 text-black-4">
+                        <!-- DATE & TIME -->
+                        <div class="grid grid-cols-2 gap-6">
                             <div>
-                                <div class="col-span-2 flex flex-col items-center">
-                                    <!-- <label class="font-bold text-black-3 text-[10px] mb-0.5 uppercase">FACE</label> -->
-                                    <div id="detail-display-face_emoji" class="text-[64px] h-16 flex items-center justify-center"></div>
+                                <label class="block font-black text-black-3 text-[10px] mb-1 uppercase tracking-wider">DATE</label>
+                                <div class="flex items-center border-b-2 border-brand-2 pb-1">
+                                    <input name="memo_date" id="detail-edit-memo_date" type="date" class="w-full bg-transparent outline-none font-bold text-black-5 text-[14px]">
                                 </div>
                             </div>
-
-                            <!-- META ROW -->
-                            <div class="relative z-10 flex mb-5 border border-[#f0e0d0] rounded-2xl overflow-hidden bg-[#fff9f0]">
-                                <div class="flex-1 flex flex-col items-center justify-center text-center py-2.5 px-3">
-                                    <span class="block text-[9px] font-black tracking-[0.14em] uppercase text-[#a08c8c] mb-0.5">Date</span>
-                                    <span id="detail-display-memo_date" class="text-[15px] font-bold text-[#3a2e2e]">2025/06/10</span>
-                                </div>
-                                <div class="flex-1 flex flex-col items-center justify-center text-center py-2.5 px-3">
-                                    <span class="block text-[9px] font-black tracking-[0.14em] uppercase text-[#a08c8c] mb-0.5">Time</span>
-                                    <span id="detail-display-memo_time" class="text-[15px] font-bold text-[#3a2e2e]">14:30</span>
-                                </div>
-                                <div class="flex-1 flex flex-col items-center justify-center text-center py-2.5 px-3">
-                                    <span class="block text-[9px] font-black tracking-[0.14em] uppercase text-[#a08c8c] mb-0.5">Weather</span>
-                                    <span id="detail-display-weather_emoji" class="text-[28px] leading-none">⛅</span>
-                                </div>
-                            </div>
-
-                            <div class="border border-brand-2 p-2 bg-brand-1">
-                                <!-- タイトル -->
-                                <!-- <label class="block font-bold text-black-3 text-[10px] mb-1 uppercase">TITLE</label> -->
-                                <div id="detail-display-title" class="w-full p-1 text-[16px] font-bold break-all min-h-[1.5rem]"></div>
-                                <!-- 本文 -->
-                                <!-- <label class="block font-bold text-black-3 text-[10px] mb-1 uppercase">BODY</label> -->
-                                <div id="detail-display-body" class="min-h-[200px] w-full px-1 text-[16px] leading-relaxed whitespace-pre-wrap overflow-y-auto border border-transparent"></div>
-                            </div>
-                            <!-- 金額 -->
-                            <div class="border border-brand-2 p-2 bg-brand-1">
-                                <!-- <label class="block font-bold text-black-3 text-[10px] mb-1 uppercase">PRICE (JPY)</label> -->
-                                <div class="w-full p-1 text-[16px] font-bold flex items-center">
-                                    <span id="detail-display-price_symbol" class="mr-1"></span>
-                                    <span id="detail-display-memo_price">0</span>
-                                </div>
-                            </div>
-                            <!-- URL -->
-                            <div class="border border-brand-2 p-2 bg-brand-1">
-                                <!-- <label class="block font-bold text-black-3 text-[10px] mb-1 uppercase">URL</label> -->
-                                <div class="w-full p-1 truncate">
-                                    <a id="detail-display-link_url" href="" target="_blank" class="text-[12px] text-blue-500 underline break-all"></a>
+                            <div>
+                                <label class="block font-black text-black-3 text-[10px] mb-1 uppercase tracking-wider">TIME</label>
+                                <div class="flex items-center border-b-2 border-brand-2 pb-1">
+                                    <input name="memo_time" id="detail-edit-memo_time" type="time" class="w-full bg-transparent outline-none font-bold text-black-5 text-[14px]">
                                 </div>
                             </div>
                         </div>
-                        <!-- 編集用（編集モード） -->
-                        <form id="detail-edit" class="hidden mt-3 space-y-5 text-black-4">
-                            <div class="grid grid-cols-10 gap-x-3 items-center border-b border-brand-3 pb-2">
-                                <!-- 日付 -->
-                                <div class="col-span-4">
-                                    <label class="block font-bold text-black-3 text-[10px] mb-0.5">DATE</label>
-                                    <input name="memo_date" id="detail-edit-memo_date" type="date"
-                                        class="w-full bg-transparent outline-none text-[16px] px-0 leading-tight">
-                                </div>
-                                <!-- 時刻 -->
-                                <div class="col-span-3">
-                                    <label class="block font-bold text-black-3 text-[10px] mb-0.5">TIME</label>
-                                    <input name="memo_time" id="detail-edit-memo_time" type="time"
-                                        class="w-full bg-transparent outline-none text-[16px] px-0 leading-tight">
-                                </div>
-                                <!-- 表情 -->
-                                <div class="col-span-1 flex flex-col items-center">
-                                    <label class="font-bold text-black-3 text-[10px] mb-0.5">FACE</label>
-                                    <button id="btn-face-trigger" type="button" class="h-10 w-10 border border-slate-200 bg-white active:scale-95 flex items-center justify-center">
-                                        <span id="span-face-preview" class="text-[32px] leading-none"></span>
+
+                        <!-- 編集用 (detail-edit) の MOOD & ATMOSPHERE エリア -->
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block font-black text-black-3 text-[10px] mb-1 uppercase tracking-wider">MOOD</label>
+                                <div class="flex items-center justify-between border-b-2 border-brand-2 pb-1">
+                                    <button id="btn-face-trigger" type="button" class="w-full text-right text-2xl outline-none active:scale-95">
+                                        <span id="span-face-preview"></span>
                                         <input name="face_emoji" id="detail-edit-face_emoji" type="hidden">
                                     </button>
                                 </div>
-                                <!-- 天気 -->
-                                <div class="col-span-2 flex flex-col items-center">
-                                    <label class="font-bold text-black-3 text-[10px] mb-0.5">WEATHER</label>
-                                    <button id="btn-weather-trigger" type="button" class="h-10 w-10 border border-slate-200 bg-white active:scale-95 flex items-center justify-center">
-                                        <span id="span-weather-preview" class="text-[32px] leading-none"></span>
+                            </div>
+                            <div>
+                                <!-- WEATHER から ATMOSPHERE に変更、ボタンに戻す -->
+                                <label class="block font-black text-black-3 text-[10px] mb-1 uppercase tracking-wider">ATMOSPHERE</label>
+                                <div class="flex items-center justify-between border-b-2 border-brand-2 pb-1">
+                                    <button id="btn-atmosphere-trigger" type="button" class="w-full text-right outline-none active:scale-95 font-bold text-brand-5 text-[16px] tracking-widest">
+                                        <span id="span-atmosphere-preview">0000</span>
                                         <input name="weather_emoji" id="detail-edit-weather_emoji" type="hidden">
                                     </button>
                                 </div>
                             </div>
-                            <!-- タイトル -->
-                            <div>
-                                <div class="flex justify-between items-end mb-1">
-                                    <label class="font-bold text-black-3 text-[10px]">TITLE</label>
-                                    <div class="text-[10px] text-black-2"><span id="detail-count-title">0</span>/50</div>
-                                </div>
-                                <input name="title" id="detail-edit-title" type="text" maxlength="50" 
-                                    placeholder="タイトルを入力"
-                                    class="w-full py-1 bg-transparent border-b border-brand-3 rounded-none focus:border-brand-5 outline-none text-[16px] px-0">
+                        </div>
+
+                        <!-- TITLE -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="font-black text-black-3 text-[10px] uppercase tracking-wider">TITLE</label>
+                                <div class="text-[10px] text-black-2 font-bold"><span id="detail-count-title">0</span>/50</div>
                             </div>
-                            <!-- 本文 -->
-                            <div>
-                                <div class="flex justify-between items-end mb-1">
-                                    <label class="font-bold text-black-3 text-[10px]">BODY</label>
-                                    <div class="text-[10px] text-black-2"><span id="detail-count-body">0</span>/500</div>
-                                </div>
-                                <textarea name="body" id="detail-edit-body" maxlength="500" 
-                                    placeholder="本文を入力してください"
-                                    class="w-full p-2 bg-white border border-brand-3 rounded h-48 focus:border-brand-5 outline-none text-[16px] resize-none"></textarea>
+                            <input name="title" id="detail-edit-title" type="text" maxlength="50" class="w-full bg-transparent border-b-2 border-brand-2 pb-1 outline-none font-black text-lg text-black-5 focus:border-brand-5">
+                        </div>
+
+                        <!-- BODY -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="font-black text-black-3 text-[10px] uppercase tracking-wider">MEMORY DETAIL</label>
+                                <div class="text-[10px] text-black-2 font-bold"><span id="detail-count-body">0</span>/500</div>
                             </div>
-                            <!-- 金額 -->
+                            <textarea name="body" id="detail-edit-body" maxlength="500" class="w-full bg-transparent border-b-2 border-brand-2 pb-1 outline-none text-[14px] text-black-4 focus:border-brand-5 resize-none h-24"></textarea>
+                        </div>
+
+                        <!-- PRICE -->
+                        <div class="grid grid-cols-2 gap-6">
                             <div>
-                                <label class="block font-bold text-black-3 text-[10px] mb-1">PRICE (JPY)</label>
-                                <div class="grid grid-cols-2 gap-x-3">
-                                    <!-- 金額（プラス） -->
-                                    <div class="relative flex items-center">
-                                        <span class="absolute left-2 text-blue-500 font-bold text-[16px]">＋</span>
-                                        <input id="detail-edit-price_plus" type="number" placeholder="0"
-                                            class="text-right w-full pr-2 py-1 bg-blue-50/50 border-b border-blue-300 rounded-t focus:bg-blue-50 focus:border-blue-500 outline-none text-[16px] text-blue-700 transition-colors">
-                                    </div>
-                                    <!-- 金額（マイナス） -->
-                                    <div class="relative flex items-center">
-                                        <span class="absolute left-2 text-red-500 font-bold text-[16px]">－</span>
-                                        <input id="detail-edit-price_minus" type="number" placeholder="0"
-                                            class="text-right w-full pr-2 py-1 bg-red-50/50 border-b border-red-300 rounded-t focus:bg-red-50 focus:border-red-500 outline-none text-[16px] text-red-700 transition-colors">
-                                    </div>
+                                <label class="block font-black text-blue-500 text-[10px] mb-1 uppercase tracking-wider">JPY</label>
+                                <div class="flex items-center border-b-2 border-brand-2 pb-1">
+                                    <span class="text-blue-500 font-bold mr-2 text-lg">＋</span>
+                                    <input id="detail-edit-price_plus" type="number" class="w-full bg-transparent outline-none font-bold text-blue-500 text-[16px]">
                                 </div>
                             </div>
-                            <!-- URL -->
                             <div>
-                                <div class="flex justify-between items-end mb-1">
-                                    <label class="font-bold text-black-3 text-[10px]">URL</label>
-                                    <div class="text-[10px] text-black-2"><span id="detail-count-url">0</span>/200</div>
+                                <label class="block font-black text-red-500 text-[10px] mb-1 uppercase tracking-wider">JPY</label>
+                                <div class="flex items-center border-b-2 border-brand-2 pb-1">
+                                    <span class="text-red-500 font-bold mr-2 text-lg">－</span>
+                                    <input id="detail-edit-price_minus" type="number" class="w-full bg-transparent outline-none font-bold text-red-500 text-[16px]">
                                 </div>
-                                <input name="link_url" id="detail-edit-link_url" type="url" maxlength="200"
-                                    placeholder="https://..."
-                                    class="w-full py-1 bg-transparent border-b border-brand-3 rounded-none focus:border-brand-5 outline-none text-[16px] px-0 text-blue-600">
                             </div>
-                            <!-- 隠しフィールド -->
-                            <div class="hidden">
-                                <input name="archive_id" id="detail-edit-archive_id" type="hidden" value="">
-                                <input name="seq" id="detail-edit-seq" type="hidden" value="">
-                                <input name="latitude" id="detail-edit-latitude" type="hidden" value="">
-                                <input name="longitude" id="detail-edit-longitude" type="hidden" value="">
-                                <input name="memo_price" id="detail-edit-memo_price" type="hidden" value="0">
+                        </div>
+
+                        <!-- URL -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="font-black text-black-3 text-[10px] uppercase tracking-wider">URL</label>
+                                <div class="text-[10px] text-black-2 font-bold"><span id="detail-count-url">0</span>/200</div>
                             </div>
-                        </form>
+                            <div class="flex items-center border-b-2 border-brand-2 pb-1">
+                                <span class="text-brand-3 mr-2 text-sm">🔗</span>
+                                <input name="link_url" id="detail-edit-link_url" type="url" maxlength="200" class="w-full bg-transparent outline-none text-[12px] font-bold text-blue-500 focus:border-brand-5" placeholder="https://...">
+                            </div>
+                        </div>
+
+                        <!-- 隠しフィールド -->
+                        <div class="hidden">
+                            <input name="archive_id" id="detail-edit-archive_id" type="hidden" value="">
+                            <input name="seq" id="detail-edit-seq" type="hidden" value="">
+                            <input name="latitude" id="detail-edit-latitude" type="hidden" value="">
+                            <input name="longitude" id="detail-edit-longitude" type="hidden" value="">
+                            <input name="memo_price" id="detail-edit-memo_price" type="hidden" value="0">
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 詳細パネルのフッター (固定) -->
+                <div class="shrink-0 px-4 pb-6 pt-4 bg-brand-0 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.03)] z-10">
+                    
+                    <!-- （いいねボタン） -->
+                    <div id="detail-group-reaction" class="flex justify-between gap-2 mb-4">
+                        <button id="detail-btn-funny" class="flex-1 bg-white rounded-2xl py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                            <span class="text-xl">🤣</span>
+                            <span class="text-[8px] font-black text-black-3 uppercase tracking-tighter mt-1">Funny</span>
+                            <span class="text-[12px] font-black text-brand-5 js-count mt-0.5">0</span>
+                        </button>
+                        <button id="detail-btn-helpful" class="flex-1 bg-white rounded-2xl py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                            <span class="text-xl">😍</span>
+                            <span class="text-[8px] font-black text-black-3 uppercase tracking-tighter mt-1">Helpful</span>
+                            <span class="text-[12px] font-black text-brand-5 js-count mt-0.5">0</span>
+                        </button>
+                        <button id="detail-btn-surprise" class="flex-1 bg-white rounded-2xl py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                            <span class="text-xl">😲</span>
+                            <span class="text-[8px] font-black text-black-3 uppercase tracking-tighter mt-1">Surprise</span>
+                            <span class="text-[12px] font-black text-brand-5 js-count mt-0.5">0</span>
+                        </button>
+                        <button id="detail-btn-empathy" class="flex-1 bg-white rounded-2xl py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                            <span class="text-xl">😉</span>
+                            <span class="text-[8px] font-black text-black-3 uppercase tracking-tighter mt-1">Empathy</span>
+                            <span class="text-[12px] font-black text-brand-5 js-count mt-0.5">0</span>
+                        </button>
                     </div>
-                    <!-- 詳細パネルのフッター -->
-                    <div class="shadow-brand ">
-                        <!-- （いいねボタン） -->
-                        <div id="detail-group-reaction" class="shrink-0 flex h-10 bg-brand-2">
-                            <button id="detail-btn-amazing" class="flex-1 text-black text-[12px] flex flex-col items-center justify-center leading-tight disabled:opacity-60">
-                                <span>Amazing</span><span class="text-[10px] font-bold js-count text-brand-5">0</span>
-                            </button>
-                            <button id="detail-btn-helpful" class="flex-1 text-black text-[12px] flex flex-col items-center justify-center leading-tight disabled:opacity-60">
-                                <span>Helpful</span><span class="text-[10px] font-bold js-count text-brand-5">0</span>
-                            </button>
-                            <button id="detail-btn-funny"   class="flex-1 text-black text-[12px] flex flex-col items-center justify-center leading-tight disabled:opacity-60">
-                                <span>Funny</span><span class="text-[10px] font-bold js-count text-brand-5">0</span>
-                            </button>
-                            <button id="detail-btn-try"     class="flex-1 text-black text-[12px] flex flex-col items-center justify-center leading-tight disabled:opacity-60">
-                                <span>Wanna Try</span><span class="text-[10px] font-bold js-count text-brand-5">0</span>
-                            </button>
-                        </div>
-                        <!-- （マーカー移動） -->
-                        <div id="detail-group-move" class="shrink-0 flex h-10 bg-brand-3">
-                            <button id="detail-btn-first" class="flex-1 text-black text-[16px]">◀◀</button>
-                            <button id="detail-btn-prev"  class="flex-1 text-black text-[16px]">◀</button>
-                            <button id="detail-btn-next"  class="flex-1 text-black text-[16px]">▶</button>
-                            <button id="detail-btn-last"  class="flex-1 text-black text-[16px]">▶▶</button>
-                        </div>
-                        <!-- （キャンセル・保存） -->
-                        <div class="shrink-0 flex h-16">
-                            <button id="detail-btn-cancel" class="flex-1 bg-brand-close text-white font-bold text-[16px]">CANCEL</button>
-                            <button id="detail-btn-save" class="flex-1 bg-brand-4 text-white font-bold text-[16px]">SAVE DATA</button>
-                        </div>
+
+                    <!-- index.html 詳細パネルフッター内：マーカー移動ボタンの修正 -->
+                    <div id="detail-group-move" class="flex items-center justify-center bg-black/50 rounded-full px-2 py-1 mb-4 shadow-md">
+                        <button id="detail-btn-first" class="w-12 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">≪</button>
+                        <button id="detail-btn-prev"  class="w-12 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">◀</button>
+                        <div class="w-px h-6 bg-white/30 mx-4"></div>
+                        <button id="detail-btn-next"  class="w-12 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">▶</button>
+                        <button id="detail-btn-last"  class="w-12 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">≫</button>
+                    </div>
+
+                    <!-- （キャンセル・保存） -->
+                    <div class="flex gap-4">
+                        <button id="detail-btn-cancel" class="flex-1 bg-slate-400 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform">CANCEL</button>
+                        <button id="detail-btn-save" class="flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform">SAVE DATA</button>
                     </div>
                 </div>
-                <div class="h-4 bg-brand-0"></div>
+
             </div>
         </div>
         <!-- ■　アプリ下部 -->
@@ -313,11 +333,15 @@
                     <button id="btn-create" class="shadow-brand w-16 h-16 bg-brand-5 text-white font-black text-[12px]">
                         create
                     </button>
-                    <!-- まとめ親 -->
-                    <div id="bot-group-move" class="space-x-2">
-                        <button id="btn-bot-move-prev" class="shadow-brand h-10 w-10 bg-brand-3 text-[12px]">◀</button>
-                        <button id="btn-bot-move-open" class="shadow-brand h-10 w-10 bg-brand-3 text-[12px]">●</button>
-                        <button id="btn-bot-move-next" class="shadow-brand h-10 w-10 bg-brand-3 text-[12px]">▶</button>
+                    <!-- index.html の下部バー内：ボトム移動ボタン群の修正 -->
+                    <div id="bot-group-move" class="hidden flex items-center bg-black/50 rounded-full px-2 py-1 shadow-md">
+                        <button id="btn-bot-move-first" class="w-10 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">≪</button>
+                        <button id="btn-bot-move-prev"  class="w-10 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">◀</button>
+                        <div class="w-px h-5 bg-white/30 mx-1"></div>
+                        <button id="btn-bot-move-open"  class="w-10 h-10 flex items-center justify-center text-brand-5 font-black text-[20px] active:scale-95 transition-transform hover:bg-white/20 rounded-full drop-shadow-md">●</button>
+                        <div class="w-px h-5 bg-white/30 mx-1"></div>
+                        <button id="btn-bot-move-next"  class="w-10 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">▶</button>
+                        <button id="btn-bot-move-last"  class="w-10 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">≫</button>
                     </div>
                     <!-- 地点検索ボタン -->
                     <button id="btn-search" class="hidden shadow-brand w-16 h-16 bg-brand-5 text-white font-black text-[12px]">
@@ -368,31 +392,27 @@
 
         <!-- 【マップ】ポップアップ -->
         <template id="tpl-marker-popup">
-            <div class="w-[200px] flex gap-2 flex-col items-start cursor-pointer active:opacity-60 transition-opacity">
-                <!-- 左：No（丸背景で目立たせる） -->
-                <div class="flex gap-2">
-                    <div class="shrink-0 w-8 h-8 rounded-full bg-brand-5 text-white flex items-center justify-center font-black text-[16px] shadow-sm">
-                        <span class="index"></span>
-                    </div>
-                    <!-- 右：内容 -->
-                    <div class="flex-1 min-w-0">
-                        <!-- 日時 -->
-                        <div class="text-[10px] font-bold text-brand-5 mb-0.5">
-                            <span class="time"></span>
-                        </div>
-                        <!-- タイトル（1行で切り捨て） -->
-                        <div class="text-[12px] font-bold text-black-5 truncate mb-0.5">
-                            <span class="title"></span>
-                        </div>
-                        <!-- 本文（2行で切り捨て、長文対応） -->
-                        <div class="text-[10px] text-black-3 line-clamp-2 leading-tight break-all">
-                            <span class="body"></span>
-                        </div>
-                    </div>
+            <div class="relative w-[240px] bg-white rounded-2xl shadow-sm p-4 pt-5 overflow-hidden flex flex-col border border-slate-100">
+                <!-- 右上のインデックスフラッグ -->
+                <div class="absolute top-0 right-0 w-[52px] h-[52px] bg-brand-5 text-white font-black text-[24px] flex items-center justify-center rounded-bl-[1.5rem] shadow-sm">
+                    <span class="index leading-none pb-1 pl-1"></span>
                 </div>
-                <!-- 地点検索モード用：まとめ参照ボタン -->
-                <button id="btn-popup-archive" class="hidden w-full h-6 bg-brand-3 text-white font-bold text-[10px] rounded flex items-center justify-center shadow">
-                    まとめを見る
+                <!-- 日時 -->
+                <div class="text-[10px] font-black text-brand-5 mb-1.5 tracking-widest">
+                    <span class="time"></span>
+                </div>
+                <!-- タイトル -->
+                <div class="text-[16px] font-black text-black-5 leading-tight mb-2 line-clamp-2 pr-8 relative z-10">
+                    <span class="title"></span>
+                </div>
+                <!-- 本文 -->
+                <div class="text-[11px] text-black-3 line-clamp-2 leading-relaxed mb-4">
+                    <span class="body"></span>
+                </div>
+                <!-- アクションボタン -->
+                <button id="btn-popup-action" class="w-full h-10 bg-brand-5 text-white font-black text-[11px] rounded-xl flex items-center justify-center gap-1 uppercase shadow-md active:scale-95 transition-transform tracking-widest">
+                    <span class="js-action-text">VIEW SUMMARY</span>
+                    <span class="text-[14px] leading-none mb-0.5">›</span>
                 </button>
             </div>
         </template>
