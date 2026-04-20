@@ -102,6 +102,7 @@ builder.Services.AddScoped<GetArchiveDetailsService>();
 builder.Services.AddScoped<GetArchiveListService>();
 builder.Services.AddScoped<UpsertDetailService>();
 builder.Services.AddScoped<MergeDetailsService>();
+builder.Services.AddScoped<AddDetailsService>();
 builder.Services.AddScoped<DeleteArchiveService>();
 builder.Services.AddScoped<UpdateArchiveService>();
 builder.Services.AddScoped<PublishArchiveService>();
@@ -205,6 +206,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy.WithOrigins(
+                "https://2cd8-112-71-71-140.ngrok-free.app",
                 "http://localhost:5500",
                 "http://127.0.0.1:5500",
                 "http://localhost:5501",

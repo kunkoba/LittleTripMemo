@@ -7,8 +7,8 @@ public class TMemoArchive : IAppRecord
 {
     public int archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
-    public string title { get; set; } = string.Empty;
-    public string memo { get; set; } = string.Empty;
+    public string title { get; set; } = "仮のタイトル";
+    public string memo { get; set; } = "仮の本文";
     public string link_url { get; set; } = string.Empty;
     public bool closed_flg { get; set; } = false;
     public bool del_flg { get; set; } = false;

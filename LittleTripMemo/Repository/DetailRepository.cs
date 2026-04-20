@@ -228,6 +228,24 @@ public class DetailRepository : _BaseRepository
         });
     }
 
+
+    /// <summary>
+    /// 秘密データへ戻す（論理削除の復元）。主キー（archive_id）による更新。
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <returns></returns>
+    public async Task<int> RestoreByKeyAsync(int archiveId)
+    {
+        string sql = $@"
+            UPDATE t_memo_detail_{_user.TableId}
+            SET del_flg    = false,
+                update_tim = CURRENT_TIMESTAMP
+            WHERE
+                archive_id = @archive_id
+                AND user_id = @user_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
+    }
+
     /// <summary>
     /// 地点検索用の明細取得。指定された緯度・経度の範囲内にある明細を取得する。
     /// </summary>

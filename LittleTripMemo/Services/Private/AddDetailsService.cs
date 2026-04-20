@@ -11,20 +11,20 @@ namespace LittleTripMemo.Services;
 /// 1. t_memo_archive を新規作成（archive_id を取得）
 /// 2. 指定された seq の明細に archive_id をセット
 /// </summary>
-public class MergeDetailsService : _BaseService
+public class AddDetailsService : _BaseService
 {
     private readonly ITransactionProvider _provider;
     private readonly ArchiveRepository _archiveRepo;
     private readonly DetailRepository _detailRepo;
 
-    public record MergeDetailsReq(
+    public record AddDetailsReq(
         [Required(ErrorMessage = "seqリストは必須です")] int[] seqs,
-        [Required(ErrorMessage = "タイトルは必須です")][StringLength(100)] string title
+        [Required(ErrorMessage = "archiveIdは必須です")] int archive_id
     );
 
     public record Response(int archiveId, int updatedCount);
 
-    public MergeDetailsService(
+    public AddDetailsService(
         UserContext userContext,
         ITransactionProvider provider,
         ArchiveRepository archiveRepo,
@@ -37,9 +37,9 @@ public class MergeDetailsService : _BaseService
     }
 
     /// <summary>
-    /// 実行（1.検証 → 2.archive作成 → 3.detail更新）
+    /// 実行（1.検証 → 2.実行）
     /// </summary>
-    public async Task<Response> ExecuteAsync(MergeDetailsReq req)
+    public async Task<Response> ExecuteAsync(AddDetailsReq req)
     {
         // 1. 検証
         await ValidateAsync(req);
@@ -48,15 +48,8 @@ public class MergeDetailsService : _BaseService
         using var tran = _provider.BeginTransaction();
         try
         {
-            // 2-1. archive を新規作成して archive_id を取得
-            var archiveId = await _archiveRepo.InsertAsync(new TMemoArchive
-            {
-                title    = req.title,
-                memo     = "くわしく",
-                link_url = ""
-            });
-
-            // 2-2. 対象の明細に archive_id をセット
+            var archiveId = req.archive_id;
+            // 対象の明細に 指定のarchive_id をセット
             var updatedCount = await _detailRepo.UpdateArchiveIdBySeqsAsync(archiveId, req.seqs);
 
             tran.Commit();
@@ -71,11 +64,12 @@ public class MergeDetailsService : _BaseService
     /// <summary>
     /// 1. 検証（業務チェック）
     /// </summary>
-    private async Task ValidateAsync(MergeDetailsReq req)
+    private async Task ValidateAsync(AddDetailsReq req)
     {
         BusinessException.ThrowIf(_user.TableId == 0, "テーブルIDが無効です");
         BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(req.seqs.Length == 0, "seqリストが空です");
+        BusinessException.ThrowIf(req.archive_id == 0, "archiveIdが無効です");
         await Task.CompletedTask;
     }
 }

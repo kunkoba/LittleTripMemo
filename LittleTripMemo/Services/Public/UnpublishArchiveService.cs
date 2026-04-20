@@ -9,6 +9,7 @@ public class UnpublishArchiveService : _BaseService
     private readonly ArchivePubRepository _archivePubRepo;
     private readonly DetailPubRepository _detailPubRepo;
     private readonly ArchiveRepository _archiveRepo;
+    private readonly DetailRepository _detailRepo;
 
     public record UnpublishArchiveReq(int archive_id);
     public record Response(int archiveId);
@@ -18,6 +19,7 @@ public class UnpublishArchiveService : _BaseService
         ITransactionProvider provider,
         ArchivePubRepository archivePubRepo,
         DetailPubRepository detailPubRepo,
+        DetailRepository detailRepo,
         ArchiveRepository archiveRepo)
         : base(userContext)
     {
@@ -25,6 +27,7 @@ public class UnpublishArchiveService : _BaseService
         _archivePubRepo = archivePubRepo;
         _detailPubRepo = detailPubRepo;
         _archiveRepo = archiveRepo;
+        _detailRepo = detailRepo;
     }
 
     public async Task<Response> ExecuteAsync(UnpublishArchiveReq req)
@@ -40,6 +43,8 @@ public class UnpublishArchiveService : _BaseService
             await _archivePubRepo.DeletePhysicalByKeyAsync(req.archive_id);
             // ③ 秘密アーカイブの論理削除を戻す
             await _archiveRepo.RestoreByKeyAsync(req.archive_id);
+            // ④ 明細の論理削除を戻す
+            await _detailRepo.RestoreByKeyAsync(req.archive_id);
 
             tran.Commit();
             return new Response(req.archive_id);

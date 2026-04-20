@@ -17,6 +17,7 @@ public class AppController : _BaseController
     private readonly GetArchiveListService _getArchiveListService;
     private readonly UpsertDetailService _upsertDetailService;
     private readonly MergeDetailsService _mergeDetailsService;
+    private readonly AddDetailsService _addDetailsService;
     private readonly DeleteArchiveService _deleteArchiveService;
     private readonly UpdateArchiveService _updateArchiveService;
     private readonly PublishArchiveService _publishArchiveService;
@@ -39,6 +40,7 @@ public class AppController : _BaseController
         GetArchiveListService getArchiveListService,
         UpsertDetailService upsertDetailService,
         MergeDetailsService mergeDetailsService,
+        AddDetailsService addDetailsService,
         DeleteArchiveService deleteArchiveService,
         UpdateArchiveService updateArchiveService,
         PublishArchiveService publishArchiveService,
@@ -58,6 +60,7 @@ public class AppController : _BaseController
         _getArchiveListService = getArchiveListService;
         _upsertDetailService = upsertDetailService;
         _mergeDetailsService = mergeDetailsService;
+        _addDetailsService = addDetailsService;
         _deleteArchiveService = deleteArchiveService;
         _updateArchiveService = updateArchiveService;
         _publishArchiveService = publishArchiveService;
@@ -85,12 +88,22 @@ public class AppController : _BaseController
     }
 
     /// <summary>
-    /// 日々のデータをまとめる。
+    /// 明細をまとめる
     /// </summary>
     [HttpPost("api/MergeDetails")]
     public async Task<IActionResult> MergeDetails([FromBody] MergeDetailsService.MergeDetailsReq req)
     {
         var result = await _mergeDetailsService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// 指定したまとめ親に追加する
+    /// </summary>
+    [HttpPost("api/AddDetails")]
+    public async Task<IActionResult> AddDetails([FromBody] AddDetailsService.AddDetailsReq req)
+    {
+        var result = await _addDetailsService.ExecuteAsync(req);
         return OkWithBase(result);
     }
 
