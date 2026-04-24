@@ -44,7 +44,8 @@ public class GetArchiveListService : _BaseService
             create_tim = x.create_tim,
             update_tim = x.update_tim,
             is_public = x.is_public,
-            is_owner = x.is_owner
+            is_owner = x.is_owner,
+            cnt = x.cnt,
             // 必要な項目だけ詰める
         });
 
@@ -60,7 +61,8 @@ public class GetArchiveListService : _BaseService
             create_tim = x.create_tim,
             update_tim = x.update_tim,
             is_public = x.is_public,
-            is_owner = x.is_owner
+            is_owner = x.is_owner,
+            cnt = x.cnt,
         });
 
         // 結合

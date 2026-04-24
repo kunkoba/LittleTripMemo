@@ -57,11 +57,16 @@ public class ArchivePubRepository : _BaseRepository
     /// </summary>
     public async Task<IEnumerable<TMemoArchivePub>> GetAllAsync()
     {
-        const string sql = @"
-            SELECT * FROM t_memo_archive_pub 
-            WHERE user_id  = @user_id 
-              AND del_flg  = false 
-            ORDER BY create_tim DESC";
+        string sql = $@"
+            SELECT a.*,
+                COUNT(d.archive_id) AS cnt
+            FROM t_memo_archive_pub a
+            LEFT JOIN t_memo_detail_pub d
+                ON a.archive_id = d.archive_id
+            WHERE a.user_id = @user_id
+              AND a.del_flg = false
+            GROUP BY a.archive_id
+            ORDER BY a.create_tim DESC";
 
         // 取得系も継承元のラッパーを使用
         return await QueryAsync<TMemoArchivePub>(sql, new { user_id = _user.UserId });

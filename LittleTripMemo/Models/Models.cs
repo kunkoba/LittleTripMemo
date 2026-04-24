@@ -16,6 +16,7 @@ public class TMemoArchive : IAppRecord
     public DateTime update_tim { get; set; }
     public bool is_public { get; set; } = false;
     public bool is_owner { get; set; } = true;
+    public int cnt { get; set; } = 0;
 }
 
 public class TMemoArchivePub : IAppRecord
@@ -31,6 +32,7 @@ public class TMemoArchivePub : IAppRecord
     public DateTime update_tim { get; set; }
     public bool is_public { get; set; } = true;
     public bool is_owner { get; set; } = false;
+    public int cnt { get; set; } = 0;
 }
 
 public class DtoArchive
@@ -46,6 +48,7 @@ public class DtoArchive
     public DateTime update_tim { get; set; }
     public bool is_public { get; set; } = true;
     public bool is_owner { get; set; } = false;
+    public int cnt { get; set; } = 0;
 }
 
 public class TMemoDetail : IAppRecord
@@ -68,6 +71,7 @@ public class TMemoDetail : IAppRecord
     public DateTime update_tim { get; set; }
     public bool is_public { get; set; } = false;
     public bool is_owner { get; set; } = true;
+    public string a_title { get; set; } = string.Empty;
 }
 
 public class TMemoDetailPub : IAppRecord
@@ -95,6 +99,7 @@ public class TMemoDetailPub : IAppRecord
     public int count_helpful { get; set; } = 0;
     public int count_surprise { get; set; } = 0;
     public int count_empathy { get; set; } = 0;
+    public string a_title { get; set; } = string.Empty;
 }
 
 public class TReactionPub

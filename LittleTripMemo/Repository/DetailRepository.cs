@@ -261,13 +261,17 @@ public class DetailRepository : _BaseRepository
     int limit = 50)
     {
         string sql = $@"
-        SELECT * FROM t_memo_detail_{_user.TableId}
-        WHERE latitude  BETWEEN @lat_min AND @lat_max
-          AND longitude BETWEEN @lng_min AND @lng_max
-          AND user_id   = @user_id
-          AND del_flg   = false
-          AND archive_id > 0
-        LIMIT @limit";
+            SELECT d.*,
+                a.title AS a_title
+            FROM t_memo_detail_{_user.TableId} d
+            LEFT JOIN t_memo_archive a
+                ON d.archive_id = a.archive_id
+            WHERE d.latitude  BETWEEN @lat_min AND @lat_max
+              AND d.longitude BETWEEN @lng_min AND @lng_max
+              AND d.user_id   = @user_id
+              AND d.del_flg   = false
+              AND d.archive_id > 0
+              LIMIT @limit";
         return await QueryAsync<TMemoDetail>(sql, new
         {
             lat_min = latMin,

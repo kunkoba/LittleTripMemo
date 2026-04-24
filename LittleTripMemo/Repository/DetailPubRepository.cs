@@ -94,8 +94,8 @@ public class DetailPubRepository : _BaseRepository
         int limit = 50)
     {
         const string sql = @"
-            SELECT
-                d.*,
+            SELECT d.*,
+                a.title AS a_title,
                 COUNT(CASE WHEN r.reaction_type = 1 THEN 1 END) as count_funny,
                 COUNT(CASE WHEN r.reaction_type = 2 THEN 1 END) as count_helpful,
                 COUNT(CASE WHEN r.reaction_type = 3 THEN 1 END) as count_surprise,
@@ -107,8 +107,20 @@ public class DetailPubRepository : _BaseRepository
               AND d.longitude BETWEEN @lng_min AND @lng_max
               AND d.del_flg   = false
               AND a.closed_flg = false
-            GROUP BY d.archive_id, d.seq
+            GROUP BY d.archive_id, d.seq, a.title
             LIMIT @limit";
+        //string sql = $@"
+        //    SELECT d.*,
+        //        a.title AS a_title
+        //    FROM t_memo_detail_pub d
+        //    LEFT JOIN t_memo_archive_pub a
+        //        ON d.archive_id = a.archive_id
+        //    WHERE d.latitude  BETWEEN @lat_min AND @lat_max
+        //      AND d.longitude BETWEEN @lng_min AND @lng_max
+        //      AND d.user_id   = @user_id
+        //      AND d.del_flg   = false
+        //      AND d.archive_id > 0
+        //      LIMIT @limit";
 
         return await QueryAsync<TMemoDetailPub>(sql, new { lat_min = latMin, lat_max = latMax, lng_min = lngMin, lng_max = lngMax, limit });
     }

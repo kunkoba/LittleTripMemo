@@ -88,11 +88,16 @@ public class ArchiveRepository : _BaseRepository
     /// </summary>
     public async Task<IEnumerable<TMemoArchive>> GetAllAsync()
     {
-        const string sql = @"
-            SELECT * FROM t_memo_archive 
-            WHERE user_id  = @user_id 
-              AND del_flg  = false 
-            ORDER BY create_tim DESC";
+        string sql = $@"
+            SELECT a.*,
+                COUNT(d.archive_id) AS cnt
+            FROM t_memo_archive a
+            LEFT JOIN t_memo_detail_{_user.TableId} d
+                ON a.archive_id = d.archive_id
+            WHERE a.user_id = @user_id
+              AND a.del_flg = false
+            GROUP BY a.archive_id
+            ORDER BY a.create_tim DESC";
 
         // 取得系も継承元のラッパーを使用
         return await QueryAsync<TMemoArchive>(sql, new { user_id = _user.UserId });
