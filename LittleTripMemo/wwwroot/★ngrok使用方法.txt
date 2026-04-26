@@ -1,0 +1,15 @@
+■ngrok使い方
+
+ngrok version
+
+ngrok http https://localhost:7292
+
+
+https://2cd8-112-71-71-140.ngrok-free.app
+
+
+
+
+まとめる📦
+
+

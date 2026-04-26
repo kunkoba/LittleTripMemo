@@ -1,0 +1,6 @@
+{
+  "javascript.referencesCodeLens.showOnAllFunctions": true,
+  "javascript.referencesCodeLens.enabled": true,
+  "references.preferredLocation": "peek",
+  "liveServer.settings.port": 5501
+}

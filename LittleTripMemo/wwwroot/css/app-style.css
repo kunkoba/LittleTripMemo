@@ -1,0 +1,79 @@
+/**
+ * app-style.css
+ * タブサイズ: 4
+ */
+
+/* ==========================================================================
+   画面・アプリ共通設定
+   ========================================================================== */
+
+/* テーマ定義：レベル間の差を抑えた配色 */
+:root[data-theme='blue'] {
+    --brand-lvl0: #fff; --brand-lvl1: #f0f9ff; --brand-lvl2: #e0f2fe; --brand-lvl3: #7dd3fc; --brand-lvl4: #38bdf8; --brand-lvl5: #0ea5e9;
+}
+:root[data-theme='green'] {
+    --brand-lvl0: #fff; --brand-lvl1: #f0fdf4; --brand-lvl2: #dcfce7; --brand-lvl3: #86efac; --brand-lvl4: #4ade80; --brand-lvl5: #22c55e;
+}
+:root[data-theme='red'] {
+    --brand-lvl0: #fff; --brand-lvl1: #fef2f2; --brand-lvl2: #fee2e2; --brand-lvl3: #fca5a5; --brand-lvl4: #f87171; --brand-lvl5: #ef4444;
+}
+:root[data-theme='yellow'] {
+    --brand-lvl0: #fff; --brand-lvl1: #fefce8; --brand-lvl2: #fef9c3; --brand-lvl3: #fde047; --brand-lvl4: #facc15; --brand-lvl5: #eab308;
+}
+
+/* レベル別の背景色ユーティリティ */
+.bg-brand-0 { background-color: var(--brand-lvl0); }
+.bg-brand-1 { background-color: var(--brand-lvl1); }
+.bg-brand-2 { background-color: var(--brand-lvl2); }
+.bg-brand-3 { background-color: var(--brand-lvl3); }
+.bg-brand-4 { background-color: var(--brand-lvl4); }
+.bg-brand-5 { background-color: var(--brand-lvl5); }
+/* テーマ変数と連動する文字色クラス */
+.text-brand-0 { color: var(--brand-lvl0); }
+.text-brand-1 { color: var(--brand-lvl1); }
+.text-brand-2 { color: var(--brand-lvl2); }
+.text-brand-3 { color: var(--brand-lvl3); }
+.text-brand-4 { color: var(--brand-lvl4); }
+.text-brand-5 { color: var(--brand-lvl5); }
+/* 枠線 */
+.border-brand-0 { border-color: var(--brand-lvl0); }
+.border-brand-1 { border-color: var(--brand-lvl1); }
+.border-brand-2 { border-color: var(--brand-lvl2); }
+.border-brand-3 { border-color: var(--brand-lvl3); }
+.border-brand-4 { border-color: var(--brand-lvl4); }
+.border-brand-5 { border-color: var(--brand-lvl5); }
+/* テキスト文字色 */
+.text-black-1 {color: #d1d1d1}
+.text-black-2 {color: #a8a8a8}
+.text-black-3 {color: #7b7b7b}
+.text-black-4 {color: #4d4e4e}
+.text-black-5 {color: #383838}
+
+/* closeボタン用：ホバー時の連動設定 */
+.bg-brand-close {
+    background-color: #a0aab8;
+    color: #ffffff;
+    transition: background-color 0.2s;
+}
+.bg-brand-close:active {
+    filter: brightness(1.2);
+}
+/* 基本設定 */
+body {
+    /* font-family: 'Noto Sans JP', sans-serif; */
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    /* font-family: 'Zen Kaku Gothic New', sans-serif; */
+    /* font-family: 'Shippori Mincho', serif; */
+    margin: 0;
+    background-color: #fff;
+    color: #383838;
+}
+
+/* 共通インタラクション：形状変化なしの色変化 */
+button:active {
+    filter: brightness(1.2);
+}
+.bg-brand-4:active, .bg-slate-500:active {
+    filter: brightness(0.9);
+}
+

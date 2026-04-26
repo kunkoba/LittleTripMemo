@@ -1,0 +1,75 @@
+# アプリ開発支援 指示書
+
+## 1. プロジェクト概要
+- **アプリ名:** 
+[LittleTripMemo]
+- **目的:** 
+[地図アプリ、メモアプリ]地点とメモを統合的に管理
+- **現在の状況:** 
+[サーバ処理はある程度完成、ローカル側を開発中、サーバとの連携部分はまだ]
+
+
+## 2. 技術スタック（移植先 / 開発中）
+- **言語:** 
+[asp, javascript, ]
+- **フレームワーク:** 
+[]
+- **主要ライブラリ:** 
+[Tailwind CSS, ]
+- **DB/インフラ:** 
+[PostgreSQL, Docker, ]
+
+
+## 3. ディレクトリ構造（アップロードファイル用）
+※アップロードしたファイルがどこに属するか、AIが認識するためのマップです。
+メイン
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\index.html
+UI関連
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\component\fatal-error.html
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\component\template.html
+CSS関連
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\css\app-style.css
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\css\component-style.css
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\css\leaflet.css
+画像関連
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\img\face
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\img\weather
+ロジック
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\app-const.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\app-data.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\app-manager.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\common.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\dialog-manager.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\local-db-controller.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\notice-manager.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\test-data.js
+ロジック（UI部品）
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\component\bottom-bar-controller.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\component\detail-content-controller.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\component\detail-frame-controller.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\component\map-controller.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\component\marker-controller.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\component\top-bar-controller.js
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot\js\component\ui-manager.js
+
+
+
+## 4. 開発ルール・コーディング規約
+- **命名規則:** 
+Coreロジックのメソッドはキャメル
+controllerはパスカル
+データモデルのフィールド名はスネーク（postgresに合わせる）
+- **書き方の好み:** [例：関数コンポーネント（Arrow Function）を優先、非同期処理は async/await を使用]
+特に好みはないが、とにかく統一させてほしい
+- **コメント:** [例：重要なロジックにはJSDoc形式でコメントを詳しく入れること]
+- **エラー処理:** [例：try-catchで囲み、エラー時は console.error を出す]
+
+## 5. 移植元（古いソース）について
+- **ステータス:** 今回はファイルはアップロードしません（必要に応じて部分的にコピペします）。
+- **役割:** 以前のロジック（[例：認証フロー、計算アルゴリズム]）を参考にする場合があります。
+- **注意:** 移植元の古い書き方（[例：Classコンポーネント、jQuery]）をそのまま提案せず、現在の技術スタックに合わせて現代的な書き方に変換してください。
+
+## 6. AIへの具体的な依頼事項
+- [例1：バグの修正とパフォーマンス改善の提案]
+- [例2：新しい機能（〇〇機能）の実装コード作成]
+- [例3：コード全体の不整合や型定義のミスの指摘]

@@ -1,0 +1,17 @@
+■FireBase使い方
+
+CD C:\Users\Owner\Desktop\_WEB\HinekuLemon_Studio
+
+# Firebaseプロジェクトにログイン
+firebase login
+
+# アップロード（デプロイ）コマンド
+firebase deploy
+
+
+https://littletripmemomock-31477.web.app
+
+https://github.com/kunkoba/SlotDataTool-release/releases
+
+
+

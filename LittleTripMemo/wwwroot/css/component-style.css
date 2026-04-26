@@ -1,0 +1,85 @@
+/* ==========================================================================
+   コンポーネント個別設定
+   ========================================================================== */
+
+/* 地図画面レイアウト：並列伸縮のアニメーション */
+#ui-map-id, #ui-detail-id {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ローディング：ドット（アニメーション） */
+@keyframes dots {
+  0%   { content: ""; }
+  10%  { content: "."; }
+  20%  { content: ".."; }
+  30%  { content: "..."; }
+  40%  { content: "...."; }
+  50%  { content: "....."; }
+  60%  { content: "......"; }
+  70%  { content: "......."; }
+  80%  { content: "........"; }
+  90%  { content: "........."; }
+  100% { content: ""; }
+}
+.wait-dots::after {
+  content: "";
+  animation: dots 10s steps(1) infinite;
+}
+
+/* Leaflet の固定位置を解除 */
+.leaflet-top,
+.leaflet-bottom,
+.leaflet-left,
+.leaflet-right {
+    position: static !important;
+}
+/* ズームボタンを左中央へ */
+.leaflet-control-zoom {
+    position: absolute !important;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    pointer-events: auto;
+}
+/* 著作権表記は非表示 */
+.leaflet-control-attribution {
+    display: none !important;
+}
+/* ポップアップ */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+    /* background: transparent !important; */
+    background-color: rgba(255, 255, 255, 0.8); /* 30% 透明 */ 
+    box-shadow: none !important;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+.leaflet-popup-content{
+    display: flex !important;
+    justify-content: center !important;
+    width: 80vw !important;
+    max-width: 400px !important;
+    margin: 0;
+}
+
+
+.shadow-brand {
+    /* 画像・SVG 用（marker, 矢印, 赤丸） */
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+
+    /* div 用（ポップアップ） */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* リスト項目（アクティブ状態） */
+.list-item-active {
+    border-color: var(--brand-lvl3) !important;
+    background-color: var(--brand-lvl1);
+}
+.list-item:hover {
+    background-color: var(--brand-lvl2);
+}
+.list-item {
+    border: 1px solid transparent;
+    background-color: white;
+}

@@ -333,10 +333,7 @@ __pycache__/
 *.xsd.cs
 
 
-
-wwwroot*
-_old1/
-_old2/
+_Del/
 Migrations/
 
 
