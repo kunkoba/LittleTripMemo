@@ -96,7 +96,9 @@ builder.Services.AddScoped<ReactionPubRepository>();
 // ---- Service（業務ロジック層） ----
 
 // Controller は必ず Service 経由で処理を行う
-builder.Services.AddScoped<AccountService>();
+builder.Services.AddScoped<RegistrationUserService>();
+builder.Services.AddScoped<UpdateUserProfileService>();
+builder.Services.AddScoped<GetUserProfileService>();
 builder.Services.AddScoped<GetUnMergeDetailsService>();
 builder.Services.AddScoped<GetArchiveDetailsService>();
 builder.Services.AddScoped<GetArchiveListService>();

@@ -30,9 +30,9 @@ public class ArchiveRepository : _BaseRepository
 
         const string sql = @"
             INSERT INTO t_memo_archive (
-                user_id, title, memo, link_url, del_flg, create_tim, update_tim
+                user_id, title, memo, link_url, currency_unit, del_flg, create_tim, update_tim
             ) VALUES (
-                @user_id, @title, @memo, @link_url, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+                @user_id, @title, @memo, @link_url, @currency_unit, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
             ) RETURNING archive_id";
 
         // 継承元のラップメソッドを使用。transaction引数の記述は不要。
@@ -51,6 +51,7 @@ public class ArchiveRepository : _BaseRepository
                 title      = @title,
                 memo       = @memo,
                 link_url   = @link_url,
+                currency_unit = @currency_unit,
                 update_tim = CURRENT_TIMESTAMP
             WHERE 
                 archive_id = @archive_id 

@@ -13,7 +13,8 @@ public class UpdateArchiveService : _BaseService
         int archive_id,
         string title,
         string memo,
-        string link_url
+        string link_url,
+        string currency_unit
     );
     public record Response(int archiveId);
 
@@ -33,7 +34,8 @@ public class UpdateArchiveService : _BaseService
             archive_id = req.archive_id,
             title = req.title,
             memo = req.memo,
-            link_url = req.link_url
+            link_url = req.link_url,
+            currency_unit = req.currency_unit
         });
         return new Response(req.archive_id);
     }

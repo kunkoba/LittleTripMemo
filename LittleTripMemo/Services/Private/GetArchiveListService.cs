@@ -27,9 +27,9 @@ public class GetArchiveListService : _BaseService
     {
         await ValidateAsync();
         var archives = await _archiveRepo.GetAllAsync();
-        var archives2 = await _archivePubRepo.GetAllAsync();
+        var archivesPub = await _archivePubRepo.GetAllAsync();
         SetAppFlags(archives);
-        SetAppFlags(archives2);
+        SetAppFlags(archivesPub);
 
         // 共通DTOへ変換
         var list1 = archives.Select(x => new DtoArchive
@@ -39,6 +39,7 @@ public class GetArchiveListService : _BaseService
             title = x.title,
             memo = x.memo,
             link_url = x.link_url,
+            currency_unit = x.currency_unit,
             closed_flg = x.closed_flg,
             del_flg = x.del_flg,
             create_tim = x.create_tim,
@@ -46,16 +47,16 @@ public class GetArchiveListService : _BaseService
             is_public = x.is_public,
             is_owner = x.is_owner,
             cnt = x.cnt,
-            // 必要な項目だけ詰める
         });
 
-        var list2 = archives2.Select(x => new DtoArchive
+        var list2 = archivesPub.Select(x => new DtoArchive
         {
             archive_id = x.archive_id,
             user_id = x.user_id,
             title = x.title,
             memo = x.memo,
             link_url = x.link_url,
+            currency_unit = x.currency_unit,
             closed_flg = x.closed_flg,
             del_flg = x.del_flg,
             create_tim = x.create_tim,

@@ -13,7 +13,7 @@ const AppManager = {
             MapStyle: null,
             IsGpsTracking: false,
             Token: null,
-            Currency: 'JPY',
+            currency_unit: 'JPY',
         },
     },
     // 設定を保存
@@ -23,7 +23,7 @@ const AppManager = {
             mapStyleKey: this.AppData.Owner.MapStyle?.key,
             isGpsTracking: this.AppData.Owner.IsGpsTracking,
             token: this.AppData.Owner.Token,
-            currency: this.AppData.Owner.Currency,
+            currency_unit: this.AppData.Owner.currency_unit,
         }));
     },
     // 設定を読込
@@ -34,7 +34,7 @@ const AppManager = {
         if (saved.mapStyleKey) this.AppData.Owner.MapStyle = $Map.MAP_STYLE[saved.mapStyleKey];
         if (saved.isGpsTracking !== undefined) this.AppData.Owner.IsGpsTracking = saved.isGpsTracking;
         if (saved.token) this.AppData.Owner.Token = saved.token;
-        if (saved.currency) this.AppData.Owner.Currency = saved.currency;
+        if (saved.currency_unit) this.AppData.Owner.currency_unit = saved.currency_unit;
     },
     // iPhoneのキーボード対策（入力中を考慮）
     _initViewport() {
@@ -154,7 +154,7 @@ const AppManager = {
     },
     // 通貨単位の変更メソッド
     ChangeCurrency(unit) {
-        this.AppData.Owner.Currency = unit;
+        this.AppData.Owner.currency_unit = unit;
         this._saveSettings();
     },
     // 画面モード変更

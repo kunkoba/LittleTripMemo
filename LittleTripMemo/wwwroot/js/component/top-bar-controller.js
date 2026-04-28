@@ -17,7 +17,8 @@ const _TopCore = {
 			{
 				this.btnArchiveTitle.addEventListener('click', (e) => {
 					// まとめ親編集
-					$Dialog.ShowEditArchiveInfo();
+					// $Dialog.ShowEditArchiveInfo();
+					$Dialog.ShowArchiveInfo();
 				});
 				this.btnSysMenu.addEventListener('click', (e) => {
 					// システムメニュー

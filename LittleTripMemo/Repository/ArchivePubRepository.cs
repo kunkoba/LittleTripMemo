@@ -15,11 +15,11 @@ public class ArchivePubRepository : _BaseRepository
     {
         archive.user_id = _user.UserId;
         const string sql = @"
-        INSERT INTO t_memo_archive_pub (
-            archive_id, user_id, title, memo, link_url, closed_flg, del_flg, create_tim, update_tim
-        ) VALUES (
-            @archive_id, @user_id, @title, @memo, @link_url, true, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-        )";
+            INSERT INTO t_memo_archive_pub (
+                archive_id, user_id, title, memo, link_url, currency_unit, closed_flg, del_flg, create_tim, update_tim
+            ) VALUES (
+                @archive_id, @user_id, @title, @memo, @link_url, @currency_unit, true, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+            )";
         return await ExecuteAsync(sql, archive);
     }
 
@@ -31,6 +31,7 @@ public class ArchivePubRepository : _BaseRepository
                 title      = @title,
                 memo       = @memo,
                 link_url   = @link_url,
+                currency_unit = @currency_unit,
                 update_tim = CURRENT_TIMESTAMP
             WHERE
                 archive_id = @archive_id

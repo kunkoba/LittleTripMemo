@@ -31,7 +31,7 @@
 <!-- 【ダイアログ親】フレーム -->
 <template id="tpl-dialog-frame">
     <div class="fixed inset-0 z-[2000] pointer-events-none flex items-center justify-center bg-black/20">
-        <div class="pointer-events-auto w-[90%] max-w-[450px] min-h-[300px] max-h-[80vh] bg-brand-0 rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-brand-2 relative">
+        <div class="pointer-events-auto w-[90%] max-w-[450px] min-h-[500px] max-h-[80vh] bg-brand-0 rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-brand-2 relative">
             <div id="dialog-title-bar" class="h-16 flex items-center justify-between shrink-0 bg-slate-50 px-4 border-b border-brand-1 relative">
                 <div id="dialog-title" class="flex-1 flex items-center font-black italic text-brand-5 uppercase tracking-wider truncate pr-2"></div>
                 <div id="dialog-header-actions" class="flex items-center gap-2 shrink-0">
@@ -41,14 +41,6 @@
             <div id="dialog-content" class="flex-1 overflow-y-auto flex flex-col p-4 relative"></div>
             <!-- 修正: 常に表示し、flex-wrapで複数段に対応、min-hを設定 -->
             <div id="dialog-button-container" class="z-[900] hrink-0 flex flex-wrap gap-3 p-4 bg-slate-50 border-t border-brand-1"></div>
-        </div>
-    </div>
-</template>
-<!-- 【ダイアログ子】複数選択コンテンツ -->
-<template id="tpl-multi-select-content">
-    <div class="flex flex-col h-full w-full overflow-hidden">
-        <div class="flex-1 overflow-y-auto flex flex-col min-h-0">
-            <div class="js-list-container space-y-3 pb-4 px-1 flex-1"></div>
         </div>
     </div>
 </template>
@@ -139,33 +131,6 @@
                 </div>
             </div>
         </div>
-    </div>
-</template>
-<!-- 【ダイアログ子】複数選択コンテンツ -->
-<template id="tpl-multi-select-content">
-    <div class="flex flex-col h-full w-full overflow-hidden">
-        
-        <!-- 上部：ヘッダーとスクロールするリスト領域 -->
-        <div class="flex-1 overflow-y-auto flex flex-col min-h-0">
-            <!-- スクロールリスト本体 -->
-            <div class="js-list-container space-y-3_ pb-4 px-1 flex-1"></div>
-        </div>
-
-        <!-- 下部：固定のアクションボタン群 -->
-        <div class="shrink-0 pt-4 mt-2 border-t border-brand-2 space-y-3 bg-white pb-2 px-1">
-            <div class="flex gap-3">
-                <button class="js-btn-merge flex-1 h-12 bg-brand-5 text-white rounded-xl font-bold text-[12px] uppercase shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
-                    <span class="text-lg">⇄</span> MERGE
-                </button>
-                <button class="js-btn-add flex-1 h-12 bg-brand-5 text-white rounded-xl font-bold text-[12px] uppercase shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
-                    <span class="text-lg">＋</span> ADD
-                </button>
-            </div>
-            <button class="js-btn-delete w-full h-10 bg-brand-1 text-red-400 rounded-xl font-bold text-[10px] uppercase active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
-                <span class="text-sm">🗑</span> LOGICAL DELETE SELECTED ITEMS
-            </button>
-        </div>
-        
     </div>
 </template>
 <!-- 日付ヘッダー -->
@@ -268,6 +233,38 @@
     </div>
 </template>
 
+<!-- 【ダイアログ子】複数選択コンテンツ -->
+<template id="tpl-multi-select-content">
+    <div class="flex flex-col h-full w-full overflow-hidden">
+        <div class="flex-1 overflow-y-auto flex flex-col min-h-0">
+            <div class="js-list-container space-y-3 pb-4 px-1 flex-1"></div>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】複数選択コンテンツ -->
+<template id="tpl-multi-select-content2">
+    <div class="flex flex-col h-full w-full overflow-hidden">
+        <!-- 上部：ヘッダーとスクロールするリスト領域 -->
+        <div class="flex-1 overflow-y-auto flex flex-col min-h-0">
+            <!-- スクロールリスト本体 -->
+            <div class="js-list-container space-y-3_ pb-4 px-1 flex-1"></div>
+        </div>
+        <!-- 下部：固定のアクションボタン群 -->
+        <div class="shrink-0 pt-4 mt-2 border-t border-brand-2 space-y-3 bg-white pb-2 px-1">
+            <div class="flex gap-3">
+                <button class="js-btn-merge flex-1 h-12 bg-brand-5 text-white rounded-xl font-bold text-[12px] uppercase shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                    <span class="text-lg">⇄</span> MERGE
+                </button>
+                <button class="js-btn-add flex-1 h-12 bg-brand-5 text-white rounded-xl font-bold text-[12px] uppercase shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                    <span class="text-lg">＋</span> ADD
+                </button>
+            </div>
+            <button class="js-btn-delete w-full h-10 bg-brand-1 text-red-400 rounded-xl font-bold text-[10px] uppercase active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                <span class="text-sm">🗑</span> LOGICAL DELETE SELECTED ITEMS
+            </button>
+        </div>
+    </div>
+</template>
 <!-- 【ダイアログ子】ログイン -->
 <template id="tpl-login">
     <div class="w-full text-black-5 my-3 space-y-5 px-2">
@@ -289,6 +286,9 @@
 <!-- 【ダイアログ子】システムメニュー（設定変更） -->
 <template id="tpl-menu-system">
     <div class="w-full flex flex-col bg-brand-0">
+        <button id="btn-sys-user-profile" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-lg">📛</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">User Profile</span>
+        </button>
         <button id="btn-sys-user-config" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
             <span class="col-span-1 flex justify-center text-lg">⚙️</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">User Settings</span>
         </button>
@@ -297,9 +297,6 @@
         </button>
         <button id="btn-sys-version" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
             <span class="col-span-1 flex justify-center text-lg">ℹ️</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">App Information</span>
-        </button>
-        <button id="btn-sys-contact" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-lg">📧</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Inquiry / Feedback</span>
         </button>
         <button id="btn-sys-auth" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
             <span class="col-span-1 flex justify-center text-lg">👤</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Login / Logout</span>
@@ -462,69 +459,6 @@
         </button>
     </div>
 </template>
-<!-- 【ダイアログ子】まとめ親編集 -->
-<template id="tpl-edit-archive">
-    <div class="w-full text-black-5">
-        <!-- 参照モード -->
-        <div id="view-mem-area" class="space-y-4">
-            <!-- ユーザー情報ボタン -->
-            <button id="btn-mem-user-profile" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-full shadow-sm active:scale-95 transition-transform w-fit">
-                <span id="view-mem-user-icon" class="text-[18px] leading-none drop-shadow-sm"></span>
-                <span id="view-mem-user-id" class="text-[12px] font-bold text-slate-600"></span>
-            </button>
-            <!-- タイトルと本文 -->
-            <div class="bg-brand-1 h-[200px] rounded-2xl shadow-sm border border-brand-1 p-4">
-                <div id="view-mem-title" class="text-[16px] font-black text-black-5 break-all mb-3 tracking-wide"></div>
-                <hr class="border-brand-2 mb-3">
-                <div id="view-mem-body" class="text-[13px] text-black-4 leading-relaxed whitespace-pre-wrap min-h-[100px]"></div>
-            </div>
-            <!-- URL -->
-            <div id="view-mem-url-wrapper" class="bg-white rounded-2xl shadow-sm border border-brand-1 p-3 flex items-center gap-3">
-                <div class="shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-blue-50 text-blue-500 text-[12px]">🔗</div>
-                <a id="view-mem-url" href="" target="_blank" class="flex-1 text-[12px] text-blue-500 underline truncate font-bold"></a>
-            </div>
-            <!-- 統計エリア -->
-            <div class="grid grid-cols-2 gap-3">
-                <div id="view-mem-price-box" class="rounded-2xl p-3 flex flex-col items-center justify-center shadow-sm transition-colors">
-                    <span id="view-mem-price-label" class="text-[8px] font-black uppercase mb-1">Total Price</span>
-                    <div id="mem-stat-price" class="text-[18px] font-black"></div>
-                </div>
-                <div class="rounded-2xl p-3 flex flex-col items-center justify-center border border-brand-1 bg-white shadow-sm">
-                    <span class="text-[8px] font-black uppercase text-black-3 mb-1">Total Memos</span>
-                    <div id="mem-stat-count" class="text-[18px] font-black text-black-5">0</div>
-                </div>
-            </div>
-            <!-- アクションボタン -->
-            <div id="view-mem-actions" class="flex flex-col gap-3 mt-2">
-                <button id="btn-mem-action-main" class="w-full bg-brand-5 text-white font-bold py-3 rounded-2xl text-[14px] shadow-md active:scale-95 transition-transform"></button>
-                <button id="btn-mem-release" class="w-full bg-white text-red-400 border border-brand-4 font-bold py-3 rounded-2xl text-[14px] shadow-sm active:scale-95 transition-transform"></button>
-            </div>
-        </div>
-        <!-- 編集モード -->
-        <div id="edit-mem-area" class="hidden space-y-4">
-            <!-- タイトル -->
-            <div>
-                <label class="block text-[12px] font-bold mb-1 uppercase">Trip Title</label>
-                <input id="edit-mem-title" type="text" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white">
-            </div>
-            <!-- 本文 -->
-            <div>
-                <label class="block text-[12px] font-bold mb-1 uppercase">Description / Memo</label>
-                <textarea id="edit-mem-body" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] h-48 rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
-            </div>
-            <!-- リンクURL -->
-            <div>
-                <label class="block text-[12px] font-bold mb-1 uppercase">Link URL</label>
-                <input id="edit-mem-url" type="url" placeholder="https://..." class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white text-blue-600">
-            </div>
-            <!-- 通貨単位 -->
-            <div>
-                <label class="block text-[12px] font-bold mb-1 uppercase">Currency</label>
-                <input id="edit-mem-currency" type="text" maxlength="5" placeholder="JPY, USD..." class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white uppercase text-black-5">
-            </div>
-        </div>
-    </div>
-</template>
 <!-- 【ダイアログ子】通貨単位設定 -->
 <template id="tpl-config-currency">
     <div class="w-full text-black-5 my-3 space-y-4 px-4">
@@ -610,58 +544,105 @@
         </div>
     </div>
 </template>
-<!-- 【ダイアログ子】ユーザープロフィール -->
-<template id="tpl-user-profile">
-    <div class="w-full text-black-5">
-        <!-- 参照モード -->
-        <div id="view-profile-area" class="space-y-4 px-2">
-            <div class="flex flex-col items-center justify-center py-4">
-                <div class="w-20 h-20 bg-white rounded-full shadow-md border-2 border-brand-2 flex items-center justify-center text-[48px] leading-none mb-3">
-                    <span id="view-profile-icon">😀</span>
-                </div>
-                <h3 id="view-profile-nickname" class="text-xl font-black text-black-5">Nickname</h3>
-                <p id="view-profile-userid" class="text-[12px] text-slate-400 font-bold mt-1"></p>
+
+<!-- 【ダイアログ子】まとめ親参照 -->
+<template id="tpl-view-archive">
+    <div class="w-full text-black-5 space-y-4">
+        <button id="btn-mem-user-profile" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-full shadow-sm active:scale-95 transition-transform w-fit">
+            <span id="view-mem-user-icon" class="text-[18px] leading-none drop-shadow-sm"></span>
+            <span id="view-mem-user-id" class="text-[12px] font-bold text-slate-600"></span>
+        </button>
+        <div class="bg-white rounded-2xl shadow-sm border border-brand-1 p-4">
+            <div id="view-mem-title" class="text-[16px] font-black text-black-5 break-all mb-3 tracking-wide"></div>
+            <hr class="border-brand-2 mb-3">
+            <div id="view-mem-body" class="text-[13px] text-black-4 leading-relaxed whitespace-pre-wrap min-h-[3rem]"></div>
+        </div>
+        <div id="view-mem-url-wrapper" class="bg-white rounded-2xl shadow-sm border border-brand-1 p-3 flex items-center gap-3">
+            <div class="shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-blue-50 text-blue-500 text-[12px]">🔗</div>
+            <a id="view-mem-url" href="" target="_blank" class="flex-1 text-[12px] text-blue-500 underline truncate font-bold"></a>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div id="view-mem-price-box" class="rounded-2xl p-3 flex flex-col items-center justify-center shadow-sm transition-colors">
+                <span id="view-mem-price-label" class="text-[8px] font-black uppercase mb-1">Total Price</span>
+                <div id="mem-stat-price" class="text-[18px] font-black"></div>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm border border-brand-1 p-4">
-                <div id="view-profile-bio" class="text-[13px] text-black-4 leading-relaxed whitespace-pre-wrap min-h-[3rem]"></div>
-            </div>
-            <div id="view-profile-links" class="space-y-2 mt-4">
-                <!-- リンクが動的に追加されます -->
-            </div>
-            <div id="view-profile-actions" class="mt-4 hidden">
-                <button id="btn-profile-edit-start" class="w-full bg-brand-3 text-white font-bold py-3 rounded-2xl text-[14px] shadow-sm uppercase active:scale-95 transition-transform">Edit Profile</button>
+            <div class="rounded-2xl p-3 flex flex-col items-center justify-center border border-brand-1 bg-white shadow-sm">
+                <span class="text-[8px] font-black uppercase text-black-3 mb-1">Total Memos</span>
+                <div id="mem-stat-count" class="text-[18px] font-black text-black-5">0</div>
             </div>
         </div>
-        <!-- 編集モード -->
-        <div id="edit-profile-area" class="hidden space-y-4 px-2">
-            <div class="flex flex-col items-center justify-center py-2">
-                <button id="btn-profile-icon-trigger" class="w-20 h-20 bg-white rounded-full shadow-md border-2 border-brand-3 flex items-center justify-center text-[48px] leading-none active:scale-95 transition-transform outline-none">
-                    <span id="edit-profile-icon-preview">😀</span>
-                    <input type="hidden" id="edit-profile-icon">
-                </button>
-                <div class="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-widest">Tap to change</div>
-            </div>
-            <div>
-                <label class="block text-[12px] font-bold mb-1 uppercase">Nickname</label>
-                <input id="edit-profile-nickname" type="text" maxlength="20" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white">
-            </div>
-            <div>
-                <div class="flex justify-between items-end mb-1">
-                    <label class="block text-[12px] font-bold uppercase">Bio / Description</label>
-                    <span class="text-[10px] font-bold text-slate-400"><span id="edit-profile-bio-count">0</span>/200</span>
-                </div>
-                <textarea id="edit-profile-bio" maxlength="200" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] h-24 rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
-            </div>
-            <div>
-                <label class="block text-[12px] font-bold mb-1 uppercase">Links</label>
-                <input id="edit-profile-link1" type="url" placeholder="https://... (Link 1)" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white text-blue-600 mb-2">
-                <input id="edit-profile-link2" type="url" placeholder="https://... (Link 2)" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white text-blue-600 mb-2">
-                <input id="edit-profile-link3" type="url" placeholder="https://... (Link 3)" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white text-blue-600">
-            </div>
+        <div id="view-mem-actions" class="flex flex-col gap-3 mt-2">
+            <button id="btn-mem-action-main" class="w-full bg-brand-5 text-white font-bold py-3 rounded-2xl text-[14px] shadow-md active:scale-95 transition-transform"></button>
+            <button id="btn-mem-release" class="w-full bg-white text-red-400 border border-brand-4 font-bold py-3 rounded-2xl text-[14px] shadow-sm active:scale-95 transition-transform"></button>
         </div>
     </div>
 </template>
-
+<!-- 【ダイアログ子】まとめ親編集 -->
+<template id="tpl-edit-archive">
+    <div class="w-full text-black-5 space-y-4">
+        <div>
+            <label class="block text-[12px] font-bold mb-1 uppercase">Trip Title</label>
+            <input id="edit-mem-title" type="text" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white">
+        </div>
+        <div>
+            <label class="block text-[12px] font-bold mb-1 uppercase">Description / Memo</label>
+            <textarea id="edit-mem-body" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] h-48 rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+        </div>
+        <div>
+            <label class="block text-[12px] font-bold mb-1 uppercase">Link URL</label>
+            <input id="edit-mem-url" type="url" placeholder="https://..." class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+        </div>
+        <div>
+            <label class="block text-[12px] font-bold mb-1 uppercase">Currency</label>
+            <input id="edit-mem-currency" type="text" maxlength="5" placeholder="JPY, USD..." class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white uppercase text-black-5">
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】ユーザープロフィール参照 -->
+<template id="tpl-view-profile">
+    <div class="w-full text-black-5 space-y-4 px-2 pb-2">
+        <div class="flex flex-col items-center justify-center pb-4">
+            <div class="w-20 h-20 bg-white rounded-full shadow-md border-2 border-brand-2 flex items-center justify-center text-[48px] leading-none mb-3">
+                <span id="view-profile-icon">😀</span>
+            </div>
+            <h3 id="view-profile-nickname" class="text-xl font-black text-black-5">Nickname</h3>
+            <p id="view-profile-userid" class="text-[12px] text-slate-400 font-bold mt-1"></p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-brand-1 p-4">
+            <div id="view-profile-bio" class="text-[16px] text-black-4 leading-relaxed whitespace-pre-wrap min-h-[3rem]"></div>
+        </div>
+        <div id="view-profile-links" class="space-y-2 mt-4"></div>
+    </div>
+</template>
+<!-- 【ダイアログ子】ユーザープロフィール編集 -->
+<template id="tpl-edit-profile">
+    <div class="w-full text-black-5 space-y-4 px-2 pb-2">
+        <div class="flex flex-col items-center justify-center py-2">
+            <button id="btn-profile-icon-trigger" class="w-20 h-20 bg-white rounded-full shadow-md border-2 border-brand-3 flex items-center justify-center text-[48px] leading-none active:scale-95 transition-transform outline-none">
+                <span id="edit-profile-icon-preview">😀</span>
+                <input type="hidden" id="edit-profile-icon">
+            </button>
+            <div class="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-widest">Tap to change</div>
+        </div>
+        <div>
+            <label class="block text-[12px] font-bold mb-1 uppercase">Nickname</label>
+            <input id="edit-profile-nickname" type="text" maxlength="20" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white">
+        </div>
+        <div>
+            <div class="flex justify-between items-end mb-1">
+                <label class="block text-[12px] font-bold uppercase">Bio / Description</label>
+                <span class="text-[10px] font-bold text-slate-400"><span id="edit-profile-bio-count">0</span>/200</span>
+            </div>
+            <textarea id="edit-profile-bio" maxlength="200" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] h-48 rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+        </div>
+        <div>
+            <label class="block text-[12px] font-bold mb-1 uppercase">Links</label>
+            <input id="edit-profile-link1" type="url" placeholder="https://... (Link 1)" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white text-blue-600 mb-2">
+            <input id="edit-profile-link2" type="url" placeholder="https://... (Link 2)" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white text-blue-600 mb-2">
+            <input id="edit-profile-link3" type="url" placeholder="https://... (Link 3)" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+        </div>
+    </div>
+</template>
 
 <!-- ============================================================= -->
 

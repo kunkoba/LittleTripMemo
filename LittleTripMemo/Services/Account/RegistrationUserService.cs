@@ -9,13 +9,13 @@ using Microsoft.Extensions.Options;
 
 namespace LittleTripMemo.Services;
 
-public class AccountService
+public class RegistrationUserService
 {
     private readonly UserManager<MyAppUser> _userManager;
     private readonly AccountRepository _accountRepository;
-    private readonly ILogger<AccountService> _logger;
+    private readonly ILogger<RegistrationUserService> _logger;
     private readonly MyAppSettings _settings;
-    private readonly JwtService _jwtService; // ★追加
+    private readonly JwtService _jwtService;
 
     // リクエスト
     public record FirebaseLoginRequest(string Email);
@@ -23,11 +23,11 @@ public class AccountService
     // レスポンス（tokenを追加）
     public record Response(bool is_success, string message, string? token = null);
 
-    public AccountService(
+    public RegistrationUserService(
         UserManager<MyAppUser> userManager,
         AccountRepository userRepo,
         IOptions<MyAppSettings> settings,
-        ILogger<AccountService> logger,
+        ILogger<RegistrationUserService> logger,
         JwtService jwtService) // ★DIで受け取る
     {
         _userManager = userManager;
@@ -75,9 +75,12 @@ public class AccountService
 
         var user = new MyAppUser
         {
-            UserName = email,
             Email = email,
-            TableId = tableId
+            TableId = tableId,
+            UserName = "user@" + DateTime.Now.ToString("yyyyMMddHHmmss"),
+            Icon = "❔",
+            NickName = email.Split('@')[0],
+            Description = "はじめまして！",
         };
 
         var result = await _userManager.CreateAsync(user);

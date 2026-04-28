@@ -1,44 +1,74 @@
-﻿using LittleTripMemo.Services;
+﻿// Controllers/AccountController.cs
+
+using LittleTripMemo.Common;
+using LittleTripMemo.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LittleTripMemo.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AccountController : ControllerBase
+public class AccountController : _BaseController // 基底クラスを _BaseController に変更
 {
-    private readonly AccountService _accountService;
+    private readonly RegistrationUserService _accountService;
+    private readonly GetUserProfileService _getUserProfileService;
+    private readonly UpdateUserProfileService _updateUserProfileService;
 
-    public AccountController(AccountService accountService)
+    public AccountController(
+        UserContext userContext,
+        IHttpContextAccessor httpContextAccessor,
+        RegistrationUserService accountService,
+        GetUserProfileService getUserProfileService,
+        UpdateUserProfileService updateUserProfileService)
+        : base(userContext, httpContextAccessor) // 基底クラスのコンストラクタを呼び出す
     {
         _accountService = accountService;
+        _getUserProfileService = getUserProfileService;
+        _updateUserProfileService = updateUserProfileService;
     }
 
     /// <summary>
     /// Firebase認証後のログイン／新規登録処理
     /// </summary>
-    [HttpPost("firebase-login")]
+    [HttpPost("LoginFirebase")]
     public async Task<IActionResult> FirebaseLogin(
-        [FromBody] AccountService.FirebaseLoginRequest request)
+        [FromBody] RegistrationUserService.FirebaseLoginRequest request)
     {
-        // 業務ロジック（登録判定、トークン発行）はすべてサービスに委譲
         var result = await _accountService.LoginOrRegisterAsync(request);
 
         if (!result.is_success)
         {
-            // エラー時はメッセージを返却
             return BadRequest(new { result.message });
         }
 
-        // 成功時はサービスが生成したトークンを返却
-        //return Ok(new { result.token });
-        return Ok(new
+        // 共通レスポンス形式で返却
+        return OkWithBase(new
         {
-            data = new { token = result.token },
-            is_logged_in = true,
+            token = result.token,
             is_owner = false,
             is_public = false,
         });
     }
-}
 
+    [CustomAuthorize]
+    [HttpPost("GetProfile")]
+    public async Task<IActionResult> GetOwnerProfile()
+    {
+        // GetUserProfileService を DI して使用
+        var result = await _getUserProfileService.ExecuteAsync(_user.UserId);
+
+        // JS側の _fetchData で ownerProfile キーで受け取れるように匿名型でラップ
+        return OkWithBase(new { ownerProfile = result });
+    }
+
+    /// <summary>
+    /// ユーザー情報更新
+    /// </summary>
+    [HttpPost("UpdateProfile")]
+    public async Task<IActionResult> Update(
+        [FromBody] UpdateUserProfileService.UpdateUserReq req)
+    {
+        var result = await _updateUserProfileService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+}

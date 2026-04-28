@@ -10,6 +10,7 @@ public class TMemoArchive : IAppRecord
     public string title { get; set; } = "仮のタイトル";
     public string memo { get; set; } = "仮の本文";
     public string link_url { get; set; } = string.Empty;
+    public string currency_unit { get; set; } = "JPY";
     public bool closed_flg { get; set; } = false;
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }
@@ -26,6 +27,7 @@ public class TMemoArchivePub : IAppRecord
     public string title { get; set; } = string.Empty;
     public string memo { get; set; } = string.Empty;
     public string link_url { get; set; } = string.Empty;
+    public string currency_unit { get; set; } = "JPY";
     public bool closed_flg { get; set; } = false;
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }
@@ -42,6 +44,7 @@ public class DtoArchive
     public string title { get; set; } = string.Empty;
     public string memo { get; set; } = string.Empty;
     public string link_url { get; set; } = string.Empty;
+    public string currency_unit { get; set; } = "JPY";
     public bool closed_flg { get; set; } = false;
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }

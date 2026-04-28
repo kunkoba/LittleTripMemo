@@ -168,13 +168,14 @@ const _DetailContentCore = {
             $Dom.ToggleShow(this.displayPriceWrapper, true);
             this.displayPrice.textContent = price.toLocaleString();
             // 通貨単位の決定ロジック
-            let displayCurrency = $App.AppData.Owner.Currency || 'JPY';
+            let displayCurrency = $App.AppData.Owner.currency_unit || 'JPY';
             if (detail.archive_id > 0) {
                 // 親アーカイブの情報をStoreから探す（一覧または現在開いているアーカイブ）
                 const archiveList = $Data.Store.GetArchiveList() || [];
+                console.log("_renderDisplayMode>>", archiveList);
                 const targetArc = archiveList.find(a => a.archive_id === detail.archive_id) || $Data.Store.GetArchive();
-                if (targetArc && targetArc.archive_id === detail.archive_id && targetArc.currency) {
-                    displayCurrency = targetArc.currency; // 親の通貨で上書き
+                if (targetArc && targetArc.archive_id === detail.archive_id && targetArc.currency_unit) {
+                    displayCurrency = targetArc.currency_unit; // 親の通貨で上書き
                 }
             }
             this.displayPriceUnit.textContent = displayCurrency;

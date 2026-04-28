@@ -35,6 +35,11 @@ namespace LittleTripMemo.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("text");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnOrder(5);
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -42,11 +47,36 @@ namespace LittleTripMemo.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnOrder(3);
+
+                    b.Property<string>("Link1")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnOrder(6);
+
+                    b.Property<string>("Link2")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnOrder(7);
+
+                    b.Property<string>("Link3")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnOrder(8);
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NickName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnOrder(4);
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)

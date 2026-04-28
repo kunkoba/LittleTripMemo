@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using LittleTripMemo.Common;
 
 namespace LittleTripMemo.JWT;
 
@@ -28,7 +29,6 @@ public class JwtMiddleware
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]);
 
-                // ✅ ちゃんと検証する
                 var validationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
@@ -37,56 +37,56 @@ public class JwtMiddleware
                     ValidIssuer = _configuration["JwtSettings:Issuer"],
                     ValidateAudience = true,
                     ValidAudience = _configuration["JwtSettings:Audience"],
-                    ValidateLifetime = true, // ✅ 有効期限チェック
-                    ClockSkew = TimeSpan.Zero // トークン期限のズレ許容なし
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
                 };
 
-                // ValidateToken で署名・有効期限をすべて検証
+                // トークン検証
                 var principal = tokenHandler.ValidateToken(
                     token,
                     validationParameters,
-                    out SecurityToken validatedToken);
+                    out _);
 
-                //// ★ AuthenticationType を付けて再構築
-                //var identity = new ClaimsIdentity(
-                //    principal.Claims,
-                //    "Bearer" // ←これが重要
-                //);
-
-                // 再セット
+                // 標準の User へのセット
                 context.User = principal;
-                //context.User = new ClaimsPrincipal(identity);
+
+                // =============================================================
+                // ✅ 追加：UserContext への値のセット
+                // =============================================================
+                var userContext = context.RequestServices.GetRequiredService<UserContext>();
+
+                // UserId (NameIdentifier)
+                var userIdStr = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (Guid.TryParse(userIdStr, out var userId))
+                {
+                    userContext.UserId = userId;
+                }
+
+                // TableId
+                var tableIdStr = principal.FindFirst(nameof(UserContext.TableId))?.Value;
+                if (int.TryParse(tableIdStr, out var tableId))
+                {
+                    userContext.TableId = tableId;
+                }
+
+                // Plan
+                userContext.Plan = principal.FindFirst(nameof(UserContext.Plan))?.Value ?? PlanType.Free.ToString();
+                // =============================================================
+
             }
             catch (SecurityTokenExpiredException)
             {
-                // 有効期限切れ
                 context.Response.StatusCode = 401;
                 context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(
-                    "{\"message\":\"Token has expired\"}");
+                await context.Response.WriteAsync("{\"message\":\"Token has expired\"}");
                 return;
             }
-            catch (SecurityTokenException)
+            catch (Exception)
             {
-                // 署名が無効など
-                context.Response.StatusCode = 401;
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(
-                    "{\"message\":\"Invalid token\"}");
-                return;
-            }
-            catch (Exception ex)
-            {
-                // その他のエラー
-                context.Response.StatusCode = 401;
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(
-                    $"{{\"message\":\"Token validation failed: {ex.Message}\"}}");
-                return;
+                // 不正なトークンの場合はここでは何もしない（CustomAuthorize が 401 を出すため）
             }
         }
 
         await _next(context);
     }
 }
-

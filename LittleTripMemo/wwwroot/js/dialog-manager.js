@@ -125,10 +125,15 @@ const DialogController = {
         const isLoggedIn = $App.AppData.System.IsLoggedIn;
         authLabel.textContent = isLoggedIn ? "LOGOUT" : "LOGIN";
         // 各ボタンの紐付け（次階層の呼び出しなど）
-        $Dom.QuerySelector('#btn-sys-user-config', el).onclick = () => { _DialogCore.close(); this.ShowUserSettingsMenu(); };
-        $Dom.QuerySelector('#btn-sys-notice', el).onclick = () => { _DialogCore.close(); this.ShowNoticeList(); };
-        $Dom.QuerySelector('#btn-sys-version', el).onclick = () => { _DialogCore.close(); this.ShowAppInfo(); };
-        $Dom.QuerySelector('#btn-sys-contact', el).onclick = () => { _DialogCore.close(); console.log("Contact"); };
+        $Dom.QuerySelector('#btn-sys-user-profile', el).onclick = async () => {
+            const isSuccess = await $Data.Access.GetProfile();
+            if (isSuccess && $App.AppData.Owner.Profile) {
+                this.ShowUserProfile($App.AppData.Owner.Profile, true);
+            }
+        };
+        $Dom.QuerySelector('#btn-sys-user-config', el).onclick = () => { this.ShowUserSettingsMenu(); };
+        $Dom.QuerySelector('#btn-sys-notice', el).onclick = () => { this.ShowNoticeList(); };
+        $Dom.QuerySelector('#btn-sys-version', el).onclick = () => { this.ShowAppInfo(); };
         btnAuth.onclick = async () => {
             if (isLoggedIn) {
                 const isOk = await this.ShowConfirm({ title: "LOGOUT", message: "ログアウトしますか？" });
@@ -239,7 +244,7 @@ const DialogController = {
         const el = $Dom.GenerateTemplate("tpl-config-currency");
         const inputCurrency = $Dom.QuerySelector('#input-currency', el);
         // 現在の値をセット
-        inputCurrency.value = $App.AppData.Owner.Currency || 'JPY';
+        inputCurrency.value = $App.AppData.Owner.currency_unit || 'JPY';
         _DialogCore.open({
             title: "CURRENCY CONFIG",
             content: el,
@@ -264,7 +269,13 @@ const DialogController = {
         _DialogCore.open({
             title: "APP INFO",
             content: el,
-            buttons:[{ label: "CLOSE", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform", closesDialog: true }]
+            buttons:[
+                {
+                    label: "CLOSE",
+                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    closesDialog: true
+                }
+            ]
         });
     },
     // アプリ評価・レビュー一覧
@@ -388,7 +399,6 @@ const DialogController = {
         const el = $Dom.GenerateTemplate("tpl-emoji-picker");
         const inputCustom = $Dom.QuerySelector('#input-custom-emoji', el);
         const combinedGrid = $Dom.QuerySelector('#emoji-combined-grid', el);
-
         // グリッド描画処理
         const renderGrid = () => {
             const combinedList = [...new Set([...emojiList, ...history])].slice(0, 50);
@@ -405,10 +415,8 @@ const DialogController = {
                 };
             });
         };
-
         // 初期描画
         renderGrid();
-
         // 履歴クリア
         $Dom.QuerySelector('#btn-clear-emoji', el).onclick = async () => {
             const isOk = await this.ShowConfirm({ title: "CLEAR HISTORY", message: "履歴を削除しますか？" });
@@ -439,7 +447,7 @@ const DialogController = {
                             localStorage.setItem(storageKey, JSON.stringify(history));
                             onSelect(val);
                         }
-                        _DialogCore.closeAll();
+                        _DialogCore.close();
                     }
                 }
             ]
@@ -845,7 +853,7 @@ const DialogController = {
                         const isSuccess = await $Data.Access.MergeDetails({
                             seqs,
                             title: "TripMemory_" + $Util.FormatDate(new Date(), 'YYYYMMDD_HHmmss'),
-                            currency: $App.AppData.Owner.Currency || 'JPY'
+                            currency_unit: $App.AppData.Owner.currency_unit || 'JPY'
                         });
                         if (!isSuccess) return;
                         $Notice.Info("作成しました");
@@ -906,12 +914,12 @@ const DialogController = {
             if (priceEl && currencyEl) {
                 const price = Number(item.memo_price || 0);
                 // 通貨単位の判定
-                let displayCurrency = $App.AppData.Owner.Currency || 'JPY';
+                let displayCurrency = $App.AppData.Owner.currency_unit || 'JPY';
                 if (item.archive_id > 0) {
                     const archiveList = $Data.Store.GetArchiveList() ||[];
                     const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
-                    if (targetArc && targetArc.currency) {
-                        displayCurrency = targetArc.currency;
+                    if (targetArc && targetArc.currency_unit) {
+                        displayCurrency = targetArc.currency_unit;
                     }
                 }
                 if (price > 0) {
@@ -1005,220 +1013,6 @@ const DialogController = {
                 if (archive) $TopBar.ChangeTitle(archive.title);
             }
         })();
-    },
-    // TripMemory（まとめ親）の情報を編集
-    ShowEditArchiveInfo() {
-        const archive = $Data.Store.GetArchive();
-        if (!archive) return $Notice.Warn("Not found.");
-        const el = $Dom.GenerateTemplate('tpl-edit-archive');
-        const viewArea = $Dom.QuerySelector('#view-mem-area', el);
-        const editArea = $Dom.QuerySelector('#edit-mem-area', el);
-        const viewTitle = $Dom.QuerySelector('#view-mem-title', el);
-        const viewBody = $Dom.QuerySelector('#view-mem-body', el);
-        const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
-        const urlWrapper = $Dom.QuerySelector('#view-mem-url-wrapper', el);
-        const editTitle = $Dom.QuerySelector('#edit-mem-title', el);
-        const editBody = $Dom.QuerySelector('#edit-mem-body', el);
-        const editUrl = $Dom.QuerySelector('#edit-mem-url', el);
-        const actionArea = $Dom.QuerySelector('#view-mem-actions', el);
-        const btnMain = $Dom.QuerySelector('#btn-mem-action-main', el);
-        const btnRelease = $Dom.QuerySelector('#btn-mem-release', el);
-        const isOwner = archive.is_owner === true;
-        const isPublic = archive.is_public === true;
-        const isClosed = archive.closed_flg === true;
-        const editCurrency = $Dom.QuerySelector('#edit-mem-currency', el);
-        editCurrency.value = archive.currency || $App.AppData.Owner.Currency || 'JPY';
-        // ユーザー情報ボタンの制御
-        const btnUserProfile = $Dom.QuerySelector('#btn-mem-user-profile', el);
-        const viewUserIcon = $Dom.QuerySelector('#view-mem-user-icon', el);
-        const viewUserId = $Dom.QuerySelector('#view-mem-user-id', el);
-        const profile = $Data.Store.GetUserProfile(); 
-        console.log(">>profile:", profile);
-        if (profile) {
-            viewUserIcon.textContent = profile.ProfileEmoji || "😀";
-            viewUserId.textContent = profile.UserId;
-            btnUserProfile.onclick = () => {
-                // 自分自身のデータかを判定するために archive の is_owner を渡す
-                this.ShowUserProfile(archive.is_owner);
-            };
-        } else {
-            $Dom.ToggleShow(btnUserProfile, false);
-        }
-        // データセット
-        viewTitle.textContent = archive.title || "";
-        viewBody.textContent = archive.memo || "";
-        if (archive.link_url) {
-            viewUrl.textContent = archive.link_url;
-            viewUrl.href = archive.link_url;
-            $Dom.ToggleShow(urlWrapper, true);
-        } else {
-            $Dom.ToggleShow(urlWrapper, false);
-        }
-        editTitle.value = archive.title || "";
-        editBody.value = archive.memo || "";
-        editUrl.value = archive.link_url || "";
-        // 統計データの計算と表示
-        const details = $Data.Store.GetAllDetails() ||[];
-        const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
-        $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
-        const priceBox = $Dom.QuerySelector('#view-mem-price-box', el);
-        const priceVal = $Dom.QuerySelector('#mem-stat-price', el);
-        const priceLabel = $Dom.QuerySelector('#view-mem-price-label', el);
-        const displayCurrency = archive.currency || $App.AppData.Owner.Currency || 'JPY';
-        if (totalPrice > 0) {
-            priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-blue-100 bg-blue-50 shadow-sm";
-            priceVal.className = "text-[18px] font-black text-blue-600";
-            priceLabel.className = "text-[8px] font-black uppercase text-blue-500 mb-1";
-            // priceVal.textContent = "+ ¥" + totalPrice.toLocaleString();
-            priceVal.innerHTML = `${totalPrice.toLocaleString()} <span class="text-[10px] text-blue-400 ml-0.5">${displayCurrency}</span>`;
-        } else if (totalPrice < 0) {
-            priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-red-100 bg-red-50 shadow-sm";
-            priceVal.className = "text-[18px] font-black text-red-600";
-            priceLabel.className = "text-[8px] font-black uppercase text-red-500 mb-1";
-            // priceVal.textContent = "- ¥" + Math.abs(totalPrice).toLocaleString();
-            priceVal.innerHTML = `- ${Math.abs(totalPrice).toLocaleString()} <span class="text-[10px] text-red-400 ml-0.5">${displayCurrency}</span>`;
-        } else {
-            priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-brand-1 bg-white shadow-sm";
-            priceVal.className = "text-[18px] font-black text-black-5";
-            priceLabel.className = "text-[8px] font-black uppercase text-black-3 mb-1";
-            // priceVal.textContent = "¥0";
-            priceVal.innerHTML = `0 <span class="text-[10px] text-black-3 ml-0.5">${displayCurrency}</span>`;
-        }
-        $Dom.ToggleShow(actionArea, isOwner);
-        // メインアクションボタンの設定
-        if (isOwner) {
-            if (!isPublic) {
-                btnMain.textContent = "Private　⇒　Public";
-                btnMain.onclick = () => this._execStatusChange(
-                    'PublishArchive',
-                    { archive_id: archive.archive_id },
-                    "Switch to [Public]",
-                    "Do you want to make\nthis internal data [Public]？",
-                    "Set to [Public].",
-                    $Const.SCREEN_MODE.ARCHIVE_PUB
-                );
-                btnRelease.textContent = "Archive　⇒　Details";
-                btnRelease.onclick = () => this._execStatusChange(
-                    'DeleteArchive',
-                    { archive_id: archive.archive_id },
-                    "Restore to Details",
-                    "Restore this group to\nindividual detail items？",
-                    "Restored to individual detail items.",
-                    $Const.SCREEN_MODE.CREATE
-                );
-            } else {
-                if (isClosed) {
-                    btnMain.textContent = "Close　⇒　Open";
-                    btnMain.onclick = () => this._execStatusChange(
-                        'OpenArchive',
-                        { archive_id: archive.archive_id },
-                        "Switch to [Open]",
-                        "Do you want to switch\nthis data to [Open]？",
-                        "Switched to [Open].",
-                        null,
-                        () => {
-                            $Data.Store.UpdateArchive({ closed_flg: false });
-                        });
-                } else {
-                    btnMain.textContent = "Open　⇒　Close";
-                    btnMain.onclick = () => this._execStatusChange(
-                        'CloseArchive',
-                        { archive_id: archive.archive_id },
-                        "Switch to [Close]",
-                        "Do you want to switch\nthis data to [Close]？",
-                        "Switched to [Close].",
-                        null,
-                        () => {
-                            $Data.Store.UpdateArchive({ closed_flg: true });
-                        }
-                    );
-                }
-                archive.isPublic = !isPublic;
-                $TopBar.ChangeTitle(archive.title);
-                btnRelease.textContent = "Public　⇒　Private";
-                btnRelease.onclick = () => this._execStatusChange(
-                    'UnpublishArchive',
-                    { archive_id: archive.archive_id },
-                    "Switch to [Private]",
-                    "Do you want to revert\nthis data to Private？",
-                    "Reverted to [Private].",
-                    $Const.SCREEN_MODE.ARCHIVE
-                );
-            }
-        }
-        // ダイアログを開く（下部ボタンは初期非表示でセットしておく）
-        const frame = _DialogCore.open({
-            title: "", // タイトルテキストは空にする
-            content: el,
-            buttons:[
-                {
-                    id: "dialog-btn-cancel-edit",
-                    label: "CANCEL",
-                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                    isHidden: true,
-                    closesDialog: false, // 閉じずに参照モードに戻す
-                    handler: () => {
-                        $Dom.ToggleShow(viewArea, true);
-                        $Dom.ToggleShow(editArea, false);
-                        const btnContainer = $Dom.QuerySelector('#dialog-button-container', frame);
-                        if (btnContainer) $Dom.ToggleShow(btnContainer, false);
-                        $Dom.ToggleShow($Dom.QuerySelector('#dialog-btn-cancel-edit', frame), false);
-                        $Dom.ToggleShow($Dom.QuerySelector('#dialog-btn-update', frame), false);
-                    }
-                },
-                {
-                    id: "dialog-btn-update",
-                    label: "SAVE DATA",
-                    className: "flex-1 bg-brand-4 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                    isHidden: true,
-                    handler: $Warn.CatchAsync(async () => {
-                        const updatedFields = {
-                            title: editTitle.value,
-                            memo: editBody.value,
-                            link_url: editUrl.value,
-                            currency: editCurrency.value.trim(),
-                        };
-                        console.log("archive:", archive);
-                        let isSuccess;
-                        if (!isPublic) {
-                            isSuccess = await $Data.Access.UpdateArchive({ archive_id: archive.archive_id, ...updatedFields });
-                        } else {
-                            isSuccess = await $Data.Access.UpdateArchivePub({ archive_id: archive.archive_id, ...updatedFields });
-                        }
-                        if (!isSuccess) return;
-                        $Data.Store.UpdateArchive(updatedFields);
-                        $TopBar.ChangeTitle(updatedFields.title);
-                        $Notice.Info("Changes saved.");
-                        _DialogCore.closeAll();
-                    })
-                }
-            ]
-        });
-        // ヘッダー領域のカスタマイズ（バッジと鉛筆ボタンの追加）
-        const titleContainer = $Dom.QuerySelector('#dialog-title', frame);
-        const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
-        // ステータスバッジの挿入
-        let badgeHtml = '';
-        if (!isPublic) badgeHtml = `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-500 text-white border border-gray-200 shadow-sm">Private</span>`;
-        else if (isClosed) badgeHtml = `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-100 text-gray-500 border border-gray-200 shadow-sm">Close</span>`;
-        else badgeHtml = `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-brand-2 text-brand-5 border border-blue-100 shadow-sm">Open</span>`;
-        if (titleContainer) titleContainer.innerHTML = badgeHtml;
-        // 鉛筆ボタンの挿入とイベント設定
-        if (isOwner && headerActions) {
-            const editBtn = document.createElement('button');
-            editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[14px] border border-brand-2 transition-transform";
-            editBtn.innerHTML = "✏️";
-            editBtn.onclick = () => {
-                $Dom.ToggleShow(viewArea, false);
-                $Dom.ToggleShow(editArea, true);
-                // 編集モード時は下部のボタンコンテナと両ボタンを表示
-                const btnContainer = $Dom.QuerySelector('#dialog-button-container', frame);
-                if (btnContainer) $Dom.ToggleShow(btnContainer, true);
-                $Dom.ToggleShow($Dom.QuerySelector('#dialog-btn-cancel-edit', frame), true);
-                $Dom.ToggleShow($Dom.QuerySelector('#dialog-btn-update', frame), true);
-            };
-            headerActions.prepend(editBtn); // ✕ボタンの左に追加
-        }
     },
     // 環境コード選択ダイアログ
     ShowAtmospherePicker(currentCode, onOk) {
@@ -1341,24 +1135,415 @@ const DialogController = {
             ]
         });
     },
-    // ユーザープロフィール参照・編集ダイアログ
-    ShowUserProfile(isOwner) {
-        const profile = $Data.Store.GetUserProfile();
-        if (!profile) return $Notice.Warn("ユーザー情報がありません");
-        const el = $Dom.GenerateTemplate('tpl-user-profile');
-        const viewArea = $Dom.QuerySelector('#view-profile-area', el);
-        const editArea = $Dom.QuerySelector('#edit-profile-area', el);
-        // View 要素
-        const viewIcon = $Dom.QuerySelector('#view-profile-icon', el);
-        const viewNickname = $Dom.QuerySelector('#view-profile-nickname', el);
-        const viewUserid = $Dom.QuerySelector('#view-profile-userid', el);
-        const viewBio = $Dom.QuerySelector('#view-profile-bio', el);
-        const viewLinks = $Dom.QuerySelector('#view-profile-links', el);
-        const viewActions = $Dom.QuerySelector('#view-profile-actions', el);
-        const btnEditStart = $Dom.QuerySelector('#btn-profile-edit-start', el);
 
-        // Edit 要素
-        const btnIconTrigger = $Dom.QuerySelector('#btn-profile-icon-trigger', el);
+
+    // TripMemory（まとめ親）の情報を編集
+    ShowEditArchiveInfo() {
+        const archive = $Data.Store.GetArchive();
+        if (!archive) return $Notice.Warn("Not found.");
+        const el = $Dom.GenerateTemplate('tpl-edit-archive');
+        const viewArea = $Dom.QuerySelector('#view-mem-area', el);
+        const editArea = $Dom.QuerySelector('#edit-mem-area', el);
+        const viewTitle = $Dom.QuerySelector('#view-mem-title', el);
+        const viewBody = $Dom.QuerySelector('#view-mem-body', el);
+        const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
+        const urlWrapper = $Dom.QuerySelector('#view-mem-url-wrapper', el);
+        const editTitle = $Dom.QuerySelector('#edit-mem-title', el);
+        const editBody = $Dom.QuerySelector('#edit-mem-body', el);
+        const editUrl = $Dom.QuerySelector('#edit-mem-url', el);
+        const actionArea = $Dom.QuerySelector('#view-mem-actions', el);
+        const btnMain = $Dom.QuerySelector('#btn-mem-action-main', el);
+        const btnRelease = $Dom.QuerySelector('#btn-mem-release', el);
+        const isOwner = archive.is_owner === true;
+        const isPublic = archive.is_public === true;
+        const isClosed = archive.closed_flg === true;
+        const editCurrency = $Dom.QuerySelector('#edit-mem-currency', el);
+        editCurrency.value = archive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
+        console.log();
+        // ユーザー情報ボタンの制御
+        const btnUserProfile = $Dom.QuerySelector('#btn-mem-user-profile', el);
+        const viewUserIcon = $Dom.QuerySelector('#view-mem-user-icon', el);
+        const viewUserId = $Dom.QuerySelector('#view-mem-user-id', el);
+        const profile = $Data.Store.GetUserProfile(); 
+        console.log(">>profile:", profile);
+        if (profile) {
+            viewUserIcon.textContent = profile.icon || "😀";
+            viewUserId.textContent = profile.nickName;
+            btnUserProfile.onclick = () => {
+                // 自分自身のデータかを判定するために archive の is_owner を渡す
+                this.ShowUserProfile(profile, archive.is_owner);
+            };
+        } else {
+            $Dom.ToggleShow(btnUserProfile, false);
+        }
+        // データセット
+        viewTitle.textContent = archive.title || "";
+        viewBody.textContent = archive.memo || "";
+        if (archive.link_url) {
+            viewUrl.textContent = archive.link_url;
+            viewUrl.href = archive.link_url;
+            $Dom.ToggleShow(urlWrapper, true);
+        } else {
+            $Dom.ToggleShow(urlWrapper, false);
+        }
+        editTitle.value = archive.title || "";
+        editBody.value = archive.memo || "";
+        editUrl.value = archive.link_url || "";
+        // 統計データの計算と表示
+        const details = $Data.Store.GetAllDetails() ||[];
+        const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
+        $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
+        const priceBox = $Dom.QuerySelector('#view-mem-price-box', el);
+        const priceVal = $Dom.QuerySelector('#mem-stat-price', el);
+        const priceLabel = $Dom.QuerySelector('#view-mem-price-label', el);
+        const displayCurrency = archive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
+        if (totalPrice > 0) {
+            priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-blue-100 bg-blue-50 shadow-sm";
+            priceVal.className = "text-[18px] font-black text-blue-600";
+            priceLabel.className = "text-[8px] font-black uppercase text-blue-500 mb-1";
+            // priceVal.textContent = "+ ¥" + totalPrice.toLocaleString();
+            priceVal.innerHTML = `${totalPrice.toLocaleString()} <span class="text-[10px] text-blue-400 ml-0.5">${displayCurrency}</span>`;
+        } else if (totalPrice < 0) {
+            priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-red-100 bg-red-50 shadow-sm";
+            priceVal.className = "text-[18px] font-black text-red-600";
+            priceLabel.className = "text-[8px] font-black uppercase text-red-500 mb-1";
+            // priceVal.textContent = "- ¥" + Math.abs(totalPrice).toLocaleString();
+            priceVal.innerHTML = `- ${Math.abs(totalPrice).toLocaleString()} <span class="text-[10px] text-red-400 ml-0.5">${displayCurrency}</span>`;
+        } else {
+            priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-brand-1 bg-white shadow-sm";
+            priceVal.className = "text-[18px] font-black text-black-5";
+            priceLabel.className = "text-[8px] font-black uppercase text-black-3 mb-1";
+            // priceVal.textContent = "¥0";
+            priceVal.innerHTML = `0 <span class="text-[10px] text-black-3 ml-0.5">${displayCurrency}</span>`;
+        }
+        $Dom.ToggleShow(actionArea, isOwner);
+        // メインアクションボタンの設定
+        if (isOwner) {
+            if (!isPublic) {
+                btnMain.textContent = "Private　⇒　Public";
+                btnMain.onclick = () => this._execStatusChange(
+                    'PublishArchive',
+                    { archive_id: archive.archive_id },
+                    "Switch to [Public]",
+                    "Do you want to make\nthis internal data [Public]？",
+                    "Set to [Public].",
+                    $Const.SCREEN_MODE.ARCHIVE_PUB
+                );
+                btnRelease.textContent = "Archive　⇒　Details";
+                btnRelease.onclick = () => this._execStatusChange(
+                    'DeleteArchive',
+                    { archive_id: archive.archive_id },
+                    "Restore to Details",
+                    "Restore this group to\nindividual detail items？",
+                    "Restored to individual detail items.",
+                    $Const.SCREEN_MODE.CREATE
+                );
+            } else {
+                if (isClosed) {
+                    btnMain.textContent = "Close　⇒　Open";
+                    btnMain.onclick = () => this._execStatusChange(
+                        'OpenArchive',
+                        { archive_id: archive.archive_id },
+                        "Switch to [Open]",
+                        "Do you want to switch\nthis data to [Open]？",
+                        "Switched to [Open].",
+                        null,
+                        () => {
+                            $Data.Store.UpdateArchive({ closed_flg: false });
+                        });
+                } else {
+                    btnMain.textContent = "Open　⇒　Close";
+                    btnMain.onclick = () => this._execStatusChange(
+                        'CloseArchive',
+                        { archive_id: archive.archive_id },
+                        "Switch to [Close]",
+                        "Do you want to switch\nthis data to [Close]？",
+                        "Switched to [Close].",
+                        null,
+                        () => {
+                            $Data.Store.UpdateArchive({ closed_flg: true });
+                        }
+                    );
+                }
+                archive.isPublic = !isPublic;
+                $TopBar.ChangeTitle(archive.title);
+                btnRelease.textContent = "Public　⇒　Private";
+                btnRelease.onclick = () => this._execStatusChange(
+                    'UnpublishArchive',
+                    { archive_id: archive.archive_id },
+                    "Switch to [Private]",
+                    "Do you want to revert\nthis data to Private？",
+                    "Reverted to [Private].",
+                    $Const.SCREEN_MODE.ARCHIVE
+                );
+            }
+        }
+        // ダイアログを開く（下部ボタンは初期非表示でセットしておく）
+        const frame = _DialogCore.open({
+            title: "", // タイトルテキストは空にする
+            content: el,
+            buttons:[
+                {
+                    id: "dialog-btn-cancel-edit",
+                    label: "CANCEL",
+                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    isHidden: true,
+                    closesDialog: false, // 閉じずに参照モードに戻す
+                    handler: () => {
+                        $Dom.ToggleShow(viewArea, true);
+                        $Dom.ToggleShow(editArea, false);
+                        const btnContainer = $Dom.QuerySelector('#dialog-button-container', frame);
+                        if (btnContainer) $Dom.ToggleShow(btnContainer, false);
+                        $Dom.ToggleShow($Dom.QuerySelector('#dialog-btn-cancel-edit', frame), false);
+                        $Dom.ToggleShow($Dom.QuerySelector('#dialog-btn-update', frame), false);
+                    }
+                },
+                {
+                    id: "dialog-btn-update",
+                    label: "SAVE DATA",
+                    className: "flex-1 bg-brand-4 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    isHidden: true,
+                    handler: $Warn.CatchAsync(async () => {
+                        const updatedFields = {
+                            title: editTitle.value,
+                            memo: editBody.value,
+                            link_url: editUrl.value,
+                            currency_unit: editCurrency.value.trim(),
+                        };
+                        console.log("archive:", archive);
+                        let isSuccess;
+                        if (!isPublic) {
+                            isSuccess = await $Data.Access.UpdateArchive({ archive_id: archive.archive_id, ...updatedFields });
+                        } else {
+                            isSuccess = await $Data.Access.UpdateArchivePub({ archive_id: archive.archive_id, ...updatedFields });
+                        }
+                        if (!isSuccess) return;
+                        $Data.Store.UpdateArchive(updatedFields);
+                        $TopBar.ChangeTitle(updatedFields.title);
+                        $Notice.Info("Changes saved.");
+                        // _DialogCore.close();
+                        $Dom.ToggleShow(viewArea, false);
+                        $Dom.ToggleShow(editArea, true);
+                    })
+                }
+            ]
+        });
+        // ヘッダー領域のカスタマイズ（バッジと鉛筆ボタンの追加）
+        const titleContainer = $Dom.QuerySelector('#dialog-title', frame);
+        const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
+        // ステータスバッジの挿入
+        let badgeHtml = '';
+        if (!isPublic) badgeHtml = `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-500 text-white border border-gray-200 shadow-sm">Private</span>`;
+        else if (isClosed) badgeHtml = `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-100 text-gray-500 border border-gray-200 shadow-sm">Close</span>`;
+        else badgeHtml = `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-brand-2 text-brand-5 border border-blue-100 shadow-sm">Open</span>`;
+        if (titleContainer) titleContainer.innerHTML = badgeHtml;
+        // 鉛筆ボタンの挿入とイベント設定
+        if (isOwner && headerActions) {
+            const editBtn = document.createElement('button');
+            editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[14px] border border-brand-2 transition-transform";
+            editBtn.innerHTML = "✏️";
+            editBtn.onclick = () => {
+                $Dom.ToggleShow(viewArea, false);
+                $Dom.ToggleShow(editArea, true);
+                // 編集モード時は下部のボタンコンテナと両ボタンを表示
+                const btnContainer = $Dom.QuerySelector('#dialog-button-container', frame);
+                if (btnContainer) $Dom.ToggleShow(btnContainer, true);
+                $Dom.ToggleShow($Dom.QuerySelector('#dialog-btn-cancel-edit', frame), true);
+                $Dom.ToggleShow($Dom.QuerySelector('#dialog-btn-update', frame), true);
+            };
+            headerActions.prepend(editBtn); // ✕ボタンの左に追加
+        }
+    },
+    // まとめ親参照（アーカイブ）
+    ShowArchiveInfo() {
+        const archive = $Data.Store.GetArchive();
+        if (!archive) return $Notice.Warn("Not found.");
+        const el = $Dom.GenerateTemplate('tpl-view-archive');
+        
+        // 参照画面の描画処理（保存後にも再利用してリフレッシュする）
+        const renderView = () => {
+            $Dom.QuerySelector('#view-mem-title', el).textContent = archive.title || "";
+            $Dom.QuerySelector('#view-mem-body', el).textContent = archive.memo || "";
+            const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
+            const urlWrapper = $Dom.QuerySelector('#view-mem-url-wrapper', el);
+            if (archive.link_url) {
+                viewUrl.textContent = archive.link_url;
+                viewUrl.href = archive.link_url;
+                $Dom.ToggleShow(urlWrapper, true);
+            } else {
+                $Dom.ToggleShow(urlWrapper, false);
+            }
+            // 統計データの計算
+            const details = $Data.Store.GetAllDetails() ||[];
+            const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
+            $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
+            const priceBox = $Dom.QuerySelector('#view-mem-price-box', el);
+            const priceVal = $Dom.QuerySelector('#mem-stat-price', el);
+            const priceLabel = $Dom.QuerySelector('#view-mem-price-label', el);
+            const displayCurrency = archive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
+            if (totalPrice > 0) {
+                priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-blue-100 bg-blue-50 shadow-sm";
+                priceVal.className = "text-[18px] font-black text-blue-600";
+                priceLabel.className = "text-[8px] font-black uppercase text-blue-500 mb-1";
+                priceVal.innerHTML = `${totalPrice.toLocaleString()} <span class="text-[10px] text-blue-400 ml-0.5">${displayCurrency}</span>`;
+            } else if (totalPrice < 0) {
+                priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-red-100 bg-red-50 shadow-sm";
+                priceVal.className = "text-[18px] font-black text-red-600";
+                priceLabel.className = "text-[8px] font-black uppercase text-red-500 mb-1";
+                priceVal.innerHTML = `- ${Math.abs(totalPrice).toLocaleString()} <span class="text-[10px] text-red-400 ml-0.5">${displayCurrency}</span>`;
+            } else {
+                priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-brand-1 bg-white shadow-sm";
+                priceVal.className = "text-[18px] font-black text-black-5";
+                priceLabel.className = "text-[8px] font-black uppercase text-black-3 mb-1";
+                priceVal.innerHTML = `0 <span class="text-[10px] text-black-3 ml-0.5">${displayCurrency}</span>`;
+            }
+        };
+
+        renderView();
+
+        // ユーザー情報の制御
+        const btnUserProfile = $Dom.QuerySelector('#btn-mem-user-profile', el);
+        const profile = $Data.Store.GetUserProfile(); 
+        if (profile) {
+            $Dom.QuerySelector('#view-mem-user-icon', el).textContent = profile.icon || "😀";
+            $Dom.QuerySelector('#view-mem-user-id', el).textContent = profile.nickName;
+            btnUserProfile.onclick = () => this.ShowUserProfile(profile, archive.is_owner);
+        } else {
+            $Dom.ToggleShow(btnUserProfile, false);
+        }
+
+        // メインアクションの制御
+        const actionArea = $Dom.QuerySelector('#view-mem-actions', el);
+        const btnMain = $Dom.QuerySelector('#btn-mem-action-main', el);
+        const btnRelease = $Dom.QuerySelector('#btn-mem-release', el);
+        $Dom.ToggleShow(actionArea, archive.is_owner);
+        
+        if (archive.is_owner) {
+            if (!archive.is_public) {
+                btnMain.textContent = "Private　⇒　Public";
+                btnMain.onclick = () => this._execStatusChange('PublishArchive', { archive_id: archive.archive_id }, "Switch to [Public]", "Do you want to make\nthis internal data [Public]？", "Set to [Public].", $Const.SCREEN_MODE.ARCHIVE_PUB);
+                btnRelease.textContent = "Archive　⇒　Details";
+                btnRelease.onclick = () => this._execStatusChange('DeleteArchive', { archive_id: archive.archive_id }, "Restore to Details", "Restore this group to\nindividual detail items？", "Restored to individual detail items.", $Const.SCREEN_MODE.CREATE);
+            } else {
+                if (archive.closed_flg) {
+                    btnMain.textContent = "Close　⇒　Open";
+                    btnMain.onclick = () => this._execStatusChange('OpenArchive', { archive_id: archive.archive_id }, "Switch to [Open]", "Do you want to switch\nthis data to [Open]？", "Switched to [Open].", null, () => $Data.Store.UpdateArchive({ closed_flg: false }));
+                } else {
+                    btnMain.textContent = "Open　⇒　Close";
+                    btnMain.onclick = () => this._execStatusChange('CloseArchive', { archive_id: archive.archive_id }, "Switch to [Close]", "Do you want to switch\nthis data to [Close]？", "Switched to [Close].", null, () => $Data.Store.UpdateArchive({ closed_flg: true }));
+                }
+                btnRelease.textContent = "Public　⇒　Private";
+                btnRelease.onclick = () => this._execStatusChange('UnpublishArchive', { archive_id: archive.archive_id }, "Switch to [Private]", "Do you want to revert\nthis data to Private？", "Reverted to [Private].", $Const.SCREEN_MODE.ARCHIVE);
+            }
+        }
+
+        const frame = _DialogCore.open({ title: "", content: el, buttons:[] });
+
+        // バッジと鉛筆ボタンの追加
+        const titleContainer = $Dom.QuerySelector('#dialog-title', frame);
+        const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
+        let badgeHtml = (!archive.is_public) ? `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-500 text-white border border-gray-200 shadow-sm">Private</span>` : 
+                        (archive.closed_flg) ? `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-100 text-gray-500 border border-gray-200 shadow-sm">Close</span>` : 
+                        `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-brand-2 text-brand-5 border border-blue-100 shadow-sm">Open</span>`;
+        if (titleContainer) titleContainer.innerHTML = badgeHtml;
+
+        if (archive.is_owner && headerActions) {
+            const editBtn = document.createElement('button');
+            editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[14px] border border-brand-2 transition-transform";
+            editBtn.innerHTML = "✏️";
+            // 編集ダイアログを「上に」開き、保存後に参照画面を描画し直す関数を渡す
+            editBtn.onclick = () => this.ShowEditArchive(archive, renderView);
+            headerActions.prepend(editBtn); 
+        }
+    },
+    // まとめ親編集（上にスタックされる）
+    ShowEditArchive(archive, onUpdate) {
+        const el = $Dom.GenerateTemplate('tpl-edit-archive');
+        const editTitle = $Dom.QuerySelector('#edit-mem-title', el);
+        const editBody = $Dom.QuerySelector('#edit-mem-body', el);
+        const editUrl = $Dom.QuerySelector('#edit-mem-url', el);
+        const editCurrency = $Dom.QuerySelector('#edit-mem-currency', el);
+
+        editTitle.value = archive.title || "";
+        editBody.value = archive.memo || "";
+        editUrl.value = archive.link_url || "";
+        editCurrency.value = archive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
+
+        _DialogCore.open({
+            title: "EDIT ARCHIVE",
+            content: el,
+            buttons:[
+                {
+                    label: "CANCEL",
+                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    closesDialog: true
+                },
+                {
+                    label: "SAVE DATA",
+                    className: "flex-1 bg-brand-4 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    closesDialog: false,
+                    handler: $Warn.CatchAsync(async () => {
+                        const updatedFields = {
+                            title: editTitle.value, memo: editBody.value, 
+                            link_url: editUrl.value, currency_unit: editCurrency.value.trim(),
+                        };
+                        const isSuccess = (!archive.is_public) 
+                            ? await $Data.Access.UpdateArchive({ archive_id: archive.archive_id, ...updatedFields })
+                            : await $Data.Access.UpdateArchivePub({ archive_id: archive.archive_id, ...updatedFields });
+                        if (!isSuccess) return;
+
+                        $Data.Store.UpdateArchive(updatedFields);
+                        $TopBar.ChangeTitle(updatedFields.title);
+                        $Notice.Info("Changes saved.");
+                        _DialogCore.close(); // 編集画面だけ閉じる
+                        if (onUpdate) onUpdate(); // 参照画面のDOMを最新化
+                    })
+                }
+            ]
+        });
+    },
+    // プロフィール参照
+    ShowUserProfile(profile, isEditable) {
+        if (!profile) return $Notice.Warn("ユーザー情報がありません");
+        const el = $Dom.GenerateTemplate('tpl-view-profile');
+        const renderView = () => {
+            const pIcon = profile.icon || "😀";
+            const pName = profile.nickName || "No Name";
+            const pBio  = profile.description || "";
+            const pL1   = profile.link1 || "";
+            const pL2   = profile.link2 || "";
+            const pL3   = profile.link3 || "";
+            $Dom.QuerySelector('#view-profile-icon', el).textContent = pIcon;
+            $Dom.QuerySelector('#view-profile-nickname', el).textContent = pName;
+            $Dom.QuerySelector('#view-profile-userid', el).textContent = profile.user_id || "";
+            $Dom.QuerySelector('#view-profile-bio', el).textContent = pBio;
+            const viewLinks = $Dom.QuerySelector('#view-profile-links', el);
+            viewLinks.innerHTML = "";
+            const links =[pL1, pL2, pL3].filter(l => l && l.trim() !== "");
+            links.forEach(l => {
+                const a = document.createElement("a");
+                a.href = l; a.target = "_blank";
+                a.className = "flex items-center gap-2 p-3 bg-white rounded-xl border border-slate-100 shadow-sm text-blue-500 text-[12px] font-bold truncate active:scale-95 transition-transform";
+                a.innerHTML = `<span class="shrink-0 text-brand-3 text-[14px]">🔗</span> <span class="truncate">${l}</span>`;
+                viewLinks.appendChild(a);
+            });
+        };
+        renderView();
+        const frame = _DialogCore.open({ title: "USER PROFILE", content: el, buttons:[] });
+        if (isEditable) {
+            const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
+            if (headerActions) {
+                const editBtn = document.createElement('button');
+                editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[14px] border border-brand-2 transition-transform";
+                editBtn.innerHTML = "✏️";
+                editBtn.onclick = () => this.ShowEditProfile(profile, renderView);
+                headerActions.prepend(editBtn); 
+            }
+        }
+    },
+    // プロフィール編集（上にスタックされる）
+    ShowEditProfile(profile, onUpdate) {
+        const el = $Dom.GenerateTemplate('tpl-edit-profile');
         const editIconPreview = $Dom.QuerySelector('#edit-profile-icon-preview', el);
         const editIconInput = $Dom.QuerySelector('#edit-profile-icon', el);
         const editNickname = $Dom.QuerySelector('#edit-profile-nickname', el);
@@ -1367,95 +1552,49 @@ const DialogController = {
         const editLink1 = $Dom.QuerySelector('#edit-profile-link1', el);
         const editLink2 = $Dom.QuerySelector('#edit-profile-link2', el);
         const editLink3 = $Dom.QuerySelector('#edit-profile-link3', el);
-        // Viewへの値セット
-        viewIcon.textContent = profile.ProfileEmoji || "😀";
-        viewNickname.textContent = profile.Nickname || "No Name";
-        viewUserid.textContent = profile.UserId;
-        viewBio.textContent = profile.Bio || "";
-        // リンクの動的生成
-        const links =[profile.Link1, profile.Link2, profile.Link3].filter(l => l && l.trim() !== "");
-        if (links.length > 0) {
-            links.forEach(l => {
-                const a = document.createElement("a");
-                a.href = l;
-                a.target = "_blank";
-                a.className = "flex items-center gap-2 p-3 bg-white rounded-xl border border-slate-100 shadow-sm text-blue-500 text-[12px] font-bold truncate active:scale-95 transition-transform";
-                a.innerHTML = `<span class="shrink-0 text-brand-3 text-[14px]">🔗</span> <span class="truncate">${l}</span>`;
-                viewLinks.appendChild(a);
-            });
-        }
-        // Editへの値セット
-        editIconPreview.textContent = profile.ProfileEmoji || "😀";
-        editIconInput.value = profile.ProfileEmoji || "😀";
-        editNickname.value = profile.Nickname || "";
-        editBio.value = profile.Bio || "";
-        editBioCount.textContent = (profile.Bio || "").length;
-        editLink1.value = profile.Link1 || "";
-        editLink2.value = profile.Link2 || "";
-        editLink3.value = profile.Link3 || "";
-        editBio.addEventListener('input', () => {
-            editBioCount.textContent = editBio.value.length;
-        });
-        // 自分のデータの場合のみ編集ボタンを表示
-        $Dom.ToggleShow(viewActions, isOwner);
-        // 絵文字選択
-        btnIconTrigger.onclick = () => {
+        editIconPreview.textContent = profile.icon || "😀";
+        editIconInput.value = profile.icon || "😀";
+        editNickname.value = profile.nickName || "";
+        editBio.value = profile.description || "";
+        editBioCount.textContent = (profile.description || "").length;
+        editLink1.value = profile.link1 || "";
+        editLink2.value = profile.link2 || "";
+        editLink3.value = profile.link3 || "";
+        editBio.addEventListener('input', () => editBioCount.textContent = editBio.value.length);
+        $Dom.QuerySelector('#btn-profile-icon-trigger', el).onclick = () => {
             this.ShowEmojiPicker((emoji) => {
                 editIconPreview.textContent = emoji;
                 editIconInput.value = emoji;
             });
         };
-        btnEditStart.onclick = () => {
-            $Dom.ToggleShow(viewArea, false);
-            $Dom.ToggleShow(editArea, true);
-            $Dom.ToggleShow(frame.querySelector('#dialog-btn-close-profile'), false);
-            $Dom.ToggleShow(frame.querySelector('#dialog-btn-cancel-profile'), true);
-            $Dom.ToggleShow(frame.querySelector('#dialog-btn-save-profile'), true);
-        };
-        const frame = _DialogCore.open({
-            title: "USER PROFILE",
+        _DialogCore.open({
+            title: "EDIT PROFILE",
             content: el,
             buttons:[
                 {
-                    id: "dialog-btn-close-profile",
-                    label: "CLOSE",
-                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    label: "CANCEL",
+                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
                     closesDialog: true
                 },
                 {
-                    id: "dialog-btn-cancel-profile",
-                    label: "CANCEL",
-                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                    isHidden: true,
-                    closesDialog: false,
-                    handler: () => {
-                        $Dom.ToggleShow(viewArea, true);
-                        $Dom.ToggleShow(editArea, false);
-                        $Dom.ToggleShow(frame.querySelector('#dialog-btn-close-profile'), true);
-                        $Dom.ToggleShow(frame.querySelector('#dialog-btn-cancel-profile'), false);
-                        $Dom.ToggleShow(frame.querySelector('#dialog-btn-save-profile'), false);
-                    }
-                },
-                {
-                    id: "dialog-btn-save-profile",
                     label: "SAVE",
                     className: "flex-1 bg-brand-4 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                    isHidden: true,
                     closesDialog: false,
                     handler: $Warn.CatchAsync(async () => {
                         const updatedFields = {
-                            Nickname: editNickname.value.trim(),
-                            ProfileEmoji: editIconInput.value,
-                            Bio: editBio.value.trim(),
-                            Link1: editLink1.value.trim(),
-                            Link2: editLink2.value.trim(),
-                            Link3: editLink3.value.trim(),
+                            nickName: editNickname.value.trim(),
+                            icon: editIconInput.value,
+                            description: editBio.value.trim(),
+                            link1: editLink1.value.trim(),
+                            link2: editLink2.value.trim(),
+                            link3: editLink3.value.trim(),
                         };
-                        const isSuccess = await $Data.Access.UpdateUserProfile(updatedFields);
+                        const isSuccess = await $Data.Access.UpdateProfile(updatedFields);
                         if (!isSuccess) return;
-                        $Data.Store.UpdateUserProfile(updatedFields);
+                        Object.assign(profile, updatedFields);
                         $Notice.Info("プロフィールを更新しました");
                         _DialogCore.close(); 
+                        if (onUpdate) onUpdate();
                     })
                 }
             ]

@@ -33,7 +33,7 @@ window.$Data = {
     Access: {
         baseUrl: "https://localhost:7292",   // ASPエントリポイント
         // baseUrl: "https://2cd8-112-71-71-140.ngrok-free.app",   // ASPエントリポイント
-        _rawData: { archive: null, details: [], archiveList:[], userProfile: null },
+        _rawData: { archive: null, details: [], archiveList: [], userProfile: null},
         // サーバー通信の基礎（エラーはスローし、同期と復元まで行う）
         async _fetchData(method, url, params, isDebug = false) {
             if (isDebug) {
@@ -86,6 +86,8 @@ window.$Data = {
             if (data.archiveId) $App.AppData.System.TargetArchiveId = data.archiveId; // 新規ID
             if (data.archiveList) this._rawData.archiveList = data.archiveList;
             if (data.userProfile) this._rawData.userProfile = data.userProfile;
+            // オーナー情報セット
+            if (data.ownerProfile) $App.AppData.Owner.Profile = data.ownerProfile;
             // ベース情報をAppDataに保持
             $App.AppData.System.IsLoggedIn = result.is_logged_in ?? false;
             $Data.Store.Restore();
@@ -93,11 +95,25 @@ window.$Data = {
         },
         // 自サーバー(C#)へログイン要求し、JWTトークンをもらう
         async LoginToServer(email) {
-            const url = '/api/Account/firebase-login';
+            const url = '/api/Account/LoginFirebase';
             const params = { Email: email };
             // (※ まだトークンが無い状態での通信なので、_fetchData 側で token が空でも通るようになっている前提です)
             return await $Warn.CatchAsync(async () => {
                 // C#が返してくる token を取り出して返す
+                return await this._fetchData('post', url, params);
+            })();
+        },
+        // ユーザ情報取得
+        async GetProfile(params = {}) {
+            const url = '/api/Account/GetProfile';
+            return await $Warn.CatchAsync(async () => {
+                return await this._fetchData('post', url, params);
+            })();
+        },
+        // ユーザ情報更新
+        async UpdateProfile(params) {
+            const url = '/api/Account/UpdateProfile';
+            return await $Warn.CatchAsync(async () => {
                 return await this._fetchData('post', url, params);
             })();
         },
@@ -228,13 +244,6 @@ window.$Data = {
                 return await this._fetchData('post', url, params);
             })();
         },
-        // ユーザ情報更新
-        async UpdateUserProfile(params = {}) {
-            const url = '/api/UpdateUserProfile'; // C#側の想定API
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
-        },
     },
     // データ操作・取得のメソッド群
     Store: {
@@ -248,7 +257,7 @@ window.$Data = {
             this._archive = structuredClone($Data.Access._rawData.archive);
             this._details = structuredClone($Data.Access._rawData.details);
             this._archiveList = structuredClone($Data.Access._rawData.archiveList);
-            this._userProfile = structuredClone($Data.Access._rawData._userProfile);
+            this._userProfile = structuredClone($Data.Access._rawData.userProfile);
         },
         Clear(){
             this._archive = null;
@@ -334,21 +343,10 @@ window.$Data = {
         },
         // ユーザ情報取得
         GetUserProfile() {
-            // ■■　ダミー　■■
-            this._userProfile = {
-                // UserId: "e4b3c2a1-1234-5678-90ab-cdef12345678",
-                UserId: "user@e4b3c2a1",
-                Nickname: "kunkoba",
-                ProfileEmoji: "✈️",
-                Bio: "毎週末どこかに旅行に行きます。おすすめスポットをまとめています！",
-                Link1: "https://x.com/kunkoba",
-                Link2: "https://instagram.com/kunkoba",
-                Link3: "https://github.com/kunkoba"
-            };
             return this._userProfile;
         },
         // ユーザ情報更新
-        UpdateUserProfile(updatedFields) {
+        UpdateProfile(updatedFields) {
             if (this._userProfile) {
                 Object.assign(this._userProfile, updatedFields);
             }

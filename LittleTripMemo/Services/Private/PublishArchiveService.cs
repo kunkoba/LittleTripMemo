@@ -59,6 +59,7 @@ public class PublishArchiveService : _BaseService
                 title = archive.title,
                 memo = archive.memo,
                 link_url = archive.link_url,
+                currency_unit = archive.currency_unit,
             };
             await _archivePubRepo.InsertAsync(pubArchive);
 

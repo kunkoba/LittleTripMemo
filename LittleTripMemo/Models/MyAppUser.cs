@@ -10,16 +10,13 @@ namespace LittleTripMemo.Models;
 /// </summary>
 public class MyAppUser : IdentityUser<Guid>
 {
-    [Column(Order = 1)]
-    /// <summary>
-    /// テーブル分散用のID (例: 0〜9)
-    /// </summary>
     public int TableId { get; set; }
-
-    [Column(Order = 2)]
-    /// <summary>
-    /// ユーザの料金プラン (例: free, standard, premium, admin)
-    /// </summary>
     public string Plan { get; set; } = PlanType.Free.ToString();
+    public string Icon { get; set; } = String.Empty;
+    public string NickName { get; set; } = String.Empty;
+    public string Description { get; set; } = String.Empty;
+    public string Link1 { get; set; } = String.Empty;
+    public string Link2 { get; set; } = String.Empty;
+    public string Link3 { get; set; } = String.Empty;
 }
 
