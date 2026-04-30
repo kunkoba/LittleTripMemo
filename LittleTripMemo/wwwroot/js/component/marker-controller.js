@@ -97,7 +97,6 @@ const _MarkerCore = {
     },
     // 現在地マーカーの更新
     refreshCurrentLocation() { // ★引数追加
-        console.log("refreshCurrentLocation()");
         $Warn.CatchAsync(async () => {
             const pos = await $Util.GetCurrentPosition();
             const p = [pos.coords.latitude, pos.coords.longitude];
@@ -199,6 +198,7 @@ const _MarkerCore = {
                 if (btnAction) {
                     btnAction.onclick = (e) => {
                         e.stopPropagation();
+                        console.log("> toggleMarkerPopup:", detail);
                         $DetailFrame.Open(detail);
                     };
                 }
@@ -289,7 +289,7 @@ const MarkerController = {
     },
     // 現在の状態に基づくフォーカス実行
     FocusToCurrentMarker(delay = 100) {
-        console.log("★FocusToCurrentMarker");
+        // console.log("★FocusToCurrentMarker");
         const marker = _MarkerCore.getMarker(this._currentIndex);
         if (!marker) return;
         const details = $Data.Store.GetAllDetails();

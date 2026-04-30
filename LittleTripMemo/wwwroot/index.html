@@ -35,14 +35,15 @@
     <!-- メインコンテンツ -->
     <div>
         <!-- ■　アプリ上部 -->
-        <div id="ui-top-bar" class="absolute top-0 left-0 right-0 z-[1001]">
+        <div id="ui-top-bar" class="absolute top-0 left-0 right-0 z-[1000]">
             <!-- ■　通知バー -->
-            <div class="h-6 shadow-brand bg-brand-2 flex items-center justify-center px-3">
-                <div id="notice-bar-text" class="text-[12px] font-bold "></div>
+            <div class="h-6 shadow-brand_ bg-black/20 flex items-center justify-center">
+                <div id="notice-bar-text" class="text-[12px] font-bold text-white"></div>
             </div>
             <!-- ■　アイコンバー -->
             <div class="mx-2 bg-transparent flex justify-between mt-2">
-                <div class="flex-1 min-w-0">
+                <!-- タイトルバー -->
+                <div class="flex-1 min-w-0 w-10">
                     <!-- まとめタイトル -->
                     <div class="p-0 mr-2">
                         <!-- 初期状態を黒背景にし、内部にアイコンとテキストの要素を分割 -->
@@ -90,23 +91,10 @@
                     <button id="btn-sys-menu" class="rounded-full shadow-brand border-2 border-brand-4 text-[20px] w-10 h-10 bg-black text-white">
                         ⚙️
                     </button>
-                        <!-- ポップアップ -->
-                        <div id="pop-sys-menu" class="hidden shadow-brand absolute top-16 right-0 w-32 bg-brand-0 border border-brand-3 shadow-xl z-[1100]">
-                            <div id="sys-menu-1" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
-                                system menu 1
-                            </div>
-                            <div id="sys-menu-2" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
-                                system menu 2
-                            </div>
-                            <div id="sys-menu-3" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
-                                system menu 3
-                            </div>
-                            <div id="sys-menu-4" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
-                                system menu 4
-                            </div>
-                        </div>
                 </div>
             </div>
+            <!-- ■　Toast を積み上げるコンテナ -->
+            <div id="toast-container" class="pt-2 _fixed _top-[100px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
         </div>
         <!-- ■　メイン画面：地図＋詳細パネル -->
         <div class="absolute bottom-0 flex h-screen w-screen overflow-hidden flex-col md:flex-row">
@@ -116,7 +104,6 @@
             <div id="ui-map-barrier" class="fixed inset-0 z-10 hidden bg-transparent"></div>
             <!-- ■　詳細パネル（右側スライド表示） -->
             <div id="ui-detail-frame-id" class="translate-y-full flex flex-col bg-brand-0 overflow-hidden shrink-0 h-0 w-full md:h-full md:w-0 border-t md:border-t-0 md:border-l border-brand-2 transition-all duration-400 rounded-t-[2rem] md:rounded-none md:rounded-l-[2rem] shadow-2xl z-[1002]">
-
                 <!-- 詳細パネルのヘッダー -->
                 <div class="bg-slate-50 h-16 px-6 flex justify-between items-center shrink-0 border-b border-brand-1">
                     <h2 id="detail-title" class="text-xl font-black italic text-brand-5 uppercase tracking-wider">Details</h2>
@@ -128,10 +115,8 @@
                         <button id="detail-btn-close" class="w-8 h-8 bg-white rounded-lg shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-lg">✕</button>
                     </div>
                 </div>
-
                 <!-- 詳細パネルの内容 (スクロールエリア) -->
                 <div id="ui-detail-content-id" class="flex-1 overflow-y-auto p-4">
-
                     <!-- ■ 参照用（表示モード） -->
                         <div id="detail-display" class="hidden mt-3 space-y-4 text-black-4 px-1">
 
@@ -178,7 +163,6 @@
                             </div>
 
                         </div>
-
                     <!-- ■ 編集用（編集モード） -->
                     <form id="detail-edit" class="hidden space-y-6 text-black-4">
                         <!-- DATE & TIME -->
@@ -196,11 +180,10 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- 編集用 (detail-edit) の MOOD & ATMOSPHERE エリア -->
+                        <!-- 編集用 (detail-edit) の MARKER & ATMOSPHERE エリア -->
                         <div class="grid grid-cols-2 gap-6">
                             <div>
-                                <label class="block font-black text-black-3 text-[10px] mb-1 uppercase tracking-wider">MOOD</label>
+                                <label class="block font-black text-black-3 text-[10px] mb-1 uppercase tracking-wider">MARKER</label>
                                 <div class="flex items-center justify-between border-b-2 border-brand-2 pb-1">
                                     <!-- 地点名取得 -->
                                     <button id="btn-face-trigger" type="button" class="h-[30px] w-full text-right text-2xl outline-none active:scale-95">
@@ -220,72 +203,72 @@
                                 </div>
                             </div>
                         </div>
-
                         <!-- TITLE -->
                         <div class="w-full">
-    <!-- 全体：左（タイトル＋カウント＋入力欄）＋右（ボタン） -->
-    <div class="flex items-end gap-2">
-        <!-- 左側：タイトル行＋カウント行＋入力欄（セット） -->
-        <div class="flex-1">
-            <!-- タイトルとカウントを1行で、幅は入力欄と同じ -->
-            <div class="flex justify-between items-center mb-1">
-                <label class="font-black text-black-3 text-[10px] uppercase tracking-wider">
-                    TITLE
-                </label>
-                <div class="text-[10px] text-black-2 font-bold">
-                    <span id="detail-count-title">0</span>/50
-                </div>
-            </div>
+                            <!-- 全体：左（タイトル＋カウント＋入力欄）＋右（ボタン） -->
+                            <div class="flex items-end gap-2">
+                                <!-- 左側：タイトル行＋カウント行＋入力欄（セット） -->
+                                <div class="flex-1">
+                                    <!-- タイトルとカウントを1行で、幅は入力欄と同じ -->
+                                    <div class="flex justify-between items-center mb-1">
+                                        <label class="font-black text-black-3 text-[10px] uppercase tracking-wider">
+                                            TITLE
+                                        </label>
+                                        <div class="text-[10px] text-black-2 font-bold">
+                                            <span id="detail-count-title">0</span>/50
+                                        </div>
+                                    </div>
 
-            <!-- 入力欄（上の行と右端が揃う） -->
-            <input
-                name="title"
-                id="detail-edit-title"
-                type="text"
-                maxlength="50"
-                class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white"
-            >
-        </div>
-
-        <!-- 右側：固定サイズボタン -->
-        <button
-            id="btn-address-name"
-            type="button"
-            class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[24px] outline-none active:scale-95"
-        >
-            📍
-        </button>
-    </div>
-</div>
-
-
+                                    <!-- 入力欄（上の行と右端が揃う） -->
+                                    <input
+                                        name="title"
+                                        id="detail-edit-title"
+                                        type="text"
+                                        maxlength="50"
+                                        class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white"
+                                    >
+                                </div>
+                                <!-- 右側：固定サイズボタン -->
+                                <button
+                                    id="btn-address-name"
+                                    type="button"
+                                    class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[24px] outline-none active:scale-95"
+                                >
+                                    📍
+                                </button>
+                            </div>
+                        </div>
                         <!-- BODY -->
                         <div>
                             <div class="flex justify-between items-end mb-1">
                                 <label class="font-black text-black-3 text-[10px] uppercase tracking-wider">MEMORY DETAIL</label>
                                 <div class="text-[10px] text-black-2 font-bold"><span id="detail-count-body">0</span>/500</div>
                             </div>
-                            <textarea name="body" id="detail-edit-body" maxlength="500" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] h-48 rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+                            <textarea name="body" id="detail-edit-body" maxlength="500" 
+                                class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] h-48 rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
                         </div>
-
                         <!-- PRICE -->
-                        <div class="grid grid-cols-2 gap-6">
-                            <div>
-                                <div class="flex items-center border-brand-2 pb-1">
-                                    <span class="text-blue-500 font-bold mr-2 text-lg">＋</span>
-                                    <input id="detail-edit-price_plus" type="number" 
-                                        class="w-full border-2 border-brand-3 px-3 py-1 text-[20px] rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none">
-                                </div>
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="font-black text-black-3 text-[10px] uppercase tracking-wider">PRICE</label>
                             </div>
-                            <div>
-                                <div class="flex items-center border-brand-2 pb-1">
-                                    <span class="text-red-500 font-bold mr-2 text-lg">－</span>
-                                    <input id="detail-edit-price_minus" type="number" 
-                                        class="w-full border-2 border-brand-3 px-3 py-1 text-[20px] rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <div class="flex items-center border-brand-2 pb-1">
+                                        <span class="text-blue-500 font-bold mr-2 text-lg">＋</span>
+                                        <input id="detail-edit-price_plus" type="number" 
+                                            class="w-full border-2 border-brand-3 px-3 py-1 text-[20px] rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none">
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex items-center border-brand-2 pb-1">
+                                        <span class="text-red-500 font-bold mr-2 text-lg">－</span>
+                                        <input id="detail-edit-price_minus" type="number" 
+                                            class="w-full border-2 border-brand-3 px-3 py-1 text-[20px] rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
                         <!-- URL -->
                         <div>
                             <div class="flex justify-between items-end mb-1">
@@ -293,12 +276,10 @@
                                 <div class="text-[10px] text-black-2 font-bold"><span id="detail-count-url">0</span>/200</div>
                             </div>
                             <div class="flex items-center border-brand-2 pb-1">
-                                <span class="text-brand-3 mr-2 text-sm">🔗</span>
                                 <input name="link_url" id="detail-edit-link_url" type="url" maxlength="200" 
                                     class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none" placeholder="https://...">
                             </div>
                         </div>
-
                         <!-- 隠しフィールド -->
                         <div class="hidden">
                             <input name="archive_id" id="detail-edit-archive_id" type="hidden" value="">
@@ -309,34 +290,27 @@
                         </div>
                     </form>
                 </div>
-
                 <!-- 詳細パネルのフッター (固定) -->
                 <div class="shrink-0 px-4 pb-6 pt-4 bg-slate-50 z-10">
-                    
                     <!-- （いいねボタン） -->
                     <div id="detail-group-reaction" class="flex justify-between gap-2 mb-4">
                         <button id="detail-btn-funny" class="flex-1 bg-white rounded-2xl py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-xl">🤣</span>
-                            <span class="text-[8px] font-black text-black-3 uppercase tracking-tighter mt-1">Funny</span>
                             <span class="text-[12px] font-black text-brand-5 js-count mt-0.5">0</span>
                         </button>
                         <button id="detail-btn-helpful" class="flex-1 bg-white rounded-2xl py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-xl">😍</span>
-                            <span class="text-[8px] font-black text-black-3 uppercase tracking-tighter mt-1">Helpful</span>
                             <span class="text-[12px] font-black text-brand-5 js-count mt-0.5">0</span>
                         </button>
                         <button id="detail-btn-surprise" class="flex-1 bg-white rounded-2xl py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-xl">😲</span>
-                            <span class="text-[8px] font-black text-black-3 uppercase tracking-tighter mt-1">Surprise</span>
                             <span class="text-[12px] font-black text-brand-5 js-count mt-0.5">0</span>
                         </button>
                         <button id="detail-btn-empathy" class="flex-1 bg-white rounded-2xl py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-xl">😉</span>
-                            <span class="text-[8px] font-black text-black-3 uppercase tracking-tighter mt-1">Empathy</span>
                             <span class="text-[12px] font-black text-brand-5 js-count mt-0.5">0</span>
                         </button>
                     </div>
-
                     <!-- index.html 詳細パネルフッター内：マーカー移動ボタンの修正 -->
                     <div id="detail-group-move" class="flex items-center justify-center bg-black rounded-full px-2 py-1 mb-4 shadow-md">
                         <button id="detail-btn-first" class="w-12 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">≪</button>
@@ -345,14 +319,12 @@
                         <button id="detail-btn-next"  class="w-12 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">▶</button>
                         <button id="detail-btn-last"  class="w-12 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">≫</button>
                     </div>
-
                     <!-- （キャンセル・保存） -->
                     <div class="flex gap-4">
                         <button id="detail-btn-cancel" class="flex-1 bg-slate-400 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform">CANCEL</button>
                         <button id="detail-btn-save" class="flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform">SAVE DATA</button>
                     </div>
                 </div>
-
             </div>
         </div>
         <!-- ■　アプリ下部 -->
@@ -366,8 +338,12 @@
                 <!-- 中央 -->
                 <div>
                     <!-- 新規登録ボタン -->
-                    <button id="btn-create" class="rounded-full shadow-brand w-16 h-16 border-2 border-brand-5 bg-brand-0 text-white font-black text-[24px]">
+                    <button id="btn-create" class="rounded-full shadow-brand w-16 h-16 border-2 border-brand-5 bg-white/70 text-white font-black text-[24px]">
                         ➕
+                    </button>
+                    <!-- 地点検索ボタン -->
+                    <button id="btn-search" class="rounded-full shadow-brand w-16 h-16 border-2 border-brand-5 bg-white/70 text-white font-black text-[24px] hidden">
+                        🔎
                     </button>
                     <!-- index.html の下部バー内：ボトム移動ボタン群の修正 -->
                     <div id="bot-group-move" class="hidden flex items-center bg-black/70 rounded-full px-2 py-1 shadow-md">
@@ -379,32 +355,13 @@
                         <button id="btn-bot-move-next"  class="w-10 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">▶</button>
                         <button id="btn-bot-move-last"  class="w-10 h-10 flex items-center justify-center text-white font-black text-[16px] active:scale-95 transition-transform hover:bg-white/20 rounded-full">≫</button>
                     </div>
-                    <!-- 地点検索ボタン -->
-                    <button id="btn-search" class="hidden rounded-full shadow-brand w-16 h-16 border-2 border-brand-5 bg-brand-0 text-white font-black text-[24px]">
-                        🔎
-                    </button>
                 </div>
                 <!-- 右 -->
                 <div>
                     <!-- アプリメニュー -->
-                    <button id="btn-app-menu" class="rounded-full shadow-brand bg-brand-1 text-brand-5 w-10 h-10 border-2 border-brand-4 text-[16px] font-bold">
+                    <button id="btn-app-menu" class="rounded-full shadow-brand bg-white/70 text-brand-5 w-10 h-10 border-2 border-brand-4 text-[16px] font-bold">
                         ☰
                     </button>
-                        <!-- ポップアップ -->
-                        <div id="pop-app-menu" class="hidden shadow-brand absolute bottom-12 right-0 w-32 bg-brand-0 border border-brand-3 shadow-xl z-[1100]">
-                            <div id="app-menu-1" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
-                                system menu 1
-                            </div>
-                            <div id="app-menu-2" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
-                                system menu 2
-                            </div>
-                            <div id="app-menu-3" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
-                                system menu 3
-                            </div>
-                            <div id="app-menu-4" class="p-2 border-b border-brand-2 text-[12px] font-bold hover:bg-brand-2 cursor-pointer uppercase">
-                                system menu 4
-                            </div>
-                        </div>
                 </div>
             </div>
         </div>
@@ -424,7 +381,7 @@
         <div id="ui-dialog-backdrop" class="z-[1999] fixed inset-0 hidden"></div>
 
         <!-- ■　Toast を積み上げるコンテナ -->
-        <div id="toast-container" class="fixed bottom-[100px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
+        <div id="toast-container2" class="fixed top-[100px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
 
         <!-- 【マップ】ポップアップ -->
         <template id="tpl-marker-popup">
@@ -434,7 +391,7 @@
                     <span class="index leading-none pb-1 pl-1"></span>
                 </div>
                 <!-- 日時 -->
-                <div class="text-[12px] font-black text-brand-5 mb-1.5 tracking-widest">
+                <div class="text-[14px] font-black text-brand-5 mb-1.5 tracking-widest">
                     <span class="time"></span>
                 </div>
                 <!-- タイトル -->
@@ -442,7 +399,7 @@
                     <span class="title"></span>
                 </div>
                 <!-- 本文 -->
-                <div class="text-[10px] text-black-3 line-clamp-4 leading-relaxed mb-4">
+                <div class="text-[12px] text-black-3 line-clamp-4 leading-relaxed mb-4">
                     <span class="body"></span>
                 </div>
                 <!-- アクションボタン -->
@@ -471,7 +428,7 @@
 </div>
 
 <!-- テスト用データ -->
-<script type="module" src="./js/test-data.js"></script>
+<!-- <script type="module" src="./js/test-data.js"></script> -->
 
 <!-- アプリ付属モジュール -->
 <script type="module" src="./js/app-const.js"></script>

@@ -59,9 +59,7 @@ const AppManager = {
     // 定期タスクの定義と開始
     _initPollingTasks() {
         $Polling.Init();
-        const online_check_ms = 5000;
-        const data_send_check_ms = 10000;
-        // ネットワーク監視
+        // オンライン監視（秒）
         $Polling.Add($Polling.TASKS.OFFLINE_CHECK, () => {
             const isOn = navigator.onLine;
             $App.AppData.System.IsOnline = isOn;    // オフライン状態を保持
@@ -75,25 +73,25 @@ const AppManager = {
                 $Polling.Stop($Polling.TASKS.DATA_SEND);
                 console.log("-- offline --");
             }
-        }, online_check_ms);
-        // データ送信処理
+        }, 30);
+        // データ送信処理（秒）
         $Polling.Add($Polling.TASKS.DATA_SEND, async () => {
             if (await $LocalDb.Detail.GetCount() === 0) return;
             await $Warn.CatchAsync(async () => {
                 // 全て $Data.LocalDb に任せる
-                await $Data.LocalDb.RunBackgroundSync();
-                // 画面再描画
-                $Marker.RefreshPointMarker();
+                await $Data.LocalDb.BulkSendDetails();
+                // 通知
+                $Notice.Info("Saved successfully.");
             })();
-        }, data_send_check_ms);
-        // 現在地追従
+        }, 60);
+        // 現在地追従（秒）
         $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
             // 追従モードかつオンラインなら現在地を更新（フォーカスはしない）
             if ($App.AppData.Owner.IsGpsTracking && $App.AppData.System.IsOnline) {
                 $Marker.RefreshCurrentLocation();
             }
-        }, 10000); // 10秒おき
-        // ネットワーク監視開始
+        }, 10);
+        // 定期タスク開始-----
         $Polling.Start($Polling.TASKS.OFFLINE_CHECK);
     },
     // 戻り値として、ログインに成功したか（true/false）を返す
@@ -129,7 +127,6 @@ const AppManager = {
         // クエリパラメータ取得してAppDataにセット
         this.AppData.System.ScreenMode = new URLSearchParams(location.search).get("mode") ?? $Const.SCREEN_MODE.CREATE;
         this.AppData.System.ArchiveId = new URLSearchParams(location.search).get("archiveId");
-        console.log("ScreenMode:", this.AppData.System.ScreenMode);
         // マーカー再構築
         this.RefreshScreen();
     },

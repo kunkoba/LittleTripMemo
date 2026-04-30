@@ -117,6 +117,7 @@ builder.Services.AddScoped<CloseArchiveService>();
 builder.Services.AddScoped<UpdateArchivePubService>();
 builder.Services.AddScoped<UpdateDetailPubService>();
 builder.Services.AddScoped<SearchByLocationPubService>();
+builder.Services.AddScoped<BulkSyncDetailsService>();
 
 
 // ======================================================================

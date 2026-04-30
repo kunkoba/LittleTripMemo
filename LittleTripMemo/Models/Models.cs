@@ -37,23 +37,6 @@ public class TMemoArchivePub : IAppRecord
     public int cnt { get; set; } = 0;
 }
 
-public class DtoArchive
-{
-    public int archive_id { get; set; } = 0;
-    public Guid user_id { get; set; }
-    public string title { get; set; } = string.Empty;
-    public string memo { get; set; } = string.Empty;
-    public string link_url { get; set; } = string.Empty;
-    public string currency_unit { get; set; } = "JPY";
-    public bool closed_flg { get; set; } = false;
-    public bool del_flg { get; set; } = false;
-    public DateTime create_tim { get; set; }
-    public DateTime update_tim { get; set; }
-    public bool is_public { get; set; } = true;
-    public bool is_owner { get; set; } = false;
-    public int cnt { get; set; } = 0;
-}
-
 public class TMemoDetail : IAppRecord
 {
     public int seq { get; set; }
@@ -115,29 +98,78 @@ public class TReactionPub
 
 #region "システム関連"
 
-public class TAppFeedback
-{
-    public int no { get; set; }
-    public byte rating { get; set; }
-    public int send_category_id { get; set; }
-    public string body { get; set; } = string.Empty;
-    public int archive_id { get; set; } = 0;
-    public int seq { get; set; }
-    public Guid sender_user_id { get; set; }
-    public bool del_flg { get; set; } = false;
-    public DateTime create_tim { get; set; }
-    public DateTime update_tim { get; set; }
-}
+    // フィードバック
+    public class TSysFeedback
+    {
+        public Guid user_id { get; set; } // アプリ側はGuid
+        public string? body { get; set; }
+        public int score { get; set; }
+        public DateTime update_tim { get; set; }
+    }
 
-public class TAppNews
-{
-    public int no { get; set; }
-    public int news_category_id { get; set; }
-    public string title { get; set; } = string.Empty;
-    public string body { get; set; } = string.Empty;
-    public DateTime expiry_tim { get; set; }
-    public bool del_flg { get; set; } = false;
-}
+    // お知らせ
+    public class TSysNotification
+    {
+        public long seq { get; set; }
+        public string title { get; set; } = string.Empty;
+        public string body { get; set; } = string.Empty;
+        public short kind { get; set; }
+        public DateTime disp_from { get; set; }
+        public DateTime disp_to { get; set; }
+        public DateTime update_tim { get; set; }
+    }
+
+    // 通報
+    public class TSysReport
+    {
+        public Guid reporter_user_id { get; set; }
+        public Guid target_user_id { get; set; }
+        public long archive_id { get; set; }
+        public string? body { get; set; }
+        public DateTime report_tim { get; set; }
+    }
 
 #endregion
 
+#region "DTO"
+
+    /// <summary>
+    /// まとめ親リスト（private＋public）
+    /// </summary>
+    public class DtoArchive
+    {
+        public int archive_id { get; set; } = 0;
+        public Guid user_id { get; set; }
+        public string title { get; set; } = string.Empty;
+        public string memo { get; set; } = string.Empty;
+        public string link_url { get; set; } = string.Empty;
+        public string currency_unit { get; set; } = "JPY";
+        public bool closed_flg { get; set; } = false;
+        public bool del_flg { get; set; } = false;
+        public DateTime create_tim { get; set; }
+        public DateTime update_tim { get; set; }
+        public bool is_public { get; set; } = true;
+        public bool is_owner { get; set; } = false;
+        public int cnt { get; set; } = 0;
+    }
+
+    /// <summary>
+    /// フィードバック集計結果
+    /// </summary>
+    public class DtoFeedbackSummary
+    {
+        public IEnumerable<TSysFeedback> LatestFeedbacks { get; set; } = Enumerable.Empty<TSysFeedback>();
+        public double AverageScore { get; set; }
+    }
+
+    /// <summary>
+    /// 通報情報集計結果
+    /// </summary>
+    public class DtoReportSummary
+    {
+        public Guid target_user_id { get; set; }
+        public long archive_id { get; set; }
+        public long report_count { get; set; }
+    }
+
+#endregion

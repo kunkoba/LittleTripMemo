@@ -103,7 +103,7 @@ const _DetailFrameCore = {
             this.toggleDetailPanel(false);
         } else if (isEditMode) {
             const currentData = $Data.Store.GetDetailByKey(data.archive_id, data.seq);
-            DetailFrameController.Open(currentData); 
+            $DetailFrame.Open(currentData); 
         } else {
             this.toggleDetailPanel(false);
         }
@@ -143,8 +143,8 @@ const _DetailFrameCore = {
     // 詳細パネルの開閉と関連UIの更新
     toggleDetailPanel(isShow) {
         // パネル占有サイズ設定
-        const PANEL_WIDTH = '400px';
-        const PANEL_HEIGHT = '70%';
+        const PANEL_WIDTH = '500px';
+        const PANEL_HEIGHT = '80%';
         const isMobile = window.innerWidth < 768;
         if (isShow) {
             $Map.LockMap(true);

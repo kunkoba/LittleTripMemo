@@ -19,7 +19,8 @@ public class GetArchiveDetailsService : _BaseService
     public record Response(
         TMemoArchive archive, 
         IEnumerable<TMemoDetail> details, 
-        GetUserProfileService.Response userProfile);
+        GetUserProfileService.Response userProfile
+    );
 
     public GetArchiveDetailsService(
         UserContext userContext,

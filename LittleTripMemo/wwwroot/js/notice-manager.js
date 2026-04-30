@@ -13,18 +13,23 @@ const Notice = {
         el.style.color = "#fff";
         $Dom.QuerySelector(".message", el).textContent = message;
         setTimeout(() => {
-            el.classList.remove("opacity-0", "translate-y-2");
+            el.classList.remove("opacity-0", "-translate-y-2");
             el.classList.add("opacity-100", "translate-y-0");
         }, 0);
         setTimeout(() => {
-            el.classList.add("opacity-0", "translate-y-2");
+            el.classList.add("opacity-0", "-translate-y-2");
             el.classList.remove("opacity-100", "translate-y-0");
-            setTimeout(() => el.remove(), 300);
-        }, 5000);
+            setTimeout(() => root.remove(), 300);
+        }, 5 * 1000);
+        root.addEventListener("click", () => {
+            el.classList.add("opacity-0", "-translate-y-2");
+            el.classList.remove("opacity-100", "translate-y-0");
+            setTimeout(() => root.remove(), 300);
+        });
     },
     // ラッパーメソッド
-    Info(msg) { this._toast(msg, "info"); }, 
-    Warn(msg) { this._toast(msg, "warn"); }, 
+    Info(msg) { this._toast(msg, "info"); },
+    Warn(msg) { this._toast(msg, "warn"); },
     Error(msg) { this._toast(msg, "error"); },
     // ローディング
     Loading: {

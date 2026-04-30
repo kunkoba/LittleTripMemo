@@ -6,10 +6,10 @@ window.$Data = {
         this.Access._rawData.details = [];
         this.Store.Restore();
     },
-    // ★追加：同期処理の専門部署
+    // 同期処理の専門部署
     LocalDb: {
-        // バックグラウンドでローカルDBのデータを確実にサーバーへ同期する
-        async RunBackgroundSync() {
+        // バックグラウンドで一括送信、一括処理
+        async BulkSendDetails2() {
             const list = await $LocalDb.Detail.GetAll();
             if (!list || list.length === 0) return;
             for (const detail of list) {
@@ -25,6 +25,50 @@ window.$Data = {
                     detail.send_flag = 0;
                     await $LocalDb.Detail.Save(detail);
                     break;
+                }
+            }
+        },
+        // バックグラウンドで一括送信、一括処理
+        async BulkSendDetails() {
+            const list = await $LocalDb.Detail.GetAll();
+            if (!list || list.length === 0) return;
+            // 1. 全件の送信フラグを一旦「送信中(1)」にする
+            for (const detail of list) {
+                detail.send_flag = 1;
+                await $LocalDb.Detail.Save(detail);
+            }
+            // 2. サーバー側の BulkSyncReq 形式に合わせてペイロードを作成
+            // サーバー側で PropertyNamingPolicy = null なので、プロパティ名は record の定義に合わせる
+            const payload = {
+                items: list.map(d => ({
+                    seq: d.seq,
+                    archive_id: d.archive_id,
+                    latitude: d.latitude,
+                    longitude: d.longitude,
+                    title: d.title,
+                    body: d.body,
+                    memo_date: d.memo_date,
+                    memo_time: d.memo_time,
+                    face_emoji: d.face_emoji,
+                    weather_emoji: d.weather_emoji,
+                    link_url: d.link_url,
+                    memo_price: d.memo_price,
+                    is_public: !!d.is_public // booleanを保証
+                }))
+            };
+            // 3. 一括送信（サーバー側は1つのトランザクションで処理される）
+            const isSuccess = await $Data.Access.BulkSyncDetails(payload);
+            if (isSuccess) {
+                // 全件成功：ローカルDBから一括削除
+                for (const detail of list) {
+                    await $LocalDb.Detail.DeleteById(detail.dbid);
+                }
+            } else {
+                // 失敗：全件の送信フラグを「未送信(0)」に戻す
+                console.error(`一括同期に失敗しました。環境が回復するまで待機します。`);
+                for (const detail of list) {
+                    detail.send_flag = 0;
+                    await $LocalDb.Detail.Save(detail);
                 }
             }
         }
@@ -244,6 +288,13 @@ window.$Data = {
                 return await this._fetchData('post', url, params);
             })();
         },
+        // 一括送信、一括処理
+        async BulkSyncDetails(params = {}) {
+            const url = '/api/BulkSyncDetails';
+            return await $Warn.CatchAsync(async () => {
+                return await this._fetchData('post', url, params);
+            })();
+        },
     },
     // データ操作・取得のメソッド群
     Store: {
@@ -271,6 +322,14 @@ window.$Data = {
             const hit = list.find(x => x.archive_id === Number(archiveId) && x.seq === Number(seq));
             return hit ? [hit] : []; // 見つかれば [obj]、なければ[] （常に配列）
         },
+        // 【ラッパー】アーカイブ取得
+        GetArchive() {
+            return this._archive;
+        },
+        // 【ラッパー】アーカイブリスト取得
+        GetArchiveList() {
+            return this._archiveList;
+        },
         // ソート処理
         SortDetails(field = "date", order = "asc") {
             if (!this._details || this._details.length === 0) return;
@@ -295,14 +354,6 @@ window.$Data = {
                 return 0;
             });
         },
-        // 【ラッパー】アーカイブ取得
-        GetArchive() {
-            return this._archive;
-        },
-        // 【ラッパー】アーカイブリスト取得
-        GetArchiveList() {
-            return this._archiveList;
-        },
         // 【ラッパー】明細全件取得
         GetAllDetails() {
             this.SortDetails('date');
@@ -316,10 +367,13 @@ window.$Data = {
         // 生データの更新または追加（反映にはRefreshが必要）
         UpsertDetail(detail) {
             if (!detail) return;
-            console.log("UpsertDetail:", detail);
             const list = $Data.Access._rawData.details;
-            // const idx = list.findIndex(x => x.seq === Number(detail.seq));
-            const idx = list.findIndex(x => x.dbid === Number(detail.dbid));
+            let idx = -1;
+            if (detail.seq > 0) {
+                idx = list.findIndex(x => x.seq === Number(detail.seq));
+            } else {
+                idx = list.findIndex(x => x.dbid === Number(detail.dbid));
+            }
             if (idx !== -1) {
                 list[idx] = { ...list[idx], ...detail };
             } else {

@@ -4,7 +4,7 @@
 <!-- トースト用 -->
 <template id="tpl-toast">
     <div class="flex justify-center w-full">
-        <div class="flex items-center justify-center px-4 py-2 rounded-3xl shadow-md w-[80vw] max-w-[400px]
+        <div class="flex items-center justify-center px-4 py-2 _rounded-3xl shadow-md w-[80vw] max-w-[400px]
             opacity-0 translate-y-2 transition-all duration-300 pointer-events-auto z-[9999]">
             <span class="message text-[14px] font-bold text-center w-full block"></span>
         </div>
@@ -31,7 +31,7 @@
 <!-- 【ダイアログ親】フレーム -->
 <template id="tpl-dialog-frame">
     <div class="fixed inset-0 z-[2000] pointer-events-none flex items-center justify-center bg-black/20">
-        <div class="pointer-events-auto w-[90%] max-w-[450px] min-h-[500px] max-h-[80vh] bg-brand-0 rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-brand-2 relative">
+        <div class="pointer-events-auto w-[90%] max-w-[600px] min-h-[500px] max-h-[80vh] bg-brand-0 rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-brand-2 relative">
             <div id="dialog-title-bar" class="h-16 flex items-center justify-between shrink-0 bg-slate-50 px-4 border-b border-brand-1 relative">
                 <div id="dialog-title" class="flex-1 flex items-center font-black italic text-brand-5 uppercase tracking-wider truncate pr-2"></div>
                 <div id="dialog-header-actions" class="flex items-center gap-2 shrink-0">
@@ -40,7 +40,7 @@
             </div>
             <div id="dialog-content" class="flex-1 overflow-y-auto flex flex-col p-4 relative"></div>
             <!-- 修正: 常に表示し、flex-wrapで複数段に対応、min-hを設定 -->
-            <div id="dialog-button-container" class="z-[900] hrink-0 flex flex-wrap gap-3 p-4 bg-slate-50 border-t border-brand-1"></div>
+            <div id="dialog-button-container" class="_hidden z-[900] shrink-0 flex flex-col gap-3 p-4 bg-slate-50 border-t border-brand-1"></div>
         </div>
     </div>
 </template>
@@ -98,7 +98,7 @@
             <!-- タイトル -->
             <div class="js-title text-[14px] font-black text-black-5 truncate mb-0.5"></div>
             <!-- 本文（2行で切り捨て） -->
-            <div class="js-body text-[11px] text-black-4 line-clamp-2 leading-snug"></div>
+            <div class="js-body text-[14px] text-black-4 line-clamp-2 leading-snug"></div>
         </div>
     </div>
 </template>
@@ -188,12 +188,12 @@
         <div class="flex-1 bg-white rounded-2xl p-3 border border-slate-200 shadow-sm relative overflow-hidden mr-2">
             <!-- 🌟 タイトルと金額 -->
             <div class="flex justify-between items-start mb-1.5 gap-2">
-                <div class="js-title text-[14px] font-black text-black-5 break-all flex-1 leading-snug"></div>
+                <div class="js-title text-[12px] font-black text-black-5 break-all flex-1 leading-snug"></div>
                 <!-- 追加：金額 -->
-                <div class="js-price text-[14px] font-black shrink-0 whitespace-nowrap"></div>
+                <div class="js-price text-[12px] font-black shrink-0 whitespace-nowrap"></div>
             </div>
             <!-- 🌟 本文：省略クラス（line-clamp-4）を外し、改行（whitespace-pre-wrap）を維持 -->
-            <div class="js-body text-[12px] text-black-4 leading-relaxed whitespace-pre-wrap break-all"></div>
+            <div class="js-body text-[14px] text-black-4 leading-relaxed whitespace-pre-wrap break-all"></div>
         </div>
     </div>
 </template>
@@ -216,7 +216,20 @@
             <div class="js-stars text-[14px] text-yellow-500 tracking-widest leading-none"></div>
             <div class="js-date text-[10px] font-bold text-slate-400"></div>
         </div>
-        <div class="js-body text-[12px] text-black-4 leading-relaxed whitespace-pre-wrap break-all"></div>
+        <div class="js-body text-[14px] text-black-4 leading-relaxed whitespace-pre-wrap break-all"></div>
+    </div>
+</template>
+<!-- 【リスト子】管理者通知一覧用 -->
+<template id="tpl-admin-list-child-notice">
+    <div class="js-item-card flex items-stretch p-0 rounded-2xl border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-sm overflow-hidden mb-3 relative">
+        <div class="flex-1 min-w-0 p-3 pl-4">
+            <div class="flex justify-between items-start mb-1">
+                <div class="text-[10px] font-black text-slate-400 tracking-wider js-date"></div>
+                <span class="js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border"></span>
+            </div>
+            <div class="text-[14px] font-black text-black-5 truncate pr-2 mb-1 js-title"></div>
+            <div class="text-[11px] text-black-3 line-clamp-1 js-body leading-relaxed"></div>
+        </div>
     </div>
 </template>
 
@@ -301,26 +314,59 @@
         <button id="btn-sys-auth" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
             <span class="col-span-1 flex justify-center text-lg">👤</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Login / Logout</span>
         </button>
+        <!-- 管理者用ボタン -->
+        <button id="btn-sys-admin" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-red-100 active:bg-red-200 transition-colors text-red-600 bg-red-50">
+            <span class="col-span-1 flex justify-center text-lg">👑</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Admin Tools</span>
+        </button>
+    </div>
+</template>
+<!-- 【ダイアログ子】管理者メニュー -->
+<template id="tpl-menu-admin">
+    <div class="w-full flex flex-col bg-brand-0">
+        <button id="btn-admin-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-lg">📢</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Notice Management</span>
+        </button>
+        <button id="btn-admin-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 opacity-50 cursor-not-allowed">
+            <span class="col-span-1 flex justify-center text-lg">🚨</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Report Mgmt (WIP)</span>
+        </button>
+        <button id="btn-admin-feedback" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 opacity-50 cursor-not-allowed">
+            <span class="col-span-1 flex justify-center text-lg">💡</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Feedback Mgmt (WIP)</span>
+        </button>
+    </div>
+</template>
+<!-- 【ダイアログ子】管理者通知編集 -->
+<template id="tpl-admin-notice-edit">
+    <div class="w-full text-black-5 space-y-4 pt-2 px-2">
+        <div>
+            <label class="block text-[12px] font-bold mb-1 uppercase text-black-3">Kind</label>
+            <select id="edit-notice-kind" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white">
+                <option value="0">0: Other 📢</option>
+                <option value="1">1: Important ⚠️</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-[12px] font-bold mb-1 uppercase text-black-3">Title</label>
+            <input id="edit-notice-title" type="text" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white">
+        </div>
+        <div>
+            <label class="block text-[12px] font-bold mb-1 uppercase text-black-3">Body</label>
+            <textarea id="edit-notice-body" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] h-32 rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-[10px] font-bold mb-1 uppercase text-black-3">Disp From</label>
+                <input id="edit-notice-from" type="datetime-local" class="w-full border-2 border-brand-3 px-2 py-2 text-[12px] rounded-xl focus:outline-none focus:border-brand-5 bg-white">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold mb-1 uppercase text-black-3">Disp To</label>
+                <input id="edit-notice-to" type="datetime-local" class="w-full border-2 border-brand-3 px-2 py-2 text-[12px] rounded-xl focus:outline-none focus:border-brand-5 bg-white">
+            </div>
+        </div>
     </div>
 </template>
 <!-- 【ダイアログ子】アプリメニュー（データ操作） -->
 <template id="tpl-menu-app">
     <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-lg">➕</span>
-            <span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[16px] uppercase">[Create] Mode</span>
-        </button>
-        <button id="btn-app-archive-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-lg">📋</span>
-            <span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[16px] uppercase">[Archive] Mode</span>
-        </button>
-        <button id="btn-app-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-lg">🔎</span>
-            <span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[16px] uppercase">[Search] Mode</span>
-        </button>
         <button id="btn-app-current" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
             <span class="col-span-1 flex justify-center text-lg">📍</span>
             <span class="col-span-1"></span>
@@ -331,25 +377,35 @@
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[16px] uppercase">Restore Map</span>
         </button>
+        <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-lg">➕</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[16px] uppercase">Create Memo</span>
+        </button>
+        <button id="btn-app-archive-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-lg">📋</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[16px] uppercase">Archive List</span>
+        </button>
         <button id="btn-app-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
             <span class="col-span-1 flex justify-center text-lg">📖</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[16px] uppercase">point list</span>
         </button>
-        <button id="btn-app-edit-memory" class="hidden w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-lg">📝</span>
-            <span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[16px] uppercase">Edit TripMemory</span>
-        </button>
-        <button id="btn-app-batch" class="hidden w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-batch" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
             <span class="col-span-1 flex justify-center text-lg">📦</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[16px] uppercase">[Merge] Or [Add]</span>
         </button>
-        <button id="btn-app-point" class="hidden w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-lg">🔍</span>
+        <button id="btn-app-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-lg">🔎</span>
             <span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[16px] uppercase">Point Search (Google)</span>
+            <span class="col-span-8 text-left font-bold text-[16px] uppercase">Map Search</span>
+        </button>
+        <button id="btn-app-point" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
+            <span class="col-span-1 flex justify-center text-lg">🛩️</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[16px] uppercase">Word Search</span>
         </button>
     </div>
 </template>
@@ -544,6 +600,20 @@
         </div>
     </div>
 </template>
+<!-- 【ダイアログ子】通知詳細 -->
+<template id="tpl-view-notice">
+    <div class="w-full text-black-5 space-y-4 pt-2">
+        <div class="flex items-center gap-2 mb-2 px-2">
+            <span id="view-notice-icon" class="text-[24px]"></span>
+            <span id="view-notice-date" class="text-[12px] font-black text-slate-400 tracking-wider"></span>
+        </div>
+        <div class="bg-brand-1 rounded-2xl shadow-sm border border-brand-1 p-4">
+            <div id="view-notice-title" class="text-[16px] font-black text-black-5 break-all mb-3 tracking-wide"></div>
+            <hr class="border-brand-2 mb-3">
+            <div id="view-notice-body" class="text-[16px] text-black-4 leading-relaxed whitespace-pre-wrap min-h-[100px]"></div>
+        </div>
+    </div>
+</template>
 
 <!-- 【ダイアログ子】まとめ親参照 -->
 <template id="tpl-view-archive">
@@ -552,10 +622,10 @@
             <span id="view-mem-user-icon" class="text-[18px] leading-none drop-shadow-sm"></span>
             <span id="view-mem-user-id" class="text-[12px] font-bold text-slate-600"></span>
         </button>
-        <div class="bg-white rounded-2xl shadow-sm border border-brand-1 p-4">
+        <div class="bg-brand-1 rounded-2xl shadow-sm border border-brand-1 p-4">
             <div id="view-mem-title" class="text-[16px] font-black text-black-5 break-all mb-3 tracking-wide"></div>
             <hr class="border-brand-2 mb-3">
-            <div id="view-mem-body" class="text-[13px] text-black-4 leading-relaxed whitespace-pre-wrap min-h-[3rem]"></div>
+            <div id="view-mem-body" class="text-[16px] text-black-4 leading-relaxed whitespace-pre-wrap min-h-[3rem]"></div>
         </div>
         <div id="view-mem-url-wrapper" class="bg-white rounded-2xl shadow-sm border border-brand-1 p-3 flex items-center gap-3">
             <div class="shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-blue-50 text-blue-500 text-[12px]">🔗</div>
@@ -608,8 +678,8 @@
             <h3 id="view-profile-nickname" class="text-xl font-black text-black-5">Nickname</h3>
             <p id="view-profile-userid" class="text-[12px] text-slate-400 font-bold mt-1"></p>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-brand-1 p-4">
-            <div id="view-profile-bio" class="text-[16px] text-black-4 leading-relaxed whitespace-pre-wrap min-h-[3rem]"></div>
+        <div class="bg-brand-1 rounded-2xl shadow-sm border border-brand-1 p-4">
+            <div id="view-profile-description" class="text-[16px] text-black-4 leading-relaxed whitespace-pre-wrap min-h-[200px]"></div>
         </div>
         <div id="view-profile-links" class="space-y-2 mt-4"></div>
     </div>
@@ -630,10 +700,10 @@
         </div>
         <div>
             <div class="flex justify-between items-end mb-1">
-                <label class="block text-[12px] font-bold uppercase">Bio / Description</label>
-                <span class="text-[10px] font-bold text-slate-400"><span id="edit-profile-bio-count">0</span>/200</span>
+                <label class="block text-[12px] font-bold uppercase">Description</label>
+                <span class="text-[10px] font-bold text-slate-400"><span id="edit-profile-description-count">0</span>/200</span>
             </div>
-            <textarea id="edit-profile-bio" maxlength="200" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] h-48 rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+            <textarea id="edit-profile-description" maxlength="200" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] h-48 rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
         <div>
             <label class="block text-[12px] font-bold mb-1 uppercase">Links</label>

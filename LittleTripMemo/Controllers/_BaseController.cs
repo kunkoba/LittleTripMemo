@@ -50,6 +50,7 @@ public abstract class _BaseController : ControllerBase
         return Ok(new
         {
             is_logged_in = IsLoggedIn,
+            plan = _user.Plan,
             data = result
         });
     }

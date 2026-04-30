@@ -129,7 +129,6 @@ const _DetailContentCore = {
     },
     // フォームに値反映
     renderDetail(detail, isEdit = false) {
-        console.log("renderDetail", detail);
         // 要素の取得チェック
         if (!this.root) this.init();
         // 引数 detail の有無で「新規作成」かどうかを判定
@@ -172,7 +171,6 @@ const _DetailContentCore = {
             if (detail.archive_id > 0) {
                 // 親アーカイブの情報をStoreから探す（一覧または現在開いているアーカイブ）
                 const archiveList = $Data.Store.GetArchiveList() || [];
-                console.log("_renderDisplayMode>>", archiveList);
                 const targetArc = archiveList.find(a => a.archive_id === detail.archive_id) || $Data.Store.GetArchive();
                 if (targetArc && targetArc.archive_id === detail.archive_id && targetArc.currency_unit) {
                     displayCurrency = targetArc.currency_unit; // 親の通貨で上書き
@@ -257,7 +255,6 @@ const _DetailContentCore = {
         const now = new Date();
         const dateStr = $Util.FormatDate();
         const timeStr = now.toTimeString().slice(0, 5);  // hh:mm
-        console.log("dateStr:", dateStr);
         this.editDate.value = dateStr;
         this.editTime.value = timeStr;
         // 隠しフィールド（ID・座標など）を完全に空にする

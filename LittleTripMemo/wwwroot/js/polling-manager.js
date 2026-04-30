@@ -37,8 +37,8 @@ const PollingManager = {
     Init(){
         _PollingCore.init();
     },
-    // タスクを追加
-    Add(name, fn, ms) { _PollingCore.add(name, fn, ms); },
+    // タスクを追加（秒で指定）
+    Add(name, fn, s) { _PollingCore.add(name, fn, s * 1000); },
     // 実行開始
     Start(name) { _PollingCore.start(name); },
     // 実行停止

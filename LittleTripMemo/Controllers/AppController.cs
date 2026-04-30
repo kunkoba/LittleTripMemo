@@ -30,6 +30,7 @@ public class AppController : _BaseController
     private readonly UpdateArchivePubService _updateArchivePubService;
     private readonly UpdateDetailPubService _updateDetailPubService;
     private readonly SearchByLocationPubService _searchByLocationPubService;
+    private readonly BulkSyncDetailsService _bulkSyncDetailsService;
 
     // コンストラクタに追加
     public AppController(
@@ -52,7 +53,8 @@ public class AppController : _BaseController
         CloseArchiveService closeArchiveService,
         UpdateArchivePubService updateArchivePubService,
         UpdateDetailPubService updateDetailPubService,
-        SearchByLocationPubService searchByLocationPubService)
+        SearchByLocationPubService searchByLocationPubService,
+        BulkSyncDetailsService bulkSyncDetailsService)
         : base(userContext, httpContextAccessor)
     {
         _getUnMergeDetailsService = getUnMergeDetailsService;
@@ -73,6 +75,7 @@ public class AppController : _BaseController
         _updateArchivePubService = updateArchivePubService;
         _updateDetailPubService = updateDetailPubService;
         _searchByLocationPubService = searchByLocationPubService;
+        _bulkSyncDetailsService = bulkSyncDetailsService;
     }
 
     /// <summary>
@@ -284,4 +287,17 @@ public class AppController : _BaseController
         var result = await _updateDetailPubService.ExecuteAsync(req);
         return OkWithBase(result);
     }
+
+    /// <summary>
+    /// 明細一括登録更新処理
+    /// </summary>
+    /// <param name="items"></param>
+    /// <returns></returns>
+    [HttpPost("api/BulkSyncDetails")]
+    public async Task<IActionResult> BulkSyncDetails([FromBody] BulkSyncDetailsService.BulkSyncReq req)
+    {
+        var result = await _bulkSyncDetailsService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
 }

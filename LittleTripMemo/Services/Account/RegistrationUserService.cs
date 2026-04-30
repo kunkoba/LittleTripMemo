@@ -77,7 +77,7 @@ public class RegistrationUserService
         {
             Email = email,
             TableId = tableId,
-            UserName = "user@" + DateTime.Now.ToString("yyyyMMddHHmmss"),
+            UserName = email,
             Icon = "❔",
             NickName = email.Split('@')[0],
             Description = "はじめまして！",

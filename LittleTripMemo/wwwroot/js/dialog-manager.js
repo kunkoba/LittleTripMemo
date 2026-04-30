@@ -21,15 +21,12 @@ const _DialogCore = {
         this.backdrop.classList.remove("hidden");
         return frame;
     },
+    // 1. _DialogCore の create メソッド修正
     create({ title = "", content = "", buttons =[], onClose = null }) {
         const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
-        // IDを指定してダイアログのタイトル要素を取得
         const titleEl = $Dom.QuerySelector("#dialog-title", frame);
-        // IDを指定してダイアログのコンテンツ表示領域を取得
         const contentEl = $Dom.QuerySelector("#dialog-content", frame);
-        // IDを指定して閉じるボタン（×）の要素を取得
         const btnCloseX = $Dom.QuerySelector("#dialog-btn-close-x", frame);
-        // IDを指定してボタン配置用のコンテナ要素を取得
         const btnContainer = $Dom.QuerySelector("#dialog-button-container", frame);
         titleEl.textContent = title;
         if (content instanceof HTMLElement) {
@@ -40,18 +37,31 @@ const _DialogCore = {
         }
         btnCloseX.onclick = () => this.close();
         if (buttons && buttons.length > 0) {
-            buttons.forEach(btnDef => {
-                const btn = document.createElement("button");
-                btn.className = btnDef.className || "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform";
-                btn.textContent = btnDef.label;
-                if (btnDef.id) btn.id = btnDef.id;
-                if (btnDef.isHidden) btn.classList.add("hidden");
-                btn.onclick = () => {
-                    if (btnDef.handler) btnDef.handler();
-                    if (btnDef.closesDialog !== false) this.close();
-                };
-                btnContainer.appendChild(btn);
+            buttons.forEach(rowDef => {
+                // 配列ならそのままアイテムリスト、オブジェクトなら行設定＋itemsと解釈
+                const isArray = Array.isArray(rowDef);
+                const items = isArray ? rowDef : (rowDef.items || [rowDef]);
+                const rowDiv = document.createElement("div");
+                rowDiv.className = "w-full flex gap-3";
+                if (!isArray && rowDef.rowId) rowDiv.id = rowDef.rowId;
+                if (!isArray && rowDef.isHidden) rowDiv.classList.add("hidden");
+                items.forEach(btnDef => {
+                    const btn = document.createElement("button");
+                    btn.className = btnDef.className || "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform";
+                    btn.textContent = btnDef.label;
+                    if (btnDef.id) btn.id = btnDef.id;
+                    if (btnDef.isHidden) btn.classList.add("hidden");
+                    btn.onclick = () => {
+                        if (btnDef.handler) btnDef.handler();
+                        if (btnDef.closesDialog !== false) this.close();
+                    };
+                    rowDiv.appendChild(btn);
+                });
+                btnContainer.appendChild(rowDiv);
             });
+            btnContainer.classList.remove("hidden");
+        } else {
+            // btnContainer.classList.add("hidden");
         }
         frame._onClose = onClose;
         return frame;
@@ -103,16 +113,18 @@ const DialogController = {
                     if (!isResolved) resolve(false);
                 },
                 // 動的ボタン生成
-                buttons:[
-                    {
-                        label: "CANCEL",
-                        className: "flex-1 bg-slate-400 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                        handler: () => { isResolved = true; resolve(false); }
-                    },
-                    {
-                        label: label,
-                        handler: () => { isResolved = true; resolve(true); }
-                    }
+                buttons: [
+                    [
+                        {
+                            label: "CANCEL",
+                            className: "flex-1 bg-slate-400 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                            handler: () => { isResolved = true; resolve(false); }
+                        },
+                        {
+                            label: label,
+                            handler: () => { isResolved = true; resolve(true); }
+                        }
+                    ]
                 ]
             });
         });
@@ -134,6 +146,7 @@ const DialogController = {
         $Dom.QuerySelector('#btn-sys-user-config', el).onclick = () => { this.ShowUserSettingsMenu(); };
         $Dom.QuerySelector('#btn-sys-notice', el).onclick = () => { this.ShowNoticeList(); };
         $Dom.QuerySelector('#btn-sys-version', el).onclick = () => { this.ShowAppInfo(); };
+        $Dom.QuerySelector('#btn-sys-admin', el).onclick = () => { this.ShowAdminMenu(); };
         btnAuth.onclick = async () => {
             if (isLoggedIn) {
                 const isOk = await this.ShowConfirm({ title: "LOGOUT", message: "ログアウトしますか？" });
@@ -248,7 +261,7 @@ const DialogController = {
         _DialogCore.open({
             title: "CURRENCY CONFIG",
             content: el,
-            buttons:[
+            buttons: [
                 {
                     label: "OK",
                     handler: () => {
@@ -269,12 +282,12 @@ const DialogController = {
         _DialogCore.open({
             title: "APP INFO",
             content: el,
-            buttons:[
-                {
-                    label: "CLOSE",
-                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                    closesDialog: true
-                }
+            buttons: [
+                // {
+                //     label: "CLOSE",
+                //     className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                //     closesDialog: true
+                // }
             ]
         });
     },
@@ -303,7 +316,9 @@ const DialogController = {
         _DialogCore.open({
             title: "REVIEWS & RATINGS",
             content: el,
-            buttons:[{ label: "BACK", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform", closesDialog: true }]
+            buttons: [
+                { label: "BACK", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform", closesDialog: true }
+            ]
         });
     },
     // レビュー投稿画面
@@ -342,25 +357,27 @@ const DialogController = {
         _DialogCore.open({
             title: "WRITE A REVIEW",
             content: el,
-            buttons:[
-                {
-                    label: "CANCEL",
-                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                    closesDialog: true
-                },
-                {
-                    label: "SUBMIT",
-                    className: "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform",
-                    closesDialog: false,
-                    handler: async () => {
-                        const rating = Number(inputRating.value);
-                        const body = inputBody.value.trim();
-                        // ※ C#のAPIを叩く処理を追加
-                        // await $Data.Access.PostReview({ rating, body });
-                        $Notice.Info("レビューを投稿しました！");
-                        _DialogCore.close(); // 投稿画面を閉じる
+            buttons: [
+                [
+                    {
+                        label: "CANCEL",
+                        className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                        closesDialog: true
+                    },
+                    {
+                        label: "SUBMIT",
+                        className: "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform",
+                        closesDialog: false,
+                        handler: async () => {
+                            const rating = Number(inputRating.value);
+                            const body = inputBody.value.trim();
+                            // ※ C#のAPIを叩く処理を追加
+                            // await $Data.Access.PostReview({ rating, body });
+                            $Notice.Info("レビューを投稿しました！");
+                            _DialogCore.close(); // 投稿画面を閉じる
+                        }
                     }
-                }
+                ]
             ]
         });
     },
@@ -429,27 +446,29 @@ const DialogController = {
         _DialogCore.open({ 
             title: "SELECT ICON", 
             content: el, 
-            buttons:[
-                {
-                    label: "CANCEL",
-                    className: "flex-1 bg-slate-100 text-slate-400 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                    closesDialog: true
-                },
-                {
-                    label: "OK",
-                    className: "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform",
-                    closesDialog: false,
-                    handler: () => {
-                        const val = inputCustom.value.trim();
-                        if (val) {
-                            // 履歴を更新して確定
-                            history = [val, ...history.filter(e => e !== val)].slice(0, 50);
-                            localStorage.setItem(storageKey, JSON.stringify(history));
-                            onSelect(val);
+            buttons: [
+                [
+                    {
+                        label: "CANCEL",
+                        className: "flex-1 bg-slate-100 text-slate-400 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                        closesDialog: true
+                    },
+                    {
+                        label: "OK",
+                        className: "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform",
+                        closesDialog: false,
+                        handler: () => {
+                            const val = inputCustom.value.trim();
+                            if (val) {
+                                // 履歴を更新して確定
+                                history = [val, ...history.filter(e => e !== val)].slice(0, 50);
+                                localStorage.setItem(storageKey, JSON.stringify(history));
+                                onSelect(val);
+                            }
+                            _DialogCore.close();
                         }
-                        _DialogCore.close();
                     }
-                }
+                ]
             ]
         });
     },
@@ -459,7 +478,7 @@ const DialogController = {
         _DialogCore.open({
             title: "地点・住所検索",
             content: el,
-            buttons:[
+            buttons: [
                 {
                     label: "GO！",
                     closesDialog: false, // 独自で制御するため自動で閉じさせない
@@ -512,7 +531,7 @@ const DialogController = {
     // 地点リスト（単一選択・ジャンプ機能）
     ShowDetailsTimeLine() {
         // Storeの機能を使って昇順にソート
-        $Data.Store.SortDetails("date", "asc");
+        // $Data.Store.SortDetails("date", "asc");
         const details = $Data.Store.GetAllDetails();
 
         if (!details || details.length === 0) {
@@ -553,7 +572,7 @@ const DialogController = {
                     priceEl.className = "js-price text-[14px] font-black shrink-0 whitespace-nowrap text-blue-500";
                 } else if (price < 0) {
                     priceEl.textContent = price.toLocaleString();
-                    priceEl.className = "js-price text-[12px] font-black shrink-0 whitespace-nowrap text-red-500";
+                    priceEl.className = "js-price text-[14px] font-black shrink-0 whitespace-nowrap text-red-500";
                 } else {
                     priceEl.textContent = ""; 
                 }
@@ -569,7 +588,7 @@ const DialogController = {
         _DialogCore.open({ 
             title: "TRIP LOG", 
             content: el,
-            buttons:[]
+            buttons: []
         });
 
         setTimeout(() => {
@@ -685,18 +704,7 @@ const DialogController = {
             _DialogCore.open({
                 title: "ARCHIVE LIST",
                 content: root,
-                buttons:[
-                    // {
-                    //     // まとめ親モードから抜けて、通常のCREATEモードに戻るためのボタン
-                    //     label: "CLOSE ARCHIVE",
-                    //     className: "w-full h-12 bg-slate-800 text-white font-black text-[14px] rounded-2xl shadow-md uppercase active:scale-95 transition-transform tracking-wider",
-                    //     handler: () => {
-                    //         _DialogCore.closeAll();
-                    //         $App.AppData.System.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    //         $App.RefreshScreen();
-                    //     }
-                    // }
-                ]
+                buttons: []
             });
         })();
     },
@@ -757,8 +765,7 @@ const DialogController = {
             _DialogCore.open({
                 title: "SELECT ARCHIVE",
                 content: root,
-                buttons:[
-                ]
+                buttons: []
             });
         })();
     },
@@ -840,39 +847,41 @@ const DialogController = {
         frame = _DialogCore.open({
             title: "SELECTION MODE",
             content: content,
-            buttons:[
-                {
-                    id: "btn-ms-merge",
-                    label: "⇄ MERGE",
-                    className: "flex-1 min-w-[40%] h-12 bg-brand-5 text-white rounded-xl font-bold text-[12px] uppercase shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2",
-                    closesDialog: false,
-                    handler: async () => {
-                        const seqs = Array.from(selectedSeqs);
-                        const isOk = await this.ShowConfirm({ title: "MERGE", message: `${seqs.length}件のアイテムを\n新しいまとめにしますか？` });
-                        if (!isOk) return;
-                        const isSuccess = await $Data.Access.MergeDetails({
-                            seqs,
-                            title: "TripMemory_" + $Util.FormatDate(new Date(), 'YYYYMMDD_HHmmss'),
-                            currency_unit: $App.AppData.Owner.currency_unit || 'JPY'
-                        });
-                        if (!isSuccess) return;
-                        $Notice.Info("作成しました");
-                        _DialogCore.closeAll();
-                        $App.AppData.System.ScreenMode = $Const.SCREEN_MODE.ARCHIVE;
-                        await $App.RefreshScreen();
-                    }
-                },
-                {
-                    id: "btn-ms-add",
-                    label: "＋ ADD",
-                    className: "flex-1 min-w-[40%] h-12 bg-brand-5 text-white rounded-xl font-bold text-[12px] uppercase shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2",
-                    closesDialog: false, // 🌟 手動で制御するためfalse
-                    handler: () => {
-                        const seqs = Array.from(selectedSeqs);
-                        // 新しく作った専用メソッドを呼び出す
-                        this.SelectArchiveForAdd(seqs);
-                    }
-                },
+            buttons: [
+                [
+                    {
+                        id: "btn-ms-merge",
+                        label: "⇄ MERGE",
+                        className: "flex-1 min-w-[40%] h-12 bg-brand-5 text-white rounded-xl font-bold text-[12px] uppercase shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2",
+                        closesDialog: false,
+                        handler: async () => {
+                            const seqs = Array.from(selectedSeqs);
+                            const isOk = await this.ShowConfirm({ title: "MERGE", message: `${seqs.length}件のアイテムを\n新しいまとめにしますか？` });
+                            if (!isOk) return;
+                            const isSuccess = await $Data.Access.MergeDetails({
+                                seqs,
+                                title: "TripMemory_" + $Util.FormatDate(new Date(), 'YYYYMMDD_HHmmss'),
+                                currency_unit: $App.AppData.Owner.currency_unit || 'JPY'
+                            });
+                            if (!isSuccess) return;
+                            $Notice.Info("作成しました");
+                            _DialogCore.closeAll();
+                            $App.AppData.System.ScreenMode = $Const.SCREEN_MODE.ARCHIVE;
+                            await $App.RefreshScreen();
+                        }
+                    },
+                    {
+                        id: "btn-ms-add",
+                        label: "＋ ADD",
+                        className: "flex-1 min-w-[40%] h-12 bg-brand-5 text-white rounded-xl font-bold text-[12px] uppercase shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2",
+                        closesDialog: false, // 🌟 手動で制御するためfalse
+                        handler: () => {
+                            const seqs = Array.from(selectedSeqs);
+                            // 新しく作った専用メソッドを呼び出す
+                            this.SelectArchiveForAdd(seqs);
+                        }
+                    },
+                ]
             ]
         });
         updateSelectionUI(); // フッターボタン生成後に再度呼んで初期状態の disabled を反映
@@ -945,7 +954,7 @@ const DialogController = {
         _DialogCore.open({ 
             title: "SEARCH RESULTS", 
             content: el,
-            buttons:[]
+            buttons: []
         });
         setTimeout(() => {
             const activeFrame = _DialogCore.stack[_DialogCore.stack.length - 1];
@@ -969,15 +978,14 @@ const DialogController = {
             current: $Dom.QuerySelector('#btn-app-current', el),
             restore: $Dom.QuerySelector('#btn-app-restore', el),
             detailList: $Dom.QuerySelector('#btn-app-list', el),
-            edit:    $Dom.QuerySelector('#btn-app-edit-memory', el),
             batch:   $Dom.QuerySelector('#btn-app-batch', el),
             point:   $Dom.QuerySelector('#btn-app-point', el),
             archiveList: $Dom.QuerySelector('#btn-app-archive-list', el),
             search: $Dom.QuerySelector('#btn-app-search', el),
         };
         // 表示制御（取得済みの変数を使用）
+        if (mode === $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.create, false);
         if (mode === $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.batch, true);
-        if (mode === $Const.SCREEN_MODE.ARCHIVE) $Dom.ToggleShow(b.edit, true);
         if (mode === $Const.SCREEN_MODE.SEARCH) $Dom.ToggleShow(b.point, true);
         if (mode == $Const.SCREEN_MODE.SEARCH) $Dom.ToggleShow(b.search, false);
         // イベント登録（取得済みの変数を使用）
@@ -985,7 +993,6 @@ const DialogController = {
         b.current.onclick = () => { $Marker.RefreshCurrentLocation(); $Marker.FocusToLocationMarker(); _DialogCore.close(); };
         b.restore.onclick = () => { $Marker.RestoreMarkers(); _DialogCore.close(); };
         b.detailList.onclick = () => mode === $Const.SCREEN_MODE.SEARCH ? this.ShowDetailsSimpleList() : this.ShowDetailsTimeLine();
-        b.edit.onclick = () => { this.ShowEditArchiveInfo(); };
         b.batch.onclick = () => { this.ShowMultiSelectTimeline({ onOk: (l) => console.log(l) }); };
         b.point.onclick = () => { this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18)); };
         b.archiveList.onclick = () => { this.ShowArchiveList(); };
@@ -1077,289 +1084,29 @@ const DialogController = {
                     if (Atmosphere.canvas) Atmosphere.canvas.style.zIndex = '0';
                 }
             },
-            buttons:[
-                {
-                    label: "CANCEL",
-                    className: "flex-1 bg-slate-400 text-white font-black text-sm h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform"
-                    // onCloseが自動で呼ばれるのでhandlerは不要
-                },
-                {
-                    label: "OK",
-                    handler: () => {
-                        const finalCode = txtCode.textContent;
-                        if (onOk) onOk(finalCode);
-                    }
-                }
-            ]
-        });
-    },
-    // 通知一覧ダイアログ
-    ShowNoticeList() {
-        // ※ 本来はAPI（$Data.Access.GetNoticeList等）から取得する想定のデータ
-        const dummyNotices =[
-            { no: 1, create_tim: "2026-04-25T10:00:00", title: "システムメンテナンスのお知らせ", body: "明日深夜2時からサーバーのメンテナンスを行います。アプリの利用が一時的に制限されます。", is_new: true },
-            { no: 2, create_tim: "2026-04-10T12:30:00", title: "バージョン1.1.0リリース！", body: "まとめ親の公開機能や、新しい環境エフェクトが追加されました。ぜひご利用ください。", is_new: false },
-            { no: 3, create_tim: "2026-03-15T09:00:00", title: "利用規約の改定について", body: "2026年4月1日より利用規約の一部を改定いたします。詳細をご確認ください。", is_new: false },
-        ];
-        const root = $Dom.GenerateTemplate("tpl-list-parent");
-        root.className = "w-full text-black-3 mb-2 px-1";
-        if (dummyNotices.length === 0) {
-            root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">通知はありません</div>`;
-        } else {
-            dummyNotices.forEach(item => {
-                const child = $Dom.GenerateTemplate("tpl-list-child-notice");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim, "YYYY.MM.DD");
-                $Dom.QuerySelector(".js-title", child).textContent = item.title;
-                $Dom.QuerySelector(".js-body", child).textContent = item.body;
-                // 新着バッジの表示
-                if (item.is_new) {
-                    $Dom.ToggleShow($Dom.QuerySelector(".js-badge-new", child), true); // hiddenを外す
-                }
-                // クリックで詳細を表示する等の処理
-                child.onclick = () => {
-                    // ※ 詳細ダイアログを開く等
-                    $Notice.Info("お知らせ詳細: " + item.title);
-                };
-                root.appendChild(child);
-            });
-        }
-        _DialogCore.open({
-            title: "NOTIFICATIONS",
-            content: root,
-            buttons:[
-                {
-                    label: "CLOSE",
-                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
-                    closesDialog: true
-                }
-            ]
-        });
-    },
-
-
-    // TripMemory（まとめ親）の情報を編集
-    ShowEditArchiveInfo() {
-        const archive = $Data.Store.GetArchive();
-        if (!archive) return $Notice.Warn("Not found.");
-        const el = $Dom.GenerateTemplate('tpl-edit-archive');
-        const viewArea = $Dom.QuerySelector('#view-mem-area', el);
-        const editArea = $Dom.QuerySelector('#edit-mem-area', el);
-        const viewTitle = $Dom.QuerySelector('#view-mem-title', el);
-        const viewBody = $Dom.QuerySelector('#view-mem-body', el);
-        const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
-        const urlWrapper = $Dom.QuerySelector('#view-mem-url-wrapper', el);
-        const editTitle = $Dom.QuerySelector('#edit-mem-title', el);
-        const editBody = $Dom.QuerySelector('#edit-mem-body', el);
-        const editUrl = $Dom.QuerySelector('#edit-mem-url', el);
-        const actionArea = $Dom.QuerySelector('#view-mem-actions', el);
-        const btnMain = $Dom.QuerySelector('#btn-mem-action-main', el);
-        const btnRelease = $Dom.QuerySelector('#btn-mem-release', el);
-        const isOwner = archive.is_owner === true;
-        const isPublic = archive.is_public === true;
-        const isClosed = archive.closed_flg === true;
-        const editCurrency = $Dom.QuerySelector('#edit-mem-currency', el);
-        editCurrency.value = archive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
-        console.log();
-        // ユーザー情報ボタンの制御
-        const btnUserProfile = $Dom.QuerySelector('#btn-mem-user-profile', el);
-        const viewUserIcon = $Dom.QuerySelector('#view-mem-user-icon', el);
-        const viewUserId = $Dom.QuerySelector('#view-mem-user-id', el);
-        const profile = $Data.Store.GetUserProfile(); 
-        console.log(">>profile:", profile);
-        if (profile) {
-            viewUserIcon.textContent = profile.icon || "😀";
-            viewUserId.textContent = profile.nickName;
-            btnUserProfile.onclick = () => {
-                // 自分自身のデータかを判定するために archive の is_owner を渡す
-                this.ShowUserProfile(profile, archive.is_owner);
-            };
-        } else {
-            $Dom.ToggleShow(btnUserProfile, false);
-        }
-        // データセット
-        viewTitle.textContent = archive.title || "";
-        viewBody.textContent = archive.memo || "";
-        if (archive.link_url) {
-            viewUrl.textContent = archive.link_url;
-            viewUrl.href = archive.link_url;
-            $Dom.ToggleShow(urlWrapper, true);
-        } else {
-            $Dom.ToggleShow(urlWrapper, false);
-        }
-        editTitle.value = archive.title || "";
-        editBody.value = archive.memo || "";
-        editUrl.value = archive.link_url || "";
-        // 統計データの計算と表示
-        const details = $Data.Store.GetAllDetails() ||[];
-        const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
-        $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
-        const priceBox = $Dom.QuerySelector('#view-mem-price-box', el);
-        const priceVal = $Dom.QuerySelector('#mem-stat-price', el);
-        const priceLabel = $Dom.QuerySelector('#view-mem-price-label', el);
-        const displayCurrency = archive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
-        if (totalPrice > 0) {
-            priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-blue-100 bg-blue-50 shadow-sm";
-            priceVal.className = "text-[18px] font-black text-blue-600";
-            priceLabel.className = "text-[8px] font-black uppercase text-blue-500 mb-1";
-            // priceVal.textContent = "+ ¥" + totalPrice.toLocaleString();
-            priceVal.innerHTML = `${totalPrice.toLocaleString()} <span class="text-[10px] text-blue-400 ml-0.5">${displayCurrency}</span>`;
-        } else if (totalPrice < 0) {
-            priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-red-100 bg-red-50 shadow-sm";
-            priceVal.className = "text-[18px] font-black text-red-600";
-            priceLabel.className = "text-[8px] font-black uppercase text-red-500 mb-1";
-            // priceVal.textContent = "- ¥" + Math.abs(totalPrice).toLocaleString();
-            priceVal.innerHTML = `- ${Math.abs(totalPrice).toLocaleString()} <span class="text-[10px] text-red-400 ml-0.5">${displayCurrency}</span>`;
-        } else {
-            priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-brand-1 bg-white shadow-sm";
-            priceVal.className = "text-[18px] font-black text-black-5";
-            priceLabel.className = "text-[8px] font-black uppercase text-black-3 mb-1";
-            // priceVal.textContent = "¥0";
-            priceVal.innerHTML = `0 <span class="text-[10px] text-black-3 ml-0.5">${displayCurrency}</span>`;
-        }
-        $Dom.ToggleShow(actionArea, isOwner);
-        // メインアクションボタンの設定
-        if (isOwner) {
-            if (!isPublic) {
-                btnMain.textContent = "Private　⇒　Public";
-                btnMain.onclick = () => this._execStatusChange(
-                    'PublishArchive',
-                    { archive_id: archive.archive_id },
-                    "Switch to [Public]",
-                    "Do you want to make\nthis internal data [Public]？",
-                    "Set to [Public].",
-                    $Const.SCREEN_MODE.ARCHIVE_PUB
-                );
-                btnRelease.textContent = "Archive　⇒　Details";
-                btnRelease.onclick = () => this._execStatusChange(
-                    'DeleteArchive',
-                    { archive_id: archive.archive_id },
-                    "Restore to Details",
-                    "Restore this group to\nindividual detail items？",
-                    "Restored to individual detail items.",
-                    $Const.SCREEN_MODE.CREATE
-                );
-            } else {
-                if (isClosed) {
-                    btnMain.textContent = "Close　⇒　Open";
-                    btnMain.onclick = () => this._execStatusChange(
-                        'OpenArchive',
-                        { archive_id: archive.archive_id },
-                        "Switch to [Open]",
-                        "Do you want to switch\nthis data to [Open]？",
-                        "Switched to [Open].",
-                        null,
-                        () => {
-                            $Data.Store.UpdateArchive({ closed_flg: false });
-                        });
-                } else {
-                    btnMain.textContent = "Open　⇒　Close";
-                    btnMain.onclick = () => this._execStatusChange(
-                        'CloseArchive',
-                        { archive_id: archive.archive_id },
-                        "Switch to [Close]",
-                        "Do you want to switch\nthis data to [Close]？",
-                        "Switched to [Close].",
-                        null,
-                        () => {
-                            $Data.Store.UpdateArchive({ closed_flg: true });
+            buttons: [
+                [
+                    {
+                        label: "CANCEL",
+                        className: "flex-1 bg-slate-400 text-white font-black text-sm h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform"
+                        // onCloseが自動で呼ばれるのでhandlerは不要
+                    },
+                    {
+                        label: "OK",
+                        handler: () => {
+                            const finalCode = txtCode.textContent;
+                            if (onOk) onOk(finalCode);
                         }
-                    );
-                }
-                archive.isPublic = !isPublic;
-                $TopBar.ChangeTitle(archive.title);
-                btnRelease.textContent = "Public　⇒　Private";
-                btnRelease.onclick = () => this._execStatusChange(
-                    'UnpublishArchive',
-                    { archive_id: archive.archive_id },
-                    "Switch to [Private]",
-                    "Do you want to revert\nthis data to Private？",
-                    "Reverted to [Private].",
-                    $Const.SCREEN_MODE.ARCHIVE
-                );
-            }
-        }
-        // ダイアログを開く（下部ボタンは初期非表示でセットしておく）
-        const frame = _DialogCore.open({
-            title: "", // タイトルテキストは空にする
-            content: el,
-            buttons:[
-                {
-                    id: "dialog-btn-cancel-edit",
-                    label: "CANCEL",
-                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                    isHidden: true,
-                    closesDialog: false, // 閉じずに参照モードに戻す
-                    handler: () => {
-                        $Dom.ToggleShow(viewArea, true);
-                        $Dom.ToggleShow(editArea, false);
-                        const btnContainer = $Dom.QuerySelector('#dialog-button-container', frame);
-                        if (btnContainer) $Dom.ToggleShow(btnContainer, false);
-                        $Dom.ToggleShow($Dom.QuerySelector('#dialog-btn-cancel-edit', frame), false);
-                        $Dom.ToggleShow($Dom.QuerySelector('#dialog-btn-update', frame), false);
                     }
-                },
-                {
-                    id: "dialog-btn-update",
-                    label: "SAVE DATA",
-                    className: "flex-1 bg-brand-4 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                    isHidden: true,
-                    handler: $Warn.CatchAsync(async () => {
-                        const updatedFields = {
-                            title: editTitle.value,
-                            memo: editBody.value,
-                            link_url: editUrl.value,
-                            currency_unit: editCurrency.value.trim(),
-                        };
-                        console.log("archive:", archive);
-                        let isSuccess;
-                        if (!isPublic) {
-                            isSuccess = await $Data.Access.UpdateArchive({ archive_id: archive.archive_id, ...updatedFields });
-                        } else {
-                            isSuccess = await $Data.Access.UpdateArchivePub({ archive_id: archive.archive_id, ...updatedFields });
-                        }
-                        if (!isSuccess) return;
-                        $Data.Store.UpdateArchive(updatedFields);
-                        $TopBar.ChangeTitle(updatedFields.title);
-                        $Notice.Info("Changes saved.");
-                        // _DialogCore.close();
-                        $Dom.ToggleShow(viewArea, false);
-                        $Dom.ToggleShow(editArea, true);
-                    })
-                }
+                ]
             ]
         });
-        // ヘッダー領域のカスタマイズ（バッジと鉛筆ボタンの追加）
-        const titleContainer = $Dom.QuerySelector('#dialog-title', frame);
-        const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
-        // ステータスバッジの挿入
-        let badgeHtml = '';
-        if (!isPublic) badgeHtml = `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-500 text-white border border-gray-200 shadow-sm">Private</span>`;
-        else if (isClosed) badgeHtml = `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-100 text-gray-500 border border-gray-200 shadow-sm">Close</span>`;
-        else badgeHtml = `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-brand-2 text-brand-5 border border-blue-100 shadow-sm">Open</span>`;
-        if (titleContainer) titleContainer.innerHTML = badgeHtml;
-        // 鉛筆ボタンの挿入とイベント設定
-        if (isOwner && headerActions) {
-            const editBtn = document.createElement('button');
-            editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[14px] border border-brand-2 transition-transform";
-            editBtn.innerHTML = "✏️";
-            editBtn.onclick = () => {
-                $Dom.ToggleShow(viewArea, false);
-                $Dom.ToggleShow(editArea, true);
-                // 編集モード時は下部のボタンコンテナと両ボタンを表示
-                const btnContainer = $Dom.QuerySelector('#dialog-button-container', frame);
-                if (btnContainer) $Dom.ToggleShow(btnContainer, true);
-                $Dom.ToggleShow($Dom.QuerySelector('#dialog-btn-cancel-edit', frame), true);
-                $Dom.ToggleShow($Dom.QuerySelector('#dialog-btn-update', frame), true);
-            };
-            headerActions.prepend(editBtn); // ✕ボタンの左に追加
-        }
     },
     // まとめ親参照（アーカイブ）
     ShowArchiveInfo() {
         const archive = $Data.Store.GetArchive();
         if (!archive) return $Notice.Warn("Not found.");
         const el = $Dom.GenerateTemplate('tpl-view-archive');
-        
         // 参照画面の描画処理（保存後にも再利用してリフレッシュする）
         const renderView = () => {
             $Dom.QuerySelector('#view-mem-title', el).textContent = archive.title || "";
@@ -1398,9 +1145,7 @@ const DialogController = {
                 priceVal.innerHTML = `0 <span class="text-[10px] text-black-3 ml-0.5">${displayCurrency}</span>`;
             }
         };
-
         renderView();
-
         // ユーザー情報の制御
         const btnUserProfile = $Dom.QuerySelector('#btn-mem-user-profile', el);
         const profile = $Data.Store.GetUserProfile(); 
@@ -1411,13 +1156,11 @@ const DialogController = {
         } else {
             $Dom.ToggleShow(btnUserProfile, false);
         }
-
         // メインアクションの制御
         const actionArea = $Dom.QuerySelector('#view-mem-actions', el);
         const btnMain = $Dom.QuerySelector('#btn-mem-action-main', el);
         const btnRelease = $Dom.QuerySelector('#btn-mem-release', el);
         $Dom.ToggleShow(actionArea, archive.is_owner);
-        
         if (archive.is_owner) {
             if (!archive.is_public) {
                 btnMain.textContent = "Private　⇒　Public";
@@ -1436,9 +1179,7 @@ const DialogController = {
                 btnRelease.onclick = () => this._execStatusChange('UnpublishArchive', { archive_id: archive.archive_id }, "Switch to [Private]", "Do you want to revert\nthis data to Private？", "Reverted to [Private].", $Const.SCREEN_MODE.ARCHIVE);
             }
         }
-
-        const frame = _DialogCore.open({ title: "", content: el, buttons:[] });
-
+        const frame = _DialogCore.open({ title: "", content: el, buttons: [] });
         // バッジと鉛筆ボタンの追加
         const titleContainer = $Dom.QuerySelector('#dialog-title', frame);
         const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
@@ -1446,7 +1187,6 @@ const DialogController = {
                         (archive.closed_flg) ? `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-100 text-gray-500 border border-gray-200 shadow-sm">Close</span>` : 
                         `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-brand-2 text-brand-5 border border-blue-100 shadow-sm">Open</span>`;
         if (titleContainer) titleContainer.innerHTML = badgeHtml;
-
         if (archive.is_owner && headerActions) {
             const editBtn = document.createElement('button');
             editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[14px] border border-brand-2 transition-transform";
@@ -1472,51 +1212,60 @@ const DialogController = {
         _DialogCore.open({
             title: "EDIT ARCHIVE",
             content: el,
-            buttons:[
-                {
-                    label: "CANCEL",
-                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                    closesDialog: true
-                },
-                {
-                    label: "SAVE DATA",
-                    className: "flex-1 bg-brand-4 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                    closesDialog: false,
-                    handler: $Warn.CatchAsync(async () => {
-                        const updatedFields = {
-                            title: editTitle.value, memo: editBody.value, 
-                            link_url: editUrl.value, currency_unit: editCurrency.value.trim(),
-                        };
-                        const isSuccess = (!archive.is_public) 
-                            ? await $Data.Access.UpdateArchive({ archive_id: archive.archive_id, ...updatedFields })
-                            : await $Data.Access.UpdateArchivePub({ archive_id: archive.archive_id, ...updatedFields });
-                        if (!isSuccess) return;
-
-                        $Data.Store.UpdateArchive(updatedFields);
-                        $TopBar.ChangeTitle(updatedFields.title);
-                        $Notice.Info("Changes saved.");
-                        _DialogCore.close(); // 編集画面だけ閉じる
-                        if (onUpdate) onUpdate(); // 参照画面のDOMを最新化
-                    })
-                }
+            buttons: [
+                [
+                    {
+                        label: "CANCEL",
+                        className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                        closesDialog: true
+                    },
+                    {
+                        label: "SAVE DATA",
+                        className: "flex-1 bg-brand-4 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                        closesDialog: false,
+                        handler: $Warn.CatchAsync(async () => {
+                            const updatedFields = {
+                                title: editTitle.value, memo: editBody.value, 
+                                link_url: editUrl.value, currency_unit: editCurrency.value.trim(),
+                            };
+                            const isSuccess = (!archive.is_public) 
+                                ? await $Data.Access.UpdateArchive({ archive_id: archive.archive_id, ...updatedFields })
+                                : await $Data.Access.UpdateArchivePub({ archive_id: archive.archive_id, ...updatedFields });
+                            if (!isSuccess) return;
+    
+                            $Data.Store.UpdateArchive(updatedFields);
+                            $TopBar.ChangeTitle(updatedFields.title);
+                            $Notice.Info("Changes saved.");
+                            _DialogCore.close(); // 編集画面だけ閉じる
+                            if (onUpdate) onUpdate(); // 参照画面のDOMを最新化
+                        })
+                    }
+                ]
             ]
         });
     },
     // プロフィール参照
-    ShowUserProfile(profile, isEditable) {
+    async ShowUserProfile(profile, isOwner) {
+        if (isOwner) {
+            const isSuccess = await $Data.Access.GetProfile();
+            if (isSuccess && $App.AppData.Owner.Profile) {
+                // 自分のプロフィールで上書き
+                profile = $App.AppData.Owner.Profile;
+            }
+        }
         if (!profile) return $Notice.Warn("ユーザー情報がありません");
         const el = $Dom.GenerateTemplate('tpl-view-profile');
         const renderView = () => {
             const pIcon = profile.icon || "😀";
             const pName = profile.nickName || "No Name";
-            const pBio  = profile.description || "";
+            const pDesc  = profile.description || "";
             const pL1   = profile.link1 || "";
             const pL2   = profile.link2 || "";
             const pL3   = profile.link3 || "";
             $Dom.QuerySelector('#view-profile-icon', el).textContent = pIcon;
             $Dom.QuerySelector('#view-profile-nickname', el).textContent = pName;
             $Dom.QuerySelector('#view-profile-userid', el).textContent = profile.user_id || "";
-            $Dom.QuerySelector('#view-profile-bio', el).textContent = pBio;
+            $Dom.QuerySelector('#view-profile-description', el).textContent = pDesc;
             const viewLinks = $Dom.QuerySelector('#view-profile-links', el);
             viewLinks.innerHTML = "";
             const links =[pL1, pL2, pL3].filter(l => l && l.trim() !== "");
@@ -1529,8 +1278,8 @@ const DialogController = {
             });
         };
         renderView();
-        const frame = _DialogCore.open({ title: "USER PROFILE", content: el, buttons:[] });
-        if (isEditable) {
+        const frame = _DialogCore.open({ title: "USER PROFILE", content: el, buttons: [] });
+        if (isOwner) {
             const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
             if (headerActions) {
                 const editBtn = document.createElement('button');
@@ -1547,20 +1296,20 @@ const DialogController = {
         const editIconPreview = $Dom.QuerySelector('#edit-profile-icon-preview', el);
         const editIconInput = $Dom.QuerySelector('#edit-profile-icon', el);
         const editNickname = $Dom.QuerySelector('#edit-profile-nickname', el);
-        const editBio = $Dom.QuerySelector('#edit-profile-bio', el);
-        const editBioCount = $Dom.QuerySelector('#edit-profile-bio-count', el);
+        const editDesc = $Dom.QuerySelector('#edit-profile-description', el);
+        const editDescCount = $Dom.QuerySelector('#edit-profile-description-count', el);
         const editLink1 = $Dom.QuerySelector('#edit-profile-link1', el);
         const editLink2 = $Dom.QuerySelector('#edit-profile-link2', el);
         const editLink3 = $Dom.QuerySelector('#edit-profile-link3', el);
         editIconPreview.textContent = profile.icon || "😀";
         editIconInput.value = profile.icon || "😀";
         editNickname.value = profile.nickName || "";
-        editBio.value = profile.description || "";
-        editBioCount.textContent = (profile.description || "").length;
+        editDesc.value = profile.description || "";
+        editDescCount.textContent = (profile.description || "").length;
         editLink1.value = profile.link1 || "";
         editLink2.value = profile.link2 || "";
         editLink3.value = profile.link3 || "";
-        editBio.addEventListener('input', () => editBioCount.textContent = editBio.value.length);
+        editDesc.addEventListener('input', () => editDescCount.textContent = editDesc.value.length);
         $Dom.QuerySelector('#btn-profile-icon-trigger', el).onclick = () => {
             this.ShowEmojiPicker((emoji) => {
                 editIconPreview.textContent = emoji;
@@ -1570,33 +1319,239 @@ const DialogController = {
         _DialogCore.open({
             title: "EDIT PROFILE",
             content: el,
+            buttons: [
+                [
+                    {
+                        label: "CANCEL",
+                        className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                        closesDialog: true
+                    },
+                    {
+                        label: "SAVE",
+                        className: "flex-1 bg-brand-4 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                        closesDialog: false,
+                        handler: $Warn.CatchAsync(async () => {
+                            const updatedFields = {
+                                nickName: editNickname.value.trim(),
+                                icon: editIconInput.value,
+                                description: editDesc.value.trim(),
+                                link1: editLink1.value.trim(),
+                                link2: editLink2.value.trim(),
+                                link3: editLink3.value.trim(),
+                            };
+                            const isSuccess = await $Data.Access.UpdateProfile(updatedFields);
+                            if (!isSuccess) return;
+                            Object.assign(profile, updatedFields);
+                            $Notice.Info("プロフィールを更新しました");
+                            _DialogCore.close(); 
+                            if (onUpdate) onUpdate();
+                        })
+                    }
+                ]
+            ]
+        });
+    },
+    // 通知詳細ダイアログ
+    ShowNoticeDetail(notice) {
+        const el = $Dom.GenerateTemplate('tpl-view-notice');
+        const icon = $Const.NOTICE_ICONS[notice.kind] || '📢';
+        $Dom.QuerySelector('#view-notice-icon', el).textContent = icon;
+        // 日付は update_tim もしくは disp_from などを利用
+        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, "YYYY.MM.DD HH:mm");
+        $Dom.QuerySelector('#view-notice-title', el).textContent = notice.title;
+        $Dom.QuerySelector('#view-notice-body', el).textContent = notice.body;
+        _DialogCore.open({
+            title: "NOTICE DETAILS",
+            content: el,
             buttons:[
                 {
-                    label: "CANCEL",
-                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    label: "BACK",
+                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
                     closesDialog: true
-                },
-                {
-                    label: "SAVE",
-                    className: "flex-1 bg-brand-4 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                    closesDialog: false,
-                    handler: $Warn.CatchAsync(async () => {
-                        const updatedFields = {
-                            nickName: editNickname.value.trim(),
-                            icon: editIconInput.value,
-                            description: editBio.value.trim(),
-                            link1: editLink1.value.trim(),
-                            link2: editLink2.value.trim(),
-                            link3: editLink3.value.trim(),
-                        };
-                        const isSuccess = await $Data.Access.UpdateProfile(updatedFields);
-                        if (!isSuccess) return;
-                        Object.assign(profile, updatedFields);
-                        $Notice.Info("プロフィールを更新しました");
-                        _DialogCore.close(); 
-                        if (onUpdate) onUpdate();
-                    })
                 }
+            ]
+        });
+    },
+    // 通知一覧ダイアログ
+    ShowNoticeList() {
+        // ※ 本来はAPI（$Data.Access.GetNoticeList等）から取得する想定のデータ
+        const dummyNotices =[
+            { seq: 1, update_tim: "2026-04-25T10:00:00", disp_from: "2026-04-25T10:00:00", title: "システムメンテナンスのお知らせ", body: "明日深夜2時からサーバーのメンテナンスを行います。アプリの利用が一時的に制限されます。", kind: 1, is_new: true },
+            { seq: 2, update_tim: "2026-04-10T12:30:00", disp_from: "2026-04-10T12:30:00", title: "バージョン1.1.0リリース！", body: "まとめ親の公開機能や、新しい環境エフェクトが追加されました。ぜひご利用ください。", kind: 0, is_new: false },
+            { seq: 3, update_tim: "2026-03-15T09:00:00", disp_from: "2026-03-15T09:00:00", title: "利用規約の改定について", body: "2026年4月1日より利用規約の一部を改定いたします。詳細をご確認ください。", kind: 0, is_new: false },
+        ];
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        root.className = "w-full text-black-3 mb-2 px-1";
+        if (dummyNotices.length === 0) {
+            root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">通知はありません</div>`;
+        } else {
+            dummyNotices.forEach(item => {
+                const child = $Dom.GenerateTemplate("tpl-list-child-notice");
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, "YYYY.MM.DD");
+                // 定数から kind に応じたアイコンを取得してタイトルに結合する
+                const icon = $Const.NOTICE_ICONS[item.kind] || '📢';
+                $Dom.QuerySelector(".js-title", child).textContent = `${icon} ${item.title}`;
+                $Dom.QuerySelector(".js-body", child).textContent = item.body;
+                // 新着バッジの表示
+                if (item.is_new) {
+                    $Dom.ToggleShow($Dom.QuerySelector(".js-badge-new", child), true); // hiddenを外す
+                }
+                // クリックで詳細ダイアログを表示する
+                child.onclick = () => {
+                    this.ShowNoticeDetail(item);
+                };
+                root.appendChild(child);
+            });
+        }
+        _DialogCore.open({
+            title: "NOTIFICATIONS",
+            content: root,
+            buttons:[
+                {
+                    label: "CLOSE",
+                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
+                    closesDialog: true
+                }
+            ]
+        });
+    },
+
+
+
+
+
+    // 【管理者機能】管理者メニュー
+    ShowAdminMenu() {
+        const el = $Dom.GenerateTemplate('tpl-menu-admin');
+        $Dom.QuerySelector('#btn-admin-notice', el).onclick = () => this.ShowAdminNoticeList();
+        _DialogCore.open({ title: "ADMIN TOOLS", content: el, ok: null });
+    },
+    // 【管理者機能】通知管理リスト
+    ShowAdminNoticeList() {
+        // --- 追加：管理者用ダミーデータモック（上部やモジュールスコープ内など） ---
+        let _adminDummyNotices =[
+            { seq: 1, title: "システムメンテナンスのお知らせ", body: "明日深夜2時からサーバーのメンテナンスを行います。アプリの利用が一時的に制限されます。", kind: 1, disp_from: "2026-04-25T10:00", disp_to: "2026-05-25T10:00", update_tim: "2026-04-25T10:00:00" },
+            { seq: 2, title: "バージョン1.1.0リリース！", body: "まとめ親の公開機能や、新しい環境エフェクトが追加されました。ぜひご利用ください。", kind: 0, disp_from: "2026-04-10T12:30", disp_to: "2026-04-20T12:30", update_tim: "2026-04-10T12:30:00" },
+            { seq: 3, title: "利用規約の改定について", body: "2026年4月1日より利用規約の一部を改定いたします。詳細をご確認ください。", kind: 0, disp_from: "2026-03-15T09:00", disp_to: "2099-12-31T23:59", update_tim: "2026-03-15T09:00:00" },
+        ];
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        root.className = "w-full text-black-3 mb-2 px-1";
+        const renderList = () => {
+            root.innerHTML = "";
+            if (_adminDummyNotices.length === 0) {
+                root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">通知データがありません</div>`;
+                return;
+            }
+            const now = new Date();
+            // update_tim 降順でソート（疑似）
+            const sorted = [..._adminDummyNotices].sort((a, b) => new Date(b.update_tim) - new Date(a.update_tim));
+            sorted.forEach(item => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-notice");
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, "YYYY.MM.DD HH:mm");
+                const icon = $Const.NOTICE_ICONS[item.kind] || '📢';
+                $Dom.QuerySelector(".js-title", child).textContent = `${icon} ${item.title}`;
+                $Dom.QuerySelector(".js-body", child).textContent = item.body;
+                // 公開中判定 (disp_from 〜 disp_to と現在時刻を比較)
+                const fromDate = new Date(item.disp_from);
+                const toDate = new Date(item.disp_to);
+                const isPublic = (now >= fromDate && now <= toDate);
+                const badge = $Dom.QuerySelector(".js-badge-status", child);
+                if (isPublic) {
+                    badge.textContent = "公開中";
+                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-brand-3 bg-brand-5 text-white";
+                } else if (now < fromDate) {
+                    badge.textContent = "公開前";
+                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-slate-300 bg-slate-100 text-slate-500";
+                } else {
+                    badge.textContent = "公開終了";
+                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-slate-300 bg-slate-500 text-white";
+                }
+                // クリックで編集ダイアログを開く
+                child.onclick = () => {
+                    this.ShowAdminNoticeEdit(item, () => renderList());
+                };
+                root.appendChild(child);
+            });
+        };
+        renderList();
+        const frame = _DialogCore.open({
+            title: "NOTICE Mgmt",
+            content: root,
+            buttons:[
+                {
+                    label: "CLOSE",
+                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
+                    closesDialog: true
+                }
+            ]
+        });
+        // 新規登録ボタンをヘッダー右上のアクション領域に追加
+        const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
+        if (headerActions) {
+            const addBtn = document.createElement('button');
+            addBtn.className = "w-8 h-8 bg-brand-5 rounded-xl shadow-sm text-white flex items-center justify-center active:scale-95 text-[18px] border border-brand-5 transition-transform";
+            addBtn.innerHTML = "＋";
+            addBtn.onclick = () => this.ShowAdminNoticeEdit(null, renderList);
+            headerActions.prepend(addBtn);
+        }
+    },
+    // 【管理者機能】通知の編集・新規登録
+    ShowAdminNoticeEdit(noticeItem, onSaved) {
+        const isNew = !noticeItem;
+        const target = isNew ? {
+            seq: 0, title: "", body: "", kind: 0,
+            disp_from: $Util.FormatDate(new Date(), "YYYY-MM-DDTHH:mm"), // datetime-local 用に T を挟む
+            disp_to: "2099-12-31T23:59",
+        } : { ...noticeItem };
+        const el = $Dom.GenerateTemplate("tpl-admin-notice-edit");
+        const selKind = $Dom.QuerySelector('#edit-notice-kind', el);
+        const inptTitle = $Dom.QuerySelector('#edit-notice-title', el);
+        const inptBody = $Dom.QuerySelector('#edit-notice-body', el);
+        const inptFrom = $Dom.QuerySelector('#edit-notice-from', el);
+        const inptTo = $Dom.QuerySelector('#edit-notice-to', el);
+        selKind.value = target.kind;
+        inptTitle.value = target.title;
+        inptBody.value = target.body;
+        inptFrom.value = target.disp_from;
+        inptTo.value = target.disp_to;
+        _DialogCore.open({
+            title: isNew ? "NEW NOTICE" : "EDIT NOTICE",
+            content: el,
+            buttons:[[
+                    {
+                        label: "CANCEL",
+                        className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                        closesDialog: true
+                    },
+                    {
+                        label: "SAVE",
+                        className: "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform",
+                        closesDialog: false,
+                        handler: () => {
+                            // 保存処理モック
+                            const updated = {
+                                seq: target.seq || Date.now(), // 新規の場合はタイムスタンプを適当なIDに
+                                title: inptTitle.value.trim() || "No Title",
+                                body: inptBody.value.trim(),
+                                kind: Number(selKind.value),
+                                disp_from: inptFrom.value,
+                                disp_to: inptTo.value,
+                                update_tim: $Util.FormatDate(new Date(), "YYYY-MM-DD HH:mm:ss")
+                            };
+                            if (isNew) {
+                                _adminDummyNotices.push(updated);
+                            } else {
+                                const idx = _adminDummyNotices.findIndex(n => n.seq === target.seq);
+                                if (idx !== -1) {
+                                    _adminDummyNotices[idx] = updated;
+                                }
+                            }
+                            $Notice.Info("Saved successfully.");
+                            _DialogCore.close(); // 編集ダイアログだけを閉じる
+                            if (onSaved) onSaved(); // リストを再描画
+                        }
+                    }
+                ]
             ]
         });
     },
