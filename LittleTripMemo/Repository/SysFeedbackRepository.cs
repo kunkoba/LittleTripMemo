@@ -3,11 +3,11 @@ using LittleTripMemo.Common;
 
 namespace LittleTripMemo.Repository;
 
-public class FeedbackRepository : _BaseRepository
+public class SysFeedbackRepository : _BaseRepository
 {
-    public FeedbackRepository(
+    public SysFeedbackRepository(
         ITransactionProvider provider,
-        ILogger<FeedbackRepository> logger,
+        ILogger<SysFeedbackRepository> logger,
         UserContext user
     ) : base(provider, logger, user)
     {

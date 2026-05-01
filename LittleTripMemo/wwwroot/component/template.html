@@ -326,12 +326,59 @@
         <button id="btn-admin-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
             <span class="col-span-1 flex justify-center text-lg">📢</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Notice Management</span>
         </button>
-        <button id="btn-admin-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 opacity-50 cursor-not-allowed">
-            <span class="col-span-1 flex justify-center text-lg">🚨</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Report Mgmt (WIP)</span>
+        <!-- ▼ WIP等の無効化クラスを削除 -->
+        <button id="btn-admin-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-lg">🚨</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Report Mgmt</span>
         </button>
         <button id="btn-admin-feedback" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 opacity-50 cursor-not-allowed">
             <span class="col-span-1 flex justify-center text-lg">💡</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Feedback Mgmt (WIP)</span>
         </button>
+    </div>
+</template>
+<!-- 【リスト子】管理者通報集計一覧用 -->
+<template id="tpl-admin-list-child-report-summary">
+    <div class="js-item-card flex items-stretch p-0 rounded-2xl border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-sm overflow-hidden mb-3 relative">
+        <div class="flex-1 min-w-0 p-3 pl-4">
+            <div class="flex justify-between items-start mb-1">
+                <div class="text-[10px] font-black text-slate-500 tracking-wider js-target-user"></div>
+                <span class="js-badge-count text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-red-200 bg-red-50 text-red-600"></span>
+            </div>
+            <div class="text-[14px] font-black text-black-5 truncate pr-2 mb-1 js-archive-title"></div>
+            <div class="text-[10px] text-slate-400 font-bold js-archive-id"></div>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】管理者通報詳細（ダイアログ全体） -->
+<template id="tpl-admin-report-detail">
+    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden">
+        <!-- 上部：対象まとめ情報・リンク -->
+        <div class="shrink-0 p-4 border-b border-brand-2 bg-slate-50 relative">
+            <div class="text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">Target User</div>
+            <div class="text-[14px] font-black text-black-5 mb-3 js-target-user break-all"></div>
+            <div class="text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">Target Archive</div>
+            <div class="text-[14px] font-black text-black-5 mb-4 js-archive-title break-all"></div>
+            <button id="btn-admin-open-archive" class="w-full bg-brand-5 text-white font-black py-3 rounded-xl text-[12px] shadow-md uppercase active:scale-95 transition-transform flex items-center justify-center gap-2">
+                <span class="text-[16px]">🔗</span> OPEN PUBLIC ARCHIVE
+            </button>
+        </div>
+        <!-- 下部：通報詳細リスト -->
+        <div class="flex-1 overflow-y-auto p-2 bg-brand-0">
+            <div class="text-[10px] font-black text-slate-400 px-2 pt-2 pb-2 uppercase tracking-widest">Report Details</div>
+            <div id="admin-report-detail-list" class="space-y-2 pb-4 px-1"></div>
+        </div>
+    </div>
+</template>
+<!-- 【リスト子】管理者通報詳細アイテム -->
+<template id="tpl-admin-list-child-report-item">
+    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-400"></div>
+        <div class="pl-2">
+            <div class="flex justify-between items-center mb-1">
+                <div class="text-[10px] font-bold text-slate-500 js-reporter-user truncate pr-2"></div>
+                <div class="text-[10px] font-bold text-slate-400 js-report-tim shrink-0"></div>
+            </div>
+            <div class="text-[12px] text-black-5 leading-relaxed whitespace-pre-wrap break-all js-report-body"></div>
+        </div>
     </div>
 </template>
 <!-- 【ダイアログ子】管理者通知編集 -->

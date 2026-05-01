@@ -1415,15 +1415,12 @@ const DialogController = {
             ]
         });
     },
-
-
-
-
-
     // 【管理者機能】管理者メニュー
     ShowAdminMenu() {
         const el = $Dom.GenerateTemplate('tpl-menu-admin');
         $Dom.QuerySelector('#btn-admin-notice', el).onclick = () => this.ShowAdminNoticeList();
+        // ▼追加：通報管理呼び出し
+        $Dom.QuerySelector('#btn-admin-report', el).onclick = () => this.ShowAdminReportList();
         _DialogCore.open({ title: "ADMIN TOOLS", content: el, ok: null });
     },
     // 【管理者機能】通知管理リスト
@@ -1552,6 +1549,103 @@ const DialogController = {
                         }
                     }
                 ]
+            ]
+        });
+    },
+    // 【管理者機能】通報集計一覧
+    ShowAdminReportList() {
+        let _adminDummyReportSummaries =[
+            { target_user_id: "user_a123", target_user_name: "John Doe", archive_id: 1001, archive_title: "My Awesome Trip in Tokyo", report_count: 5 },
+            { target_user_id: "user_b456", target_user_name: "Jane Smith", archive_id: 1002, archive_title: "危険な場所のまとめ", report_count: 2 },
+        ];
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        root.className = "w-full text-black-3 mb-2 px-1";
+        if (_adminDummyReportSummaries.length === 0) {
+            root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">通報データはありません</div>`;
+        } else {
+            // 通報件数の多い順にソート（疑似）
+            const sorted = [..._adminDummyReportSummaries].sort((a, b) => b.report_count - a.report_count);
+            sorted.forEach(item => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-summary");
+                $Dom.QuerySelector(".js-target-user", child).textContent = `Target: ${item.target_user_name || item.target_user_id}`;
+                $Dom.QuerySelector(".js-archive-title", child).textContent = item.archive_title || "Unknown Title";
+                $Dom.QuerySelector(".js-archive-id", child).textContent = `Archive ID: ${item.archive_id}`;
+                $Dom.QuerySelector(".js-badge-count", child).textContent = `${item.report_count} Reports`;
+                // クリックで詳細ダイアログを開く
+                child.onclick = () => {
+                    this.ShowAdminReportDetail(item);
+                };
+                root.appendChild(child);
+            });
+        }
+        _DialogCore.open({
+            title: "REPORT Mgmt",
+            content: root,
+            buttons:[
+                {
+                    label: "CLOSE",
+                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
+                    closesDialog: true
+                }
+            ]
+        });
+    },
+    // 【管理者機能】通報詳細（まとめ親リンク ＋ 投稿者一覧）
+    ShowAdminReportDetail(summaryItem) {
+        let _adminDummyReports =[
+            { reporter_user_id: "user_x999", reporter_user_name: "Reporter Alpha", target_user_id: "user_a123", archive_id: 1001, body: "不適切な画像が含まれています。", report_tim: "2026-04-20T10:00:00" },
+            { reporter_user_id: "user_y888", reporter_user_name: "Reporter Beta", target_user_id: "user_a123", archive_id: 1001, body: "スパムです。関係のないリンクが多数あります。", report_tim: "2026-04-21T11:00:00" },
+            { reporter_user_id: "user_z777", reporter_user_name: "Reporter Gamma", target_user_id: "user_a123", archive_id: 1001, body: "個人情報が載っています。", report_tim: "2026-04-22T09:30:00" },
+            { reporter_user_id: "user_z777", reporter_user_name: "Reporter Gamma", target_user_id: "user_a123", archive_id: 1001, body: "個人情報が載っています。", report_tim: "2026-04-22T09:30:00" },
+            { reporter_user_id: "user_z777", reporter_user_name: "Reporter Gamma", target_user_id: "user_a123", archive_id: 1001, body: "個人情報が載っています。", report_tim: "2026-04-22T09:30:00" },
+            { reporter_user_id: "user_z777", reporter_user_name: "Reporter Gamma", target_user_id: "user_a123", archive_id: 1001, body: "個人情報が載っています。", report_tim: "2026-04-22T09:30:00" },
+            { reporter_user_id: "user_z777", reporter_user_name: "Reporter Gamma", target_user_id: "user_a123", archive_id: 1001, body: "個人情報が載っています。", report_tim: "2026-04-22T09:30:00" },
+            { reporter_user_id: "user_w666", reporter_user_name: "Reporter Delta", target_user_id: "user_b456", archive_id: 1002, body: "暴言が含まれています", report_tim: "2026-04-25T14:15:00" },
+            { reporter_user_id: "user_w666", reporter_user_name: "Reporter Delta", target_user_id: "user_b456", archive_id: 1002, body: "暴言が含まれています", report_tim: "2026-04-25T14:15:00" },
+            { reporter_user_id: "user_w666", reporter_user_name: "Reporter Delta", target_user_id: "user_b456", archive_id: 1002, body: "暴言が含まれています", report_tim: "2026-04-25T14:15:00" },
+            { reporter_user_id: "user_w666", reporter_user_name: "Reporter Delta", target_user_id: "user_b456", archive_id: 1002, body: "暴言が含まれています", report_tim: "2026-04-25T14:15:00" },
+            { reporter_user_id: "user_w666", reporter_user_name: "Reporter Delta", target_user_id: "user_b456", archive_id: 1002, body: "暴言が含まれています", report_tim: "2026-04-25T14:15:00" },
+        ];
+        const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
+        // 上部：対象情報
+        $Dom.QuerySelector(".js-target-user", el).textContent = `${summaryItem.target_user_name || ""} (${summaryItem.target_user_id})`;
+        $Dom.QuerySelector(".js-archive-title", el).textContent = `${summaryItem.archive_title || ""} [ID: ${summaryItem.archive_id}]`;
+        // 上部：まとめ親（Public）を開くボタン
+        $Dom.QuerySelector("#btn-admin-open-archive", el).onclick = async () => {
+            // 確認ダイアログを挟んでも良い
+            const isOk = await this.ShowConfirm({ title: "OPEN ARCHIVE", message: "この Public まとめデータを開きますか？" });
+            if (!isOk) return;
+            // すべてのダイアログを閉じて、対象のまとめを Public モードで開く
+            _DialogCore.closeAll();
+            $App.AppData.System.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+            $App.AppData.System.TargetArchiveId = summaryItem.archive_id;
+            await $App.RefreshScreen();
+        };
+        // 下部：通報詳細リストの描画
+        const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
+        // 今回のまとめIDに対する通報のみを抽出
+        const reports = _adminDummyReports.filter(r => r.archive_id === summaryItem.archive_id);
+        if (reports.length === 0) {
+            listContainer.innerHTML = `<div class="text-[12px] text-slate-400 p-2">詳細データがありません</div>`;
+        } else {
+            // 報告日時の降順（新しい順）
+            reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
+                $Dom.QuerySelector(".js-reporter-user", child).textContent = `From: ${rep.reporter_user_name || rep.reporter_user_id}`;
+                $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim, "YYYY.MM.DD HH:mm");
+                $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
+                listContainer.appendChild(child);
+            });
+        }
+        _DialogCore.open({
+            title: "REPORT DETAILS",
+            content: el,
+            buttons:[
+                {
+                    label: "BACK",
+                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    closesDialog: true
+                }
             ]
         });
     },
