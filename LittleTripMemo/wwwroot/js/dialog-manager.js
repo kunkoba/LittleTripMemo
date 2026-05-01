@@ -1352,11 +1352,10 @@ const DialogController = {
         });
     },
     // 通知詳細ダイアログ
-    ShowNoticeDetail(notice) {
+    ShowNoticeDetail_2(notice) {
         const el = $Dom.GenerateTemplate('tpl-view-notice');
         const icon = $Const.NOTICE_ICONS[notice.kind] || '📢';
         $Dom.QuerySelector('#view-notice-icon', el).textContent = icon;
-        // 日付は update_tim もしくは disp_from などを利用
         $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, "YYYY.MM.DD HH:mm");
         $Dom.QuerySelector('#view-notice-title', el).textContent = notice.title;
         $Dom.QuerySelector('#view-notice-body', el).textContent = notice.body;
@@ -1372,59 +1371,119 @@ const DialogController = {
             ]
         });
     },
-    // 通知一覧ダイアログ
-    ShowNoticeList() {
-        // ※ 本来はAPI（$Data.Access.GetNoticeList等）から取得する想定のデータ
-        const dummyNotices =[
-            { seq: 1, update_tim: "2026-04-25T10:00:00", disp_from: "2026-04-25T10:00:00", title: "システムメンテナンスのお知らせ", body: "明日深夜2時からサーバーのメンテナンスを行います。アプリの利用が一時的に制限されます。", kind: 1, is_new: true },
-            { seq: 2, update_tim: "2026-04-10T12:30:00", disp_from: "2026-04-10T12:30:00", title: "バージョン1.1.0リリース！", body: "まとめ親の公開機能や、新しい環境エフェクトが追加されました。ぜひご利用ください。", kind: 0, is_new: false },
-            { seq: 3, update_tim: "2026-03-15T09:00:00", disp_from: "2026-03-15T09:00:00", title: "利用規約の改定について", body: "2026年4月1日より利用規約の一部を改定いたします。詳細をご確認ください。", kind: 0, is_new: false },
-        ];
+    // 通知詳細ダイアログ
+    ShowNoticeDetail(notice) {
+        // ...既存コードそのまま...
+        const el = $Dom.GenerateTemplate('tpl-view-notice');
+        const icon = $Const.NOTICE_ICONS[notice.kind] || '📢';
+        $Dom.QuerySelector('#view-notice-icon', el).textContent = icon;
+        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, "YYYY.MM.DD HH:mm");
+        $Dom.QuerySelector('#view-notice-title', el).textContent = notice.title;
+        $Dom.QuerySelector('#view-notice-body', el).textContent = notice.body;
+        _DialogCore.open({
+            title: "NOTICE DETAILS",
+            content: el,
+            buttons:[ { label: "BACK", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider", closesDialog: true } ]
+        });
+    },
+    // 通知一覧ダイアログ（API通信化）
+    async ShowNoticeList() {
+        const isSuccess = await $Data.Access.GetActiveNotifications({});
+        if (!isSuccess) return;
+        const notices = $Data.Store.GetNotifications() ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         root.className = "w-full text-black-3 mb-2 px-1";
-        if (dummyNotices.length === 0) {
+        if (notices.length === 0) {
             root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">通知はありません</div>`;
         } else {
-            dummyNotices.forEach(item => {
+            notices.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-list-child-notice");
                 $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, "YYYY.MM.DD");
-                // 定数から kind に応じたアイコンを取得してタイトルに結合する
                 const icon = $Const.NOTICE_ICONS[item.kind] || '📢';
                 $Dom.QuerySelector(".js-title", child).textContent = `${icon} ${item.title}`;
                 $Dom.QuerySelector(".js-body", child).textContent = item.body;
-                // 新着バッジの表示
-                if (item.is_new) {
-                    $Dom.ToggleShow($Dom.QuerySelector(".js-badge-new", child), true); // hiddenを外す
-                }
-                // クリックで詳細ダイアログを表示する
-                child.onclick = () => {
-                    this.ShowNoticeDetail(item);
-                };
+                child.onclick = () => this.ShowNoticeDetail(item);
                 root.appendChild(child);
             });
         }
         _DialogCore.open({
-            title: "NOTIFICATIONS",
-            content: root,
-            buttons:[
-                {
-                    label: "CLOSE",
-                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
-                    closesDialog: true
-                }
-            ]
+            title: "NOTIFICATIONS", content: root,
+            buttons:[ { label: "CLOSE", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider", closesDialog: true } ]
         });
     },
     // 【管理者機能】管理者メニュー
     ShowAdminMenu() {
         const el = $Dom.GenerateTemplate('tpl-menu-admin');
         $Dom.QuerySelector('#btn-admin-notice', el).onclick = () => this.ShowAdminNoticeList();
-        // ▼追加：通報管理呼び出し
         $Dom.QuerySelector('#btn-admin-report', el).onclick = () => this.ShowAdminReportList();
+        $Dom.QuerySelector('#btn-admin-feedback', el).onclick = () => this.ShowAdminFeedbackList();
         _DialogCore.open({ title: "ADMIN TOOLS", content: el, ok: null });
     },
+    // 通知管理リスト（API通信化）
+    async ShowAdminNoticeList() {
+        const isSuccess = await $Data.Access.GetAllNotifications({});
+        if (!isSuccess) return;
+        const notices = $Data.Store.GetNotifications() ||[];
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        root.className = "w-full text-black-3 mb-2 px-1";
+        const renderList = async () => {
+            root.innerHTML = "";
+            if (notices.length === 0) {
+                root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">通知データがありません</div>`;
+                return;
+            }
+            const now = new Date();
+            const sorted = [...notices].sort((a, b) => new Date(b.update_tim) - new Date(a.update_tim));
+            sorted.forEach(item => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-notice");
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, "YYYY.MM.DD HH:mm");
+                const icon = $Const.NOTICE_ICONS[item.kind] || '📢';
+                $Dom.QuerySelector(".js-title", child).textContent = `${icon} ${item.title}`;
+                $Dom.QuerySelector(".js-body", child).textContent = item.body;
+                const fromDate = new Date(item.disp_from);
+                const toDate = new Date(item.disp_to);
+                const isPublic = (now >= fromDate && now <= toDate);
+                const badge = $Dom.QuerySelector(".js-badge-status", child);
+                if (isPublic) {
+                    badge.textContent = "公開中";
+                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-brand-3 bg-brand-5 text-white";
+                } else if (now < fromDate) {
+                    badge.textContent = "公開前";
+                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-slate-300 bg-slate-100 text-slate-500";
+                } else {
+                    badge.textContent = "公開終了";
+                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-slate-300 bg-slate-500 text-white";
+                }
+                // 編集を開き、保存成功時は一覧を閉じて開き直す
+                child.onclick = () => {
+                    this.ShowAdminNoticeEdit(item, () => {
+                        _DialogCore.close(); // 一覧も閉じて
+                        this.ShowAdminNoticeList(); // 最新データで再度一覧を開く
+                    });
+                };
+                root.appendChild(child);
+            });
+        };
+        await renderList();
+        const frame = _DialogCore.open({
+            title: "NOTICE Mgmt", content: root,
+            buttons:[ { label: "CLOSE", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider", closesDialog: true } ]
+        });
+        // 新規登録ボタン
+        const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
+        if (headerActions) {
+            const addBtn = document.createElement('button');
+            addBtn.className = "w-8 h-8 bg-brand-5 rounded-xl shadow-sm text-white flex items-center justify-center active:scale-95 text-[18px] border border-brand-5 transition-transform";
+            addBtn.innerHTML = "＋";
+            addBtn.onclick = () => this.ShowAdminNoticeEdit(null, () => {
+                _DialogCore.close();
+                this.ShowAdminNoticeList();
+            });
+            headerActions.prepend(addBtn);
+        }
+    },
     // 【管理者機能】通知管理リスト
-    ShowAdminNoticeList() {
+    ShowAdminNoticeList_2() {
         // --- 追加：管理者用ダミーデータモック（上部やモジュールスコープ内など） ---
         let _adminDummyNotices =[
             { seq: 1, title: "システムメンテナンスのお知らせ", body: "明日深夜2時からサーバーのメンテナンスを行います。アプリの利用が一時的に制限されます。", kind: 1, disp_from: "2026-04-25T10:00", disp_to: "2026-05-25T10:00", update_tim: "2026-04-25T10:00:00" },
@@ -1492,12 +1551,12 @@ const DialogController = {
             headerActions.prepend(addBtn);
         }
     },
-    // 【管理者機能】通知の編集・新規登録
+    // 通知の編集・新規登録（API通信化）
     ShowAdminNoticeEdit(noticeItem, onSaved) {
         const isNew = !noticeItem;
         const target = isNew ? {
             seq: 0, title: "", body: "", kind: 0,
-            disp_from: $Util.FormatDate(new Date(), "YYYY-MM-DDTHH:mm"), // datetime-local 用に T を挟む
+            disp_from: $Util.FormatDate(new Date(), "YYYY-MM-DDTHH:mm"),
             disp_to: "2099-12-31T23:59",
         } : { ...noticeItem };
         const el = $Dom.GenerateTemplate("tpl-admin-notice-edit");
@@ -1515,120 +1574,73 @@ const DialogController = {
             title: isNew ? "NEW NOTICE" : "EDIT NOTICE",
             content: el,
             buttons:[[
-                    {
-                        label: "CANCEL",
-                        className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                        closesDialog: true
-                    },
-                    {
-                        label: "SAVE",
-                        className: "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform",
-                        closesDialog: false,
-                        handler: () => {
-                            // 保存処理モック
-                            const updated = {
-                                seq: target.seq || Date.now(), // 新規の場合はタイムスタンプを適当なIDに
-                                title: inptTitle.value.trim() || "No Title",
-                                body: inptBody.value.trim(),
-                                kind: Number(selKind.value),
-                                disp_from: inptFrom.value,
-                                disp_to: inptTo.value,
-                                update_tim: $Util.FormatDate(new Date(), "YYYY-MM-DD HH:mm:ss")
-                            };
-                            if (isNew) {
-                                _adminDummyNotices.push(updated);
-                            } else {
-                                const idx = _adminDummyNotices.findIndex(n => n.seq === target.seq);
-                                if (idx !== -1) {
-                                    _adminDummyNotices[idx] = updated;
-                                }
-                            }
-                            $Notice.Info("Saved successfully.");
-                            _DialogCore.close(); // 編集ダイアログだけを閉じる
-                            if (onSaved) onSaved(); // リストを再描画
-                        }
+                { label: "CANCEL", className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform", closesDialog: true },
+                { label: "SAVE", className: "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform", closesDialog: false,
+                    handler: async () => {
+                        const req = {
+                            seq: target.seq,
+                            title: inptTitle.value.trim() || "No Title",
+                            body: inptBody.value.trim(),
+                            kind: Number(selKind.value),
+                            disp_from: inptFrom.value,
+                            disp_to: inptTo.value
+                        };
+                        const isSuccess = await $Data.Access.UpsertNotification(req);
+                        if (!isSuccess) return;
+                        $Notice.Info("Saved successfully.");
+                        _DialogCore.close(); // 編集ダイアログを閉じる
+                        if (onSaved) onSaved(); // 親画面の再描画コールバック
                     }
-                ]
-            ]
+                }
+            ]]
         });
     },
-    // 【管理者機能】通報集計一覧
-    ShowAdminReportList() {
-        let _adminDummyReportSummaries =[
-            { target_user_id: "user_a123", target_user_name: "John Doe", archive_id: 1001, archive_title: "My Awesome Trip in Tokyo", report_count: 5 },
-            { target_user_id: "user_b456", target_user_name: "Jane Smith", archive_id: 1002, archive_title: "危険な場所のまとめ", report_count: 2 },
-        ];
+    // 通報集計一覧（API通信化）
+    async ShowAdminReportList() {
+        const isSuccess = await $Data.Access.GetReportSummary({ min_count: 0 });
+        if (!isSuccess) return;
+        const reportSummaries = $Data.Store.GetReportSummaries() ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         root.className = "w-full text-black-3 mb-2 px-1";
-        if (_adminDummyReportSummaries.length === 0) {
+        if (reportSummaries.length === 0) {
             root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">通報データはありません</div>`;
         } else {
-            // 通報件数の多い順にソート（疑似）
-            const sorted = [..._adminDummyReportSummaries].sort((a, b) => b.report_count - a.report_count);
+            // 通報件数の多い順にソート
+            const sorted = [...reportSummaries].sort((a, b) => b.report_count - a.report_count);
             sorted.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-summary");
                 $Dom.QuerySelector(".js-target-user", child).textContent = `Target: ${item.target_user_name || item.target_user_id}`;
                 $Dom.QuerySelector(".js-archive-title", child).textContent = item.archive_title || "Unknown Title";
                 $Dom.QuerySelector(".js-archive-id", child).textContent = `Archive ID: ${item.archive_id}`;
                 $Dom.QuerySelector(".js-badge-count", child).textContent = `${item.report_count} Reports`;
-                // クリックで詳細ダイアログを開く
-                child.onclick = () => {
-                    this.ShowAdminReportDetail(item);
-                };
+                child.onclick = () => this.ShowAdminReportDetail(item);
                 root.appendChild(child);
             });
         }
         _DialogCore.open({
-            title: "REPORT Mgmt",
-            content: root,
-            buttons:[
-                {
-                    label: "CLOSE",
-                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
-                    closesDialog: true
-                }
-            ]
+            title: "REPORT Mgmt", content: root,
+            buttons:[ { label: "CLOSE", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider", closesDialog: true } ]
         });
     },
-    // 【管理者機能】通報詳細（まとめ親リンク ＋ 投稿者一覧）
+    // 通報詳細（APIデータ利用）
     ShowAdminReportDetail(summaryItem) {
-        let _adminDummyReports =[
-            { reporter_user_id: "user_x999", reporter_user_name: "Reporter Alpha", target_user_id: "user_a123", archive_id: 1001, body: "不適切な画像が含まれています。", report_tim: "2026-04-20T10:00:00" },
-            { reporter_user_id: "user_y888", reporter_user_name: "Reporter Beta", target_user_id: "user_a123", archive_id: 1001, body: "スパムです。関係のないリンクが多数あります。", report_tim: "2026-04-21T11:00:00" },
-            { reporter_user_id: "user_z777", reporter_user_name: "Reporter Gamma", target_user_id: "user_a123", archive_id: 1001, body: "個人情報が載っています。", report_tim: "2026-04-22T09:30:00" },
-            { reporter_user_id: "user_z777", reporter_user_name: "Reporter Gamma", target_user_id: "user_a123", archive_id: 1001, body: "個人情報が載っています。", report_tim: "2026-04-22T09:30:00" },
-            { reporter_user_id: "user_z777", reporter_user_name: "Reporter Gamma", target_user_id: "user_a123", archive_id: 1001, body: "個人情報が載っています。", report_tim: "2026-04-22T09:30:00" },
-            { reporter_user_id: "user_z777", reporter_user_name: "Reporter Gamma", target_user_id: "user_a123", archive_id: 1001, body: "個人情報が載っています。", report_tim: "2026-04-22T09:30:00" },
-            { reporter_user_id: "user_z777", reporter_user_name: "Reporter Gamma", target_user_id: "user_a123", archive_id: 1001, body: "個人情報が載っています。", report_tim: "2026-04-22T09:30:00" },
-            { reporter_user_id: "user_w666", reporter_user_name: "Reporter Delta", target_user_id: "user_b456", archive_id: 1002, body: "暴言が含まれています", report_tim: "2026-04-25T14:15:00" },
-            { reporter_user_id: "user_w666", reporter_user_name: "Reporter Delta", target_user_id: "user_b456", archive_id: 1002, body: "暴言が含まれています", report_tim: "2026-04-25T14:15:00" },
-            { reporter_user_id: "user_w666", reporter_user_name: "Reporter Delta", target_user_id: "user_b456", archive_id: 1002, body: "暴言が含まれています", report_tim: "2026-04-25T14:15:00" },
-            { reporter_user_id: "user_w666", reporter_user_name: "Reporter Delta", target_user_id: "user_b456", archive_id: 1002, body: "暴言が含まれています", report_tim: "2026-04-25T14:15:00" },
-            { reporter_user_id: "user_w666", reporter_user_name: "Reporter Delta", target_user_id: "user_b456", archive_id: 1002, body: "暴言が含まれています", report_tim: "2026-04-25T14:15:00" },
-        ];
         const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
-        // 上部：対象情報
         $Dom.QuerySelector(".js-target-user", el).textContent = `${summaryItem.target_user_name || ""} (${summaryItem.target_user_id})`;
-        $Dom.QuerySelector(".js-archive-title", el).textContent = `${summaryItem.archive_title || ""} [ID: ${summaryItem.archive_id}]`;
-        // 上部：まとめ親（Public）を開くボタン
+        $Dom.QuerySelector(".js-archive-title", el).textContent = `${summaryItem.archive_title || ""}[ID: ${summaryItem.archive_id}]`;
         $Dom.QuerySelector("#btn-admin-open-archive", el).onclick = async () => {
-            // 確認ダイアログを挟んでも良い
             const isOk = await this.ShowConfirm({ title: "OPEN ARCHIVE", message: "この Public まとめデータを開きますか？" });
             if (!isOk) return;
-            // すべてのダイアログを閉じて、対象のまとめを Public モードで開く
             _DialogCore.closeAll();
             $App.AppData.System.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
             $App.AppData.System.TargetArchiveId = summaryItem.archive_id;
             await $App.RefreshScreen();
         };
-        // 下部：通報詳細リストの描画
         const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
-        // 今回のまとめIDに対する通報のみを抽出
-        const reports = _adminDummyReports.filter(r => r.archive_id === summaryItem.archive_id);
+        // レポート詳細は Store から取得 (GetReportSummary または GetSystemInfo 時にまとめて取得されている前提)
+        const reports = ($Data.Store.GetReports() ||[]).filter(r => r.archive_id === summaryItem.archive_id);
         if (reports.length === 0) {
             listContainer.innerHTML = `<div class="text-[12px] text-slate-400 p-2">詳細データがありません</div>`;
         } else {
-            // 報告日時の降順（新しい順）
             reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
                 $Dom.QuerySelector(".js-reporter-user", child).textContent = `From: ${rep.reporter_user_name || rep.reporter_user_id}`;
@@ -1638,12 +1650,63 @@ const DialogController = {
             });
         }
         _DialogCore.open({
-            title: "REPORT DETAILS",
-            content: el,
+            title: "REPORT DETAILS", content: el,
+            buttons:[ { label: "BACK", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform", closesDialog: true } ]
+        });
+    },
+    // 【管理者機能】フィードバック一覧（無限スクロール）
+    async ShowAdminFeedbackList() {
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        // スクロール検知のために高さを固定し、overflow-y-auto を付与
+        root.className = "w-full text-black-3 mb-2 px-1 h-[60vh] overflow-y-auto";
+        let skip = 0;
+        const take = 100;
+        let isLoading = false;
+        let hasMore = true;
+        // データ取得＆DOM追加関数
+        const loadMore = async () => {
+            if (isLoading || !hasMore) return;
+            isLoading = true;
+            // skip, take をパラメータとして渡す
+            const isSuccess = await $Data.Access.GetAllFeedback({ skip, take });
+            if (!isSuccess) {
+                isLoading = false;
+                return;
+            }
+            // fetchごとに Store 内のフィードバックリストが更新(上書き)される想定
+            const items = $Data.Store.GetFeedbackList() ||[];
+            if (items.length < take) {
+                hasMore = false; // 取得件数がtake未満なら終端
+            }
+            items.forEach(item => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");
+                // ※ 日付プロパティ名はAPIの実装に合わせます（create_tim想定）
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim || new Date(), "YYYY.MM.DD HH:mm");
+                $Dom.QuerySelector(".js-score", child).textContent = `Score: ${item.score || 0}`;
+                $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
+                root.appendChild(child);
+            });
+            skip += take;
+            isLoading = false;
+        };
+        // スクロールイベント：最下部付近で次をロード
+        root.addEventListener('scroll', () => {
+            if (root.scrollTop + root.clientHeight >= root.scrollHeight - 50) {
+                loadMore();
+            }
+        });
+        // 初回ロード
+        await loadMore();
+        if (root.children.length === 0) {
+            root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
+        }
+        _DialogCore.open({
+            title: "FEEDBACK Mgmt",
+            content: root,
             buttons:[
                 {
-                    label: "BACK",
-                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    label: "CLOSE",
+                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
                     closesDialog: true
                 }
             ]

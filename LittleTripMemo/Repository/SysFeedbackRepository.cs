@@ -21,7 +21,7 @@ public class SysFeedbackRepository : _BaseRepository
         feedback.user_id = _user.UserId;
 
         const string sql = @"
-            INSERT INTO t_app_feedbacks (
+            INSERT INTO t_sys_feedbacks (
                 user_id, 
                 body, 
                 score, 
@@ -41,28 +41,16 @@ public class SysFeedbackRepository : _BaseRepository
     }
 
     /// <summary>
-    /// 自分のフィードバックを取得
+    /// フィードバックを範囲指定で取得（更新日時降順）
     /// </summary>
-    public async Task<TSysFeedback?> GetMyFeedbackAsync()
+    public async Task<IEnumerable<TSysFeedback>> GetFeedbacksAsync(int offset = 0, int limit = 50)
     {
         const string sql = @"
-            SELECT * FROM t_app_feedbacks 
-            WHERE user_id = @user_id";
-
-        return await QuerySingleOrDefaultAsync<TSysFeedback>(sql, new { user_id = _user.UserId });
-    }
-
-    /// <summary>
-    /// 最新100件のフィードバックを取得
-    /// </summary>
-    public async Task<IEnumerable<TSysFeedback>> GetLatestFeedbacksAsync()
-    {
-        const string sql = @"
-            SELECT * FROM t_app_feedbacks 
+            SELECT * FROM t_sys_feedbacks 
             ORDER BY update_tim DESC 
-            LIMIT 100";
+            LIMIT @limit OFFSET @offset";
 
-        return await QueryAsync<TSysFeedback>(sql);
+        return await QueryAsync<TSysFeedback>(sql, new { limit, offset });
     }
 
     /// <summary>
@@ -70,7 +58,7 @@ public class SysFeedbackRepository : _BaseRepository
     /// </summary>
     public async Task<double> GetAverageScoreAsync()
     {
-        const string sql = "SELECT COALESCE(AVG(score), 0) FROM t_app_feedbacks";
+        const string sql = "SELECT COALESCE(AVG(score), 0) FROM t_sys_feedbacks";
 
         return await ExecuteScalarAsync<double>(sql);
     }

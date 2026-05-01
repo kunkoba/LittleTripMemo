@@ -14,7 +14,14 @@ const AppManager = {
             IsGpsTracking: false,
             Token: null,
             currency_unit: 'JPY',
+            systemInfo: null,
         },
+        Admin: {
+            notifications: [],
+            reportSummaries: [],
+            reports:[],
+            feedbackList:[]
+        }
     },
     // 設定を保存
     _saveSettings() {
@@ -94,40 +101,39 @@ const AppManager = {
         // 定期タスク開始-----
         $Polling.Start($Polling.TASKS.OFFLINE_CHECK);
     },
-    // 戻り値として、ログインに成功したか（true/false）を返す
+    // ログインフロー内に追加
     async ExecuteLoginFlow() {
-        // 共通エラー処理でラップし、成否を受け取る（直前に直した仕様が大活躍します！）
         return await $Warn.CatchAsync(async () => {
             $Notice.Info("Logging in...");
-            // 1. 認証専門家($Auth)から身分証明をもらう
             const email = await $Auth.GetVerifiedEmailByGoogle();
-            // 2. 通信専門家($Data.Access)にログインさせ、JWTをもらう
             const ret = await $Data.Access.LoginToServer(email);
             if (ret) {
                 this.AppData.System.IsLoggedIn = true;
                 this._saveSettings();
+                // ▼ 追加：ログイン成功直後にシステム情報を取得
+                await $Data.Access.GetSystemInfo();
                 $Notice.Info("Login successful！");
                 return true;
             }
             return false;
         })();
     },
-    // アプリの起動（初期化の入口）
+    // アプリ起動時フロー内に追加
     async Init() {
         console.log("★App.Init");
-        this._initViewport(); // ビューポートの初期化
-        await $LocalDb.Init();   // ローカル㏈初期化
-        this._initPollingTasks();   // 定期監視
-        this._loadSettings(); // 起動時に読み込み
-        // $Notice.Loading.Hide();
-        $UI.Init();     // UI初期化
-        //
+        this._initViewport();
+        await $LocalDb.Init();
+        this._initPollingTasks();
+        this._loadSettings(); 
+        $UI.Init();
         this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
         this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD);
-        // クエリパラメータ取得してAppDataにセット
+        // ▼ 追加：起動時にトークンがあればシステム情報を取得（1度きり）
+        if (this.AppData.Owner.Token) {
+            await $Data.Access.GetSystemInfo();
+        }
         this.AppData.System.ScreenMode = new URLSearchParams(location.search).get("mode") ?? $Const.SCREEN_MODE.CREATE;
         this.AppData.System.ArchiveId = new URLSearchParams(location.search).get("archiveId");
-        // マーカー再構築
         this.RefreshScreen();
     },
     // カラーテーマ変更

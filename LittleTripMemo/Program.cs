@@ -8,6 +8,7 @@ using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Services;
+using LittleTripMemo.Services.Sys;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -92,6 +93,10 @@ builder.Services.AddScoped<DetailRepository>();
 builder.Services.AddScoped<ArchivePubRepository>();
 builder.Services.AddScoped<DetailPubRepository>();
 builder.Services.AddScoped<ReactionPubRepository>();
+// ---- Sys / Infrastructure Repository ----
+builder.Services.AddScoped<SysFeedbackRepository>();
+builder.Services.AddScoped<SysNotificationRepository>();
+builder.Services.AddScoped<SysReportRepository>();
 
 // ---- Service（業務ロジック層） ----
 
@@ -118,6 +123,15 @@ builder.Services.AddScoped<UpdateArchivePubService>();
 builder.Services.AddScoped<UpdateDetailPubService>();
 builder.Services.AddScoped<SearchByLocationPubService>();
 builder.Services.AddScoped<BulkSyncDetailsService>();
+// ---- Sys / Infrastructure Service ----
+builder.Services.AddScoped<UpsertFeedbackService>();
+builder.Services.AddScoped<UpsertReportService>();
+builder.Services.AddScoped<GetSystemInfoService>();
+builder.Services.AddScoped<GetFeedbackService>();
+builder.Services.AddScoped<UpsertNotificationService>();
+builder.Services.AddScoped<GetReportSummaryService>();
+builder.Services.AddScoped<GetAllNotificationsService>();
+builder.Services.AddScoped<GetReportDetailsService>();
 
 
 // ======================================================================

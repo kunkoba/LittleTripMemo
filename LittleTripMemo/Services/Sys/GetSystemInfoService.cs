@@ -3,7 +3,7 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 
-namespace LittleTripMemo.Services;
+namespace LittleTripMemo.Services.Sys;
 
 public class GetSystemInfoService : _BaseService
 {
@@ -12,8 +12,8 @@ public class GetSystemInfoService : _BaseService
 
     // レスポンス：平均点、最新100件、有効な通知を統合
     public record Response(
-        double feedback_average,
-        IEnumerable<TSysFeedback> latest_feedbacks,
+        double score_avg,
+        IEnumerable<TSysFeedback> feedbacks,
         IEnumerable<TSysNotification> notifications
     );
 
@@ -32,32 +32,17 @@ public class GetSystemInfoService : _BaseService
         // 1. 検証（必要に応じて。システム情報の取得なので基本はスルー可能）
         await ValidateAsync();
 
-        // 2. 並列でデータを取得して効率化
-        var avgTask = _feedbackRepo.GetAverageScoreAsync();
-        var latestTask = _feedbackRepo.GetLatestFeedbacksAsync();
-        var notifyTask = _notificationRepo.GetActiveNotificationsAsync();
+        // 2. 順番に実行（並列実行はエラーになるため）
+        var avg = await _feedbackRepo.GetAverageScoreAsync();
+        var feedback = await _feedbackRepo.GetFeedbacksAsync();
+        var notifications = await _notificationRepo.GetActiveNotificationsAsync();
 
-        await Task.WhenAll(avgTask, latestTask, notifyTask);
-
-        // 3. 結果をまとめて返却
-        return new Response(
-            await avgTask,
-            await latestTask,
-            await notifyTask
-        );
+        return new Response(avg, feedback, notifications);
     }
 
     private async Task ValidateAsync()
     {
         BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
-        
-        // ✅ 管理者でない場合はエラー（データを返さない）
-        BusinessException.ThrowIf(
-            _user.Plan != PlanType.Admin.ToString(),
-            "この操作には管理者権限が必要です",
-            "FORBIDDEN"
-        );
-
         await Task.CompletedTask;
     }
 }

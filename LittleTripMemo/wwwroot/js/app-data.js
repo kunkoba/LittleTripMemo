@@ -77,7 +77,11 @@ window.$Data = {
     Access: {
         baseUrl: "https://localhost:7292",   // ASPエントリポイント
         // baseUrl: "https://2cd8-112-71-71-140.ngrok-free.app",   // ASPエントリポイント
-        _rawData: { archive: null, details: [], archiveList: [], userProfile: null},
+        // _rawData: { archive: null, details: [], archiveList: [], userProfile: null},
+        _rawData: {
+            archive: null, details: [], archiveList:[], userProfile: null,
+            notifications: [], reportSummaries: [], reports: [], feedbackList:[], systemInfo: null
+        },
         // サーバー通信の基礎（エラーはスローし、同期と復元まで行う）
         async _fetchData(method, url, params, isDebug = false) {
             if (isDebug) {
@@ -124,17 +128,24 @@ window.$Data = {
             const data = result.data;  // dataの中身を取り出す
             // token取得
             if (data.token) $App.AppData.Owner.Token = data.token;
+            $App.AppData.System.IsLoggedIn = result.is_logged_in ?? false;
             // archives, details
             if (data.archive) this._rawData.archive = data.archive;
             if (data.details) this._rawData.details = data.details;
             if (data.archiveId) $App.AppData.System.TargetArchiveId = data.archiveId; // 新規ID
             if (data.archiveList) this._rawData.archiveList = data.archiveList;
             if (data.userProfile) this._rawData.userProfile = data.userProfile;
-            // オーナー情報セット
             if (data.ownerProfile) $App.AppData.Owner.Profile = data.ownerProfile;
             // ベース情報をAppDataに保持
-            $App.AppData.System.IsLoggedIn = result.is_logged_in ?? false;
             $Data.Store.Restore();
+            // システム系データの取り込み（プロパティ名はレスポンス仕様に依存）
+            if (data.systemInfo) $App.AppData.Owner.systemInfo = data.systemInfo;
+            if (data.notifications) $App.AppData.Admin.notifications = data.notifications;
+            if (data.reportSummaries) $App.AppData.Admin.reportSummaries = data.reportSummaries;
+            if (data.reports) $App.AppData.Admin.reports = data.reports;
+            if (data.feedbacks) $App.AppData.Admin.feedbackList = data.feedbacks;
+            console.log("$App.AppData.Owner:", $App.AppData.Owner);
+            console.log("$App.AppData.Admin:", $App.AppData.Admin);
             return true;
         },
         // 自サーバー(C#)へログイン要求し、JWTトークンをもらう
@@ -295,25 +306,84 @@ window.$Data = {
                 return await this._fetchData('post', url, params);
             })();
         },
+        // 【Sys】システム情報取得（ユーザ）
+        async GetSystemInfo(params = {}) {
+            const url = '/api/Sys/GetSystemInfo';
+            return await $Warn.CatchAsync(async () => {
+                return await this._fetchData('post', url, params);
+            })();
+        },
+        // 【Sys】フィードバック登録更新（ユーザ）
+        async UpsertFeedback(params) {
+            const url = '/api/Sys/UpsertFeedback';
+            return await $Warn.CatchAsync(async () => {
+                return await this._fetchData('post', url, params);
+            })();
+        },
+        // 【Sys】通知情報取得（ユーザ）
+        async GetActiveNotifications(params = {}) {
+            const url = '/api/Sys/GetActiveNotifications';
+            return await $Warn.CatchAsync(async () => {
+                return await this._fetchData('post', url, params);
+            })();
+        },
+        // 【Sys】通報情報登録更新（ユーザ）
+        async UpsertReport(params) {
+            const url = '/api/Sys/UpsertReport';
+            return await $Warn.CatchAsync(async () => {
+                return await this._fetchData('post', url, params);
+            })();
+        },
+        // 【Sys】通知情報登録更新（管理者）
+        async UpsertNotification(params) {
+            const url = '/api/Sys/UpsertNotification';
+            return await $Warn.CatchAsync(async () => {
+                return await this._fetchData('post', url, params);
+            })();
+        },
+        // 【Sys】通報集計情報取得（管理者）
+        async GetReportSummary(params = {}) {
+            const url = '/api/Sys/GetReportSummary';
+            return await $Warn.CatchAsync(async () => {
+                return await this._fetchData('post', url, params);
+            })();
+        },
+        // 【Sys】フィードバック取得（管理者）
+        async GetAllFeedback(params = {}) {
+            const url = '/api/Sys/GetAllFeedback';
+            return await $Warn.CatchAsync(async () => {
+                return await this._fetchData('post', url, params);
+            })();
+        },
+        // 【Sys】フィードバック取得（管理者）
+        async GetAllNotifications(params = {}) {
+            const url = '/api/Sys/GetAllNotifications';
+            return await $Warn.CatchAsync(async () => {
+                return await this._fetchData('post', url, params);
+            })();
+        },
     },
     // データ操作・取得のメソッド群
     Store: {
-        // アプリで使う最新データを保持
-        _archive: null,
-        _details: [],
-        _archiveList: null,
-        _userProfile: null,
+        _archive: null, _details:[], _archiveList: null, _userProfile: null,
+        _notifications: [], _reportSummaries:[], _reports: [], _feedbackList:[], _systemInfo: null,
         // 生データからクローンを作成
         Restore() {
-            this._archive = structuredClone($Data.Access._rawData.archive);
-            this._details = structuredClone($Data.Access._rawData.details);
-            this._archiveList = structuredClone($Data.Access._rawData.archiveList);
-            this._userProfile = structuredClone($Data.Access._rawData.userProfile);
+            this._archive = structuredClone($Data.Access._rawData.archive ||[]);
+            this._details = structuredClone($Data.Access._rawData.details ||[]);
+            this._archiveList = structuredClone($Data.Access._rawData.archiveList ||[]);
+            this._userProfile = structuredClone($Data.Access._rawData.userProfile ||[]);
+            // システム系
+            this._notifications = structuredClone($Data.Access._rawData.notifications ||[]);
+            this._reportSummaries = structuredClone($Data.Access._rawData.reportSummaries ||[]);
+            this._reports = structuredClone($Data.Access._rawData.reports ||[]);
+            this._feedbackList = structuredClone($Data.Access._rawData.feedbackList ||[]);
+            this._systemInfo = structuredClone($Data.Access._rawData.systemInfo || null);
         },
         Clear(){
-            this._archive = null;
-            this._details = null;
-            this._archiveList = null;
+            this._archive = null; this._details =[]; this._archiveList = null; this._userProfile = null;
+            this._notifications =[]; this._reportSummaries = []; this._reports = [];
+            this._feedbackList =[]; this._systemInfo = null;
         },
         // 詳細データを取得
         _getDetails(archiveId, seq) {
@@ -405,5 +475,15 @@ window.$Data = {
                 Object.assign(this._userProfile, updatedFields);
             }
         },
+        // システム情報取得（ユーザ）
+        GetSystemInfo() { return this._systemInfo; },
+        // 通知情報取得（管理者）
+        GetNotifications() { return this._notifications; },
+        // 通報集計結果情報取得（管理者）
+        GetReportSummaries() { return this._reportSummaries; },
+        // 通報情報取得（管理者）
+        GetReports() { return this._reports; },
+        // フィードバック一覧取得（管理者）
+        GetFeedbackList() { return this._feedbackList; },
     },
 };

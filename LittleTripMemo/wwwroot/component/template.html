@@ -330,9 +330,20 @@
         <button id="btn-admin-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
             <span class="col-span-1 flex justify-center text-lg">🚨</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Report Mgmt</span>
         </button>
-        <button id="btn-admin-feedback" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 opacity-50 cursor-not-allowed">
-            <span class="col-span-1 flex justify-center text-lg">💡</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Feedback Mgmt (WIP)</span>
+        <!-- 【ダイアログ子】管理者メニュー の Feedback Mgmt ボタンから opacity-50 cursor-not-allowed を削除 -->
+        <button id="btn-admin-feedback" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-lg">💡</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[16px] uppercase">Feedback Mgmt</span>
         </button>
+    </div>
+</template>
+<!-- 【リスト子】管理者フィードバック一覧用 -->
+<template id="tpl-admin-list-child-feedback">
+    <div class="js-item-card flex flex-col p-3 rounded-2xl border border-brand-1 bg-white mb-3 shadow-sm">
+        <div class="flex justify-between items-center mb-1">
+            <span class="text-[10px] font-black text-slate-400 js-date"></span>
+            <span class="text-[10px] font-bold text-white bg-brand-5 px-2 py-0.5 rounded-full js-score"></span>
+        </div>
+        <div class="text-[12px] text-black-5 leading-relaxed whitespace-pre-wrap break-all js-body mt-1"></div>
     </div>
 </template>
 <!-- 【リスト子】管理者通報集計一覧用 -->

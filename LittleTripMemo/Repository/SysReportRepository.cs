@@ -22,7 +22,7 @@ public class SysReportRepository : _BaseRepository
         report.reporter_user_id = _user.UserId;
 
         const string sql = @"
-            INSERT INTO t_app_reports (
+            INSERT INTO t_sys_reports (
                 reporter_user_id, 
                 target_user_id, 
                 archive_id, 
@@ -50,12 +50,22 @@ public class SysReportRepository : _BaseRepository
                 target_user_id, 
                 archive_id, 
                 COUNT(1) AS report_count
-            FROM t_app_reports
+            FROM t_sys_reports
             GROUP BY target_user_id, archive_id
             HAVING COUNT(*) >= @min_count
             ORDER BY report_count DESC";
 
         return await QueryAsync<DtoReportSummary>(sql, new { min_count = minCount });
+    }
+
+    public async Task<IEnumerable<TSysReport>> GetReportsByTargetAsync(Guid targetUserId, long archiveId)
+    {
+        const string sql = @"
+        SELECT * FROM t_sys_reports 
+        WHERE target_user_id = @target_user_id 
+          AND archive_id = @archive_id 
+        ORDER BY report_tim DESC";
+        return await QueryAsync<TSysReport>(sql, new { target_user_id = targetUserId, archive_id = archiveId });
     }
 
 }

@@ -8,7 +8,7 @@ public class GetReportSummaryService : _BaseService
 {
     private readonly SysReportRepository _repo;
     public record GetReportSummaryReq(int min_count);
-    public record Response(IEnumerable<DtoReportSummary> list);
+    public record Response(IEnumerable<DtoReportSummary> reportSummaries);
 
     public GetReportSummaryService(UserContext user, SysReportRepository repo) : base(user) => _repo = repo;
 
