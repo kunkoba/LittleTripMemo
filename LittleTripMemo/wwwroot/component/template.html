@@ -587,60 +587,6 @@
         </p>
     </div>
 </template>
-<!-- 【ダイアログ子】アプリ情報 -->
-<template id="tpl-app-info">
-    <div class="w-full space-y-4 px-2 text-black-5">
-        <div class="flex flex-col items-center justify-center py-6">
-            <div class="w-20 h-20 bg-brand-5 rounded-2xl shadow-md flex items-center justify-center text-white text-[32px] font-black mb-3">LM</div>
-            <h3 class="text-xl font-black uppercase tracking-widest text-brand-5">Little Trip Memo</h3>
-            <p class="text-[12px] text-black-3 font-bold mt-1">Version 1.0.0</p>
-        </div>
-        <div class="space-y-2">
-            <div class="flex justify-between items-center p-3 bg-white rounded-xl border border-brand-2 shadow-sm">
-                <span class="text-[12px] font-bold text-black-3 uppercase">Developer</span>
-                <span class="text-[14px] font-black text-black-5">kunkoba</span>
-            </div>
-            <button id="btn-info-review" class="w-full flex justify-between items-center p-3 bg-white rounded-xl border border-brand-2 shadow-sm active:scale-95 transition-transform">
-                <span class="text-[12px] font-bold text-black-3 uppercase">Rating & Reviews</span>
-                <div class="flex items-center gap-2">
-                    <span class="text-[16px] font-black text-yellow-500 leading-none">★ 4.8</span>
-                    <span class="text-[16px] text-brand-3 leading-none">›</span>
-                </div>
-            </button>
-            <a href="https://example.com" target="_blank" class="w-full flex justify-between items-center p-3 bg-white rounded-xl border border-brand-2 shadow-sm active:scale-95 transition-transform">
-                <span class="text-[12px] font-bold text-black-3 uppercase">Official Site</span>
-                <span class="text-blue-500 text-[12px] font-bold">Open 🔗</span>
-            </a>
-            <button id="btn-info-license" class="w-full flex justify-between items-center p-3 bg-white rounded-xl border border-brand-2 shadow-sm active:scale-95 transition-transform">
-                <span class="text-[12px] font-bold text-black-3 uppercase">License</span>
-                <span class="text-[16px] text-brand-3 leading-none">›</span>
-            </button>
-        </div>
-    </div>
-</template>
-<!-- 【ダイアログ子】レビュー一覧 -->
-<template id="tpl-review-list">
-    <div class="w-full flex flex-col h-full">
-        <div class="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-brand-2 mb-4 shrink-0">
-            <div class="flex flex-col">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Average Rating</span>
-                <div class="flex items-baseline gap-2 mt-1">
-                    <span class="text-[32px] font-black text-black-5 leading-none">4.8</span>
-                    <span class="text-[14px] font-bold text-yellow-500 tracking-widest">★★★★★</span>
-                </div>
-            </div>
-            <div class="text-right">
-                <span class="text-[10px] font-bold text-black-3">Based on 128 reviews</span>
-            </div>
-        </div>
-        <div class="js-review-container flex-1 overflow-y-auto space-y-3 pb-4"></div>
-        <div class="shrink-0 pt-2 border-t border-brand-2">
-            <button id="btn-post-review" class="w-full bg-brand-5 text-white font-black py-3 rounded-2xl text-[14px] shadow-md uppercase active:scale-95 transition-transform">
-                Write a Review
-            </button>
-        </div>
-    </div>
-</template>
 <!-- 【ダイアログ子】レビュー投稿 -->
 <template id="tpl-review-post">
     <div class="w-full text-black-5 px-2 space-y-6 pt-4">
@@ -672,7 +618,6 @@
         </div>
     </div>
 </template>
-
 <!-- 【ダイアログ子】まとめ親参照 -->
 <template id="tpl-view-archive">
     <div class="w-full text-black-5 space-y-4">
@@ -698,10 +643,6 @@
                 <span class="text-[8px] font-black uppercase text-black-3 mb-1">Total Memos</span>
                 <div id="mem-stat-count" class="text-[18px] font-black text-black-5">0</div>
             </div>
-        </div>
-        <div id="view-mem-actions" class="flex flex-col gap-3 mt-2">
-            <button id="btn-mem-action-main" class="w-full bg-brand-5 text-white font-bold py-3 rounded-2xl text-[14px] shadow-md active:scale-95 transition-transform"></button>
-            <button id="btn-mem-release" class="w-full bg-white text-red-400 border border-brand-4 font-bold py-3 rounded-2xl text-[14px] shadow-sm active:scale-95 transition-transform"></button>
         </div>
     </div>
 </template>
@@ -768,6 +709,60 @@
             <input id="edit-profile-link1" type="url" placeholder="https://... (Link 1)" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white text-blue-600 mb-2">
             <input id="edit-profile-link2" type="url" placeholder="https://... (Link 2)" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white text-blue-600 mb-2">
             <input id="edit-profile-link3" type="url" placeholder="https://... (Link 3)" class="w-full border-2 border-brand-3 px-3 py-2 text-[16px] rounded-xl focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】アプリ情報 -->
+<template id="tpl-app-info">
+    <div class="w-full space-y-4 px-2 text-black-5">
+        <div class="flex flex-col items-center justify-center py-6">
+            <div class="w-20 h-20 bg-brand-5 rounded-2xl shadow-md flex items-center justify-center text-white text-[32px] font-black mb-3">LM</div>
+            <h3 class="text-xl font-black uppercase tracking-widest text-brand-5 js-app-name"></h3>
+            <p class="text-[12px] text-black-3 font-bold mt-1 js-app-version"></p>
+        </div>
+        <div class="space-y-2">
+            <div class="flex justify-between items-center p-3 bg-white rounded-xl border border-brand-2 shadow-sm">
+                <span class="text-[12px] font-bold text-black-3 uppercase">Developer</span>
+                <span class="text-[14px] font-black text-black-5 js-app-developer"></span>
+            </div>
+            <button id="btn-info-review" class="w-full flex justify-between items-center p-3 bg-white rounded-xl border border-brand-2 shadow-sm active:scale-95 transition-transform">
+                <span class="text-[12px] font-bold text-black-3 uppercase">Feedback & Rating</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-[16px] font-black text-yellow-500 leading-none js-app-score">★ 0.0</span>
+                    <span class="text-[16px] text-brand-3 leading-none">›</span>
+                </div>
+            </button>
+            <a id="link-info-official" href="" target="_blank" class="w-full flex justify-between items-center p-3 bg-white rounded-xl border border-brand-2 shadow-sm active:scale-95 transition-transform">
+                <span class="text-[12px] font-bold text-black-3 uppercase">Official Site</span>
+                <span class="text-blue-500 text-[12px] font-bold">Open 🔗</span>
+            </a>
+            <button id="btn-info-license" class="w-full flex justify-between items-center p-3 bg-white rounded-xl border border-brand-2 shadow-sm active:scale-95 transition-transform">
+                <span class="text-[12px] font-bold text-black-3 uppercase">License</span>
+                <span class="text-[16px] text-brand-3 leading-none">›</span>
+            </button>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】レビュー一覧 -->
+<template id="tpl-review-list">
+    <div class="w-full flex flex-col h-full">
+        <div class="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-brand-2 mb-4 shrink-0">
+            <div class="flex flex-col">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Average Rating</span>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <span class="text-[32px] font-black text-black-5 leading-none js-avg-score">0.0</span>
+                    <span class="text-[14px] font-bold text-yellow-500 tracking-widest js-avg-stars"></span>
+                </div>
+            </div>
+            <div class="text-right">
+                <span class="text-[10px] font-bold text-black-3 js-total-reviews"></span>
+            </div>
+        </div>
+        <div class="js-review-container flex-1 overflow-y-auto space-y-3 pb-4"></div>
+        <div class="shrink-0 pt-2 border-t border-brand-2">
+            <button id="btn-post-review" class="w-full bg-brand-5 text-white font-black py-3 rounded-2xl text-[14px] shadow-md uppercase active:scale-95 transition-transform">
+                Write Feedback
+            </button>
         </div>
     </div>
 </template>

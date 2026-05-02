@@ -13,7 +13,7 @@ const _DetailContentCore = {
                     this.displayDate = $Dom.GetElementById("detail-display-memo_date");
                     this.displayTime = $Dom.GetElementById("detail-display-memo_time");
                     this.displayFaceEmoji = $Dom.GetElementById("detail-display-face_emoji");
-                    this.displayWeatherEmoji = $Dom.GetElementById("detail-display-weather_emoji");
+                    this.displayWeatherEmoji = $Dom.GetElementById("detail-display-weather_code");
                     this.displayTitle = $Dom.GetElementById("detail-display-title");
                     this.displayBody = $Dom.GetElementById("detail-display-body");
                     this.displayPrice = $Dom.GetElementById("detail-display-memo_price");
@@ -44,7 +44,7 @@ const _DetailContentCore = {
                     // 
                     this.btnAtmosphereTrigger = $Dom.GetElementById("btn-atmosphere-trigger");
                     this.spanAtmospherePreview = $Dom.GetElementById("span-atmosphere-preview");
-                    this.editWeatherEmoji = $Dom.GetElementById("detail-edit-weather_emoji");
+                    this.editWeatherEmoji = $Dom.GetElementById("detail-edit-weather_code");
                     if (this.btnAtmosphereTrigger) {
                         this.btnAtmosphereTrigger.addEventListener('click', () => {
                             const currentCode = this.editWeatherEmoji.value || "0000";
@@ -149,7 +149,7 @@ const _DetailContentCore = {
         // 環境エフェクトをオンにする
         if (typeof Atmosphere !== 'undefined') {
             if (Atmosphere.canvas) Atmosphere.canvas.style.zIndex = '1005'; // 詳細パネル(1002)より手前
-            const code = detail?.weather_emoji || "0000";
+            const code = detail?.weather_code || "0000";
             Atmosphere.show(code);
         }
         // ▼ 画面を開く前にポップアップを閉じる
@@ -170,7 +170,7 @@ const _DetailContentCore = {
             let displayCurrency = $App.AppData.Owner.currency_unit || 'JPY';
             if (detail.archive_id > 0) {
                 // 親アーカイブの情報をStoreから探す（一覧または現在開いているアーカイブ）
-                const archiveList = $Data.Store.GetArchiveList() || [];
+                const archiveList = $Data.Store.GetArchiveList() ||[];
                 const targetArc = archiveList.find(a => a.archive_id === detail.archive_id) || $Data.Store.GetArchive();
                 if (targetArc && targetArc.archive_id === detail.archive_id && targetArc.currency_unit) {
                     displayCurrency = targetArc.currency_unit; // 親の通貨で上書き
@@ -205,8 +205,8 @@ const _DetailContentCore = {
         }
 
         this.displayFaceEmoji.textContent = detail.face_emoji || '😀';
-        // this.displayWeatherEmoji.textContent = detail.weather_emoji || 'はれ'; // デフォルトを文字に
-        this.displayWeatherEmoji.textContent = detail.weather_emoji || '0000';
+        // this.displayWeatherEmoji.textContent = detail.weather_code || 'はれ'; // デフォルトを文字に
+        this.displayWeatherEmoji.textContent = detail.weather_code || '0000';
     },
     // 編集用反映
     _renderEditMode(detail) {
@@ -233,9 +233,9 @@ const _DetailContentCore = {
         // 表情・天気IDとプレビュー画像
         this.editFaceEmoji.value = detail.face_emoji || '😀';
         this.editFacePreview.textContent = detail.face_emoji || '😀';
-        // this.editWeatherEmoji.value = detail.weather_emoji || 'はれ'; // select の value に直接セット
-        this.editWeatherEmoji.value = detail.weather_emoji || '0000';
-        this.spanAtmospherePreview.textContent = detail.weather_emoji || '0000';
+        // this.editWeatherEmoji.value = detail.weather_code || 'はれ'; // select の value に直接セット
+        this.editWeatherEmoji.value = detail.weather_code || '0000';
+        this.spanAtmospherePreview.textContent = detail.weather_code || '0000';
         // 更新用隠しフィールド
         this.editArchiveId.value = detail.archive_id;
         this.editSeq.value = detail.seq;

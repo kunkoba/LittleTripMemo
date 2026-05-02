@@ -10,12 +10,15 @@ public class GetSystemInfoService : _BaseService
     private readonly SysFeedbackRepository _feedbackRepo;
     private readonly SysNotificationRepository _notificationRepo;
 
-    // レスポンス：平均点、最新100件、有効な通知を統合
-    public record Response(
+    // 統合されたデータ構造
+    public record SystemInfoData(
         double score_avg,
         IEnumerable<TSysFeedback> feedbacks,
         IEnumerable<TSysNotification> notifications
     );
+
+    // レスポンス形式（systemInfo でラップ）
+    public record Response(SystemInfoData systemInfo);
 
     public GetSystemInfoService(
         UserContext userContext,
@@ -34,10 +37,10 @@ public class GetSystemInfoService : _BaseService
 
         // 2. 順番に実行（並列実行はエラーになるため）
         var avg = await _feedbackRepo.GetAverageScoreAsync();
-        var feedback = await _feedbackRepo.GetFeedbacksAsync();
-        var notifications = await _notificationRepo.GetActiveNotificationsAsync();
+        var feeds = await _feedbackRepo.GetAllFeedbacksAsync();
+        var notes = await _notificationRepo.GetActiveNotificationsAsync();
 
-        return new Response(avg, feedback, notifications);
+        return new Response(new SystemInfoData(avg, feeds, notes));
     }
 
     private async Task ValidateAsync()

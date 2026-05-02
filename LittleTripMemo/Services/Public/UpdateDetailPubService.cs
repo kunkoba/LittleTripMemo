@@ -26,7 +26,7 @@ public class UpdateDetailPubService : _BaseService
         [Required(ErrorMessage = "日付は必須です")] string memo_date,
         [Required(ErrorMessage = "時間は必須です")] string memo_time,
         [Required(ErrorMessage = "表情IDは必須です")] string face_emoji,
-        [Required(ErrorMessage = "天気IDは必須です")] string weather_emoji,
+        [Required(ErrorMessage = "天気IDは必須です")] string weather_code,
         string? link_url,
         [Required(ErrorMessage = "金額は必須です")] int memo_price
     );
@@ -107,7 +107,7 @@ public class UpdateDetailPubService : _BaseService
             memo_date = req.memo_date,
             memo_time = req.memo_time,
             face_emoji = req.face_emoji,
-            weather_emoji = req.weather_emoji,
+            weather_code = req.weather_code,
             link_url = req.link_url,
             memo_price = req.memo_price,
             del_flg = false

@@ -6,7 +6,7 @@ window.$Const = {
         DEVELOPER: "kunkoba",
         VERSION: "1.0.0",
         OFFICIAL_SITE: "http://127.0.0.1:5501/index.html",
-        LICENSE: "",
+        LICENSE: "?????????????",
     },
     // 画面モード
     SCREEN_MODE: {

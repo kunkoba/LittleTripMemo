@@ -23,7 +23,7 @@ public class BulkSyncDetailsService : _BaseService
         [Required(ErrorMessage = "日付は必須です")] string memo_date,
         [Required(ErrorMessage = "時間は必須です")] string memo_time,
         [Required(ErrorMessage = "表情IDは必須です")] string face_emoji,
-        [Required(ErrorMessage = "天気IDは必須です")] string weather_emoji,
+        [Required(ErrorMessage = "天気IDは必須です")] string weather_code,
         string? link_url,
         [Required(ErrorMessage = "金額は必須です")] int memo_price,
         [Required] bool is_public // 振替判定用
@@ -101,7 +101,7 @@ public class BulkSyncDetailsService : _BaseService
         memo_date = item.memo_date,
         memo_time = item.memo_time,
         face_emoji = item.face_emoji,
-        weather_emoji = item.weather_emoji,
+        weather_code = item.weather_code,
         link_url = item.link_url,
         memo_price = item.memo_price,
         del_flg = false
@@ -119,7 +119,7 @@ public class BulkSyncDetailsService : _BaseService
         memo_date = item.memo_date,
         memo_time = item.memo_time,
         face_emoji = item.face_emoji,
-        weather_emoji = item.weather_emoji,
+        weather_code = item.weather_code,
         link_url = item.link_url,
         memo_price = item.memo_price,
         closed_flg = false,

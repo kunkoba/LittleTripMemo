@@ -2,8 +2,8 @@
 window.$Data = {
     // データの完全初期化
     Clear() {
-        this.Access._rawData.archives = [];
-        this.Access._rawData.details = [];
+        this.Access._rawData.archives =[];
+        this.Access._rawData.details =[];
         this.Store.Restore();
     },
     // 同期処理の専門部署
@@ -38,7 +38,6 @@ window.$Data = {
                 await $LocalDb.Detail.Save(detail);
             }
             // 2. サーバー側の BulkSyncReq 形式に合わせてペイロードを作成
-            // サーバー側で PropertyNamingPolicy = null なので、プロパティ名は record の定義に合わせる
             const payload = {
                 items: list.map(d => ({
                     seq: d.seq,
@@ -50,21 +49,19 @@ window.$Data = {
                     memo_date: d.memo_date,
                     memo_time: d.memo_time,
                     face_emoji: d.face_emoji,
-                    weather_emoji: d.weather_emoji,
+                    weather_code: d.weather_code,
                     link_url: d.link_url,
                     memo_price: d.memo_price,
-                    is_public: !!d.is_public // booleanを保証
+                    is_public: !!d.is_public
                 }))
             };
-            // 3. 一括送信（サーバー側は1つのトランザクションで処理される）
+            // 3. 一括送信
             const isSuccess = await $Data.Access.BulkSyncDetails(payload);
             if (isSuccess) {
-                // 全件成功：ローカルDBから一括削除
                 for (const detail of list) {
                     await $LocalDb.Detail.DeleteById(detail.dbid);
                 }
             } else {
-                // 失敗：全件の送信フラグを「未送信(0)」に戻す
                 console.error(`一括同期に失敗しました。環境が回復するまで待機します。`);
                 for (const detail of list) {
                     detail.send_flag = 0;
@@ -75,28 +72,14 @@ window.$Data = {
     },
     // 通信関連のメソッド群
     Access: {
-        baseUrl: "https://localhost:7292",   // ASPエントリポイント
-        // baseUrl: "https://2cd8-112-71-71-140.ngrok-free.app",   // ASPエントリポイント
-        // _rawData: { archive: null, details: [], archiveList: [], userProfile: null},
+        baseUrl: "https://localhost:7292",
         _rawData: {
-            archive: null, details: [], archiveList:[], userProfile: null,
-            notifications: [], reportSummaries: [], reports: [], feedbackList:[], systemInfo: null
+            archive: null, details: [], archiveList:[], userProfile: null
         },
-        // サーバー通信の基礎（エラーはスローし、同期と復元まで行う）
+        // サーバー通信の基礎
         async _fetchData(method, url, params, isDebug = false) {
-            if (isDebug) {
-                // =============================================================
-                // テスト用★★
-                // =============================================================
-                const { testArchive, generateTestDetails } = await import("./test-data.js");
-                this._rawData.archive = testArchive;
-                this._rawData.details = generateTestDetails();
-                $Data.Store.Restore();
-                return;
-            }
             console.log("▼ Access:", this.baseUrl + url, params);
             const token = $App.AppData.Owner.Token;
-            // console.log("token:", token);
             const options = {
                 method: method.toUpperCase(),
                 headers: {
@@ -106,9 +89,7 @@ window.$Data = {
             };
             if (options.method !== "GET" && params) options.body = JSON.stringify(params);
             const response = await fetch(this.baseUrl + url, options);
-            // レスポンス処理
             if (!response.ok) {
-                // 401の場合はログイン画面へ
                 if (response.status === 401) {
                     $App.AppData.Owner.Token = null;
                     $App.AppData.System.IsLoggedIn = false;
@@ -116,8 +97,7 @@ window.$Data = {
                     return false;
                 }
                 const errData = await response.json();
-                console.log("errData:", errData);  // 追加して確認
-                // ※プロパティ名は先頭小文字じゃないとダメみたい
+                console.log("errData:", errData);
                 const errMsg = errData.Message || errData.message || "同期失敗";
                 const err = new Error(errMsg);
                 err.debugInfo = errData.debugInfo;
@@ -125,281 +105,166 @@ window.$Data = {
             }
             const result = await response.json();
             console.log("■ Result:", url, result);
-            const data = result.data;  // dataの中身を取り出す
-            // token取得
+            const data = result.data;
+            // アプリ基幹のデータ
             if (data.token) $App.AppData.Owner.Token = data.token;
             $App.AppData.System.IsLoggedIn = result.is_logged_in ?? false;
-            // archives, details
             if (data.archive) this._rawData.archive = data.archive;
             if (data.details) this._rawData.details = data.details;
-            if (data.archiveId) $App.AppData.System.TargetArchiveId = data.archiveId; // 新規ID
+            if (data.archiveId) $App.AppData.System.TargetArchiveId = data.archiveId;
             if (data.archiveList) this._rawData.archiveList = data.archiveList;
             if (data.userProfile) this._rawData.userProfile = data.userProfile;
             if (data.ownerProfile) $App.AppData.Owner.Profile = data.ownerProfile;
-            // ベース情報をAppDataに保持
-            $Data.Store.Restore();
-            // システム系データの取り込み（プロパティ名はレスポンス仕様に依存）
+            // ========================================================
+            // システム・管理者データの振り分け（APIごとに判別）
+            // ========================================================
+            // // ユーザ用：GetSystemInfo のレスポンスをまるごと systemInfo として格納
+            // $App.AppData.Owner.systemInfo = {
+            //     notifications: data.notifications ||[],
+            //     score_avg: data.score_avg || 0,
+            //     feedbackList: data.feedbackList ||[],
+            // };
             if (data.systemInfo) $App.AppData.Owner.systemInfo = data.systemInfo;
+            // 管理者用：各取得APIのレスポンスを Admin に格納
             if (data.notifications) $App.AppData.Admin.notifications = data.notifications;
-            if (data.reportSummaries) $App.AppData.Admin.reportSummaries = data.reportSummaries;
+            if (data.reportSummary) $App.AppData.Admin.reportSummary = data.reportSummary;
             if (data.reports) $App.AppData.Admin.reports = data.reports;
-            if (data.feedbacks) $App.AppData.Admin.feedbackList = data.feedbacks;
-            console.log("$App.AppData.Owner:", $App.AppData.Owner);
-            console.log("$App.AppData.Admin:", $App.AppData.Admin);
+            if (data.feedbackList) $App.AppData.Admin.feedbackList = data.feedbackList;
+            // ユーザ用システムデータ
+            if (data.myFeedback) $App.AppData.Owner.myFeedback = data.myFeedback;
+            if (data.myReport) $App.AppData.Owner.myReport = data.myReport;
+            console.log(">>$App.AppData:", $App.AppData);
+            // ベース情報をStoreに保持
+            $Data.Store.Restore();
             return true;
         },
-        // 自サーバー(C#)へログイン要求し、JWTトークンをもらう
+        // --- (既存のアプリアクセスメソッド群省略なし) ---
         async LoginToServer(email) {
             const url = '/api/Account/LoginFirebase';
             const params = { Email: email };
-            // (※ まだトークンが無い状態での通信なので、_fetchData 側で token が空でも通るようになっている前提です)
-            return await $Warn.CatchAsync(async () => {
-                // C#が返してくる token を取り出して返す
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', url, params))();
         },
-        // ユーザ情報取得
         async GetProfile(params = {}) {
-            const url = '/api/Account/GetProfile';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/GetProfile', params))();
         },
-        // ユーザ情報更新
         async UpdateProfile(params) {
-            const url = '/api/Account/UpdateProfile';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/UpdateProfile', params))();
         },
-        // 明細の登録・更新（seq=0でINSERT、seq>0でUPDATE）
         async UpsertDetail(params) {
-            const url = '/api/UpsertDetail';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpsertDetail', params))();
         },
-        // 明細の登録・更新（seq=0でINSERT、seq>0でUPDATE）
         async UpdateDetailPub(params) {
-            const url = '/api/UpdateDetailPub';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpdateDetailPub', params))();
         },
-        // 日々のデータをまとめる
         async MergeDetails(params) {
-            const url = '/api/MergeDetails';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/MergeDetails', params))();
         },
-        // 明細を指定した親に追加する
         async AddDetails(params) {
-            const url = '/api/AddDetails';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/AddDetails', params))();
         },
-        // まとめ親一覧取得
         async GetArchiveList(params = {}) {
-            const url = '/api/GetArchiveList';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/GetArchiveList', params))();
         },
-        // 未まとめ明細一覧取得
         async GetUnMergeDetails(params = {}) {
-            const url = '/api/GetUnMergeDetails';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/GetUnMergeDetails', params))();
         },
-        // 指定したまとめに紐づく明細取得
         async GetArchiveDetails(params = { archive_id: 0 }, isPublic = false) {
             const url = isPublic ? "/api/GetArchiveDetails_pub" : "/api/GetArchiveDetails";
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', url, params))();
         },
-        // まとめ親（アーカイブ）の削除（解除）
         async DeleteArchive(params) {
-            const url = '/api/DeleteArchive';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/DeleteArchive', params))();
         },
-        // まとめ親（アーカイブ）更新
         async UpdateArchive(params = {}) {
-            const url = '/api/UpdateArchive';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpdateArchive', params))();
         },
-        // まとめ親（アーカイブ）更新
         async UpdateArchivePub(params = {}) {
-            const url = '/api/UpdateArchivePub';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpdateArchivePub', params))();
         },
-        // Public化
         async PublishArchive(params = {}) {
-            console.log("this", this);
-            const url = '/api/PublishArchive';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/PublishArchive', params))();
         },
-        // Private戻し
         async UnpublishArchive(params = {}) {
-            const url = '/api/UnpublishArchive';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UnpublishArchive', params))();
         },
-        // 地点検索（Private）
         async SearchByLocation(params = {}) {
-            const url = '/api/SearchByLocation';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/SearchByLocation', params))();
         },
-        // 地点検索（Public）
         async SearchByLocationPub(params = {}) {
-            const url = '/api/SearchByLocationPub';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/SearchByLocationPub', params))();
         },
-        // Publicアーカイブ明細取得
         async GetArchiveDetailsPub(params = {}) {
-            const url = '/api/GetArchiveDetailsPub';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/GetArchiveDetailsPub', params))();
         },
-        // リアクション更新
         async UpsertReaction(params = {}) {
-            const url = '/api/UpsertReaction';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpsertReaction', params))();
         },
-        // Publicデータを「Public中 (closed_flg=false)」にする
         async OpenArchive(params = {}) {
-            const url = '/api/OpenArchive';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/OpenArchive', params))();
         },
-        // Publicデータを「Private中 (closed_flg=true)」にする
         async CloseArchive(params = {}) {
-            const url = '/api/CloseArchive';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/CloseArchive', params))();
         },
-        // 一括送信、一括処理
         async BulkSyncDetails(params = {}) {
-            const url = '/api/BulkSyncDetails';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/BulkSyncDetails', params))();
         },
-        // 【Sys】システム情報取得（ユーザ）
-        async GetSystemInfo(params = {}) {
-            const url = '/api/Sys/GetSystemInfo';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
-        },
-        // 【Sys】フィードバック登録更新（ユーザ）
+
+        // --- システム系API ---
         async UpsertFeedback(params) {
-            const url = '/api/Sys/UpsertFeedback';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertFeedback', params))();
         },
-        // 【Sys】通知情報取得（ユーザ）
-        async GetActiveNotifications(params = {}) {
-            const url = '/api/Sys/GetActiveNotifications';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
-        },
-        // 【Sys】通報情報登録更新（ユーザ）
         async UpsertReport(params) {
-            const url = '/api/Sys/UpsertReport';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertReport', params))();
         },
-        // 【Sys】通知情報登録更新（管理者）
         async UpsertNotification(params) {
-            const url = '/api/Sys/UpsertNotification';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertNotification', params))();
         },
-        // 【Sys】通報集計情報取得（管理者）
         async GetReportSummary(params = {}) {
-            const url = '/api/Sys/GetReportSummary';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportSummary', params))();
         },
-        // 【Sys】フィードバック取得（管理者）
+        async GetReportDetails(params = {}) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportDetails', params))();
+        },
         async GetAllFeedback(params = {}) {
-            const url = '/api/Sys/GetAllFeedback';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllFeedback', params))();
         },
-        // 【Sys】フィードバック取得（管理者）
         async GetAllNotifications(params = {}) {
-            const url = '/api/Sys/GetAllNotifications';
-            return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('post', url, params);
-            })();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllNotifications', params))();
+        },
+        async GetMyFeedback(params = {}) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyFeedback', params))();
+        },
+        async GetMyReport(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyReport', params))();
+        },
+        async GetSystemInfo(params = {}) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetSystemInfo', params))();
         },
     },
     // データ操作・取得のメソッド群
     Store: {
         _archive: null, _details:[], _archiveList: null, _userProfile: null,
-        _notifications: [], _reportSummaries:[], _reports: [], _feedbackList:[], _systemInfo: null,
         // 生データからクローンを作成
         Restore() {
-            this._archive = structuredClone($Data.Access._rawData.archive ||[]);
+            this._archive = structuredClone($Data.Access._rawData.archive || null);
             this._details = structuredClone($Data.Access._rawData.details ||[]);
             this._archiveList = structuredClone($Data.Access._rawData.archiveList ||[]);
-            this._userProfile = structuredClone($Data.Access._rawData.userProfile ||[]);
-            // システム系
-            this._notifications = structuredClone($Data.Access._rawData.notifications ||[]);
-            this._reportSummaries = structuredClone($Data.Access._rawData.reportSummaries ||[]);
-            this._reports = structuredClone($Data.Access._rawData.reports ||[]);
-            this._feedbackList = structuredClone($Data.Access._rawData.feedbackList ||[]);
-            this._systemInfo = structuredClone($Data.Access._rawData.systemInfo || null);
+            this._userProfile = structuredClone($Data.Access._rawData.userProfile || null);
         },
         Clear(){
             this._archive = null; this._details =[]; this._archiveList = null; this._userProfile = null;
-            this._notifications =[]; this._reportSummaries = []; this._reports = [];
-            this._feedbackList =[]; this._systemInfo = null;
         },
         // 詳細データを取得
         _getDetails(archiveId, seq) {
             const list = this._details;
-            if (archiveId == null && seq == null) return list; // 全件（配列）
+            if (archiveId == null && seq == null) return list;
             const hit = list.find(x => x.archive_id === Number(archiveId) && x.seq === Number(seq));
-            return hit ? [hit] : []; // 見つかれば [obj]、なければ[] （常に配列）
+            return hit ? [hit] :[];
         },
         // 【ラッパー】アーカイブ取得
-        GetArchive() {
-            return this._archive;
-        },
+        GetArchive() { return this._archive; },
         // 【ラッパー】アーカイブリスト取得
-        GetArchiveList() {
-            return this._archiveList;
-        },
+        GetArchiveList() { return this._archiveList; },
         // ソート処理
         SortDetails(field = "date", order = "asc") {
             if (!this._details || this._details.length === 0) return;
@@ -408,33 +273,27 @@ window.$Data = {
                 let valA, valB;
                 switch (field) {
                     case "date":
-                        // メモ日付と時間を結合して比較 (例: "2026-03-10 06:37")
                         valA = (a.memo_date || "") + " " + (a.memo_time || "");
                         valB = (b.memo_date || "") + " " + (b.memo_time || "");
                         break;
                     case "update":
-                        // 更新日時（ISO文字列）
                         valA = a.update_tim || "";
                         valB = b.update_tim || "";
                         break;
                 }
-                // --- 実際の比較処理 ---
                 if (valA < valB) return isAsc ? -1 : 1;
                 if (valA > valB) return isAsc ? 1 : -1;
                 return 0;
             });
         },
-        // 【ラッパー】明細全件取得
         GetAllDetails() {
             this.SortDetails('date');
             return this._getDetails();
         },
-        // 【ラッパー】明細１件取得
         GetDetailByKey(archiveId, seq) {
             const res = this._getDetails(archiveId, seq);
             return res[0] || null;
         },
-        // 生データの更新または追加（反映にはRefreshが必要）
         UpsertDetail(detail) {
             if (!detail) return;
             const list = $Data.Access._rawData.details;
@@ -449,15 +308,11 @@ window.$Data = {
             } else {
                 list.push(detail);
             }
-            // 最新化
             this.Restore();
         },
-        // まとめ親の情報を部分的に上書き更新する
         UpdateArchive(updatedFields) {
             if (!this._archive) return;
-            // 現在開いているまとめ親を更新
             Object.assign(this._archive, updatedFields);
-            // リスト側のデータも更新しておく（アーカイブリストを開き直した時のため）
             if (this._archiveList) {
                 const target = this._archiveList.find(a => a.archive_id === this._archive.archive_id);
                 if (target) {
@@ -465,25 +320,11 @@ window.$Data = {
                 }
             }
         },
-        // ユーザ情報取得
-        GetUserProfile() {
-            return this._userProfile;
-        },
-        // ユーザ情報更新
+        GetUserProfile() { return this._userProfile; },
         UpdateProfile(updatedFields) {
             if (this._userProfile) {
                 Object.assign(this._userProfile, updatedFields);
             }
         },
-        // システム情報取得（ユーザ）
-        GetSystemInfo() { return this._systemInfo; },
-        // 通知情報取得（管理者）
-        GetNotifications() { return this._notifications; },
-        // 通報集計結果情報取得（管理者）
-        GetReportSummaries() { return this._reportSummaries; },
-        // 通報情報取得（管理者）
-        GetReports() { return this._reports; },
-        // フィードバック一覧取得（管理者）
-        GetFeedbackList() { return this._feedbackList; },
     },
 };

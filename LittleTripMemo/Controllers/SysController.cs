@@ -2,43 +2,51 @@
 using LittleTripMemo.Controllers;
 using LittleTripMemo.Services.Sys;
 using Microsoft.AspNetCore.Mvc;
-using static GetFeedbackService;
+using static GetAllFeedbackService;
 
 [ApiController]
 [CustomAuthorize]
 public class SysController : _BaseController
 {
     private readonly UpsertFeedbackService _upsertFeedbackService;
-    private readonly GetFeedbackService _getFeedbackService;
+    private readonly GetAllFeedbackService _getFeedbackService;
     private readonly UpsertReportService _upsertReportService;
     private readonly GetSystemInfoService _getSystemInfoService;
     private readonly UpsertNotificationService _upsertNotificationService;
     private readonly GetReportSummaryService _getReportSummaryService;
     private readonly GetAllNotificationsService _getAllNotificationsService;
     private readonly GetReportDetailsService _getReportDetailsService;
+    private readonly GetMyFeedbackService _getMyFeedbackService;
+    private readonly GetMyReportService _getMyReportService;
+    private readonly DeleteMyReportService _deleteMyReportService;
 
     public SysController(
         UserContext user,
         IHttpContextAccessor accessor,
         UpsertFeedbackService upsertFeedbackService,
-        GetFeedbackService getMyFeedbackService,
+        GetAllFeedbackService getAllFeedbackService,
         UpsertReportService upsertReportService,
         GetSystemInfoService getSystemInfoService,
         UpsertNotificationService upsertNotificationService,
         GetReportSummaryService getReportSummaryService,
         GetAllNotificationsService getAllNotificationsService,
-        GetReportDetailsService getReportDetailsService
-
+        GetReportDetailsService getReportDetailsService,
+        GetMyFeedbackService getMyFeedbackService,
+        GetMyReportService getMyReportService,
+        DeleteMyReportService deleteMyReportService
     ) : base(user, accessor)
     {
         _upsertFeedbackService = upsertFeedbackService;
-        _getFeedbackService = getMyFeedbackService;
+        _getFeedbackService = getAllFeedbackService;
         _upsertReportService = upsertReportService;
         _getSystemInfoService = getSystemInfoService;
         _upsertNotificationService = upsertNotificationService;
         _getReportSummaryService = getReportSummaryService;
         _getAllNotificationsService = getAllNotificationsService;
-        _getReportDetailsService = getReportDetailsService; 
+        _getReportDetailsService = getReportDetailsService;
+        _getMyFeedbackService = getMyFeedbackService;
+        _getMyReportService = getMyReportService;
+        _deleteMyReportService = deleteMyReportService;
     }
 
     /// <summary>
@@ -105,12 +113,17 @@ public class SysController : _BaseController
     /// </summary>
     /// <returns></returns>
     [HttpPost("api/Sys/GetAllFeedback")]
-    public async Task<IActionResult> GetAllFeedback([FromBody] GetFeedbackService.GetAllFeedbackReq req)
+    public async Task<IActionResult> GetAllFeedback([FromBody] GetAllFeedbackService.GetAllFeedbackReq req)
     {
         var result = await _getFeedbackService.ExecuteAsync(req);
         return OkWithBase(result);
     }
 
+    /// <summary>
+    /// 通知取得（管理者）
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
     [HttpPost("api/Sys/GetAllNotifications")]
     public async Task<IActionResult> GetAllNotifications([FromBody] GetAllNotificationsService.GetAllNotificationsReq req)
     {
@@ -125,6 +138,36 @@ public class SysController : _BaseController
     public async Task<IActionResult> GetReportDetails([FromBody] GetReportDetailsService.GetReportDetailsReq req)
     {
         var result = await _getReportDetailsService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// フィードバック取得（ユーザ）
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost("api/Sys/GetMyFeedback")]
+    public async Task<IActionResult> GetMyFeedback()
+    {
+        var result = await _getMyFeedbackService.ExecuteAsync();
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// 通報取得（ユーザ）
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("api/Sys/GetMyReport")]
+    public async Task<IActionResult> GetMyReport([FromBody] GetMyReportService.GetMyReportReq req)
+    {
+        var result = await _getMyReportService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    [HttpPost("api/Sys/DeleteMyReport")]
+    public async Task<IActionResult> DeleteMyReport([FromBody] DeleteMyReportService.DeleteMyReportReq req)
+    {
+        var result = await _deleteMyReportService.ExecuteAsync(req);
         return OkWithBase(result);
     }
 

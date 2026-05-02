@@ -58,6 +58,12 @@ public class SysReportRepository : _BaseRepository
         return await QueryAsync<DtoReportSummary>(sql, new { min_count = minCount });
     }
 
+    /// <summary>
+    /// 通報されたユーザーIDとアーカイブIDを指定して、通報内容のリストを取得
+    /// </summary>
+    /// <param name="targetUserId"></param>
+    /// <param name="archiveId"></param>
+    /// <returns></returns>
     public async Task<IEnumerable<TSysReport>> GetReportsByTargetAsync(Guid targetUserId, long archiveId)
     {
         const string sql = @"
@@ -66,6 +72,32 @@ public class SysReportRepository : _BaseRepository
           AND archive_id = @archive_id 
         ORDER BY report_tim DESC";
         return await QueryAsync<TSysReport>(sql, new { target_user_id = targetUserId, archive_id = archiveId });
+    }
+
+    /// <summary>
+    /// ログインユーザーが通報した内容をアーカイブIDで絞り込んで取得
+    /// </summary>
+    public async Task<TSysReport?> GetMyReportByArchiveIdAsync(long archiveId)
+    {
+        const string sql = @"
+            SELECT * FROM t_sys_reports 
+            WHERE reporter_user_id = @user_id 
+              AND archive_id = @archive_id";
+
+        return await QuerySingleOrDefaultAsync<TSysReport>(sql, new { user_id = _user.UserId, archive_id = archiveId });
+    }
+
+    /// <summary>
+    /// 自分が特定のアーカイブに対して行った通報を物理削除
+    /// </summary>
+    public async Task<int> DeletePhysicalAsync(long archiveId)
+    {
+        const string sql = @"
+            DELETE FROM t_sys_reports 
+            WHERE reporter_user_id = @user_id 
+              AND archive_id        = @archive_id";
+
+        return await ExecuteAsync(sql, new { user_id = _user.UserId, archive_id = archiveId });
     }
 
 }

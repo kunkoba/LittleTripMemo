@@ -277,64 +277,97 @@ const DialogController = {
     // （システム）アプリ情報
     ShowAppInfo() {
         const el = $Dom.GenerateTemplate("tpl-app-info");
+        // $Const.APP_INFO から情報を埋め込む
+        $Dom.QuerySelector('.js-app-name', el).textContent = $Const.APP_INFO.NAME;
+        $Dom.QuerySelector('.js-app-version', el).textContent = `Version ${$Const.APP_INFO.VERSION}`;
+        $Dom.QuerySelector('.js-app-developer', el).textContent = $Const.APP_INFO.DEVELOPER;
+        const linkOfficial = $Dom.QuerySelector('#link-info-official', el);
+        if ($Const.APP_INFO.OFFICIAL_SITE) {
+            linkOfficial.href = $Const.APP_INFO.OFFICIAL_SITE;
+        } else {
+            $Dom.ToggleShow(linkOfficial, false);
+        }
+        // systemInfo からスコア平均を取得して反映
+        const sysInfo = $App.AppData.Owner.systemInfo || {};
+        console.log(">sysInfo:", sysInfo);
+        const scoreAvg = sysInfo.score_avg || 0;
+        $Dom.QuerySelector('.js-app-score', el).textContent = `★ ${scoreAvg.toFixed(1)}`;
         $Dom.QuerySelector('#btn-info-review', el).onclick = () => this.ShowReviewList();
-        $Dom.QuerySelector('#btn-info-license', el).onclick = () => $Notice.Info("MIT License");
+        $Dom.QuerySelector('#btn-info-license', el).onclick = () => $Notice.Info($Const.APP_INFO.LICENSE || "No License Info");
         _DialogCore.open({
             title: "APP INFO",
             content: el,
-            buttons: [
-                // {
-                //     label: "CLOSE",
-                //     className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                //     closesDialog: true
-                // }
+            buttons:[
+                {
+                    label: "CLOSE",
+                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
+                    closesDialog: true
+                }
             ]
         });
     },
-    // アプリ評価・レビュー一覧
+    // アプリ評価・レビュー一覧（フィードバック一覧）
     ShowReviewList() {
         const el = $Dom.GenerateTemplate("tpl-review-list");
         const container = $Dom.QuerySelector(".js-review-container", el);
-        // ※APIからの取得結果を想定したモックデータ
-        const dummyReviews =[
-            { rating: 5, body: "とても使いやすいです！旅行の記録が楽しくなりました。", create_tim: "2026-04-20T10:00:00" },
-            { rating: 4, body: "シンプルで良い。環境エフェクトが好き。", create_tim: "2026-04-18T14:30:00" },
-            { rating: 5, body: "Awesome app!", create_tim: "2026-04-15T09:12:00" },
-            { rating: 5, body: "Awesome app!", create_tim: "2026-04-15T09:12:00" },
-            { rating: 5, body: "Awesome app!", create_tim: "2026-04-15T09:12:00" },
-            { rating: 5, body: "Awesome app!", create_tim: "2026-04-15T09:12:00" },
-            { rating: 5, body: "Awesome app!", create_tim: "2026-04-15T09:12:00" },
-        ];
-        dummyReviews.forEach(rev => {
-            const child = $Dom.GenerateTemplate("tpl-list-child-review");
-            $Dom.QuerySelector(".js-stars", child).textContent = "★".repeat(rev.rating) + "☆".repeat(5 - rev.rating);
-            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(rev.create_tim, "YYYY.MM.DD");
-            $Dom.QuerySelector(".js-body", child).textContent = rev.body;
-            container.appendChild(child);
-        });
+        // systemInfo からフィードバック情報を取得
+        const sysInfo = $App.AppData.Owner.systemInfo || {};
+        console.log(">sysInfo:", sysInfo);
+        const feedbackList = sysInfo.feedbacks ||[];
+        const scoreAvg = sysInfo.score_avg || 0;
+        $Dom.QuerySelector(".js-avg-score", el).textContent = scoreAvg.toFixed(1);
+        $Dom.QuerySelector(".js-avg-stars", el).textContent = "★".repeat(Math.round(scoreAvg)) + "☆".repeat(5 - Math.round(scoreAvg));
+        $Dom.QuerySelector(".js-total-reviews", el).textContent = `Recent ${feedbackList.length} feedbackList`;
+        if (feedbackList.length === 0) {
+            container.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
+        } else {
+            feedbackList.forEach(rev => {
+                const child = $Dom.GenerateTemplate("tpl-list-child-review");
+                const score = rev.score || 0;
+                $Dom.QuerySelector(".js-stars", child).textContent = "★".repeat(score) + "☆".repeat(5 - score);
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(rev.create_tim, "YYYY.MM.DD");
+                $Dom.QuerySelector(".js-body", child).textContent = rev.body || "（内容なし）";
+                container.appendChild(child);
+            });
+        }
         $Dom.QuerySelector('#btn-post-review', el).onclick = () => this.ShowReviewPost();
         _DialogCore.open({
-            title: "REVIEWS & RATINGS",
+            title: "FEEDBACKS",
             content: el,
-            buttons: [
+            buttons:[
                 { label: "BACK", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform", closesDialog: true }
             ]
         });
     },
-    // レビュー投稿画面
-    ShowReviewPost() {
+    // レビュー（フィードバック）投稿画面
+    async ShowReviewPost() {
+        // ★ ダイアログを開く前に自分の過去の投稿データを取得
+        const isSuccess = await $Data.Access.GetMyFeedback();
+        if (!isSuccess) return;
+        // 取得したデータがあれば初期値として設定
+        const myFeedback = $App.AppData.Owner.myFeedback;
+        let currentRating = myFeedback ? (myFeedback.score || 5) : 5;
+        let currentBody = myFeedback ? (myFeedback.body || "") : "";
         const el = $Dom.GenerateTemplate("tpl-review-post");
         const starContainer = $Dom.QuerySelector('#review-star-input', el);
         const inputRating = $Dom.QuerySelector('#input-review-rating', el);
         const inputBody = $Dom.QuerySelector('#input-review-body', el);
         const countBody = $Dom.QuerySelector('#review-text-count', el);
-        let currentRating = 5;
+        // 初期値の反映
+        inputRating.value = currentRating;
+        inputBody.value = currentBody;
+        countBody.textContent = currentBody.length;
         const stars =[];
         // 星ボタンの生成と制御
         for (let i = 1; i <= 5; i++) {
             const star = document.createElement("button");
             star.textContent = "★";
-            star.className = "outline-none transition-colors active:scale-90 text-yellow-500";
+            // 初期値の星の着色
+            if (i <= currentRating) {
+                star.className = "outline-none transition-colors active:scale-90 text-yellow-500";
+            } else {
+                star.className = "outline-none transition-colors active:scale-90 text-slate-200";
+            }
             star.onclick = () => {
                 currentRating = i;
                 inputRating.value = currentRating;
@@ -355,30 +388,37 @@ const DialogController = {
             countBody.textContent = inputBody.value.length;
         });
         _DialogCore.open({
-            title: "WRITE A REVIEW",
+            // データが既にあれば編集（EDIT）、なければ新規（WRITE）
+            title: myFeedback ? "EDIT FEEDBACK" : "WRITE FEEDBACK",
             content: el,
-            buttons: [
-                [
-                    {
-                        label: "CANCEL",
-                        className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
-                        closesDialog: true
-                    },
-                    {
-                        label: "SUBMIT",
-                        className: "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform",
-                        closesDialog: false,
-                        handler: async () => {
-                            const rating = Number(inputRating.value);
-                            const body = inputBody.value.trim();
-                            // ※ C#のAPIを叩く処理を追加
-                            // await $Data.Access.PostReview({ rating, body });
-                            $Notice.Info("レビューを投稿しました！");
-                            _DialogCore.close(); // 投稿画面を閉じる
-                        }
+            buttons: [[
+                {
+                    label: "CANCEL",
+                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    closesDialog: true
+                },
+                {
+                    label: "SUBMIT",
+                    className: "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform",
+                    closesDialog: false,
+                    handler: async () => {
+                        const rating = Number(inputRating.value);
+                        const body = inputBody.value.trim();
+                        const req = { body: body, score: rating };
+                        const isSubmitSuccess = await $Data.Access.UpsertFeedback(req);
+                        if (!isSubmitSuccess) return;
+                        console.log(">$App.AppData.Owner.myFeedback:", $App.AppData.Owner.myFeedback);
+                        $App.AppData.Owner.myFeedback.score = rating;
+                        $App.AppData.Owner.myFeedback.body = body;
+                        console.log($App.AppData.Owner.myFeedback);
+                        $Notice.Info("フィードバックを送信しました！");
+                        // 投稿ダイアログと一覧ダイアログを閉じて、最新の状態で一覧を開き直す
+                        _DialogCore.closeAll(); // 投稿を閉じる
+                        // システム情報を取得
+                        $Data.Access.GetSystemInfo();
                     }
-                ]
-            ]
+                }
+            ]]
         });
     },
     // アイコン選択ダイアログを表示
@@ -635,6 +675,10 @@ const DialogController = {
             // リストの上下の余白を少し調整
             root.className = "w-full text-black-3 mb-2 px-1";
             const archives = $Data.Store.GetArchiveList() ||[];
+            if (archives.length == 0){
+                $Notice.Warn("データはありません");
+                return;
+            }
             // is_public で分類
             const privateList = archives.filter(item => !item.is_public);
             const publicList  = archives.filter(item => item.is_public);
@@ -1156,30 +1200,57 @@ const DialogController = {
         } else {
             $Dom.ToggleShow(btnUserProfile, false);
         }
-        // メインアクションの制御
-        const actionArea = $Dom.QuerySelector('#view-mem-actions', el);
-        const btnMain = $Dom.QuerySelector('#btn-mem-action-main', el);
-        const btnRelease = $Dom.QuerySelector('#btn-mem-release', el);
-        $Dom.ToggleShow(actionArea, archive.is_owner);
+        // -----------------------------------------------------
+        // ダイアログフッターのボタン配列を構築（縦並びにするため配列をネストする）
+        // -----------------------------------------------------
+        const dialogButtons =[];
         if (archive.is_owner) {
+            const btnMainClass = "w-full bg-brand-5 text-white font-bold py-3 rounded-2xl text-[14px] shadow-md active:scale-95 transition-transform";
+            const btnReleaseClass = "w-full bg-white text-red-400 border border-brand-4 font-bold py-3 rounded-2xl text-[14px] shadow-sm active:scale-95 transition-transform";
             if (!archive.is_public) {
-                btnMain.textContent = "Private　⇒　Public";
-                btnMain.onclick = () => this._execStatusChange('PublishArchive', { archive_id: archive.archive_id }, "Switch to [Public]", "Do you want to make\nthis internal data [Public]？", "Set to [Public].", $Const.SCREEN_MODE.ARCHIVE_PUB);
-                btnRelease.textContent = "Archive　⇒　Details";
-                btnRelease.onclick = () => this._execStatusChange('DeleteArchive', { archive_id: archive.archive_id }, "Restore to Details", "Restore this group to\nindividual detail items？", "Restored to individual detail items.", $Const.SCREEN_MODE.CREATE);
+                // Private ⇒ Public
+                dialogButtons.push([{
+                    label: "Private　⇒　Public",
+                    className: btnMainClass,
+                    closesDialog: false,
+                    handler: () => this._execStatusChange('PublishArchive', { archive_id: archive.archive_id }, "Switch to [Public]", "Do you want to make\nthis internal data [Public]？", "Set to [Public].", $Const.SCREEN_MODE.ARCHIVE_PUB)
+                }]);
+                // Archive ⇒ Details
+                dialogButtons.push([{
+                    label: "Archive　⇒　Details",
+                    className: btnReleaseClass,
+                    closesDialog: false,
+                    handler: () => this._execStatusChange('DeleteArchive', { archive_id: archive.archive_id }, "Restore to Details", "Restore this group to\nindividual detail items？", "Restored to individual detail items.", $Const.SCREEN_MODE.CREATE)
+                }]);
             } else {
                 if (archive.closed_flg) {
-                    btnMain.textContent = "Close　⇒　Open";
-                    btnMain.onclick = () => this._execStatusChange('OpenArchive', { archive_id: archive.archive_id }, "Switch to [Open]", "Do you want to switch\nthis data to [Open]？", "Switched to [Open].", null, () => $Data.Store.UpdateArchive({ closed_flg: false }));
+                    // Close ⇒ Open
+                    dialogButtons.push([{
+                        label: "Close　⇒　Open",
+                        className: btnMainClass,
+                        closesDialog: false,
+                        handler: () => this._execStatusChange('OpenArchive', { archive_id: archive.archive_id }, "Switch to [Open]", "Do you want to switch\nthis data to [Open]？", "Switched to [Open].", null, () => $Data.Store.UpdateArchive({ closed_flg: false }))
+                    }]);
                 } else {
-                    btnMain.textContent = "Open　⇒　Close";
-                    btnMain.onclick = () => this._execStatusChange('CloseArchive', { archive_id: archive.archive_id }, "Switch to [Close]", "Do you want to switch\nthis data to [Close]？", "Switched to [Close].", null, () => $Data.Store.UpdateArchive({ closed_flg: true }));
+                    // Open ⇒ Close
+                    dialogButtons.push([{
+                        label: "Open　⇒　Close",
+                        className: btnMainClass,
+                        closesDialog: false,
+                        handler: () => this._execStatusChange('CloseArchive', { archive_id: archive.archive_id }, "Switch to [Close]", "Do you want to switch\nthis data to [Close]？", "Switched to [Close].", null, () => $Data.Store.UpdateArchive({ closed_flg: true }))
+                    }]);
                 }
-                btnRelease.textContent = "Public　⇒　Private";
-                btnRelease.onclick = () => this._execStatusChange('UnpublishArchive', { archive_id: archive.archive_id }, "Switch to [Private]", "Do you want to revert\nthis data to Private？", "Reverted to [Private].", $Const.SCREEN_MODE.ARCHIVE);
+                // Public ⇒ Private
+                dialogButtons.push([{
+                    label: "Public　⇒　Private",
+                    className: btnReleaseClass,
+                    closesDialog: false,
+                    handler: () => this._execStatusChange('UnpublishArchive', { archive_id: archive.archive_id }, "Switch to [Private]", "Do you want to revert\nthis data to Private？", "Reverted to [Private].", $Const.SCREEN_MODE.ARCHIVE)
+                }]);
             }
         }
-        const frame = _DialogCore.open({ title: "", content: el, buttons: [] });
+        // _DialogCore に構築したボタン配列を渡す
+        const frame = _DialogCore.open({ title: "", content: el, buttons: dialogButtons });
         // バッジと鉛筆ボタンの追加
         const titleContainer = $Dom.QuerySelector('#dialog-title', frame);
         const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
@@ -1352,26 +1423,6 @@ const DialogController = {
         });
     },
     // 通知詳細ダイアログ
-    ShowNoticeDetail_2(notice) {
-        const el = $Dom.GenerateTemplate('tpl-view-notice');
-        const icon = $Const.NOTICE_ICONS[notice.kind] || '📢';
-        $Dom.QuerySelector('#view-notice-icon', el).textContent = icon;
-        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, "YYYY.MM.DD HH:mm");
-        $Dom.QuerySelector('#view-notice-title', el).textContent = notice.title;
-        $Dom.QuerySelector('#view-notice-body', el).textContent = notice.body;
-        _DialogCore.open({
-            title: "NOTICE DETAILS",
-            content: el,
-            buttons:[
-                {
-                    label: "BACK",
-                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
-                    closesDialog: true
-                }
-            ]
-        });
-    },
-    // 通知詳細ダイアログ
     ShowNoticeDetail(notice) {
         // ...既存コードそのまま...
         const el = $Dom.GenerateTemplate('tpl-view-notice');
@@ -1388,24 +1439,22 @@ const DialogController = {
     },
     // 通知一覧ダイアログ（API通信化）
     async ShowNoticeList() {
-        const isSuccess = await $Data.Access.GetActiveNotifications({});
-        if (!isSuccess) return;
-        const notices = $Data.Store.GetNotifications() ||[];
+        const notices = $App.AppData.Owner.systemInfo.notifications ||[];
+        if (notices.length === 0) {
+            $Notice.Warn("データはありません");
+            return;
+        }
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         root.className = "w-full text-black-3 mb-2 px-1";
-        if (notices.length === 0) {
-            root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">通知はありません</div>`;
-        } else {
-            notices.forEach(item => {
-                const child = $Dom.GenerateTemplate("tpl-list-child-notice");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, "YYYY.MM.DD");
-                const icon = $Const.NOTICE_ICONS[item.kind] || '📢';
-                $Dom.QuerySelector(".js-title", child).textContent = `${icon} ${item.title}`;
-                $Dom.QuerySelector(".js-body", child).textContent = item.body;
-                child.onclick = () => this.ShowNoticeDetail(item);
-                root.appendChild(child);
-            });
-        }
+        notices.forEach(item => {
+            const child = $Dom.GenerateTemplate("tpl-list-child-notice");
+            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, "YYYY.MM.DD");
+            const icon = $Const.NOTICE_ICONS[item.kind] || '📢';
+            $Dom.QuerySelector(".js-title", child).textContent = `${icon} ${item.title}`;
+            $Dom.QuerySelector(".js-body", child).textContent = item.body;
+            child.onclick = () => this.ShowNoticeDetail(item);
+            root.appendChild(child);
+        });
         _DialogCore.open({
             title: "NOTIFICATIONS", content: root,
             buttons:[ { label: "CLOSE", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider", closesDialog: true } ]
@@ -1423,7 +1472,7 @@ const DialogController = {
     async ShowAdminNoticeList() {
         const isSuccess = await $Data.Access.GetAllNotifications({});
         if (!isSuccess) return;
-        const notices = $Data.Store.GetNotifications() ||[];
+        const notices = $App.AppData.Admin.notifications ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         root.className = "w-full text-black-3 mb-2 px-1";
         const renderList = async () => {
@@ -1482,75 +1531,6 @@ const DialogController = {
             headerActions.prepend(addBtn);
         }
     },
-    // 【管理者機能】通知管理リスト
-    ShowAdminNoticeList_2() {
-        // --- 追加：管理者用ダミーデータモック（上部やモジュールスコープ内など） ---
-        let _adminDummyNotices =[
-            { seq: 1, title: "システムメンテナンスのお知らせ", body: "明日深夜2時からサーバーのメンテナンスを行います。アプリの利用が一時的に制限されます。", kind: 1, disp_from: "2026-04-25T10:00", disp_to: "2026-05-25T10:00", update_tim: "2026-04-25T10:00:00" },
-            { seq: 2, title: "バージョン1.1.0リリース！", body: "まとめ親の公開機能や、新しい環境エフェクトが追加されました。ぜひご利用ください。", kind: 0, disp_from: "2026-04-10T12:30", disp_to: "2026-04-20T12:30", update_tim: "2026-04-10T12:30:00" },
-            { seq: 3, title: "利用規約の改定について", body: "2026年4月1日より利用規約の一部を改定いたします。詳細をご確認ください。", kind: 0, disp_from: "2026-03-15T09:00", disp_to: "2099-12-31T23:59", update_tim: "2026-03-15T09:00:00" },
-        ];
-        const root = $Dom.GenerateTemplate("tpl-list-parent");
-        root.className = "w-full text-black-3 mb-2 px-1";
-        const renderList = () => {
-            root.innerHTML = "";
-            if (_adminDummyNotices.length === 0) {
-                root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">通知データがありません</div>`;
-                return;
-            }
-            const now = new Date();
-            // update_tim 降順でソート（疑似）
-            const sorted = [..._adminDummyNotices].sort((a, b) => new Date(b.update_tim) - new Date(a.update_tim));
-            sorted.forEach(item => {
-                const child = $Dom.GenerateTemplate("tpl-admin-list-child-notice");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, "YYYY.MM.DD HH:mm");
-                const icon = $Const.NOTICE_ICONS[item.kind] || '📢';
-                $Dom.QuerySelector(".js-title", child).textContent = `${icon} ${item.title}`;
-                $Dom.QuerySelector(".js-body", child).textContent = item.body;
-                // 公開中判定 (disp_from 〜 disp_to と現在時刻を比較)
-                const fromDate = new Date(item.disp_from);
-                const toDate = new Date(item.disp_to);
-                const isPublic = (now >= fromDate && now <= toDate);
-                const badge = $Dom.QuerySelector(".js-badge-status", child);
-                if (isPublic) {
-                    badge.textContent = "公開中";
-                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-brand-3 bg-brand-5 text-white";
-                } else if (now < fromDate) {
-                    badge.textContent = "公開前";
-                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-slate-300 bg-slate-100 text-slate-500";
-                } else {
-                    badge.textContent = "公開終了";
-                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-slate-300 bg-slate-500 text-white";
-                }
-                // クリックで編集ダイアログを開く
-                child.onclick = () => {
-                    this.ShowAdminNoticeEdit(item, () => renderList());
-                };
-                root.appendChild(child);
-            });
-        };
-        renderList();
-        const frame = _DialogCore.open({
-            title: "NOTICE Mgmt",
-            content: root,
-            buttons:[
-                {
-                    label: "CLOSE",
-                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
-                    closesDialog: true
-                }
-            ]
-        });
-        // 新規登録ボタンをヘッダー右上のアクション領域に追加
-        const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
-        if (headerActions) {
-            const addBtn = document.createElement('button');
-            addBtn.className = "w-8 h-8 bg-brand-5 rounded-xl shadow-sm text-white flex items-center justify-center active:scale-95 text-[18px] border border-brand-5 transition-transform";
-            addBtn.innerHTML = "＋";
-            addBtn.onclick = () => this.ShowAdminNoticeEdit(null, renderList);
-            headerActions.prepend(addBtn);
-        }
-    },
     // 通知の編集・新規登録（API通信化）
     ShowAdminNoticeEdit(noticeItem, onSaved) {
         const isNew = !noticeItem;
@@ -1599,14 +1579,14 @@ const DialogController = {
     async ShowAdminReportList() {
         const isSuccess = await $Data.Access.GetReportSummary({ min_count: 0 });
         if (!isSuccess) return;
-        const reportSummaries = $Data.Store.GetReportSummaries() ||[];
+        const reportSummary = $App.AppData.Admin.reportSummary ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         root.className = "w-full text-black-3 mb-2 px-1";
-        if (reportSummaries.length === 0) {
+        if (reportSummary.length === 0) {
             root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">通報データはありません</div>`;
         } else {
             // 通報件数の多い順にソート
-            const sorted = [...reportSummaries].sort((a, b) => b.report_count - a.report_count);
+            const sorted = [...reportSummary].sort((a, b) => b.report_count - a.report_count);
             sorted.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-summary");
                 $Dom.QuerySelector(".js-target-user", child).textContent = `Target: ${item.target_user_name || item.target_user_id}`;
@@ -1636,7 +1616,6 @@ const DialogController = {
             await $App.RefreshScreen();
         };
         const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
-        // レポート詳細は Store から取得 (GetReportSummary または GetSystemInfo 時にまとめて取得されている前提)
         const reports = ($Data.Store.GetReports() ||[]).filter(r => r.archive_id === summaryItem.archive_id);
         if (reports.length === 0) {
             listContainer.innerHTML = `<div class="text-[12px] text-slate-400 p-2">詳細データがありません</div>`;
@@ -1654,52 +1633,56 @@ const DialogController = {
             buttons:[ { label: "BACK", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform", closesDialog: true } ]
         });
     },
-    // 【管理者機能】フィードバック一覧（無限スクロール）
+    // 管理者：フィードバックリスト（無限スクロール）
     async ShowAdminFeedbackList() {
-        const root = $Dom.GenerateTemplate("tpl-list-parent");
-        // スクロール検知のために高さを固定し、overflow-y-auto を付与
-        root.className = "w-full text-black-3 mb-2 px-1 h-[60vh] overflow-y-auto";
         let skip = 0;
         const take = 100;
+        // ★ 実行時に即データアクセスし、エラーの場合は開かずに終了
+        const isSuccess = await $Data.Access.GetAllFeedback({ skip, take });
+        if (!isSuccess) return;
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        root.className = "w-full text-black-3 mb-2 px-1 h-[60vh] overflow-y-auto";
         let isLoading = false;
         let hasMore = true;
-        // データ取得＆DOM追加関数
-        const loadMore = async () => {
-            if (isLoading || !hasMore) return;
-            isLoading = true;
-            // skip, take をパラメータとして渡す
-            const isSuccess = await $Data.Access.GetAllFeedback({ skip, take });
-            if (!isSuccess) {
-                isLoading = false;
-                return;
-            }
-            // fetchごとに Store 内のフィードバックリストが更新(上書き)される想定
-            const items = $Data.Store.GetFeedbackList() ||[];
-            if (items.length < take) {
-                hasMore = false; // 取得件数がtake未満なら終端
-            }
+        const renderItems = (items) => {
             items.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");
-                // ※ 日付プロパティ名はAPIの実装に合わせます（create_tim想定）
                 $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim || new Date(), "YYYY.MM.DD HH:mm");
                 $Dom.QuerySelector(".js-score", child).textContent = `Score: ${item.score || 0}`;
                 $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
                 root.appendChild(child);
             });
+        };
+        // 初回取得分の描画
+        const initialItems = $App.AppData.Admin.feedbackList ||[];
+        if (initialItems.length < take) hasMore = false;
+        renderItems(initialItems);
+        skip += take;
+        // 追加読み込み処理
+        const loadMore = async () => {
+            if (isLoading || !hasMore) return;
+            isLoading = true;
+            const isLoadSuccess = await $Data.Access.GetAllFeedback({ skip, take });
+            if (!isLoadSuccess) { 
+                isLoading = false; 
+                return; 
+            }
+            const newItems = $App.AppData.Admin.feedbackList ||[];
+            if (newItems.length < take) hasMore = false;
+            renderItems(newItems);
             skip += take;
             isLoading = false;
         };
-        // スクロールイベント：最下部付近で次をロード
+        // スクロール検知
         root.addEventListener('scroll', () => {
-            if (root.scrollTop + root.clientHeight >= root.scrollHeight - 50) {
-                loadMore();
-            }
+            // スクロール最下部付近で追加ロード
+            if (root.scrollTop + root.clientHeight >= root.scrollHeight - 50) loadMore();
         });
-        // 初回ロード
-        await loadMore();
+        // 1件もない場合の表示
         if (root.children.length === 0) {
             root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
         }
+        // ダイアログを開く
         _DialogCore.open({
             title: "FEEDBACK Mgmt",
             content: root,

@@ -32,11 +32,11 @@ public class DetailRepository : _BaseRepository
         string sql = $@"
             INSERT INTO t_memo_detail_{_user.TableId} (
                 archive_id, user_id, latitude, longitude, title, body, 
-                memo_date, memo_time, face_emoji, weather_emoji, link_url, 
+                memo_date, memo_time, face_emoji, weather_code, link_url, 
                 memo_price, create_tim, update_tim
             ) VALUES (
                 @archive_id, @user_id, @latitude, @longitude, @title, @body, 
-                @memo_date, @memo_time, @face_emoji, @weather_emoji, @link_url, 
+                @memo_date, @memo_time, @face_emoji, @weather_code, @link_url, 
                 @memo_price, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
             ) RETURNING seq";
 
@@ -59,7 +59,7 @@ public class DetailRepository : _BaseRepository
                 memo_date    = @memo_date,
                 memo_time    = @memo_time,
                 face_emoji   = @face_emoji,
-                weather_emoji = @weather_emoji,
+                weather_code = @weather_code,
                 link_url     = @link_url,
                 memo_price   = @memo_price,
                 update_tim   = CURRENT_TIMESTAMP
@@ -89,7 +89,7 @@ public class DetailRepository : _BaseRepository
                     memo_date     = @memo_date,
                     memo_time     = @memo_time,
                     face_emoji    = @face_emoji,
-                    weather_emoji = @weather_emoji,
+                    weather_code = @weather_code,
                     link_url      = @link_url,
                     memo_price    = @memo_price,
                     update_tim    = CURRENT_TIMESTAMP

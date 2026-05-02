@@ -81,7 +81,7 @@ public class PublishArchiveService : _BaseService
                     memo_date = detail.memo_date,
                     memo_time = detail.memo_time,
                     face_emoji = detail.face_emoji,
-                    weather_emoji = detail.weather_emoji,
+                    weather_code = detail.weather_code,
                     link_url = detail.link_url,
                     memo_price = detail.memo_price,
                     closed_flg = false,     // 初期値はfalse

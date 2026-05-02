@@ -19,12 +19,12 @@ public class SysNotificationRepository : _BaseRepository
     public async Task<IEnumerable<TSysNotification>> GetActiveNotificationsAsync()
     {
         const string sql = @"
-            SELECT * FROM t_sys_notifications 
-            WHERE CURRENT_TIMESTAMP BETWEEN disp_from AND disp_to 
-              AND kind > 0
-            ORDER BY update_tim DESC";
+        SELECT * FROM t_sys_notifications 
+        WHERE disp_from <= @now 
+          AND disp_to   >= @now 
+        ORDER BY update_tim DESC";
 
-        return await QueryAsync<TSysNotification>(sql);
+        return await QueryAsync<TSysNotification>(sql, new { now = DateTime.Now });
     }
 
     /// <summary>

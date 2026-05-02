@@ -43,7 +43,7 @@ public class SysFeedbackRepository : _BaseRepository
     /// <summary>
     /// フィードバックを範囲指定で取得（更新日時降順）
     /// </summary>
-    public async Task<IEnumerable<TSysFeedback>> GetFeedbacksAsync(int offset = 0, int limit = 50)
+    public async Task<IEnumerable<TSysFeedback>> GetAllFeedbacksAsync(int offset = 0, int limit = 50)
     {
         const string sql = @"
             SELECT * FROM t_sys_feedbacks 
@@ -51,6 +51,18 @@ public class SysFeedbackRepository : _BaseRepository
             LIMIT @limit OFFSET @offset";
 
         return await QueryAsync<TSysFeedback>(sql, new { limit, offset });
+    }
+
+    /// <summary>
+    /// 自分のフィードバックをリスト形式で取得
+    /// </summary>
+    public async Task<TSysFeedback?> GetMyFeedbacksAsync()
+    {
+        const string sql = @"
+            SELECT * FROM t_sys_feedbacks 
+            WHERE user_id = @user_id";
+
+        return await QuerySingleOrDefaultAsync<TSysFeedback>(sql, new { user_id = _user.UserId });
     }
 
     /// <summary>

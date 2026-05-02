@@ -2,6 +2,7 @@
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
+using LittleTripMemo.Services.Sys;
 
 namespace LittleTripMemo.Services;
 
@@ -12,18 +13,22 @@ namespace LittleTripMemo.Services;
 public class GetUnMergeDetailsService : _BaseService
 {
     private readonly DetailRepository _detailRepo;
+    private readonly GetSystemInfoService _getSystemInfoService; // 追加
 
-    //public record Request();
     public class GetUnMergeDetailsReq { }
 
-    public record Response(IEnumerable<TMemoDetail> details);
+    public record Response(
+        IEnumerable<TMemoDetail> details
+        );
 
     public GetUnMergeDetailsService(
         UserContext userContext,
-        DetailRepository detailRepo)
+        DetailRepository detailRepo,
+        GetSystemInfoService getSystemInfoService) // DI追加
         : base(userContext)
     {
         _detailRepo = detailRepo;
+        _getSystemInfoService = getSystemInfoService;
     }
 
     /// <summary>
@@ -31,12 +36,11 @@ public class GetUnMergeDetailsService : _BaseService
     /// </summary>
     public async Task<Response> ExecuteAsync(GetUnMergeDetailsReq req)
     {
-        // 1. 検証
         await ValidateAsync();
-
-        // 2. 取得
+     
+        // 1. 未まとめ明細取得
         var details = await _detailRepo.GetUnMergedAsync();
-        //SetAppFlags(details);
+        SetAppFlags(details);
 
         return new Response(details);
     }

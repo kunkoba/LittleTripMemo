@@ -18,7 +18,7 @@ const AppManager = {
         },
         Admin: {
             notifications: [],
-            reportSummaries: [],
+            reportSummary: [],
             reports:[],
             feedbackList:[]
         }
@@ -110,8 +110,6 @@ const AppManager = {
             if (ret) {
                 this.AppData.System.IsLoggedIn = true;
                 this._saveSettings();
-                // ▼ 追加：ログイン成功直後にシステム情報を取得
-                await $Data.Access.GetSystemInfo();
                 $Notice.Info("Login successful！");
                 return true;
             }
@@ -128,10 +126,6 @@ const AppManager = {
         $UI.Init();
         this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
         this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD);
-        // ▼ 追加：起動時にトークンがあればシステム情報を取得（1度きり）
-        if (this.AppData.Owner.Token) {
-            await $Data.Access.GetSystemInfo();
-        }
         this.AppData.System.ScreenMode = new URLSearchParams(location.search).get("mode") ?? $Const.SCREEN_MODE.CREATE;
         this.AppData.System.ArchiveId = new URLSearchParams(location.search).get("archiveId");
         this.RefreshScreen();
@@ -170,6 +164,8 @@ const AppManager = {
             case $Const.SCREEN_MODE.CREATE:
                 isSuccess = await $Data.Access.GetUnMergeDetails({});
                 if (!isSuccess) return;
+                // システム情報を取得
+                $Data.Access.GetSystemInfo();
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
                 if (!archiveId) {

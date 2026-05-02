@@ -94,7 +94,7 @@
                 </div>
             </div>
             <!-- ■　Toast を積み上げるコンテナ -->
-            <div id="toast-container" class="pt-2 _fixed _top-[100px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
+            <div id="toast-container-2" class="pt-2 _fixed _top-[100px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
         </div>
         <!-- ■　メイン画面：地図＋詳細パネル -->
         <div class="absolute bottom-0 flex h-screen w-screen overflow-hidden flex-col md:flex-row">
@@ -153,7 +153,7 @@
                             </div>
 
                             <!-- 隠し項目 -->
-                            <span id="detail-display-weather_emoji" class="hidden"></span>
+                            <span id="detail-display-weather_code" class="hidden"></span>
 
                             <!-- 下段：タイトル・本文 -->
                             <div class="bg-brand-1 rounded-2xl p-4 shadow-sm">
@@ -198,7 +198,7 @@
                                 <div class="flex items-center justify-between border-b-2 border-brand-2 pb-1">
                                     <button id="btn-atmosphere-trigger" type="button" class="h-[30px] w-full text-right outline-none active:scale-95 font-bold text-brand-5 text-[16px] tracking-widest">
                                         <span id="span-atmosphere-preview">0000</span>
-                                        <input name="weather_emoji" id="detail-edit-weather_emoji" type="hidden">
+                                        <input name="weather_code" id="detail-edit-weather_code" type="hidden">
                                     </button>
                                 </div>
                             </div>
@@ -381,7 +381,7 @@
         <div id="ui-dialog-backdrop" class="z-[1999] fixed inset-0 hidden"></div>
 
         <!-- ■　Toast を積み上げるコンテナ -->
-        <div id="toast-container2" class="fixed top-[100px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
+        <div id="toast-container" class="fixed top-[20px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
 
         <!-- 【マップ】ポップアップ -->
         <template id="tpl-marker-popup">

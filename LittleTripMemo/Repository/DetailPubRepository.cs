@@ -17,11 +17,11 @@ public class DetailPubRepository : _BaseRepository
         const string sql = @"
             INSERT INTO t_memo_detail_pub (
                 archive_id, seq, user_id, latitude, longitude, title, body,
-                memo_date, memo_time, face_emoji, weather_emoji, link_url,
+                memo_date, memo_time, face_emoji, weather_code, link_url,
                 memo_price, del_flg, create_tim, update_tim
             ) VALUES (
                 @archive_id, @seq, @user_id, @latitude, @longitude, @title, @body,
-                @memo_date, @memo_time, @face_emoji, @weather_emoji, @link_url,
+                @memo_date, @memo_time, @face_emoji, @weather_code, @link_url,
                 @memo_price, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
             )";
         return await ExecuteAsync(sql, detail);
@@ -40,7 +40,7 @@ public class DetailPubRepository : _BaseRepository
                 memo_date    = @memo_date,
                 memo_time    = @memo_time,
                 face_emoji   = @face_emoji,
-                weather_emoji = @weather_emoji,
+                weather_code = @weather_code,
                 link_url     = @link_url,
                 memo_price   = @memo_price,
                 update_tim   = CURRENT_TIMESTAMP

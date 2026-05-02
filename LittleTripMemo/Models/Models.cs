@@ -39,7 +39,7 @@ public class TMemoArchivePub : IAppRecord
 
 public class TMemoDetail : IAppRecord
 {
-    public int seq { get; set; }
+    public long seq { get; set; }
     public int archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
     public decimal latitude { get; set; }
@@ -48,8 +48,8 @@ public class TMemoDetail : IAppRecord
     public string body { get; set; } = string.Empty;
     public string memo_date { get; set; } = string.Empty;
     public string memo_time { get; set; } = string.Empty;
-    public string face_emoji { get; set; }
-    public string weather_emoji { get; set; }
+    public string face_emoji { get; set; } = string.Empty;
+    public string weather_code { get; set; } = string.Empty;
     public string? link_url { get; set; } = string.Empty;
     public int memo_price { get; set; } = 0;
     public bool del_flg { get; set; } = false;
@@ -63,7 +63,7 @@ public class TMemoDetail : IAppRecord
 public class TMemoDetailPub : IAppRecord
 {
     public int archive_id { get; set; } = 0;
-    public int seq { get; set; }
+    public long seq { get; set; }
     public Guid user_id { get; set; }
     public decimal latitude { get; set; }
     public decimal longitude { get; set; }
@@ -71,8 +71,8 @@ public class TMemoDetailPub : IAppRecord
     public string? body { get; set; } = string.Empty;
     public string memo_date { get; set; } = string.Empty;
     public string memo_time { get; set; } = string.Empty;
-    public string face_emoji { get; set; }
-    public string weather_emoji { get; set; }
+    public string face_emoji { get; set; } = string.Empty;
+    public string weather_code { get; set; } = string.Empty;
     public string? link_url { get; set; } = string.Empty;
     public int memo_price { get; set; } = 0;
     public bool closed_flg { get; set; } = false;
@@ -91,7 +91,7 @@ public class TMemoDetailPub : IAppRecord
 public class TReactionPub
 {
     public int archive_id { get; set; } = 0;
-    public int seq { get; set; }
+    public long seq { get; set; }
     public Guid user_id { get; set; }
     public int reaction_type { get; set; } = 0;
 }
@@ -138,7 +138,7 @@ public class TReactionPub
     /// </summary>
     public class DtoArchive
     {
-        public int archive_id { get; set; } = 0;
+        public long archive_id { get; set; } = 0;
         public Guid user_id { get; set; }
         public string title { get; set; } = string.Empty;
         public string memo { get; set; } = string.Empty;

@@ -127,11 +127,14 @@ builder.Services.AddScoped<BulkSyncDetailsService>();
 builder.Services.AddScoped<UpsertFeedbackService>();
 builder.Services.AddScoped<UpsertReportService>();
 builder.Services.AddScoped<GetSystemInfoService>();
-builder.Services.AddScoped<GetFeedbackService>();
+builder.Services.AddScoped<GetAllFeedbackService>();
 builder.Services.AddScoped<UpsertNotificationService>();
 builder.Services.AddScoped<GetReportSummaryService>();
 builder.Services.AddScoped<GetAllNotificationsService>();
 builder.Services.AddScoped<GetReportDetailsService>();
+builder.Services.AddScoped<GetMyFeedbackService>();
+builder.Services.AddScoped<GetMyReportService>();
+builder.Services.AddScoped<DeleteMyReportService>();
 
 
 // ======================================================================
@@ -166,52 +169,48 @@ builder.Services.AddControllers()
     });
 
 
-// ======================================================================
-// ■ API メタデータ（Swagger 用・本体非依存）
-// ======================================================================
+//// ======================================================================
+//// ■ API メタデータ（Swagger 用・本体非依存）
+//// ======================================================================
+//// Controller / Minimal API の定義を収集し、
+//// OpenAPI 仕様生成の材料を提供する
+//builder.Services.AddEndpointsApiExplorer();
 
-// Controller / Minimal API の定義を収集し、
-// OpenAPI 仕様生成の材料を提供する
-builder.Services.AddEndpointsApiExplorer();
 
-
-// ======================================================================
-// ■ Swagger（開発・デバッグ用）
-// ======================================================================
-
-// API 仕様確認用。本番では UI を出さない
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1",
-        new OpenApiInfo { Title = "LittleTripMemo", Version = "v1" });
-
-    // JWT 認証用ヘッダ定義
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "JWTトークンを入力"
-    });
-
-    // 全APIで JWT を必須にする
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
-});
+//// ======================================================================
+//// ■ Swagger（開発・デバッグ用）
+//// ======================================================================
+//// API 仕様確認用。本番では UI を出さない
+//builder.Services.AddSwaggerGen(c =>
+//{
+//    c.SwaggerDoc("v1",
+//        new OpenApiInfo { Title = "LittleTripMemo", Version = "v1" });
+//    // JWT 認証用ヘッダ定義
+//    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+//    {
+//        Name = "Authorization",
+//        Type = SecuritySchemeType.Http,
+//        Scheme = "Bearer",
+//        BearerFormat = "JWT",
+//        In = ParameterLocation.Header,
+//        Description = "JWTトークンを入力"
+//    });
+//    // 全APIで JWT を必須にする
+//    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+//    {
+//        {
+//            new OpenApiSecurityScheme
+//            {
+//                Reference = new OpenApiReference
+//                {
+//                    Type = ReferenceType.SecurityScheme,
+//                    Id = "Bearer"
+//                }
+//            },
+//            Array.Empty<string>()
+//        }
+//    });
+//});
 
 
 // ======================================================================
@@ -302,12 +301,13 @@ var app = builder.Build();
 // 全体例外を JSON レスポンスに変換
 app.UseMiddleware<ExceptionHandling>();
 
-// Swagger UI（開発時のみ）
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+//// Swagger UI（開発時のみ）
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
 
 
 // ======================================================================

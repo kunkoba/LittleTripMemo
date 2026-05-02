@@ -179,7 +179,6 @@ window.$Util = {
             if (!data.display_name) {
                 return "Address not found";
             }
-            console.log("--GetAddressName:", lat + ',' + lng, data);
             // 住所文字列の分割処理
             const parts = data.display_name.split(',').map(p => p.trim());
             // 住所要素の抽出
