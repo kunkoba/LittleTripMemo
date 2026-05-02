@@ -38,16 +38,20 @@ const _DialogCore = {
         btnCloseX.onclick = () => this.close();
         if (buttons && buttons.length > 0) {
             buttons.forEach(rowDef => {
-                // 配列ならそのままアイテムリスト、オブジェクトなら行設定＋itemsと解釈
                 const isArray = Array.isArray(rowDef);
                 const items = isArray ? rowDef : (rowDef.items || [rowDef]);
                 const rowDiv = document.createElement("div");
                 rowDiv.className = "w-full flex gap-3";
                 if (!isArray && rowDef.rowId) rowDiv.id = rowDef.rowId;
                 if (!isArray && rowDef.isHidden) rowDiv.classList.add("hidden");
+                const sizeClass = items.length > 1 ? "flex-1" : "w-full";
+                const baseClass = `${sizeClass} font-black text-[14px] h-12 rounded-2xl uppercase active:scale-95 transition-transform`;
+                const defaultColorClass = "bg-brand-5 text-white shadow-md";
                 items.forEach(btnDef => {
                     const btn = document.createElement("button");
-                    btn.className = btnDef.className || "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform";
+                    btn.className = btnDef.className
+                        ? `${baseClass} ${btnDef.className}`
+                        : `${baseClass} ${defaultColorClass}`;
                     btn.textContent = btnDef.label;
                     if (btnDef.id) btn.id = btnDef.id;
                     if (btnDef.isHidden) btn.classList.add("hidden");
@@ -95,7 +99,6 @@ const _DialogCore = {
         // ...
     },
 };
-
 // 窓口
 const DialogController = {
     // 【共通】汎用的な確認ダイアログを表示する
@@ -117,7 +120,7 @@ const DialogController = {
                     [
                         {
                             label: "CANCEL",
-                            className: "flex-1 bg-slate-400 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                            className: "bg-slate-400 text-white shadow-sm",
                             handler: () => { isResolved = true; resolve(false); }
                         },
                         {
@@ -297,13 +300,7 @@ const DialogController = {
         _DialogCore.open({
             title: "APP INFO",
             content: el,
-            buttons:[
-                {
-                    label: "CLOSE",
-                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
-                    closesDialog: true
-                }
-            ]
+            buttons:[]
         });
     },
     // アプリ評価・レビュー一覧（フィードバック一覧）
@@ -330,12 +327,19 @@ const DialogController = {
                 container.appendChild(child);
             });
         }
-        $Dom.QuerySelector('#btn-post-review', el).onclick = () => this.ShowReviewPost();
+        // $Dom.QuerySelector('#btn-post-review', el).onclick = () => this.ShowReviewPost();
         _DialogCore.open({
             title: "FEEDBACKS",
             content: el,
             buttons:[
-                { label: "BACK", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform", closesDialog: true }
+                {
+                    label: "Write Feedback",
+                    className: "bg-brand-5 text-white shadow-md",
+                    closesDialog: false,
+                    handler: async () => {
+                        this.ShowReviewPost();
+                    }
+                }
             ]
         });
     },
@@ -394,12 +398,12 @@ const DialogController = {
             buttons: [[
                 {
                     label: "CANCEL",
-                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    className: "bg-slate-200 text-slate-500 shadow-sm",
                     closesDialog: true
                 },
                 {
                     label: "SUBMIT",
-                    className: "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform",
+                    className: "bg-brand-5 text-white shadow-md",
                     closesDialog: false,
                     handler: async () => {
                         const rating = Number(inputRating.value);
@@ -459,12 +463,11 @@ const DialogController = {
         // グリッド描画処理
         const renderGrid = () => {
             const combinedList = [...new Set([...emojiList, ...history])].slice(0, 50);
-            combinedGrid.innerHTML = combinedList.map(e => 
+            combinedGrid.innerHTML = combinedList.map(e =>
                 `<button class="w-10 h-10 rounded-xl hover:bg-slate-50 active:bg-slate-100 active:scale-90 flex items-center justify-center text-[28px] leading-none transition-all">
                     ${e}
                 </button>`
             ).join('');
-            
             $Dom.QuerySelectorAll('button', combinedGrid).forEach(btn => {
                 btn.onclick = () => {
                     // クリック時は入力欄に反映するだけ
@@ -483,19 +486,19 @@ const DialogController = {
             renderGrid();
         };
         // ダイアログを表示
-        _DialogCore.open({ 
-            title: "SELECT ICON", 
-            content: el, 
+        _DialogCore.open({
+            title: "SELECT ICON",
+            content: el,
             buttons: [
                 [
                     {
                         label: "CANCEL",
-                        className: "flex-1 bg-slate-100 text-slate-400 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                        className: "bg-slate-100 text-slate-400 shadow-sm",
                         closesDialog: true
                     },
                     {
                         label: "OK",
-                        className: "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform",
+                        className: "bg-brand-5 text-white shadow-md",
                         closesDialog: false,
                         handler: () => {
                             const val = inputCustom.value.trim();
@@ -573,21 +576,16 @@ const DialogController = {
         // Storeの機能を使って昇順にソート
         // $Data.Store.SortDetails("date", "asc");
         const details = $Data.Store.GetAllDetails();
-
         if (!details || details.length === 0) {
             $Notice.Warn("No data.");
             return;
         }
-
         const el = $Dom.GenerateTemplate("tpl-timeline-container");
         const listContainer = $Dom.QuerySelector(".js-list-container", el);
-        
         let currentDate = ""; // 現在描画中の日付を保持
-
         // すでにソート済みなので、上から順にループするだけでOK！
         details.forEach((item, index) => {
             const dateStr = (item.memo_date || "").replace(/-/g, '.');
-
             // 日付が変わったタイミングでだけヘッダーを差し込む
             if (currentDate !== dateStr) {
                 const header = $Dom.GenerateTemplate("tpl-timeline-date");
@@ -595,14 +593,12 @@ const DialogController = {
                 listContainer.appendChild(header);
                 currentDate = dateStr;
             }
-
             // アイテムの描画
             const child = $Dom.GenerateTemplate("tpl-timeline-item");
             $Dom.QuerySelector(".js-time", child).textContent = item.memo_time || "";
             $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
             $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
             $Dom.QuerySelector(".js-body", child).textContent = item.body || "";
-
             // 金額のセットと色分け
             const priceEl = $Dom.QuerySelector(".js-price", child);
             if (priceEl) {
@@ -614,23 +610,20 @@ const DialogController = {
                     priceEl.textContent = price.toLocaleString();
                     priceEl.className = "js-price text-[14px] font-black shrink-0 whitespace-nowrap text-red-500";
                 } else {
-                    priceEl.textContent = ""; 
+                    priceEl.textContent = "";
                 }
             }
-
-            child.onclick = () => { 
-                _DialogCore.closeAll(); 
+            child.onclick = () => {
+                _DialogCore.closeAll();
                 $Marker.SelectMarker(index); // details自体がソート済みなので、このindexをそのまま使える
             };
             listContainer.appendChild(child);
         });
-
-        _DialogCore.open({ 
-            title: "TRIP LOG", 
+        _DialogCore.open({
+            title: "TRIP LOG",
             content: el,
             buttons: []
         });
-
         setTimeout(() => {
             const activeFrame = _DialogCore.stack[_DialogCore.stack.length - 1];
             if (activeFrame) {
@@ -733,8 +726,8 @@ const DialogController = {
                     }
                     child.onclick = () => {
                         _DialogCore.closeAll();
-                        $App.AppData.System.ScreenMode = isPublicGroup 
-                            ? $Const.SCREEN_MODE.ARCHIVE_PUB 
+                        $App.AppData.System.ScreenMode = isPublicGroup
+                            ? $Const.SCREEN_MODE.ARCHIVE_PUB
                             : $Const.SCREEN_MODE.ARCHIVE;
                         $App.AppData.System.TargetArchiveId = item.archive_id;
                         $App.RefreshScreen();
@@ -788,9 +781,9 @@ const DialogController = {
                 leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800";
                 // アイテムクリック時の処理（追加確認 ＆ API実行）
                 child.onclick = async () => {
-                    const isOk = await this.ShowConfirm({ 
-                        title: "ADD", 
-                        message: `${seqs.length}件のアイテムを「${item.title}」に追加しますか？` 
+                    const isOk = await this.ShowConfirm({
+                        title: "ADD",
+                        message: `${seqs.length}件のアイテムを「${item.title}」に追加しますか？`
                     });
                     if (!isOk) return;
                     const params = { seqs: seqs, archive_id: item.archive_id };
@@ -896,7 +889,7 @@ const DialogController = {
                     {
                         id: "btn-ms-merge",
                         label: "⇄ MERGE",
-                        className: "flex-1 min-w-[40%] h-12 bg-brand-5 text-white rounded-xl font-bold text-[12px] uppercase shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2",
+                        className: "min-w-[40%] bg-brand-5 text-white shadow-md disabled:opacity-50 flex items-center justify-center gap-2",
                         closesDialog: false,
                         handler: async () => {
                             const seqs = Array.from(selectedSeqs);
@@ -917,7 +910,7 @@ const DialogController = {
                     {
                         id: "btn-ms-add",
                         label: "＋ ADD",
-                        className: "flex-1 min-w-[40%] h-12 bg-brand-5 text-white rounded-xl font-bold text-[12px] uppercase shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2",
+                        className: "min-w-[40%] bg-brand-5 text-white shadow-md disabled:opacity-50 flex items-center justify-center gap-2",
                         closesDialog: false, // 🌟 手動で制御するためfalse
                         handler: () => {
                             const seqs = Array.from(selectedSeqs);
@@ -989,14 +982,14 @@ const DialogController = {
                     currencyEl.textContent = "";
                 }
             }
-            child.onclick = () => { 
-                _DialogCore.closeAll(); 
-                $Marker.SelectMarker(index); 
+            child.onclick = () => {
+                _DialogCore.closeAll();
+                $Marker.SelectMarker(index);
             };
             el.appendChild(child);
         });
-        _DialogCore.open({ 
-            title: "SEARCH RESULTS", 
+        _DialogCore.open({
+            title: "SEARCH RESULTS",
             content: el,
             buttons: []
         });
@@ -1132,7 +1125,7 @@ const DialogController = {
                 [
                     {
                         label: "CANCEL",
-                        className: "flex-1 bg-slate-400 text-white font-black text-sm h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform"
+                        className: "bg-slate-400 text-white shadow-sm"
                         // onCloseが自動で呼ばれるのでhandlerは不要
                     },
                     {
@@ -1192,7 +1185,7 @@ const DialogController = {
         renderView();
         // ユーザー情報の制御
         const btnUserProfile = $Dom.QuerySelector('#btn-mem-user-profile', el);
-        const profile = $Data.Store.GetUserProfile(); 
+        const profile = $Data.Store.GetUserProfile();
         if (profile) {
             $Dom.QuerySelector('#view-mem-user-icon', el).textContent = profile.icon || "😀";
             $Dom.QuerySelector('#view-mem-user-id', el).textContent = profile.nickName;
@@ -1260,8 +1253,8 @@ const DialogController = {
         // バッジと鉛筆ボタンの追加
         const titleContainer = $Dom.QuerySelector('#dialog-title', frame);
         const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
-        let badgeHtml = (!archive.is_public) ? `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-500 text-white border border-gray-200 shadow-sm">Private</span>` : 
-                        (archive.closed_flg) ? `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-100 text-gray-500 border border-gray-200 shadow-sm">Close</span>` : 
+        let badgeHtml = (!archive.is_public) ? `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-500 text-white border border-gray-200 shadow-sm">Private</span>` :
+                        (archive.closed_flg) ? `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-100 text-gray-500 border border-gray-200 shadow-sm">Close</span>` :
                         `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-brand-2 text-brand-5 border border-blue-100 shadow-sm">Open</span>`;
         if (titleContainer) titleContainer.innerHTML = badgeHtml;
         if (archive.is_owner && headerActions) {
@@ -1270,7 +1263,7 @@ const DialogController = {
             editBtn.innerHTML = "✏️";
             // 編集ダイアログを「上に」開き、保存後に参照画面を描画し直す関数を渡す
             editBtn.onclick = () => this.ShowEditArchive(archive, renderView);
-            headerActions.prepend(editBtn); 
+            headerActions.prepend(editBtn);
         }
     },
     // まとめ親編集（上にスタックされる）
@@ -1280,12 +1273,10 @@ const DialogController = {
         const editBody = $Dom.QuerySelector('#edit-mem-body', el);
         const editUrl = $Dom.QuerySelector('#edit-mem-url', el);
         const editCurrency = $Dom.QuerySelector('#edit-mem-currency', el);
-
         editTitle.value = archive.title || "";
         editBody.value = archive.memo || "";
         editUrl.value = archive.link_url || "";
         editCurrency.value = archive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
-
         _DialogCore.open({
             title: "EDIT ARCHIVE",
             content: el,
@@ -1293,23 +1284,22 @@ const DialogController = {
                 [
                     {
                         label: "CANCEL",
-                        className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                        className: "bg-slate-200 text-slate-500 shadow-sm",
                         closesDialog: true
                     },
                     {
                         label: "SAVE DATA",
-                        className: "flex-1 bg-brand-4 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                        className: "bg-brand-4 text-white shadow-sm",
                         closesDialog: false,
                         handler: $Warn.CatchAsync(async () => {
                             const updatedFields = {
-                                title: editTitle.value, memo: editBody.value, 
+                                title: editTitle.value, memo: editBody.value,
                                 link_url: editUrl.value, currency_unit: editCurrency.value.trim(),
                             };
-                            const isSuccess = (!archive.is_public) 
+                            const isSuccess = (!archive.is_public)
                                 ? await $Data.Access.UpdateArchive({ archive_id: archive.archive_id, ...updatedFields })
                                 : await $Data.Access.UpdateArchivePub({ archive_id: archive.archive_id, ...updatedFields });
                             if (!isSuccess) return;
-    
                             $Data.Store.UpdateArchive(updatedFields);
                             $TopBar.ChangeTitle(updatedFields.title);
                             $Notice.Info("Changes saved.");
@@ -1363,7 +1353,7 @@ const DialogController = {
                 editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[14px] border border-brand-2 transition-transform";
                 editBtn.innerHTML = "✏️";
                 editBtn.onclick = () => this.ShowEditProfile(profile, renderView);
-                headerActions.prepend(editBtn); 
+                headerActions.prepend(editBtn);
             }
         }
     },
@@ -1400,12 +1390,12 @@ const DialogController = {
                 [
                     {
                         label: "CANCEL",
-                        className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                        className: "bg-slate-200 text-slate-500 shadow-sm",
                         closesDialog: true
                     },
                     {
                         label: "SAVE",
-                        className: "flex-1 bg-brand-4 text-white font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                        className: "bg-brand-4 text-white shadow-sm",
                         closesDialog: false,
                         handler: $Warn.CatchAsync(async () => {
                             const updatedFields = {
@@ -1420,7 +1410,7 @@ const DialogController = {
                             if (!isSuccess) return;
                             Object.assign(profile, updatedFields);
                             $Notice.Info("プロフィールを更新しました");
-                            _DialogCore.close(); 
+                            _DialogCore.close();
                             if (onUpdate) onUpdate();
                         })
                     }
@@ -1440,7 +1430,7 @@ const DialogController = {
         _DialogCore.open({
             title: "NOTICE DETAILS",
             content: el,
-            buttons:[ { label: "BACK", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider", closesDialog: true } ]
+            buttons:[]
         });
     },
     // 通知一覧ダイアログ（API通信化）
@@ -1463,7 +1453,7 @@ const DialogController = {
         });
         _DialogCore.open({
             title: "NOTIFICATIONS", content: root,
-            buttons:[ { label: "CLOSE", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider", closesDialog: true } ]
+            buttons:[]
         });
     },
     // 【管理者機能】管理者メニュー
@@ -1522,7 +1512,7 @@ const DialogController = {
         await renderList();
         const frame = _DialogCore.open({
             title: "NOTICE Mgmt", content: root,
-            buttons:[ { label: "CLOSE", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider", closesDialog: true } ]
+            buttons:[]
         });
         // 新規登録ボタン
         const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
@@ -1560,8 +1550,15 @@ const DialogController = {
             title: isNew ? "NEW NOTICE" : "EDIT NOTICE",
             content: el,
             buttons:[[
-                { label: "CANCEL", className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform", closesDialog: true },
-                { label: "SAVE", className: "flex-1 bg-brand-5 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform", closesDialog: false,
+                {
+                    label: "CANCEL",
+                    className: "bg-slate-200 text-slate-500 shadow-sm",
+                    closesDialog: true
+                },
+                {
+                    label: "SAVE",
+                    className: "bg-brand-5 text-white shadow-md",
+                    closesDialog: false,
                     handler: async () => {
                         const req = {
                             seq: target.seq,
@@ -1606,62 +1603,52 @@ const DialogController = {
         _DialogCore.open({
             title: "REPORT Mgmt",
             content: root,
-            buttons:[ { label: "CLOSE", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider", closesDialog: true } ]
+            buttons:[]
         });
     },
     // 管理者：通報詳細
     async ShowAdminReportDetail(summaryItem) {
         // ★ リストから指定されたターゲットユーザとアーカイブIDで詳細をAPI取得
-        const isSuccess = await $Data.Access.GetReportDetails({ 
-            target_user_id: summaryItem.target_user_id, 
-            archive_id: summaryItem.archive_id 
+        const isSuccess = await $Data.Access.GetReportDetails({
+            target_user_id: summaryItem.target_user_id,
+            archive_id: summaryItem.archive_id
         });
         if (!isSuccess) return;
-        
         // 取得した詳細データ
         const reports = $App.AppData.Admin.reports ||[];
-        
         const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
-        
         // 上部：対象情報（集計データから表示）
         $Dom.QuerySelector(".js-target-user", el).textContent = summaryItem.target_user_id;
         $Dom.QuerySelector(".js-archive-title", el).textContent = `Archive ID: ${summaryItem.archive_id}`;
-
         // 上部：まとめ親（Public）を開くボタン
         $Dom.QuerySelector("#btn-admin-open-archive", el).onclick = async () => {
             const isOk = await this.ShowConfirm({ title: "OPEN ARCHIVE", message: "この Public まとめデータを開きますか？" });
             if (!isOk) return;
-
             _DialogCore.closeAll();
             $App.AppData.System.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
             $App.AppData.System.TargetArchiveId = summaryItem.archive_id;
             await $App.RefreshScreen();
         };
-
         const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
-
         if (reports.length === 0) {
             listContainer.innerHTML = `<div class="text-[12px] text-slate-400 p-2">詳細データがありません</div>`;
         } else {
             // 通報日時（report_tim）の新しい順（降順）にソートして描画
             reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
-                
                 // 通報者
                 $Dom.QuerySelector(".js-reporter-user", child).textContent = `From: ${rep.reporter_user_id}`;
                 // 通報日時
                 $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim, "YYYY.MM.DD HH:mm");
                 // 通報内容
                 $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
-                
                 listContainer.appendChild(child);
             });
         }
-
-        _DialogCore.open({ 
-            title: "REPORT DETAILS", 
-            content: el, 
-            buttons:[ { label: "BACK", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform", closesDialog: true } ] 
+        _DialogCore.open({
+            title: "REPORT DETAILS",
+            content: el,
+            buttons:[ { label: "BACK", className: "bg-slate-200 text-slate-500 shadow-sm", closesDialog: true } ]
         });
     },
     // 管理者：フィードバックリスト（無限スクロール）
@@ -1694,9 +1681,9 @@ const DialogController = {
             if (isLoading || !hasMore) return;
             isLoading = true;
             const isLoadSuccess = await $Data.Access.GetAllFeedback({ skip, take });
-            if (!isLoadSuccess) { 
-                isLoading = false; 
-                return; 
+            if (!isLoadSuccess) {
+                isLoading = false;
+                return;
             }
             const newItems = $App.AppData.Admin.feedbackList ||[];
             if (newItems.length < take) hasMore = false;
@@ -1717,13 +1704,7 @@ const DialogController = {
         _DialogCore.open({
             title: "FEEDBACK Mgmt",
             content: root,
-            buttons:[
-                {
-                    label: "CLOSE",
-                    className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider",
-                    closesDialog: true
-                }
-            ]
+            buttons:[]
         });
     },
     // 通報投稿画面
@@ -1751,12 +1732,12 @@ const DialogController = {
             buttons: [[
                 {
                     label: "CANCEL",
-                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    className: "bg-slate-200 text-slate-500 shadow-sm",
                     closesDialog: true
                 },
                 {
                     label: "SUBMIT",
-                    className: "flex-1 bg-red-500 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform",
+                    className: "bg-red-500 text-white shadow-md",
                     closesDialog: false,
                     handler: async () => {
                         const body = inputBody.value.trim();
@@ -1779,9 +1760,7 @@ const DialogController = {
         });
     },
 };
-
 // 初期処理
 _DialogCore.init();
-
 // Public
 export default DialogController;

@@ -52,8 +52,8 @@ const UI_Manager = {
     // 画面モード変更時
     ChangeScreenMode(){
 		const mode = $App.AppData.System.ScreenMode;
-		// 通知バー
-		this.NoticeUpdate("りとめも（Littele Trip Memo） >> " + $App.AppData.System.ScreenMode);
+		// // 通知バー
+		// this.NoticeUpdate("りとめも（Littele Trip Memo） >> " + $App.AppData.System.ScreenMode);
 		// アイコンバー
 		$TopBar.ChangeScreenMode();
 		$BotBar.ChangeScreenMode();

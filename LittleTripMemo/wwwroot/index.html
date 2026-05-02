@@ -55,32 +55,32 @@
                     <!-- 地点検索関連 -->
                     <div id="ui-sort-group" class="flex flex-col">
                         <!-- Public／Private -->
-                        <div id="sort-kbn" class="shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-3">
-                            <button data-value="0" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-3 ">
+                        <div id="sort-kbn" class="shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-0 rounded-full overflow-hidden">
+                            <button data-value="0" class="ui-btn h-full px-4 text-[12px] font-bold bg-brand-3 transition-colors">
                                 Private
                             </button>
-                            <button data-value="1" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-0 ">
+                            <button data-value="1" class="ui-btn h-full px-4 text-[12px] font-bold bg-brand-0 transition-colors">
                                 Publish
                             </button>
                         </div>
                         <!-- 並び順 -->
-                        <div id="sort-field"  class="shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-3">
-                            <button data-value="1" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-3">
+                        <div id="sort-field" class="shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-0 rounded-full overflow-hidden">
+                            <button data-value="1" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-3 transition-colors">
                                 Created
                             </button>
-                            <button data-value="2" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-0">
+                            <button data-value="2" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-0 transition-colors">
                                 Updated
                             </button>
-                            <button data-value="3" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-0 hidden">
+                            <button data-value="3" class="hidden ui-btn h-full px-3 text-[12px] font-bold bg-brand-0 transition-colors">
                                 Reaction
                             </button>
                         </div>
                         <!-- リアクション種別 -->
-                        <div id="sort-reaction" class="hidden shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-3 text-[14px]">
-                            <button data-value="1" class="ui-btn h-full px-3 bg-brand-3">🤣</button>
-                            <button data-value="2" class="ui-btn h-full px-3 bg-brand-0">😍</button>
-                            <button data-value="3" class="ui-btn h-full px-3 bg-brand-0">😲</button>
-                            <button data-value="4" class="ui-btn h-full px-3 bg-brand-0">😉</button>
+                        <div id="sort-reaction" class="hidden shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-0 text-[14px] rounded-full overflow-hidden">
+                            <button data-value="1" class="ui-btn h-full px-3 bg-brand-3 transition-colors">🤣</button>
+                            <button data-value="2" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😍</button>
+                            <button data-value="3" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😲</button>
+                            <button data-value="4" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😉</button>
                         </div>
                     </div>
                 </div>
@@ -383,7 +383,7 @@
 
         <!-- 【マップ】ポップアップ -->
         <template id="tpl-marker-popup">
-            <div class="relative w-full bg-white/10 rounded-2xl shadow-sm p-4 pt-5 overflow-hidden flex flex-col">
+            <div class="relative w-full bg-white/70 rounded-2xl shadow-sm p-4 pt-5 overflow-hidden flex flex-col">
                 <!-- 右上のインデックスフラッグ -->
                 <div class="absolute top-0 right-0 w-[42px] h-[42px] bg-brand-2 text-brand-5 font-black text-[20px] flex items-center justify-center rounded-bl-[1.5rem] shadow-sm">
                     <span class="index leading-none pb-1 pl-1"></span>

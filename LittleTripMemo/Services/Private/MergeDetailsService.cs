@@ -52,7 +52,7 @@ public class MergeDetailsService : _BaseService
             var archiveId = await _archiveRepo.InsertAsync(new TMemoArchive
             {
                 title    = req.title,
-                memo     = "くわしく",
+                memo     = "メモ全体に対する説明を入力してください",
                 link_url = ""
             });
 

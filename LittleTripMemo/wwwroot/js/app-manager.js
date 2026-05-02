@@ -162,12 +162,16 @@ const AppManager = {
         // モードごとにデータ取得
         switch (this.AppData.System.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
+                // 通知バー
+                $UI.NoticeUpdate("「＋」ボタンで地点メモを作成することができます");
                 isSuccess = await $Data.Access.GetUnMergeDetails({});
                 if (!isSuccess) return;
                 // システム情報を取得
                 $Data.Access.GetSystemInfo();
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
+                // 通知バー
+                $UI.NoticeUpdate("画面下部の「操作ボタン」で各メモを移動できます");
                 if (!archiveId) {
                     // 不正か？
                     $Dialog.ShowLoginDialog();
@@ -179,6 +183,8 @@ const AppManager = {
                 $TopBar.ChangeTitle(archive.title);
                 break;
             case $Const.SCREEN_MODE.ARCHIVE_PUB:
+                // 通知バー
+                $UI.NoticeUpdate("公開データは「Open」にしないと公開されません");
                 if (!archiveId) {
                     $Dialog.ShowLoginDialog();
                     return;
@@ -189,6 +195,8 @@ const AppManager = {
                 $TopBar.ChangeTitle(archivePub.title);
                 break;
             case $Const.SCREEN_MODE.SEARCH:
+                // 通知バー
+                $UI.NoticeUpdate("画面範囲内のメモを検索できます");
                 $Data.Store.Clear();
                 $Marker.Clear()
                 break;
