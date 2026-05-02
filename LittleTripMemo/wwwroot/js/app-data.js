@@ -115,21 +115,13 @@ window.$Data = {
             if (data.archiveList) this._rawData.archiveList = data.archiveList;
             if (data.userProfile) this._rawData.userProfile = data.userProfile;
             if (data.ownerProfile) $App.AppData.Owner.Profile = data.ownerProfile;
-            // ========================================================
-            // システム・管理者データの振り分け（APIごとに判別）
-            // ========================================================
-            // // ユーザ用：GetSystemInfo のレスポンスをまるごと systemInfo として格納
-            // $App.AppData.Owner.systemInfo = {
-            //     notifications: data.notifications ||[],
-            //     score_avg: data.score_avg || 0,
-            //     feedbackList: data.feedbackList ||[],
-            // };
-            if (data.systemInfo) $App.AppData.Owner.systemInfo = data.systemInfo;
             // 管理者用：各取得APIのレスポンスを Admin に格納
             if (data.notifications) $App.AppData.Admin.notifications = data.notifications;
             if (data.reportSummary) $App.AppData.Admin.reportSummary = data.reportSummary;
             if (data.reports) $App.AppData.Admin.reports = data.reports;
             if (data.feedbackList) $App.AppData.Admin.feedbackList = data.feedbackList;
+            // システム通知関連
+            if (data.systemInfo) $App.AppData.Owner.systemInfo = data.systemInfo;
             // ユーザ用システムデータ
             if (data.myFeedback) $App.AppData.Owner.myFeedback = data.myFeedback;
             if (data.myReport) $App.AppData.Owner.myReport = data.myReport;
@@ -222,7 +214,7 @@ window.$Data = {
         async GetReportSummary(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportSummary', params))();
         },
-        async GetReportDetails(params = {}) {
+        async GetReportDetails(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportDetails', params))();
         },
         async GetAllFeedback(params = {}) {
@@ -287,7 +279,6 @@ window.$Data = {
             });
         },
         GetAllDetails() {
-            this.SortDetails('date');
             return this._getDetails();
         },
         GetDetailByKey(archiveId, seq) {

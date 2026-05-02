@@ -31,22 +31,24 @@ const _BottomCore = {
 					$DetailFrame.Open();
 				});
 				this.btnSearch.addEventListener('click', async () => {
+					// 検索範囲（緯度経度）を取得
 					const range = $Map.GetSearchRange(0.8);
+					// TopBar から新しい構造のソート設定を取得
 					const sortSetting = $TopBar.GetSortSetting();
-					const sortKbn = Number(sortSetting.sortKbn); // 0:Private, 1:Public
+					console.log(">>sortSetting", sortSetting);
+					// C# 側の引数名（sortField, reactionType）に合わせたパラメータ生成
 					const params = {
 						...range,
-						sort_field: Number(sortSetting.sortField), // 1:登録, 2:更新, 3:評価
-						limit: 20
+						sortField: sortSetting.sortField,
+						reactionType: sortSetting.reactionType,
+						limit: 50 // サーバー側のデフォルトに合わせて50件にする（任意で調整可能）
 					};
-					// 区分に応じて呼び出すAPIを切り替え
+					// 通信処理（Public と Private でエンドポイントを分岐）
 					let isSuccess = false;
-					if (sortKbn === 0) {
-						// Privateデータ検索
-						isSuccess = await $Data.Access.SearchByLocation(params);
-					} else {
-						// Publicデータ検索
+					if (sortSetting.isPublic) {
 						isSuccess = await $Data.Access.SearchByLocationPub(params);
+					} else {
+						isSuccess = await $Data.Access.SearchByLocation(params);
 					}
 					if (!isSuccess) return;
 					// 検索結果のリスト表示、またはマーカーの再描画

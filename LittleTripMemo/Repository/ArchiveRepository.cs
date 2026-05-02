@@ -18,8 +18,6 @@ public class ArchiveRepository : _BaseRepository
     {
     }
 
-    #region CUD (更新・削除系)
-
     /// <summary>
     /// 新規保存。モデルのスネークケース・プロパティ（user_id）に直接値をセットする。
     /// </summary>
@@ -80,10 +78,6 @@ public class ArchiveRepository : _BaseRepository
         });
     }
 
-    #endregion
-
-    #region R (取得系)
-
     /// <summary>
     /// 一覧取得。スネークケースのモデルへそのままマッピング。
     /// </summary>
@@ -121,8 +115,6 @@ public class ArchiveRepository : _BaseRepository
             user_id = _user.UserId
         });
     }
-
-    #endregion
 
     /// <summary>
     /// 秘密データへ戻す（論理削除の復元）。主キー（archive_id）による更新。

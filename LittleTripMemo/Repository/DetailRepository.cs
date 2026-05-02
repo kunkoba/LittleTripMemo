@@ -19,8 +19,6 @@ public class DetailRepository : _BaseRepository
     {
     }
 
-    #region CUD (更新・削除系)
-
     /// <summary>
     /// 明細登録。モデルのスネークケース（user_id等）をそのままSQLパラメータに使用。
     /// </summary>
@@ -71,72 +69,6 @@ public class DetailRepository : _BaseRepository
     }
 
     /// <summary>
-    /// 一括更新。archive_id に紐づく明細を全件更新し、更新件数を返す。
-    /// </summary>
-    public async Task<int> UpdateBulkAsync(IEnumerable<TMemoDetail> entities)
-    {
-        var count = 0;
-        foreach (var entity in entities)
-        {
-            entity.user_id = _user.UserId;
-
-            string sql = $@"
-                UPDATE t_memo_detail_{_user.TableId} SET
-                    latitude      = @latitude,
-                    longitude     = @longitude,
-                    title         = @title,
-                    body          = @body,
-                    memo_date     = @memo_date,
-                    memo_time     = @memo_time,
-                    face_emoji    = @face_emoji,
-                    weather_code = @weather_code,
-                    link_url      = @link_url,
-                    memo_price    = @memo_price,
-                    update_tim    = CURRENT_TIMESTAMP
-                WHERE 
-                    seq     = @seq 
-                    AND user_id = @user_id";
-
-            count += await ExecuteAsync(sql, entity);
-        }
-        return count;
-    }
-
-    /// <summary>
-    /// 主キー（seq）による論理削除。
-    /// </summary>
-    public async Task<int> DeleteByKeyAsync(int seq)
-    {
-        string sql = $@"
-            UPDATE t_memo_detail_{_user.TableId} SET
-                del_flg    = true,
-                update_tim = CURRENT_TIMESTAMP
-            WHERE 
-                seq     = @seq 
-                AND user_id = @user_id";
-
-        return await ExecuteAsync(sql, new { seq, user_id = _user.UserId });
-    }
-
-    #endregion
-
-    #region Read (取得系)
-
-    /// <summary>
-    /// 全明細取得。モデルがスネークケースなので SELECT * でそのまま受ける。
-    /// </summary>
-    public async Task<IEnumerable<TMemoDetail>> GetAllAsync()
-    {
-        string sql = $@"
-            SELECT * FROM t_memo_detail_{_user.TableId} 
-            WHERE user_id = @user_id 
-              AND del_flg = false 
-            ORDER BY memo_date ASC, memo_time ASC";
-
-        return await QueryAsync<TMemoDetail>(sql, new { user_id = _user.UserId });
-    }
-
-    /// <summary>
     /// 親ID（archive_id）紐づき取得。
     /// </summary>
     public async Task<IEnumerable<TMemoDetail>> GetByArchiveIdAsync(int archiveId)
@@ -150,8 +82,6 @@ public class DetailRepository : _BaseRepository
 
         return await QueryAsync<TMemoDetail>(sql, new { archive_id = archiveId, user_id = _user.UserId });
     }
-
-    #endregion
 
     /// <summary>
     /// 指定された seq リストの明細に archive_id をセット。
@@ -175,7 +105,6 @@ public class DetailRepository : _BaseRepository
             user_id = _user.UserId
         });
     }
-
 
     /// <summary>
     /// 主キー（seq）による論理削除。
@@ -228,7 +157,6 @@ public class DetailRepository : _BaseRepository
         });
     }
 
-
     /// <summary>
     /// 秘密データへ戻す（論理削除の復元）。主キー（archive_id）による更新。
     /// </summary>
@@ -256,10 +184,19 @@ public class DetailRepository : _BaseRepository
     /// <param name="limit"></param>
     /// <returns></returns>
     public async Task<IEnumerable<TMemoDetail>> GetByLocationAsync(
-    decimal latMin, decimal latMax,
-    decimal lngMin, decimal lngMax,
-    int limit = 50)
+        decimal latMin, decimal latMax,
+        decimal lngMin, decimal lngMax,
+        int sortField,
+        int limit = 50)
     {
+        // ソート句の決定
+        string orderBy = sortField switch
+        {
+            1 => "d.create_tim DESC",
+            2 => "d.update_tim DESC",
+            _ => "d.create_tim DESC"
+        };
+
         string sql = $@"
             SELECT d.*,
                 a.title AS a_title
@@ -271,7 +208,9 @@ public class DetailRepository : _BaseRepository
               AND d.user_id   = @user_id
               AND d.del_flg   = false
               AND d.archive_id > 0
+            ORDER BY {orderBy}
               LIMIT @limit";
+
         return await QueryAsync<TMemoDetail>(sql, new
         {
             lat_min = latMin,

@@ -766,6 +766,22 @@
         </div>
     </div>
 </template>
+<!-- 【ダイアログ子】通報投稿 -->
+<template id="tpl-report-post">
+    <div class="w-full text-black-5 px-2 space-y-4 pt-4">
+        <div class="text-[12px] text-red-500 font-bold leading-relaxed border-l-4 border-red-500 pl-2">
+            利用規約に違反していると思われる内容を通報できます。通報内容は管理者が確認します。
+        </div>
+        <div>
+            <div class="flex justify-between items-end mb-1">
+                <label class="block text-[12px] font-black text-black-3 uppercase tracking-widest">Report Details</label>
+                <span class="text-[10px] font-bold text-black-2"><span id="report-text-count">0</span>/300</span>
+            </div>
+            <textarea id="input-report-body" maxlength="300" placeholder="問題のある箇所や理由を具体的に記入してください" class="w-full border-2 border-brand-3 p-3 text-[14px] h-32 rounded-xl focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+        </div>
+    </div>
+</template>
+
 
 <!-- ============================================================= -->
 

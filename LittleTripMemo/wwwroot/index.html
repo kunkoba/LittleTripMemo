@@ -65,24 +65,22 @@
                         </div>
                         <!-- 並び順 -->
                         <div id="sort-field"  class="shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-3">
-                            <button data-value="1" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-3 ">
+                            <button data-value="1" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-3">
                                 Created
                             </button>
-                            <button data-value="2" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-0 ">
+                            <button data-value="2" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-0">
                                 Updated
                             </button>
-                            <button data-value="3" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-0 ">
+                            <button data-value="3" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-0 hidden">
                                 Reaction
                             </button>
                         </div>
-                        <!-- 昇順／降順 -->
-                        <div id="sort-order" class="hidden shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-2 text-black-3">
-                            <button data-value="1" class="ui-btn h-full px-3 text-[10px] font-bold border bg-brand-0 ">
-                                Asc
-                            </button>
-                            <button data-value="2" class="ui-btn h-full px-3 text-[10px] font-bold border bg-brand-3  border-brand-3">
-                                Desc
-                            </button>
+                        <!-- リアクション種別 -->
+                        <div id="sort-reaction" class="hidden shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-3 text-[14px]">
+                            <button data-value="1" class="ui-btn h-full px-3 bg-brand-3">🤣</button>
+                            <button data-value="2" class="ui-btn h-full px-3 bg-brand-0">😍</button>
+                            <button data-value="3" class="ui-btn h-full px-3 bg-brand-0">😲</button>
+                            <button data-value="4" class="ui-btn h-full px-3 bg-brand-0">😉</button>
                         </div>
                     </div>
                 </div>
@@ -107,7 +105,7 @@
                 <!-- 詳細パネルのヘッダー -->
                 <div class="bg-slate-50 h-16 px-6 flex justify-between items-center shrink-0 border-b border-brand-1">
                     <h2 id="detail-title" class="text-xl font-black italic text-brand-5 uppercase tracking-wider">Details</h2>
-                    <div class="flex gap-4">
+                    <div class="flex gap-2">
                         <!-- ▼ ここに追加 -->
                         <button id="detail-btn-earth" class="w-8 h-8 bg-white rounded-lg shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-lg">🌍</button>
                         <button id="detail-btn-map"   class="w-8 h-8 bg-white rounded-lg shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-lg">🗺️</button>

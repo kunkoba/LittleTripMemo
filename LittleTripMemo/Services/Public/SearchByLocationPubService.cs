@@ -15,6 +15,8 @@ public class SearchByLocationPubService : _BaseService
         decimal lat_max,
         decimal lng_min,
         decimal lng_max,
+        int sortField,      // 1:作成順, 2:更新順, 3:リアクション順
+        int? reactionType,  // sort_fieldが3の場合に使用
         int limit = 50
     );
     public record Response(IEnumerable<TMemoDetailPub> details);
@@ -35,7 +37,7 @@ public class SearchByLocationPubService : _BaseService
         var details = await _detailPubRepo.GetByLocationAsync(
             req.lat_min, req.lat_max,
             req.lng_min, req.lng_max,
-            req.limit);
+            req.sortField, req.reactionType, req.limit);
 
         SetAppFlags(details);
         return new Response(details);

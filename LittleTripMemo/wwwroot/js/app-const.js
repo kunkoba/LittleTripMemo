@@ -17,22 +17,24 @@ window.$Const = {
     },
     // FACE絵文字リスト（共通定数）
     FACE_EMOJIS: ['😀', '🤣', '😍', '🤔', '😋', '😭', '😵‍💫', '😱', '😡', '😮'],
-    // リアクション種別
-    REACTION_TYPE: {
-        FUNNY:    1, // 笑える🤣
-        HELPFUL:  2, // 参考になる😍
-        SURPRISE: 3, // びっくり😮
-        EMPATHY:  4, // 共感する😉
-    },
     // 地点検索並び替え
     SORT_FIELD: {
-        CREATED: 1,
-        UPDATED: 2,
-        REACTION: 3,
+        CREATED: 1, // 登録順
+        UPDATED: 2, // 登録順
+        REACTION: 3, // 登録順
+    },
+    // リアクション種別
+    REACTION_TYPE: {
+        FUNNY:    { id: 1, emoji: '🤣' }, //笑える
+        LOVE:     { id: 2, emoji: '😍' }, //好き
+        SURPRISE: { id: 3, emoji: '😮' }, //びっくり
+        SAD:      { id: 4, emoji: '😢' }, //悲しい
+        REPORT:   { id: 5, emoji: '😡' }, //通報
     },
     // 通知種別アイコン
     NOTICE_ICONS: {
-        0: '📢', // その他
+        0: '🤔', // その他
         1: '⚠️', // 重要
+        2: '📢', // 周知
     },
 };

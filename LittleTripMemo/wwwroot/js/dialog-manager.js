@@ -1200,9 +1200,7 @@ const DialogController = {
         } else {
             $Dom.ToggleShow(btnUserProfile, false);
         }
-        // -----------------------------------------------------
         // ダイアログフッターのボタン配列を構築（縦並びにするため配列をネストする）
-        // -----------------------------------------------------
         const dialogButtons =[];
         if (archive.is_owner) {
             const btnMainClass = "w-full bg-brand-5 text-white font-bold py-3 rounded-2xl text-[14px] shadow-md active:scale-95 transition-transform";
@@ -1248,6 +1246,14 @@ const DialogController = {
                     handler: () => this._execStatusChange('UnpublishArchive', { archive_id: archive.archive_id }, "Switch to [Private]", "Do you want to revert\nthis data to Private？", "Reverted to [Private].", $Const.SCREEN_MODE.ARCHIVE)
                 }]);
             }
+        } else {
+            // ▼ オーナーでない（他人の）アーカイブの場合は通報ボタンを表示する
+            dialogButtons.push([{
+                label: "REPORT THIS ARCHIVE",
+                className: "w-full bg-white text-red-500 border border-red-500 font-bold py-3 rounded-2xl text-[14px] shadow-sm active:scale-95 transition-transform",
+                closesDialog: false,
+                handler: () => this.ShowReportPost(archive)
+            }]);
         }
         // _DialogCore に構築したボタン配列を渡す
         const frame = _DialogCore.open({ title: "", content: el, buttons: dialogButtons });
@@ -1598,39 +1604,64 @@ const DialogController = {
             });
         }
         _DialogCore.open({
-            title: "REPORT Mgmt", content: root,
+            title: "REPORT Mgmt",
+            content: root,
             buttons:[ { label: "CLOSE", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform tracking-wider", closesDialog: true } ]
         });
     },
-    // 通報詳細（APIデータ利用）
-    ShowAdminReportDetail(summaryItem) {
+    // 管理者：通報詳細
+    async ShowAdminReportDetail(summaryItem) {
+        // ★ リストから指定されたターゲットユーザとアーカイブIDで詳細をAPI取得
+        const isSuccess = await $Data.Access.GetReportDetails({ 
+            target_user_id: summaryItem.target_user_id, 
+            archive_id: summaryItem.archive_id 
+        });
+        if (!isSuccess) return;
+        
+        // 取得した詳細データ
+        const reports = $App.AppData.Admin.reports ||[];
+        
         const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
-        $Dom.QuerySelector(".js-target-user", el).textContent = `${summaryItem.target_user_name || ""} (${summaryItem.target_user_id})`;
-        $Dom.QuerySelector(".js-archive-title", el).textContent = `${summaryItem.archive_title || ""}[ID: ${summaryItem.archive_id}]`;
+        
+        // 上部：対象情報（集計データから表示）
+        $Dom.QuerySelector(".js-target-user", el).textContent = summaryItem.target_user_id;
+        $Dom.QuerySelector(".js-archive-title", el).textContent = `Archive ID: ${summaryItem.archive_id}`;
+
+        // 上部：まとめ親（Public）を開くボタン
         $Dom.QuerySelector("#btn-admin-open-archive", el).onclick = async () => {
             const isOk = await this.ShowConfirm({ title: "OPEN ARCHIVE", message: "この Public まとめデータを開きますか？" });
             if (!isOk) return;
+
             _DialogCore.closeAll();
             $App.AppData.System.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
             $App.AppData.System.TargetArchiveId = summaryItem.archive_id;
             await $App.RefreshScreen();
         };
+
         const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
-        const reports = ($Data.Store.GetReports() ||[]).filter(r => r.archive_id === summaryItem.archive_id);
+
         if (reports.length === 0) {
             listContainer.innerHTML = `<div class="text-[12px] text-slate-400 p-2">詳細データがありません</div>`;
         } else {
+            // 通報日時（report_tim）の新しい順（降順）にソートして描画
             reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
-                $Dom.QuerySelector(".js-reporter-user", child).textContent = `From: ${rep.reporter_user_name || rep.reporter_user_id}`;
+                
+                // 通報者
+                $Dom.QuerySelector(".js-reporter-user", child).textContent = `From: ${rep.reporter_user_id}`;
+                // 通報日時
                 $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim, "YYYY.MM.DD HH:mm");
+                // 通報内容
                 $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
+                
                 listContainer.appendChild(child);
             });
         }
-        _DialogCore.open({
-            title: "REPORT DETAILS", content: el,
-            buttons:[ { label: "BACK", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform", closesDialog: true } ]
+
+        _DialogCore.open({ 
+            title: "REPORT DETAILS", 
+            content: el, 
+            buttons:[ { label: "BACK", className: "w-full h-12 bg-slate-200 text-slate-500 font-black text-[14px] rounded-2xl shadow-sm uppercase active:scale-95 transition-transform", closesDialog: true } ] 
         });
     },
     // 管理者：フィードバックリスト（無限スクロール）
@@ -1641,7 +1672,7 @@ const DialogController = {
         const isSuccess = await $Data.Access.GetAllFeedback({ skip, take });
         if (!isSuccess) return;
         const root = $Dom.GenerateTemplate("tpl-list-parent");
-        root.className = "w-full text-black-3 mb-2 px-1 h-[60vh] overflow-y-auto";
+        // root.className = "w-full text-black-3 mb-2 px-1 _h-[60vh] overflow-y-auto";
         let isLoading = false;
         let hasMore = true;
         const renderItems = (items) => {
@@ -1693,6 +1724,58 @@ const DialogController = {
                     closesDialog: true
                 }
             ]
+        });
+    },
+    // 通報投稿画面
+    async ShowReportPost(archive) {
+        // ダイアログを開く前に、自分が過去にこのアーカイブを通報したか取得
+        const reqParam = { target_user_id: archive.user_id, archive_id: archive.archive_id };
+        const isSuccess = await $Data.Access.GetMyReport(reqParam);
+        if (!isSuccess) return;
+        // 取得したデータがあれば初期値として設定
+        const myReport = $App.AppData.Owner.myReport || null;
+        let currentBody = myReport ? (myReport.body || "") : "";
+        const el = $Dom.GenerateTemplate("tpl-report-post");
+        const inputBody = $Dom.QuerySelector('#input-report-body', el);
+        const countBody = $Dom.QuerySelector('#report-text-count', el);
+        // 初期値の反映
+        inputBody.value = currentBody;
+        countBody.textContent = currentBody.length;
+        inputBody.addEventListener("input", () => {
+            countBody.textContent = inputBody.value.length;
+        });
+        _DialogCore.open({
+            // データが既にあれば編集（EDIT）、なければ新規（SUBMIT）
+            title: myReport ? "EDIT REPORT" : "REPORT SUBMIT",
+            content: el,
+            buttons: [[
+                {
+                    label: "CANCEL",
+                    className: "flex-1 bg-slate-200 text-slate-500 font-black text-[14px] h-12 rounded-2xl shadow-sm uppercase active:scale-95 transition-transform",
+                    closesDialog: true
+                },
+                {
+                    label: "SUBMIT",
+                    className: "flex-1 bg-red-500 text-white font-black text-[14px] h-12 rounded-2xl shadow-md uppercase active:scale-95 transition-transform",
+                    closesDialog: false,
+                    handler: async () => {
+                        const body = inputBody.value.trim();
+                        if (!body) {
+                            $Notice.Warn("通報内容を入力してください。");
+                            return;
+                        }
+                        const req = {
+                            target_user_id: archive.user_id,
+                            archive_id: archive.archive_id,
+                            body: body
+                        };
+                        const isSubmitSuccess = await $Data.Access.UpsertReport(req);
+                        if (!isSubmitSuccess) return;
+                        $Notice.Info("通報を送信しました。管理者が確認します。");
+                        _DialogCore.close(); // 通報ダイアログを閉じる
+                    }
+                }
+            ]]
         });
     },
 };

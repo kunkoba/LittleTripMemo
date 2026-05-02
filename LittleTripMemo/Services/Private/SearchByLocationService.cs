@@ -14,6 +14,8 @@ public class SearchByLocationService : _BaseService
         decimal lat_max,
         decimal lng_min,
         decimal lng_max,
+        int sortField,      // 1:作成順, 2:更新順, 3:リアクション順
+        int? reactionType,  // sort_fieldが3の場合に使用
         int limit = 50
     );
     public record Response(IEnumerable<TMemoDetail> details);
@@ -32,6 +34,7 @@ public class SearchByLocationService : _BaseService
         var details = await _detailRepo.GetByLocationAsync(
             req.lat_min, req.lat_max,
             req.lng_min, req.lng_max,
+            req.sortField,
             req.limit);
 
         SetAppFlags(details);
@@ -44,4 +47,5 @@ public class SearchByLocationService : _BaseService
         BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
         await Task.CompletedTask;
     }
+
 }
