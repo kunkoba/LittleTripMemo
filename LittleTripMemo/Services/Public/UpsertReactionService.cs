@@ -2,69 +2,70 @@
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
+using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services;
 
 public class UpsertReactionService : _BaseService
 {
+    private readonly ReactionPubRepository _repo;
     private readonly ITransactionProvider _provider;
-    private readonly ReactionPubRepository _reactionPubRepo;
 
-    public record ReactionDetail(int seq, int[] reaction_types);
+    // リクエスト：1レコードで各リアクションをフラグ(bool)で表現
     public record UpsertReactionReq(
-        int archive_id,
-        IEnumerable<ReactionDetail> reactions
+        [Required] int archive_id,
+        [Required] int seq,
+        bool is_funny,    // type: 1
+        bool is_love,     // type: 2
+        bool is_surprise, // type: 3
+        bool is_sad       // type: 4
     );
-    public record Response(int updatedCount);
+
+    // レスポンス：DBの生データ形式（通常のデータ）をそのまま配列で返す
+    public record Response(IEnumerable<TReactionPub> reactions);
 
     public UpsertReactionService(
         UserContext userContext,
         ITransactionProvider provider,
-        ReactionPubRepository reactionPubRepo)
-        : base(userContext)
+        ReactionPubRepository repo) : base(userContext)
     {
         _provider = provider;
-        _reactionPubRepo = reactionPubRepo;
+        _repo = repo;
     }
 
     public async Task<Response> ExecuteAsync(UpsertReactionReq req)
     {
+        // 1. 検証
         await ValidateAsync(req);
 
         using var tran = _provider.BeginTransaction();
         try
         {
-            int count = 0;
-            foreach (var detail in req.reactions)
-            {
-                // ① 対象明細のリアクションを全件物理削除
-                await _reactionPubRepo.DeletePhysicalBySeqAsync(req.archive_id, detail.seq);
+            // 2. 既存の自分のリアクションを一旦クリア（ユーザーID単位の更新）
+            await _repo.DeletePhysicalBySeqAsync(req.archive_id, req.seq);
 
-                // ② フラグ分だけ登録
-                foreach (var reactionType in detail.reaction_types)
-                {
-                    await _reactionPubRepo.InsertAsync(new TReactionPub
-                    {
-                        archive_id = req.archive_id,
-                        seq = detail.seq,
-                        user_id = _user.UserId,
-                        reaction_type = reactionType
-                    });
-                    count++;
-                }
-            }
+            // 3. ONになっているフラグのみを個別に登録
+            if (req.is_funny) await _repo.InsertAsync(req.archive_id, req.seq, 1);
+            if (req.is_love) await _repo.InsertAsync(req.archive_id, req.seq, 2);
+            if (req.is_surprise) await _repo.InsertAsync(req.archive_id, req.seq, 3);
+            if (req.is_sad) await _repo.InsertAsync(req.archive_id, req.seq, 4);
+
             tran.Commit();
-            return new Response(count);
+
+            // 4. 最新のDB状態を取得して返却（通常のデータ形式）
+            var currentReactions = await _repo.GetMyReactionsByArchiveIdAsync(req.archive_id);
+
+            return new Response(currentReactions);
         }
         catch
         {
-            throw;
+            throw; // 共通例外処理へ
         }
     }
 
     private async Task ValidateAsync(UpsertReactionReq req)
     {
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "Unauthorized");
         BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが無効です");
         await Task.CompletedTask;
     }

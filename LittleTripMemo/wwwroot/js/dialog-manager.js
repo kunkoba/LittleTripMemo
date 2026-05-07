@@ -1220,7 +1220,11 @@ const DialogController = {
                         label: "Close　⇒　Open",
                         className: btnMainClass,
                         closesDialog: false,
-                        handler: () => this._execStatusChange('OpenArchive', { archive_id: archive.archive_id }, "Switch to [Open]", "Do you want to switch\nthis data to [Open]？", "Switched to [Open].", null, () => $Data.Store.UpdateArchive({ closed_flg: false }))
+                        handler: () => this._execStatusChange(
+                            'OpenArchive', { archive_id: archive.archive_id }, "Switch to [Open]", 
+                            "Do you want to switch\nthis data to [Open]？", "Switched to [Open].", null, 
+                            () => $Data.Store.UpdateArchive({ closed_flg: false })
+                        )
                     }]);
                 } else {
                     // Open ⇒ Close

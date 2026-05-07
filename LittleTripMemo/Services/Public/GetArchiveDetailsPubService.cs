@@ -52,6 +52,7 @@ public class GetArchiveDetailsPubService : _BaseService
             ? await _reactionPubRepo.GetMyReactionsByArchiveIdAsync(req.archive_id)
             : Enumerable.Empty<TReactionPub>();
 
+        // ユーザプロフィール取得
         var profile = await _getUserProfileService.ExecuteAsync(archive.user_id);
 
         return new Response(archive, details, myReactions, profile);

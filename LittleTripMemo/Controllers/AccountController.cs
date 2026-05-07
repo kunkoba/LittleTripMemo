@@ -16,11 +16,10 @@ public class AccountController : _BaseController // 基底クラスを _BaseCont
 
     public AccountController(
         UserContext userContext,
-        IHttpContextAccessor httpContextAccessor,
         RegistrationUserService accountService,
         GetUserProfileService getUserProfileService,
         UpdateUserProfileService updateUserProfileService)
-        : base(userContext, httpContextAccessor) // 基底クラスのコンストラクタを呼び出す
+        : base(userContext) // 基底クラスのコンストラクタを呼び出す
     {
         _accountService = accountService;
         _getUserProfileService = getUserProfileService;

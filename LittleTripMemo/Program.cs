@@ -146,9 +146,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         // JSON プロパティ名を camelCase に統一
-        //options.JsonSerializerOptions.PropertyNamingPolicy =
-        //    JsonNamingPolicy.CamelCase;
-        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     })
     .ConfigureApiBehaviorOptions(options =>
     {

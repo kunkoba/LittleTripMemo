@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿// JwtMiddleware.cs（ここを唯一のセットアップ場所にする）
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
@@ -17,10 +18,10 @@ public class JwtMiddleware
         _configuration = configuration;
     }
 
+    // JwtMiddleware.cs 内の Invoke メソッド
     public async Task Invoke(HttpContext context)
     {
-        var token = context.Request.Headers["Authorization"]
-            .FirstOrDefault()?.Split(" ").Last();
+        var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
         if (!string.IsNullOrEmpty(token))
         {
@@ -29,7 +30,8 @@ public class JwtMiddleware
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]);
 
-                var validationParameters = new TokenValidationParameters
+                // ★ここで署名・有効期限を厳格に検証
+                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -39,54 +41,19 @@ public class JwtMiddleware
                     ValidAudience = _configuration["JwtSettings:Audience"],
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
-                };
+                }, out _);
 
-                // トークン検証
-                var principal = tokenHandler.ValidateToken(
-                    token,
-                    validationParameters,
-                    out _);
-
-                // 標準の User へのセット
-                context.User = principal;
-
-                // =============================================================
-                // ✅ 追加：UserContext への値のセット
-                // =============================================================
+                // 成功したら UserContext に注入
                 var userContext = context.RequestServices.GetRequiredService<UserContext>();
-
-                // UserId (NameIdentifier)
-                var userIdStr = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (Guid.TryParse(userIdStr, out var userId))
-                {
-                    userContext.UserId = userId;
-                }
-
-                // TableId
-                var tableIdStr = principal.FindFirst(nameof(UserContext.TableId))?.Value;
-                if (int.TryParse(tableIdStr, out var tableId))
-                {
-                    userContext.TableId = tableId;
-                }
-
-                // Plan
+                userContext.UserId = Guid.Parse(principal.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                userContext.TableId = int.Parse(principal.FindFirst(nameof(UserContext.TableId))?.Value ?? "0");
                 userContext.Plan = principal.FindFirst(nameof(UserContext.Plan))?.Value ?? PlanType.Free.ToString();
-                // =============================================================
 
+                context.User = principal; // 標準のUserもセットしておく
             }
-            catch (SecurityTokenExpiredException)
-            {
-                context.Response.StatusCode = 401;
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync("{\"message\":\"Token has expired\"}");
-                return;
-            }
-            catch (Exception)
-            {
-                // 不正なトークンの場合はここでは何もしない（CustomAuthorize が 401 を出すため）
-            }
+            catch { /* 検証失敗時は何もしない。後続のAuthorize属性が401を出す */ }
         }
-
         await _next(context);
     }
+
 }

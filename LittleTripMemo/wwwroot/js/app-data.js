@@ -115,16 +115,15 @@ window.$Data = {
             if (data.archiveList) this._rawData.archiveList = data.archiveList;
             if (data.userProfile) this._rawData.userProfile = data.userProfile;
             if (data.ownerProfile) $App.AppData.Owner.Profile = data.ownerProfile;
+            // ユーザ用：システムデータ
+            if (data.systemInfo) $App.AppData.Owner.systemInfo = data.systemInfo;
+            if (data.myFeedback) $App.AppData.Owner.myFeedback = data.myFeedback;
+            if (data.myReport) $App.AppData.Owner.myReport = data.myReport;
             // 管理者用：各取得APIのレスポンスを Admin に格納
             if (data.notifications) $App.AppData.Admin.notifications = data.notifications;
             if (data.reportSummary) $App.AppData.Admin.reportSummary = data.reportSummary;
             if (data.reports) $App.AppData.Admin.reports = data.reports;
             if (data.feedbackList) $App.AppData.Admin.feedbackList = data.feedbackList;
-            // システム通知関連
-            if (data.systemInfo) $App.AppData.Owner.systemInfo = data.systemInfo;
-            // ユーザ用システムデータ
-            if (data.myFeedback) $App.AppData.Owner.myFeedback = data.myFeedback;
-            if (data.myReport) $App.AppData.Owner.myReport = data.myReport;
             console.log(">>$App.AppData:", $App.AppData);
             // ベース情報をStoreに保持
             $Data.Store.Restore();
@@ -160,7 +159,7 @@ window.$Data = {
         async GetUnMergeDetails(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/GetUnMergeDetails', params))();
         },
-        async GetArchiveDetails(params = { archive_id: 0 }, isPublic = false) {
+        async GetArchiveDetails(params, isPublic = false) {
             const url = isPublic ? "/api/GetArchiveDetails_pub" : "/api/GetArchiveDetails";
             return await $Warn.CatchAsync(async () => await this._fetchData('post', url, params))();
         },
@@ -201,19 +200,23 @@ window.$Data = {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/BulkSyncDetails', params))();
         },
 
-        // --- システム系API ---
+
+        // public record UpsertFeedbackReq(string? body, int score);
         async UpsertFeedback(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertFeedback', params))();
         },
+        // public record UpsertReportReq(Guid target_user_id, long archive_id, string? body);
         async UpsertReport(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertReport', params))();
         },
+        // public record UpsertNotificationReq(long seq, string title, string body, short kind, DateTime disp_from, DateTime disp_to);
         async UpsertNotification(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertNotification', params))();
         },
         async GetReportSummary(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportSummary', params))();
         },
+        // public record GetReportDetailsReq(Guid target_user_id, long archive_id);
         async GetReportDetails(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportDetails', params))();
         },
@@ -226,8 +229,13 @@ window.$Data = {
         async GetMyFeedback(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyFeedback', params))();
         },
+        // public record GetMyReportReq(long archive_id);
         async GetMyReport(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyReport', params))();
+        },
+        // public record DeleteMyReportReq(long archive_id);
+        async DeleteMyReport(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/DeleteMyReport', params))();
         },
         async GetSystemInfo(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetSystemInfo', params))();

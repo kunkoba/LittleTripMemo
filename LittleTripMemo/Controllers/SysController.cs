@@ -22,7 +22,6 @@ public class SysController : _BaseController
 
     public SysController(
         UserContext user,
-        IHttpContextAccessor accessor,
         UpsertFeedbackService upsertFeedbackService,
         GetAllFeedbackService getAllFeedbackService,
         UpsertReportService upsertReportService,
@@ -34,7 +33,7 @@ public class SysController : _BaseController
         GetMyFeedbackService getMyFeedbackService,
         GetMyReportService getMyReportService,
         DeleteMyReportService deleteMyReportService
-    ) : base(user, accessor)
+    ) : base(user)
     {
         _upsertFeedbackService = upsertFeedbackService;
         _getFeedbackService = getAllFeedbackService;
@@ -164,6 +163,9 @@ public class SysController : _BaseController
         return OkWithBase(result);
     }
 
+    /// <summary>
+    /// 通報削除
+    /// </summary>
     [HttpPost("api/Sys/DeleteMyReport")]
     public async Task<IActionResult> DeleteMyReport([FromBody] DeleteMyReportService.DeleteMyReportReq req)
     {

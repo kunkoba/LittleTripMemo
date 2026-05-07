@@ -35,7 +35,6 @@ public class AppController : _BaseController
     // コンストラクタに追加
     public AppController(
         UserContext userContext,
-        IHttpContextAccessor httpContextAccessor,
         GetUnMergeDetailsService getUnMergeDetailsService,
         GetArchiveDetailsService getArchiveDetailsService,
         GetArchiveListService getArchiveListService,
@@ -55,7 +54,7 @@ public class AppController : _BaseController
         UpdateDetailPubService updateDetailPubService,
         SearchByLocationPubService searchByLocationPubService,
         BulkSyncDetailsService bulkSyncDetailsService)
-        : base(userContext, httpContextAccessor)
+        : base(userContext)
     {
         _getUnMergeDetailsService = getUnMergeDetailsService;
         _getArchiveDetailsService = getArchiveDetailsService;
@@ -262,7 +261,6 @@ public class AppController : _BaseController
         var result = await _closeArchiveService.ExecuteAsync(req);
         return OkWithBase(result);
     }
-
 
     /// <summary>
     /// まとめ親の更新
