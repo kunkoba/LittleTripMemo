@@ -40,6 +40,10 @@ public class AccountController : _BaseController // 基底クラスを _BaseCont
             return BadRequest(new { result.message });
         }
 
+        // ✅ 重要：OkWithBase が参照している _user オブジェクトにログイン情報を手動でセットする
+        _user.UserId = result.userId ?? Guid.Empty;
+        _user.Plan = result.plan ?? PlanType.Free.ToString();
+
         // 共通レスポンス形式で返却
         return OkWithBase(new
         {

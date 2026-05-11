@@ -6,78 +6,33 @@ window.$Data = {
         this.Access._rawData.details =[];
         this.Store.Restore();
     },
-    // 同期処理の専門部署
-    LocalDb: {
-        // バックグラウンドで一括送信、一括処理
-        async BulkSendDetails2() {
-            const list = await $LocalDb.Detail.GetAll();
-            if (!list || list.length === 0) return;
-            for (const detail of list) {
-                detail.send_flag = 1;
-                await $LocalDb.Detail.Save(detail);
-                const isSuccess = (detail && detail.is_public === true)
-                    ? await $Data.Access.UpdateDetailPub(detail)
-                    : await $Data.Access.UpsertDetail(detail);
-                if (isSuccess) {
-                    await $LocalDb.Detail.DeleteById(detail.dbid);
-                } else {
-                    console.error(`dbid:${detail.dbid} の通信に失敗。環境が回復するまで待機します。`);
-                    detail.send_flag = 0;
-                    await $LocalDb.Detail.Save(detail);
-                    break;
-                }
-            }
-        },
-        // バックグラウンドで一括送信、一括処理
-        async BulkSendDetails() {
-            const list = await $LocalDb.Detail.GetAll();
-            if (!list || list.length === 0) return;
-            // 1. 全件の送信フラグを一旦「送信中(1)」にする
-            for (const detail of list) {
-                detail.send_flag = 1;
-                await $LocalDb.Detail.Save(detail);
-            }
-            // 2. サーバー側の BulkSyncReq 形式に合わせてペイロードを作成
-            const payload = {
-                items: list.map(d => ({
-                    seq: d.seq,
-                    archive_id: d.archive_id,
-                    latitude: d.latitude,
-                    longitude: d.longitude,
-                    title: d.title,
-                    body: d.body,
-                    memo_date: d.memo_date,
-                    memo_time: d.memo_time,
-                    face_emoji: d.face_emoji,
-                    weather_code: d.weather_code,
-                    link_url: d.link_url,
-                    memo_price: d.memo_price,
-                    is_public: !!d.is_public
-                }))
-            };
-            // 3. 一括送信
-            const isSuccess = await $Data.Access.BulkSyncDetails(payload);
-            if (isSuccess) {
-                for (const detail of list) {
-                    await $LocalDb.Detail.DeleteById(detail.dbid);
-                }
-            } else {
-                console.error(`一括同期に失敗しました。環境が回復するまで待機します。`);
-                for (const detail of list) {
-                    detail.send_flag = 0;
-                    await $LocalDb.Detail.Save(detail);
-                }
-            }
-        }
-    },
     // 通信関連のメソッド群
     Access: {
         baseUrl: "https://localhost:7292",
         _rawData: {
-            archive: null, details: [], archiveList:[], userProfile: null
+            archive: null,
+            details: [],
+            myReactions: [],
+            archiveList:[],
+            userProfile: null,
         },
         // サーバー通信の基礎
         async _fetchData(method, url, params, isDebug = false) {
+            // const isLoggedIn = $App.AppData.Context.IsLoggedIn;
+            // // ログイン不要なAPIのリスト（ホワイトリスト）
+            // const publicEndpoints = [
+            //     '/api/GetArchiveDetailsPub',
+            //     '/api/Account/LoginFirebase' // ログイン自体は通す
+            // ];
+            // // ホワイトリストに含まれているかチェック
+            // const isPublic = publicEndpoints.some(path => url.startsWith(path));
+            // // 未ログインかつ、公開用ではないAPIを叩こうとしたらブロック
+            // if (!isLoggedIn && !isPublic) {
+            //     $Notice.Warn("Please log in to use this feature.");
+            //     $Dialog.ShowLoginDialog();
+            //     return false;
+            // }
+            // メイン処理
             console.log("▼ Access:", this.baseUrl + url, params);
             const token = $App.AppData.Owner.Token;
             const options = {
@@ -92,7 +47,7 @@ window.$Data = {
             if (!response.ok) {
                 if (response.status === 401) {
                     $App.AppData.Owner.Token = null;
-                    $App.AppData.System.IsLoggedIn = false;
+                    $App.AppData.Context.IsLoggedIn = false;
                     $Dialog.ShowLoginDialog();
                     return false;
                 }
@@ -106,15 +61,19 @@ window.$Data = {
             const result = await response.json();
             console.log("■ Result:", url, result);
             const data = result.data;
+            //
+            $App.AppData.Context.IsLoggedIn = result.is_logged_in ?? false;
+            $App.AppData.Owner.plan = result.plan;
+            if (data.archiveId) $App.AppData.Context.TargetArchiveId = data.archiveId;
             // アプリ基幹のデータ
-            if (data.token) $App.AppData.Owner.Token = data.token;
-            $App.AppData.System.IsLoggedIn = result.is_logged_in ?? false;
             if (data.archive) this._rawData.archive = data.archive;
             if (data.details) this._rawData.details = data.details;
-            if (data.archiveId) $App.AppData.System.TargetArchiveId = data.archiveId;
+            if (data.myReactions) this._rawData.myReactions = data.myReactions;
             if (data.archiveList) this._rawData.archiveList = data.archiveList;
             if (data.userProfile) this._rawData.userProfile = data.userProfile;
+            // Owner
             if (data.ownerProfile) $App.AppData.Owner.Profile = data.ownerProfile;
+            if (data.token) $App.AppData.Owner.Token = data.token;
             // ユーザ用：システムデータ
             if (data.systemInfo) $App.AppData.Owner.systemInfo = data.systemInfo;
             if (data.myFeedback) $App.AppData.Owner.myFeedback = data.myFeedback;
@@ -133,7 +92,11 @@ window.$Data = {
         async LoginToServer(email) {
             const url = '/api/Account/LoginFirebase';
             const params = { Email: email };
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', url, params))();
+            return await $Warn.CatchAsync(async () => {
+                await this._fetchData('post', url, params);
+                console.log("Login 成功");
+                // await $App.RefreshScreen();
+            })();
         },
         async GetProfile(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/GetProfile', params))();
@@ -184,10 +147,19 @@ window.$Data = {
         async SearchByLocationPub(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/SearchByLocationPub', params))();
         },
-        async GetArchiveDetailsPub(params = {}) {
+        async GetArchiveDetailsPub_2(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/GetArchiveDetailsPub', params))();
         },
-        async UpsertReaction(params = {}) {
+        // get
+        async GetArchiveDetailsPub(params = {}) {
+            // 引数 params.archive_id を使用して URL を構築
+            const url = `/api/GetArchiveDetailsPub/${params.archive_id}`;
+            // GET リクエストとして実行 (_fetchData の method 引数を 'get' に)
+            return await $Warn.CatchAsync(async () => {
+                return await this._fetchData('get', url, null); 
+            })();
+        },
+        async UpsertReaction(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpsertReaction', params))();
         },
         async OpenArchive(params = {}) {
@@ -248,6 +220,7 @@ window.$Data = {
         Restore() {
             this._archive = structuredClone($Data.Access._rawData.archive || null);
             this._details = structuredClone($Data.Access._rawData.details ||[]);
+            this._myReactions = structuredClone($Data.Access._rawData.myReactions || []);
             this._archiveList = structuredClone($Data.Access._rawData.archiveList ||[]);
             this._userProfile = structuredClone($Data.Access._rawData.userProfile || null);
         },
@@ -261,12 +234,13 @@ window.$Data = {
             const hit = list.find(x => x.archive_id === Number(archiveId) && x.seq === Number(seq));
             return hit ? [hit] :[];
         },
-        // 【ラッパー】アーカイブ取得
-        GetArchive() { return this._archive; },
-        // 【ラッパー】アーカイブリスト取得
-        GetArchiveList() { return this._archiveList; },
-        // ソート処理
-        SortDetails(field = "date", order = "asc") {
+        GetArchive() {
+            return this._archive;
+        },
+        GetArchiveList() {
+            return this._archiveList;
+        },
+        GetDetailsWithSort(field = "date", order = "asc") {
             if (!this._details || this._details.length === 0) return;
             const isAsc = order.toLowerCase() === "asc";
             this._details.sort((a, b) => {
@@ -286,12 +260,15 @@ window.$Data = {
                 return 0;
             });
         },
-        GetAllDetails() {
+        GetDetails() {
             return this._getDetails();
         },
         GetDetailByKey(archiveId, seq) {
             const res = this._getDetails(archiveId, seq);
             return res[0] || null;
+        },
+        GetMyReactions() {
+            return this._myReactions;
         },
         UpsertDetail(detail) {
             if (!detail) return;
@@ -319,11 +296,71 @@ window.$Data = {
                 }
             }
         },
-        GetUserProfile() { return this._userProfile; },
+        GetUserProfile() {
+            return this._userProfile; 
+        },
         UpdateProfile(updatedFields) {
             if (this._userProfile) {
                 Object.assign(this._userProfile, updatedFields);
             }
+        },
+    },
+    // 同期処理の専門部署
+    LocalDb: {
+        // バックグラウンドで明細を一括送信
+        async BulkSendDetails() {
+            const list = await $LocalDb.Detail.GetAll();
+            if (!list || list.length === 0) return;
+            // 1. 全件の送信フラグを一旦「送信中(1)」にする
+            for (const detail of list) {
+                detail.send_flag = 1;
+                await $LocalDb.Detail.Save(detail);
+            }
+            // 2. サーバー側の BulkSyncReq 形式に合わせてペイロードを作成
+            const payload = {
+                items: list.map(d => ({
+                    seq: d.seq,
+                    archive_id: d.archive_id,
+                    latitude: d.latitude,
+                    longitude: d.longitude,
+                    title: d.title,
+                    body: d.body,
+                    memo_date: d.memo_date,
+                    memo_time: d.memo_time,
+                    face_emoji: d.face_emoji,
+                    weather_code: d.weather_code,
+                    link_url: d.link_url,
+                    memo_price: d.memo_price,
+                    is_public: !!d.is_public
+                }))
+            };
+            // 3. 一括送信
+            const isSuccess = await $Data.Access.BulkSyncDetails(payload);
+            if (isSuccess) {
+                for (const detail of list) {
+                    await $LocalDb.Detail.DeleteById(detail.dbid);
+                }
+            } else {
+                console.error(`一括同期に失敗しました。環境が回復するまで待機します。`);
+                for (const detail of list) {
+                    detail.send_flag = 0;
+                    await $LocalDb.Detail.Save(detail);
+                }
+            }
+        },
+        // 現在ストアにある明細とリアクションをローカルDBに同期する。リアクションがない明細についても、空のレコードを作成する
+        async SetReactionsToLocalDb() {
+            const archive = $Data.Store.GetArchive();
+            if (!archive) return;
+            const archiveId = archive.archive_id;
+            const details = $Data.Store.GetDetails();
+            const rawReactions = $Data.Store.GetMyReactions(); // サーバーから取得した生リスト
+            // ローカルDBの ParseAndSaveMyReactions を呼び出す
+            await $Warn.CatchAsync(async () => {
+                await $LocalDb.Reaction.ParseAndSaveMyReactions(archiveId, rawReactions, details);
+                // 通知
+                $Notice.Info(`SyncReactions: Archive ${archiveId} の同期完了`);
+            })();
         },
     },
 };

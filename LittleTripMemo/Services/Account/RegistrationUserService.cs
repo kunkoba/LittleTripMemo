@@ -21,7 +21,8 @@ public class RegistrationUserService
     public record FirebaseLoginRequest(string Email);
 
     // レスポンス（tokenを追加）
-    public record Response(bool is_success, string message, string? token = null);
+    //public record Response(bool is_success, string message, string? token = null);
+    public record Response(bool is_success, string message, string? token = null, Guid? userId = null, string? plan = null);
 
     public RegistrationUserService(
         UserManager<MyAppUser> userManager,
@@ -58,7 +59,9 @@ public class RegistrationUserService
 
         // JwtService を使ってトークン生成
         var token = _jwtService.CreateToken(user);
-        return new Response(true, "成功", token);
+
+        //return new Response(true, "成功", token);
+        return new Response(true, "成功", token, user.Id, user.Plan);
     }
 
     /// <summary>

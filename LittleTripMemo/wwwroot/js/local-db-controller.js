@@ -2,7 +2,7 @@
 const _LocalDbCore = {
     db: null,
     DB_NAME: "littleTripMemoDb",
-    VERSION: 1,
+    VERSION: 2,
     // トランザクションモード定義
     TRANSACTION_MODES: {
         READONLY: 'readonly',
@@ -11,7 +11,8 @@ const _LocalDbCore = {
     // ストア名称定義
     STORE_NAMES: {
         DETAIL: 'detailStore',
-        ARCHIVE: 'archiveStore',
+        // ARCHIVE: 'archiveStore',
+        REACTION: 'reactionStore',
     },
     // 初期化
     async init() {
@@ -36,6 +37,7 @@ const _LocalDbCore = {
     },
     // ※※※※ データベースを削除する関数 ※※※※
     __deleteAllDatabases() {
+        console.log("◆__deleteAllDatabases");
         const request = indexedDB.deleteDatabase(this.DB_NAME);    // dbNameは削除したいデータベース名
         request.onsuccess = () => {
             console.log(`deleteAllDatabases >> データベース ${this.DB_NAME} は削除されました`);
@@ -53,9 +55,13 @@ const _LocalDbCore = {
         if (!db.objectStoreNames.contains(this.STORE_NAMES.DETAIL)) {
             const store = db.createObjectStore(this.STORE_NAMES.DETAIL, { keyPath: "dbid", autoIncrement: true });
         }
-        // まとめ親
-        if (!db.objectStoreNames.contains(this.STORE_NAMES.ARCHIVE)) {
-            const store = db.createObjectStore(this.STORE_NAMES.ARCHIVE, { keyPath: "dbid", autoIncrement: true });
+        // // まとめ親
+        // if (!db.objectStoreNames.contains(this.STORE_NAMES.ARCHIVE)) {
+        //     const store = db.createObjectStore(this.STORE_NAMES.ARCHIVE, { keyPath: "dbid", autoIncrement: true });
+        // }
+        // リアクション（archive_id と seq の複合キー）
+        if (!db.objectStoreNames.contains(this.STORE_NAMES.REACTION)) {
+            const store = db.createObjectStore(this.STORE_NAMES.REACTION, { keyPath: ["archive_id", "seq"] });
         }
     },
     // トランザクションからオブジェクトストアを取得
@@ -218,13 +224,14 @@ const _LocalDbCore = {
 const LocalDbController = {
     // ※※※※ データベースを削除する ※※※※
     RemoveDB(){
-        // 基本的にコメントアウト
+        // // 基本的にコメントアウト
         // _LocalDbCore.__deleteAllDatabases();
     },
     // 初期化
     async Init() {
         await _LocalDbCore.init();
     },
+    // 明細管理
     Detail: {
         storeName: _LocalDbCore.STORE_NAMES.DETAIL,
         // データ保存（成否が返却、「dbid」が付与される）
@@ -260,9 +267,78 @@ const LocalDbController = {
                 return item;
             });
         },
-    }
+    },
+    // リアクション管理
+    Reaction: {
+        storeName: _LocalDbCore.STORE_NAMES.REACTION,
+        // 保存（1seq=1レコード形式をUpsert）
+        async Save(reactionData) {
+            // send_flag が未設定の場合は 0 (未送信) とする
+            if (reactionData.send_flag === undefined) reactionData.send_flag = 0;
+            return await _LocalDbCore.upsertData(this.storeName, reactionData);
+        },
+        // 特定の明細のリアクションを取得
+        async Get(archiveId, seq) {
+            return await _LocalDbCore.getDataByKey(this.storeName, [Number(archiveId), Number(seq)]);
+        },
+        // 未送信(send_flag = 0)のものを全取得
+        async GetUnsentAll() {
+            const all = await _LocalDbCore.getAllData(this.storeName);
+            return all.filter(item => item.send_flag === 0);
+        },
+        // サーバーからの生データ（1リアクション＝1レコード）を受け取り、ローカルDBに同期する
+        async ParseAndSaveMyReactions(archiveId, rawReactions, allDetails = []) {
+            if (!archiveId) return;
+            const targetArchiveId = Number(archiveId);
+            // 1. ローカルの未送信(send_flag === 0)を保護（既存ロジック）
+            const unsentList = await this.GetUnsentAll();
+            const unsentSeqs = unsentList
+                .filter(r => r.archive_id === targetArchiveId)
+                .map(r => r.seq);
+            // 2. サーバーからのリアクションを集約
+            const aggregated = {};
+            rawReactions.forEach(raw => {
+                const seq = Number(raw.seq);
+                if (!aggregated[seq]) {
+                    aggregated[seq] = this._createEmptyReaction(targetArchiveId, seq, 1); // 1=同期済み
+                }
+                // 各フラグを反映
+                if (raw.reaction_type === 1) aggregated[seq].is_funny = true;
+                if (raw.reaction_type === 2) aggregated[seq].is_love = true;
+                if (raw.reaction_type === 3) aggregated[seq].is_surprise = true;
+                if (raw.reaction_type === 4) aggregated[seq].is_sad = true;
+            });
+            // 3. ★重要：明細(allDetails)をループして、不足しているseqに空のレコードを作る
+            allDetails.forEach(detail => {
+                const seq = Number(detail.seq);
+                if (!aggregated[seq]) {
+                    // サーバーにリアクションがなかった明細にも空枠を作成
+                    aggregated[seq] = this._createEmptyReaction(targetArchiveId, seq, 1);
+                }
+            });
+            // 4. 未送信(send_flag=0)以外のものを一括保存
+            const promises = Object.values(aggregated).map(data => {
+                if (unsentSeqs.includes(data.seq)) return Promise.resolve();
+                return this.Save(data);
+            });
+            await Promise.all(promises);
+        },
+        // ヘルパー：空のリアクションオブジェクト生成
+        _createEmptyReaction(archiveId, seq, sendFlag = 0) {
+            return {
+                archive_id: archiveId,
+                seq: seq,
+                is_funny: false,
+                is_love: false,
+                is_surprise: false,
+                is_sad: false,
+                send_flag: sendFlag
+            };
+        }
+    },
 };
 
+LocalDbController.RemoveDB();
 // Public
 export default LocalDbController;
 

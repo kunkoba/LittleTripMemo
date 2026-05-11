@@ -45,7 +45,7 @@ const _DialogCore = {
                 if (!isArray && rowDef.rowId) rowDiv.id = rowDef.rowId;
                 if (!isArray && rowDef.isHidden) rowDiv.classList.add("hidden");
                 const sizeClass = items.length > 1 ? "flex-1" : "w-full";
-                const baseClass = `${sizeClass} font-black text-[14px] h-12 rounded-2xl uppercase active:scale-95 transition-transform`;
+                const baseClass = `${sizeClass} font-black text-[0.8rem] h-12 rounded-2xl uppercase active:scale-95 transition-transform`;
                 const defaultColorClass = "bg-brand-5 text-white shadow-md";
                 items.forEach(btnDef => {
                     const btn = document.createElement("button");
@@ -132,30 +132,65 @@ const DialogController = {
             });
         });
     },
+    // ログイン処理
+    ShowLoginDialog() {
+        const el = $Dom.GenerateTemplate("tpl-login");
+        // Googleログインボタン
+        $Dom.QuerySelector("#btn-login-google", el).onclick = $Err.CatchAsync(async () => {
+            // 認証処理を実行
+            const isLoginSuccess = await $App.ExecuteLoginFlow();
+            if (!isLoginSuccess) {
+                // 失敗時はコンソールにエラーを出力して中断
+                console.error("ログイン失敗");
+                return;
+            }
+            // 表示されているすべてのダイアログを破棄
+            _DialogCore.closeAll();
+            // ★修正3: Init()で全初期化するのではなく、現在の画面モードを維持して再描画する
+            await $App.RefreshScreen();
+        });
+        _DialogCore.open({
+            title: "LOGIN",
+            content: el,
+            ok: null,
+        });
+    },
     // 【基幹】システムメニューを表示
     ShowSystemMenu() {
         const el = $Dom.GenerateTemplate('tpl-menu-system');
-        const btnAuth = $Dom.QuerySelector('#btn-sys-auth', el);
-        const authLabel = $Dom.QuerySelector('span:last-child', btnAuth);
-        const isLoggedIn = $App.AppData.System.IsLoggedIn;
-        authLabel.textContent = isLoggedIn ? "LOGOUT" : "LOGIN";
-        // 各ボタンの紐付け（次階層の呼び出しなど）
-        $Dom.QuerySelector('#btn-sys-user-profile', el).onclick = async () => {
-            const isSuccess = await $Data.Access.GetProfile();
-            if (isSuccess && $App.AppData.Owner.Profile) {
-                this.ShowUserProfile($App.AppData.Owner.Profile, true);
-            }
+        const isLoggedIn = $App.AppData.Context.IsLoggedIn;
+        const isAdmin = isLoggedIn && $App.AppData.Owner.plan === "Admin";
+        // 1. ShowAppMenuと同様、まとめてボタン変数にする
+        const b = {
+            profile: $Dom.QuerySelector('#btn-sys-user-profile', el),
+            config:  $Dom.QuerySelector('#btn-sys-user-config', el),
+            notice:  $Dom.QuerySelector('#btn-sys-notice', el),
+            version: $Dom.QuerySelector('#btn-sys-version', el),
+            auth:    $Dom.QuerySelector('#btn-sys-auth', el),
+            admin:   $Dom.QuerySelector('#btn-sys-admin', el),
         };
-        $Dom.QuerySelector('#btn-sys-user-config', el).onclick = () => { this.ShowUserSettingsMenu(); };
-        $Dom.QuerySelector('#btn-sys-notice', el).onclick = () => { this.ShowNoticeList(); };
-        $Dom.QuerySelector('#btn-sys-version', el).onclick = () => { this.ShowAppInfo(); };
-        $Dom.QuerySelector('#btn-sys-admin', el).onclick = () => { this.ShowAdminMenu(); };
-        btnAuth.onclick = async () => {
+        // 2. まとめて表示設定（ログイン・権限状態で絞り込み）
+        $Dom.ToggleShow(b.profile, isLoggedIn);
+        $Dom.ToggleShow(b.notice,  isLoggedIn);
+        $Dom.ToggleShow(b.version, isLoggedIn);
+        $Dom.ToggleShow(b.admin, isAdmin);
+        // 3. ログイン/ログアウトボタンのラベル反映
+        const authLabel = $Dom.QuerySelector('span:last-child', b.auth);
+        authLabel.textContent = isLoggedIn ? "LOGOUT" : "LOGIN";
+        // 4. 各ボタンのイベント登録
+        b.profile.onclick = async () => {
+            const isSuccess = await $Data.Access.GetProfile();
+            if (isSuccess && $App.AppData.Owner.Profile) this.ShowUserProfile($App.AppData.Owner.Profile, true);
+        };
+        b.config.onclick = () => this.ShowUserSettingsMenu();
+        b.notice.onclick = () => this.ShowNoticeList();
+        b.version.onclick = () => this.ShowAppInfo();
+        b.admin.onclick = () => this.ShowAdminMenu();
+        b.auth.onclick = async () => {
             if (isLoggedIn) {
-                const isOk = await this.ShowConfirm({ title: "LOGOUT", message: "ログアウトしますか？" });
-                if (isOk) {
+                if (await this.ShowConfirm({ title: "LOGOUT", message: "ログアウトしますか？" })) {
                     _DialogCore.closeAll();
-                    $App.AppData.System.IsLoggedIn = false;
+                    $App.AppData.Context.IsLoggedIn = false;
                     $App.AppData.Owner.Token = null;
                     $App._saveSettings();
                     $Notice.Info("Logged out.");
@@ -166,6 +201,47 @@ const DialogController = {
             }
         };
         _DialogCore.open({ title: "SYSTEM MENU", content: el, ok: null });
+    },
+    // 【基幹】アプリメニューを表示
+    ShowAppMenu() {
+        const isLoggedIn = $App.AppData.Context.IsLoggedIn;
+        const mode = $App.AppData.Context.ScreenMode;
+        const el = $Dom.GenerateTemplate('tpl-menu-app');
+        // 各ボタンを一度だけ取得してオブジェクトに格納
+        const b = {
+            create: $Dom.QuerySelector('#btn-app-create', el),
+            current: $Dom.QuerySelector('#btn-app-current', el),
+            restore: $Dom.QuerySelector('#btn-app-restore', el),
+            detailList: $Dom.QuerySelector('#btn-app-list', el),
+            batch:   $Dom.QuerySelector('#btn-app-batch', el),
+            point:   $Dom.QuerySelector('#btn-app-point', el),
+            archiveList: $Dom.QuerySelector('#btn-app-archive-list', el),
+            search: $Dom.QuerySelector('#btn-app-search', el),
+        };
+        // 表示制御（取得済みの変数を使用）
+        console.log("modemode:", mode);
+        if (mode === $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.create, false);
+        if (mode === $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.batch, true);
+        if (mode === $Const.SCREEN_MODE.SEARCH) $Dom.ToggleShow(b.point, true);
+        if (mode == $Const.SCREEN_MODE.SEARCH) $Dom.ToggleShow(b.search, false);
+        // 未ログインなら
+        if (!isLoggedIn) {
+            $Dom.ToggleShow(b.create, false);
+            $Dom.ToggleShow(b.archiveList, false);
+            $Dom.ToggleShow(b.batch, false);
+            $Dom.ToggleShow(b.search, false);
+        }
+        // イベント登録（取得済みの変数を使用）
+        b.create.onclick = () => { $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; _DialogCore.close(); $App.RefreshScreen(); };
+        b.current.onclick = () => { $Marker.RefreshCurrentLocation(); $Marker.FocusToLocationMarker(); _DialogCore.close(); };
+        b.restore.onclick = () => { $Marker.RestoreMarkers(); _DialogCore.close(); };
+        b.detailList.onclick = () => mode === $Const.SCREEN_MODE.SEARCH ? this.ShowDetailsSimpleList() : this.ShowDetailsTimeLine();
+        b.batch.onclick = () => { this.ShowMultiSelectTimeline({ onOk: (l) => console.log(l) }); };
+        b.point.onclick = () => { this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18)); };
+        b.archiveList.onclick = () => { this.ShowArchiveList(); };
+        b.search.onclick = () => { $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH; $App.RefreshScreen(); _DialogCore.close(); };
+        //
+        _DialogCore.open({ title: "APP MENU", content: el, ok: null });
     },
     // （システム）ユーザー設定メニュー（第2階層）
     ShowUserSettingsMenu() {
@@ -184,7 +260,7 @@ const DialogController = {
         let previewItems = '';
         for (let i = 0; i <= 5; i++) {
             const textColor = i > 2 ? 'text-white' : 'text-black-3';
-            previewItems += `<div class="w-full h-10 bg-brand-${i} border border-brand-2 flex items-center px-4 text-[11px] font-bold ${textColor}">LEVEL ${i} PREVIEW</div>`;
+            previewItems += `<div class="w-full h-10 bg-brand-${i} border border-brand-2 flex items-center px-4 text-[0.7rem] font-bold ${textColor}">LEVEL ${i} PREVIEW</div>`;
         }
         const html = `
             <div class="p-6 w-full space-y-6 bg-brand-0">
@@ -226,9 +302,9 @@ const DialogController = {
         Object.values($Map.MAP_STYLE).forEach(style => {
             listHtml += `
                 <button id="ms-btn-${style.key}" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-                    <span class="col-span-1 flex justify-center text-lg">🗺️</span>
+                    <span class="col-span-1 flex justify-center text-[1.2rem]">🗺️</span>
                     <span class="col-span-1"></span>
-                    <span class="col-span-8 text-left font-bold text-[15px] uppercase">${style.name}</span>
+                    <span class="col-span-8 text-left font-bold text-[1rem] uppercase">${style.name}</span>
                 </button>`;
         });
         const el = document.createElement('div');
@@ -316,7 +392,7 @@ const DialogController = {
         $Dom.QuerySelector(".js-avg-stars", el).textContent = "★".repeat(Math.round(scoreAvg)) + "☆".repeat(5 - Math.round(scoreAvg));
         $Dom.QuerySelector(".js-total-reviews", el).textContent = `Recent ${feedbackList.length} feedbackList`;
         if (feedbackList.length === 0) {
-            container.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
+            container.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
         } else {
             feedbackList.forEach(rev => {
                 const child = $Dom.GenerateTemplate("tpl-list-child-review");
@@ -574,8 +650,8 @@ const DialogController = {
     // 地点リスト（単一選択・ジャンプ機能）
     ShowDetailsTimeLine() {
         // Storeの機能を使って昇順にソート
-        // $Data.Store.SortDetails("date", "asc");
-        const details = $Data.Store.GetAllDetails();
+        // $Data.Store.GetDetailsWithSort("date", "asc");
+        const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) {
             $Notice.Warn("No data.");
             return;
@@ -605,10 +681,10 @@ const DialogController = {
                 const price = Number(item.memo_price || 0);
                 if (price > 0) {
                     priceEl.textContent = `+${price.toLocaleString()}`;
-                    priceEl.className = "js-price text-[14px] font-black shrink-0 whitespace-nowrap text-blue-500";
+                    priceEl.className = "js-price text-[0.8rem] font-black shrink-0 whitespace-nowrap text-blue-500";
                 } else if (price < 0) {
                     priceEl.textContent = price.toLocaleString();
-                    priceEl.className = "js-price text-[14px] font-black shrink-0 whitespace-nowrap text-red-500";
+                    priceEl.className = "js-price text-[0.8rem] font-black shrink-0 whitespace-nowrap text-red-500";
                 } else {
                     priceEl.textContent = "";
                 }
@@ -635,29 +711,6 @@ const DialogController = {
                 }
             }
         }, 10);
-    },
-    // ログイン処理
-    ShowLoginDialog() {
-        const el = $Dom.GenerateTemplate("tpl-login");
-        // Googleログインボタン
-        $Dom.QuerySelector("#btn-login-google", el).onclick = $Err.CatchAsync(async () => {
-            // 認証処理を実行
-            const isLoginSuccess = await $App.ExecuteLoginFlow();
-            if (!isLoginSuccess) {
-                // 失敗時はコンソールにエラーを出力して中断
-                console.error("ログイン失敗");
-                return;
-            }
-            // 表示されているすべてのダイアログを破棄
-            _DialogCore.closeAll();
-            // 画面表示内容を最新の状態に更新
-            $App.RefreshScreen();
-        });
-        _DialogCore.open({
-            title: "LOGIN",
-            content: el,
-            ok: null,
-        });
     },
     // まとめ親一覧選択
     ShowArchiveList() {
@@ -710,26 +763,26 @@ const DialogController = {
                         if (item.closed_flg) {
                             // Publicデータ（CLOSE）
                             badge.textContent = "Close";
-                            badge.className = "js-badge text-[10px] font-black px-2 py-0.5 rounded-md uppercase italic border border-slate-200 bg-white text-slate-400";
+                            badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-md uppercase italic border border-slate-200 bg-white text-slate-400";
                             leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-200"; // 左線グレー
                         } else {
                             // Publicデータ（OPEN）
                             badge.textContent = "OPEN";
-                            badge.className = "js-badge text-[10px] font-black px-2 py-0.5 rounded-md uppercase italic border border-blue-100 bg-brand-2 text-brand-5 shadow-sm";
+                            badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-md uppercase italic border border-blue-100 bg-brand-2 text-brand-5 shadow-sm";
                             leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-brand-5"; // 左線ブランドカラー
                         }
                     } else {
                         // 内部データ（PRIVATE）
                         badge.textContent = "PRIVATE";
-                        badge.className = "js-badge text-[10px] font-black px-2 py-0.5 rounded-md uppercase italic border border-slate-200 bg-slate-100 text-slate-400 shadow-sm";
+                        badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-md uppercase italic border border-slate-200 bg-slate-100 text-slate-400 shadow-sm";
                         leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800"; // 左線ブランドカラー
                     }
                     child.onclick = () => {
                         _DialogCore.closeAll();
-                        $App.AppData.System.ScreenMode = isPublicGroup
+                        $App.AppData.Context.ScreenMode = isPublicGroup
                             ? $Const.SCREEN_MODE.ARCHIVE_PUB
                             : $Const.SCREEN_MODE.ARCHIVE;
-                        $App.AppData.System.TargetArchiveId = item.archive_id;
+                        $App.AppData.Context.TargetArchiveId = item.archive_id;
                         $App.RefreshScreen();
                     };
                     root.appendChild(child);
@@ -792,8 +845,8 @@ const DialogController = {
                     $Notice.Info("Added successfully.");
                     _DialogCore.closeAll();
                     // ARCHIVEモードに切り替えて対象のまとめを開く
-                    $App.AppData.System.ScreenMode = $Const.SCREEN_MODE.ARCHIVE;
-                    $App.AppData.System.TargetArchiveId = item.archive_id;
+                    $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE;
+                    $App.AppData.Context.TargetArchiveId = item.archive_id;
                     await $App.RefreshScreen();
                 };
                 root.appendChild(child);
@@ -808,7 +861,7 @@ const DialogController = {
     },
     // メモをまとめる（複数選択モード）
     ShowMultiSelectTimeline() {
-        const details = $Data.Store.GetAllDetails();
+        const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) {
             $Notice.Warn("No data.");
             return;
@@ -903,7 +956,7 @@ const DialogController = {
                             if (!isSuccess) return;
                             $Notice.Info("作成しました");
                             _DialogCore.closeAll();
-                            $App.AppData.System.ScreenMode = $Const.SCREEN_MODE.ARCHIVE;
+                            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE;
                             await $App.RefreshScreen();
                         }
                     },
@@ -925,7 +978,7 @@ const DialogController = {
     },
     // 地図用のシンプルリスト表示
     ShowDetailsSimpleList() {
-        const details = $Data.Store.GetAllDetails();
+        const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) {
             $Notice.Warn("No data.");
             return;
@@ -936,10 +989,10 @@ const DialogController = {
             <div class="flex justify-between items-center mb-6 mt-2 px-1">
                 <div class="flex items-center gap-2">
                     <div class="w-2 h-2 rounded-full bg-red-500 shadow-sm shadow-red-500/30"></div>
-                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">HIT MEMOS</span>
+                    <span class="text-[0.6rem] font-black uppercase tracking-[0.2em] text-slate-500">HIT MEMOS</span>
                 </div>
                 <div class="bg-white border border-slate-100 rounded-full px-3 py-1 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
-                    <span class="text-[10px] font-black text-slate-600 tracking-wider">${details.length} FOUND</span>
+                    <span class="text-[0.6rem] font-black text-slate-600 tracking-wider">${details.length} FOUND</span>
                 </div>
             </div>
         `;
@@ -970,11 +1023,11 @@ const DialogController = {
                 }
                 if (price > 0) {
                     priceEl.textContent = `+${price.toLocaleString()}`;
-                    priceEl.className = "js-memo-price text-[10px] font-black text-blue-500";
+                    priceEl.className = "js-memo-price text-[0.6rem] font-black text-blue-500";
                     currencyEl.textContent = displayCurrency;
                 } else if (price < 0) {
                     priceEl.textContent = price.toLocaleString();
-                    priceEl.className = "js-memo-price text-[10px] font-black text-red-500";
+                    priceEl.className = "js-memo-price text-[0.6rem] font-black text-red-500";
                     currencyEl.textContent = displayCurrency;
                 } else {
                     // 0円の時は枠を詰めるために中身を空に
@@ -1005,38 +1058,6 @@ const DialogController = {
             }
         }, 10);
     },
-    // 【基幹】アプリメニューを表示
-    ShowAppMenu() {
-        const el = $Dom.GenerateTemplate('tpl-menu-app');
-        const mode = $App.AppData.System.ScreenMode;
-        // 各ボタンを一度だけ取得してオブジェクトに格納
-        const b = {
-            create: $Dom.QuerySelector('#btn-app-create', el),
-            current: $Dom.QuerySelector('#btn-app-current', el),
-            restore: $Dom.QuerySelector('#btn-app-restore', el),
-            detailList: $Dom.QuerySelector('#btn-app-list', el),
-            batch:   $Dom.QuerySelector('#btn-app-batch', el),
-            point:   $Dom.QuerySelector('#btn-app-point', el),
-            archiveList: $Dom.QuerySelector('#btn-app-archive-list', el),
-            search: $Dom.QuerySelector('#btn-app-search', el),
-        };
-        // 表示制御（取得済みの変数を使用）
-        if (mode === $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.create, false);
-        if (mode === $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.batch, true);
-        if (mode === $Const.SCREEN_MODE.SEARCH) $Dom.ToggleShow(b.point, true);
-        if (mode == $Const.SCREEN_MODE.SEARCH) $Dom.ToggleShow(b.search, false);
-        // イベント登録（取得済みの変数を使用）
-        b.create.onclick = () => { $App.AppData.System.ScreenMode = $Const.SCREEN_MODE.CREATE; $App.RefreshScreen(); _DialogCore.close(); };
-        b.current.onclick = () => { $Marker.RefreshCurrentLocation(); $Marker.FocusToLocationMarker(); _DialogCore.close(); };
-        b.restore.onclick = () => { $Marker.RestoreMarkers(); _DialogCore.close(); };
-        b.detailList.onclick = () => mode === $Const.SCREEN_MODE.SEARCH ? this.ShowDetailsSimpleList() : this.ShowDetailsTimeLine();
-        b.batch.onclick = () => { this.ShowMultiSelectTimeline({ onOk: (l) => console.log(l) }); };
-        b.point.onclick = () => { this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18)); };
-        b.archiveList.onclick = () => { this.ShowArchiveList(); };
-        b.search.onclick = () => { $App.AppData.System.ScreenMode = $Const.SCREEN_MODE.SEARCH; $App.RefreshScreen(); _DialogCore.close(); };
-        //
-        _DialogCore.open({ title: "APP MENU", content: el, ok: null });
-    },
     // 状態変更の定型処理ヘルパー
     async _execStatusChange(methodName, params, confirmTitle, confirmMsg, successMsg, nextScreenMode = null, onUpdateStore = null) {
         // Promiseで結果を待つ
@@ -1050,7 +1071,7 @@ const DialogController = {
             $Notice.Info(successMsg);
             _DialogCore.closeAll();
             if (nextScreenMode) {
-                $App.AppData.System.ScreenMode = nextScreenMode;
+                $App.AppData.Context.ScreenMode = nextScreenMode;
                 await $App.RefreshScreen();
             } else {
                 const archive = $Data.Store.GetArchive();
@@ -1158,7 +1179,7 @@ const DialogController = {
                 $Dom.ToggleShow(urlWrapper, false);
             }
             // 統計データの計算
-            const details = $Data.Store.GetAllDetails() ||[];
+            const details = $Data.Store.GetDetails() ||[];
             const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
             $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
             const priceBox = $Dom.QuerySelector('#view-mem-price-box', el);
@@ -1166,20 +1187,20 @@ const DialogController = {
             const priceLabel = $Dom.QuerySelector('#view-mem-price-label', el);
             const displayCurrency = archive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
             if (totalPrice > 0) {
-                priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-blue-100 bg-blue-50 shadow-sm";
-                priceVal.className = "text-[18px] font-black text-blue-600";
+                // priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-blue-100 bg-blue-50 shadow-sm";
+                priceVal.className = "text-[1.2rem] font-black text-blue-600";
                 priceLabel.className = "text-[8px] font-black uppercase text-blue-500 mb-1";
-                priceVal.innerHTML = `${totalPrice.toLocaleString()} <span class="text-[10px] text-blue-400 ml-0.5">${displayCurrency}</span>`;
+                priceVal.innerHTML = `${totalPrice.toLocaleString()} <span class="text-[0.6rem] text-blue-400 ml-0.5">${displayCurrency}</span>`;
             } else if (totalPrice < 0) {
-                priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-red-100 bg-red-50 shadow-sm";
-                priceVal.className = "text-[18px] font-black text-red-600";
+                // priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-red-100 bg-red-50 shadow-sm";
+                priceVal.className = "text-[1.2rem] font-black text-red-600";
                 priceLabel.className = "text-[8px] font-black uppercase text-red-500 mb-1";
-                priceVal.innerHTML = `- ${Math.abs(totalPrice).toLocaleString()} <span class="text-[10px] text-red-400 ml-0.5">${displayCurrency}</span>`;
+                priceVal.innerHTML = `- ${Math.abs(totalPrice).toLocaleString()} <span class="text-[0.6rem] text-red-400 ml-0.5">${displayCurrency}</span>`;
             } else {
                 priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-brand-1 bg-white shadow-sm";
-                priceVal.className = "text-[18px] font-black text-black-5";
+                priceVal.className = "text-[1.2rem] font-black text-black-5";
                 priceLabel.className = "text-[8px] font-black uppercase text-black-3 mb-1";
-                priceVal.innerHTML = `0 <span class="text-[10px] text-black-3 ml-0.5">${displayCurrency}</span>`;
+                priceVal.innerHTML = `0 <span class="text-[0.6rem] text-black-3 ml-0.5">${displayCurrency}</span>`;
             }
         };
         renderView();
@@ -1195,9 +1216,18 @@ const DialogController = {
         }
         // ダイアログフッターのボタン配列を構築（縦並びにするため配列をネストする）
         const dialogButtons =[];
+        // 公開データなら「シェアボタン」を一番上に表示
+        if (archive.is_public) {
+            dialogButtons.push([{
+                label: "🔗 SHARE THIS ARCHIVE",
+                className: "w-full bg-blue-500 text-white font-bold py-3 rounded-2xl shadow-md mb-2",
+                closesDialog: false,
+                handler: () => this.ShowShareArchive(archive, profile)
+            }]);
+        }
         if (archive.is_owner) {
-            const btnMainClass = "w-full bg-brand-5 text-white font-bold py-3 rounded-2xl text-[14px] shadow-md active:scale-95 transition-transform";
-            const btnReleaseClass = "w-full bg-white text-red-400 border border-brand-4 font-bold py-3 rounded-2xl text-[14px] shadow-sm active:scale-95 transition-transform";
+            const btnMainClass = "w-full bg-brand-5 text-white font-bold py-3 rounded-2xl text-[0.8rem] shadow-md active:scale-95 transition-transform";
+            const btnReleaseClass = "w-full bg-white text-red-400 border border-brand-4 font-bold py-3 rounded-2xl text-[0.8rem] shadow-sm active:scale-95 transition-transform";
             if (!archive.is_public) {
                 // Private ⇒ Public
                 dialogButtons.push([{
@@ -1247,7 +1277,7 @@ const DialogController = {
             // ▼ オーナーでない（他人の）アーカイブの場合は通報ボタンを表示する
             dialogButtons.push([{
                 label: "REPORT THIS ARCHIVE",
-                className: "w-full bg-white text-red-500 border border-red-500 font-bold py-3 rounded-2xl text-[14px] shadow-sm active:scale-95 transition-transform",
+                className: "w-full bg-white text-red-500 border border-red-500 font-bold py-3 rounded-2xl text-[0.8rem] shadow-sm active:scale-95 transition-transform",
                 closesDialog: false,
                 handler: () => this.ShowReportPost(archive)
             }]);
@@ -1257,13 +1287,13 @@ const DialogController = {
         // バッジと鉛筆ボタンの追加
         const titleContainer = $Dom.QuerySelector('#dialog-title', frame);
         const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
-        let badgeHtml = (!archive.is_public) ? `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-500 text-white border border-gray-200 shadow-sm">Private</span>` :
-                        (archive.closed_flg) ? `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-gray-100 text-gray-500 border border-gray-200 shadow-sm">Close</span>` :
-                        `<span class="text-[10px] font-black px-3 py-1 rounded-xl bg-brand-2 text-brand-5 border border-blue-100 shadow-sm">Open</span>`;
+        let badgeHtml = (!archive.is_public) ? `<span class="text-[0.6rem] font-black px-3 py-1 rounded-xl bg-gray-500 text-white border border-gray-200 shadow-sm">Private</span>` :
+                        (archive.closed_flg) ? `<span class="text-[0.6rem] font-black px-3 py-1 rounded-xl bg-gray-100 text-gray-500 border border-gray-200 shadow-sm">Close</span>` :
+                        `<span class="text-[0.6rem] font-black px-3 py-1 rounded-xl bg-brand-2 text-brand-5 border border-blue-100 shadow-sm">Open</span>`;
         if (titleContainer) titleContainer.innerHTML = badgeHtml;
         if (archive.is_owner && headerActions) {
             const editBtn = document.createElement('button');
-            editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[14px] border border-brand-2 transition-transform";
+            editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[0.8rem] border border-brand-2 transition-transform";
             editBtn.innerHTML = "✏️";
             // 編集ダイアログを「上に」開き、保存後に参照画面を描画し直す関数を渡す
             editBtn.onclick = () => this.ShowEditArchive(archive, renderView);
@@ -1343,8 +1373,8 @@ const DialogController = {
             links.forEach(l => {
                 const a = document.createElement("a");
                 a.href = l; a.target = "_blank";
-                a.className = "flex items-center gap-2 p-3 bg-white rounded-xl border border-slate-100 shadow-sm text-blue-500 text-[12px] font-bold truncate active:scale-95 transition-transform";
-                a.innerHTML = `<span class="shrink-0 text-brand-3 text-[14px]">🔗</span> <span class="truncate">${l}</span>`;
+                a.className = "flex items-center gap-2 p-3 bg-white rounded-xl border border-slate-100 shadow-sm text-blue-500 text-[0.7rem] font-bold truncate active:scale-95 transition-transform";
+                a.innerHTML = `<span class="shrink-0 text-brand-3 text-[0.8rem]">🔗</span> <span class="truncate">${l}</span>`;
                 viewLinks.appendChild(a);
             });
         };
@@ -1354,7 +1384,7 @@ const DialogController = {
             const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
             if (headerActions) {
                 const editBtn = document.createElement('button');
-                editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[14px] border border-brand-2 transition-transform";
+                editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[0.8rem] border border-brand-2 transition-transform";
                 editBtn.innerHTML = "✏️";
                 editBtn.onclick = () => this.ShowEditProfile(profile, renderView);
                 headerActions.prepend(editBtn);
@@ -1478,7 +1508,7 @@ const DialogController = {
         const renderList = async () => {
             root.innerHTML = "";
             if (notices.length === 0) {
-                root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">通知データがありません</div>`;
+                root.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-6">通知データがありません</div>`;
                 return;
             }
             const now = new Date();
@@ -1522,7 +1552,7 @@ const DialogController = {
         const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
         if (headerActions) {
             const addBtn = document.createElement('button');
-            addBtn.className = "w-8 h-8 bg-brand-5 rounded-xl shadow-sm text-white flex items-center justify-center active:scale-95 text-[18px] border border-brand-5 transition-transform";
+            addBtn.className = "w-8 h-8 bg-brand-5 rounded-xl shadow-sm text-white flex items-center justify-center active:scale-95 text-[1.2rem] border border-brand-5 transition-transform";
             addBtn.innerHTML = "＋";
             addBtn.onclick = () => this.ShowAdminNoticeEdit(null, () => {
                 _DialogCore.close();
@@ -1590,7 +1620,7 @@ const DialogController = {
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         root.className = "w-full text-black-3 mb-2 px-1";
         if (reportSummary.length === 0) {
-            root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">通報データはありません</div>`;
+            root.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-6">通報データはありません</div>`;
         } else {
             // 通報件数の多い順にソート
             const sorted = [...reportSummary].sort((a, b) => b.report_count - a.report_count);
@@ -1629,13 +1659,13 @@ const DialogController = {
             const isOk = await this.ShowConfirm({ title: "OPEN ARCHIVE", message: "この Public まとめデータを開きますか？" });
             if (!isOk) return;
             _DialogCore.closeAll();
-            $App.AppData.System.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
-            $App.AppData.System.TargetArchiveId = summaryItem.archive_id;
+            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+            $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
             await $App.RefreshScreen();
         };
         const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
         if (reports.length === 0) {
-            listContainer.innerHTML = `<div class="text-[12px] text-slate-400 p-2">詳細データがありません</div>`;
+            listContainer.innerHTML = `<div class="text-[0.7rem] text-slate-400 p-2">詳細データがありません</div>`;
         } else {
             // 通報日時（report_tim）の新しい順（降順）にソートして描画
             reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
@@ -1702,7 +1732,7 @@ const DialogController = {
         });
         // 1件もない場合の表示
         if (root.children.length === 0) {
-            root.innerHTML = `<div class="text-center text-[12px] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
+            root.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
         }
         // ダイアログを開く
         _DialogCore.open({
@@ -1761,6 +1791,32 @@ const DialogController = {
                     }
                 }
             ]]
+        });
+    },
+    // URL公開画面
+    ShowShareArchive(archive, profile) {
+        const el = $Dom.GenerateTemplate('tpl-share-archive');
+        // 1. 基本情報の反映
+        $Dom.QuerySelector('#share-user-icon', el).textContent = profile?.icon || "😀";
+        $Dom.QuerySelector('#share-archive-title', el).textContent = archive.title;
+        // 2. URLの生成 (現在のドメイン + パラメータ)
+        const baseUrl = window.location.origin + window.location.pathname;
+        const shareUrl = `${baseUrl}?mode=archive_pub&archiveId=${archive.archive_id}`;
+        const input = $Dom.QuerySelector('#share-url-input', el);
+        input.value = shareUrl;
+        // 3. QRコードの生成 (無料APIを利用)
+        const qrImg = $Dom.QuerySelector('#share-qr-image', el);
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`;
+        // 4. コピー処理
+        $Dom.QuerySelector('#btn-share-copy', el).onclick = () => {
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                $Notice.Info("URL copied to clipboard!");
+            });
+        };
+        _DialogCore.open({
+            title: "SHARE ARCHIVE",
+            content: el,
+            buttons: [{ label: "CLOSE", className: "bg-slate-400 text-white", closesDialog: true }]
         });
     },
 };

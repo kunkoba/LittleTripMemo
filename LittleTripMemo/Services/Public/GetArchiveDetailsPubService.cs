@@ -16,7 +16,7 @@ public class GetArchiveDetailsPubService : _BaseService
     public record Response(
         TMemoArchivePub archive,
         IEnumerable<TMemoDetailPub> details,
-        IEnumerable<TReactionPub> my_reactions,
+        IEnumerable<TReactionPub> myReactions,
         GetUserProfileService.Response userProfile
     );
 
@@ -48,14 +48,14 @@ public class GetArchiveDetailsPubService : _BaseService
         SetAppFlags(details);
 
         // 自分のリアクション取得（ログイン済みの場合のみ）
-        var myReactions = _user.UserId != Guid.Empty
+        var reactions = _user.UserId != Guid.Empty
             ? await _reactionPubRepo.GetMyReactionsByArchiveIdAsync(req.archive_id)
             : Enumerable.Empty<TReactionPub>();
 
         // ユーザプロフィール取得
         var profile = await _getUserProfileService.ExecuteAsync(archive.user_id);
 
-        return new Response(archive, details, myReactions, profile);
+        return new Response(archive, details, reactions, profile);
     }
 
     private async Task ValidateAsync(GetArchiveDetailsPubReq req)

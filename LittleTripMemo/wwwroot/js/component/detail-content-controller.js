@@ -111,7 +111,7 @@ const _DetailContentCore = {
     },
     // 画面モード変更時
     changeScreenMode(){
-        switch ($App.AppData.System.ScreenMode) {
+        switch ($App.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
                 // 新規登録
                 break;
@@ -179,11 +179,11 @@ const _DetailContentCore = {
             this.displayPriceUnit.textContent = displayCurrency;
             // マイナスなら赤、プラスなら青に色分け
             if (price < 0) {
-                this.displayPrice.className = "text-xl font-black text-red-500";
-                // this.displayPriceLabel.className = "text-[10px] font-black uppercase tracking-wider text-red-500";
+                this.displayPrice.className = "text-[1.2rem] font-black text-red-500";
+                // this.displayPriceLabel.className = "text-[0.6rem] font-black uppercase tracking-wider text-red-500";
             } else {
-                this.displayPrice.className = "text-xl font-black text-blue-500";
-                // this.displayPriceLabel.className = "text-[10px] font-black uppercase tracking-wider text-blue-500";
+                this.displayPrice.className = "text-[1.2rem] font-black text-blue-500";
+                // this.displayPriceLabel.className = "text-[0.6rem] font-black uppercase tracking-wider text-blue-500";
             }
         } else {
             $Dom.ToggleShow(this.displayPriceWrapper, false);
@@ -321,6 +321,36 @@ const DetailContentController = {
     // フォーム上のデータをまとめて取得
     GetFormEditData(){
         return _DetailContentCore.getFormEditData();
+    },
+    // DetailContentController (窓口) 内に追加
+    Validate(detail) {
+        // 1. タイトル必須チェック
+        if (!detail.title || detail.title.trim().length === 0) {
+            $Notice.Warn("TITLE is required.");
+            return false;
+        }
+        if (!detail.body || detail.body.trim().length === 0) {
+            $Notice.Warn("BODY is required.");
+            return false;
+        }
+        // 3. 日付・時刻チェック（HTML5のinputで制限されていますが、JSでも念のため）
+        if (!detail.memo_date || !detail.memo_time) {
+            $Notice.Warn("DATE and TIME are required.");
+            return false;
+        }
+        // 5. URL形式チェック（入力されている場合のみ）
+        if (detail.link_url && detail.link_url.trim().length > 0) {
+            try {
+                // 文字列がhttpから始まっているか等の簡易チェック
+                if (!detail.link_url.startsWith('http')) {
+                    throw new Error();
+                }
+            } catch (e) {
+                $Notice.Warn("Please enter a valid URL (starting with http/https).");
+                return false;
+            }
+        }
+        return true; // 全てOK
     },
 };
 

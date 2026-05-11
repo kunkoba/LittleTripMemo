@@ -20,7 +20,7 @@ const Notice = {
             el.classList.add("opacity-0", "-translate-y-2");
             el.classList.remove("opacity-100", "translate-y-0");
             setTimeout(() => root.remove(), 300);
-        }, 5 * 1000);
+        }, 3 * 1000);
         root.addEventListener("click", () => {
             el.classList.add("opacity-0", "-translate-y-2");
             el.classList.remove("opacity-100", "translate-y-0");

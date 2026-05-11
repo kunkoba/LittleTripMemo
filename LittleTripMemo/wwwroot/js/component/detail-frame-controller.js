@@ -21,6 +21,10 @@ const _DetailFrameCore = {
                 this.btnMoveNext = $Dom.GetElementById("detail-btn-next");
                 this.btnMoveLast = $Dom.GetElementById("detail-btn-last");
                 this.groupReaction = $Dom.GetElementById("detail-group-reaction");
+                this.btnReactionFunny = $Dom.GetElementById("detail-btn-funny");
+                this.btnReactionHelpful = $Dom.GetElementById("detail-btn-helpful");
+                this.btnReactionSurprise = $Dom.GetElementById("detail-btn-surprise");
+                this.btnReactionEmpathy = $Dom.GetElementById("detail-btn-empathy");
                 // 
                 this.mapBarrier = $Dom.GetElementById("ui-map-barrier");
             }
@@ -63,6 +67,11 @@ const _DetailFrameCore = {
                 });
                 // 保存ボタン
                 this.btnSave.addEventListener("click", async () => {
+                    const detail = $DetailContent.GetFormEditData(); // フォームのデータを取得
+                    // バリデーション実行 ---
+                    const isValid = $DetailContent.Validate(detail);
+                    if (!isValid) return; // 失敗時はここで中断（NoticeはValidate内で出している）
+                    // 確認ダイアログ
                     const isOk = await $Dialog.ShowConfirm({
                         title: "保存前確認",
                         message: "保存してもよろしいですか？",
@@ -86,11 +95,17 @@ const _DetailFrameCore = {
                 });
                 this.btnClose.addEventListener("click", () => this.handleCloseOrCancel());
                 this.btnCancel.addEventListener("click", () => this.handleCloseOrCancel());
+                // 移動ボタン
                 this.btnMoveFirst.addEventListener("click", () => this._moveAndRender(() => $Marker.FocusFirst()));
                 this.btnMovePrev.addEventListener("click",  () => this._moveAndRender(() => $Marker.FocusPrev()));
                 this.btnMoveNext.addEventListener("click",  () => this._moveAndRender(() => $Marker.FocusNext()));
                 this.btnMoveLast.addEventListener("click",  () => this._moveAndRender(() => $Marker.FocusLast()));
                 this.mapBarrier.addEventListener("click", () => this.handleCloseOrCancel());
+                // リアクションボタン
+                this.btnReactionFunny.addEventListener("click", () => this._onReactionClick("is_funny", 1));
+                this.btnReactionHelpful.addEventListener("click", () => this._onReactionClick("is_love", 2));
+                this.btnReactionSurprise.addEventListener("click", () => this._onReactionClick("is_surprise", 3));
+                this.btnReactionEmpathy.addEventListener("click", () => this._onReactionClick("is_sad", 4));
             }
         }
     },
@@ -113,7 +128,7 @@ const _DetailFrameCore = {
         $Dom.ToggleShow(this.btnSave, false);
         $Dom.ToggleShow(this.groupMove, false);
         $Dom.ToggleShow(this.groupReaction, false);
-        switch ($App.AppData.System.ScreenMode) {
+        switch ($App.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
                 // 新規登録
                 $Dom.ToggleShow(this.btnSave, true);
@@ -139,13 +154,21 @@ const _DetailFrameCore = {
         // 移動後のデータを取得して反映
         const detail = $Marker.GetDataWithCurrentIndex();
         $DetailContent.RenderDetail(detail);
+        // リアクションも再描画する
+        this.renderReactions(detail);
     },
     // 詳細パネルの開閉と関連UIの更新
     toggleDetailPanel(isShow) {
         // パネル占有サイズ設定
         const PANEL_WIDTH = '500px';
         const PANEL_HEIGHT = '80%';
+        // 広告差分計算
         const isMobile = window.innerWidth < 768;
+        // const adSpace = document.getElementById("ad-space-pc");
+        // const adWidth = adSpace ? adSpace.offsetWidth : 0;
+        // const isMobile = (window.innerWidth - adWidth) < 768;
+        console.log(">isMobile:", isMobile);
+        // メイン処理
         if (isShow) {
             $Map.LockMap(true);
             // バリアを展開（マーカーへのタッチを防ぐ）
@@ -186,6 +209,86 @@ const _DetailFrameCore = {
         // 地図リサイズ
         $Map.ResizeMap();
     },
+    // リアクションのカウントと状態を反映する
+    async renderReactions(detail) {
+        if (!detail) return;
+        // --- 【追加】UIの初期化（リセット） ---
+        const btns = [this.btnReactionFunny, this.btnReactionHelpful, this.btnReactionSurprise, this.btnReactionEmpathy];
+        btns.forEach(btn => {
+            if (!btn) return;
+            $Dom.QuerySelector('.js-count', btn).textContent = "..."; // 取得中表示
+            btn.classList.remove('text-brand-5', 'border-brand-3', 'bg-brand-1', 'shadow-brand');
+        });
+        // 1. ローカルDBから自分のリアクション状態を取得
+        const myLocal = await $LocalDb.Reaction.Get(detail.archive_id, detail.seq) || {};
+        // 2. サーバー数値 + ローカルフラグ を加算
+        const counts = {
+            funny:    (detail.count_funny || 0)    + (myLocal.is_funny ? 1 : 0),
+            helpful:  (detail.count_helpful || 0)  + (myLocal.is_love ? 1 : 0),
+            surprise: (detail.count_surprise || 0) + (myLocal.is_surprise ? 1 : 0),
+            empathy:  (detail.count_empathy || 0)  + (myLocal.is_sad ? 1 : 0)
+        };
+        // 3. UIに数値を反映
+        if (this.btnReactionFunny)    $Dom.QuerySelector('.js-count', this.btnReactionFunny).textContent = counts.funny;
+        if (this.btnReactionHelpful)  $Dom.QuerySelector('.js-count', this.btnReactionHelpful).textContent = counts.helpful;
+        if (this.btnReactionSurprise) $Dom.QuerySelector('.js-count', this.btnReactionSurprise).textContent = counts.surprise;
+        if (this.btnReactionEmpathy)  $Dom.QuerySelector('.js-count', this.btnReactionEmpathy).textContent = counts.empathy;
+        // 4. 自分の状態を反映
+        const states = [
+            { el: this.btnReactionFunny,    active: myLocal.is_funny },
+            { el: this.btnReactionHelpful,  active: myLocal.is_love },
+            { el: this.btnReactionSurprise, active: myLocal.is_surprise },
+            { el: this.btnReactionEmpathy,  active: myLocal.is_sad }
+        ];
+        states.forEach(item => {
+            if (!item.el) return;
+            if (item.active) {
+                item.el.classList.add('text-brand-5', 'border-brand-3', 'bg-brand-1', 'shadow-brand');
+            }
+        });
+    },
+    // リアクションボタンクリック
+    async _onReactionClick(propName, unusedType) {
+        const detail = $DetailContent.GetFormEditData();
+        if (!detail || !detail.archive_id) return;
+        // 1. 自分のまとめの場合は何もしない
+        if (detail.is_owner) {
+            $Notice.Warn("You cannot react to your own memories.");
+            return;
+        }
+        // 2. 現在のローカル状態を取得
+        let myLocal = await $LocalDb.Reaction.Get(detail.archive_id, detail.seq);
+        if (!myLocal) {
+            myLocal = {
+                archive_id: Number(detail.archive_id),
+                seq: Number(detail.seq),
+                is_funny: false, is_love: false, is_surprise: false, is_sad: false
+            };
+        }
+        // 3. 押されたボタンに対応するフラグを反転
+        myLocal[propName] = !myLocal[propName];
+        // 4. 送信フラグを 0 (未送信) に設定
+        myLocal.send_flag = 0;
+        // 5. ローカルDBへ保存 ＆ UIを即座に再描画
+        await $LocalDb.Reaction.Save(myLocal);
+        await this.renderReactions(detail);
+        // // 6. サーバーへ送信（全てのフラグをリクエストに含める）
+        // $Warn.CatchAsync(async () => {
+        //     const isSuccess = await $Data.Access.UpsertReaction({
+        //         archive_id:   myLocal.archive_id,
+        //         seq:          myLocal.seq,
+        //         is_funny:     myLocal.is_funny,
+        //         is_love:      myLocal.is_love,
+        //         is_surprise:  myLocal.is_surprise,
+        //         is_sad:       myLocal.is_sad
+        //     });
+        //     if (isSuccess) {
+        //         // 送信成功時のみフラグを 1 に更新
+        //         myLocal.send_flag = 1;
+        //         await $LocalDb.Reaction.Save(myLocal);
+        //     }
+        // })();
+    },
 };
 
 // 窓口
@@ -207,7 +310,7 @@ const DetailFrameController = {
         const isNew = !detail;
         const isOwner = detail?.is_owner ?? true;
         // ScreenMode または detailのプロパティでPublicデータか判定
-        const isPublic = $App.AppData.System.ScreenMode === $Const.SCREEN_MODE.ARCHIVE_PUB || detail?.is_public === true;
+        const isPublic = $App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.ARCHIVE_PUB || detail?.is_public === true;
         if (isNew) {
             // 1. 新規入力時
             $DetailContent.RenderDetail(null, true); // 編集モードで描画
@@ -226,6 +329,8 @@ const DetailFrameController = {
             // リアクションボタンの制御
             if (isPublic) {
                 $Dom.ToggleShow(_DetailFrameCore.groupReaction, true);
+                // リアクションカウントをボタンに描画
+                _DetailFrameCore.renderReactions(detail);
                 // 自データの場合はボタンを非活性（disabled）にする
                 const reactionBtns = $Dom.QuerySelectorAll("button", _DetailFrameCore.groupReaction);
                 reactionBtns.forEach(btn => btn.disabled = isOwner);

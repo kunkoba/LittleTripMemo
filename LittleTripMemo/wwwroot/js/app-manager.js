@@ -2,8 +2,8 @@
 const AppManager = {
     AppSettingKey: "little_trip_settings",
     AppData: {
-        System: {
-            ScreenMode: null,
+        Context: {
+            ScreenMode: $Const.SCREEN_MODE.CREATE,
             IsOnline: navigator.onLine,
             IsLoggedIn: false,
             TargetArchiveId: 0,
@@ -17,7 +17,7 @@ const AppManager = {
             systemInfo: null,
         },
         Admin: {
-            notifications: [],
+            notifications:[],
             reportSummary: [],
             reports:[],
             feedbackList:[]
@@ -36,7 +36,6 @@ const AppManager = {
     // 設定を読込
     _loadSettings() {
         const saved = JSON.parse(localStorage.getItem(this.AppSettingKey) || '{}');
-        // console.log("saved:", saved);
         if (saved.theme) this.AppData.Owner.Theme = saved.theme;
         if (saved.mapStyleKey) this.AppData.Owner.MapStyle = $Map.MAP_STYLE[saved.mapStyleKey];
         if (saved.isGpsTracking !== undefined) this.AppData.Owner.IsGpsTracking = saved.isGpsTracking;
@@ -69,7 +68,7 @@ const AppManager = {
         // オンライン監視（秒）
         $Polling.Add($Polling.TASKS.OFFLINE_CHECK, () => {
             const isOn = navigator.onLine;
-            $App.AppData.System.IsOnline = isOn;    // オフライン状態を保持
+            $App.AppData.Context.IsOnline = isOn;    // オフライン状態を保持
             if (isOn) {
                 // オンライン
                 $Notice.Offline.Hide();
@@ -94,7 +93,7 @@ const AppManager = {
         // 現在地追従（秒）
         $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
             // 追従モードかつオンラインなら現在地を更新（フォーカスはしない）
-            if ($App.AppData.Owner.IsGpsTracking && $App.AppData.System.IsOnline) {
+            if ($App.AppData.Owner.IsGpsTracking && $App.AppData.Context.IsOnline) {
                 $Marker.RefreshCurrentLocation();
             }
         }, 10);
@@ -108,7 +107,7 @@ const AppManager = {
             const email = await $Auth.GetVerifiedEmailByGoogle();
             const ret = await $Data.Access.LoginToServer(email);
             if (ret) {
-                this.AppData.System.IsLoggedIn = true;
+                this.AppData.Context.IsLoggedIn = true;
                 this._saveSettings();
                 $Notice.Info("Login successful！");
                 return true;
@@ -116,19 +115,38 @@ const AppManager = {
             return false;
         })();
     },
-    // アプリ起動時フロー内に追加
+    // アプリ起動時フロー
     async Init() {
-        console.log("★App.Init");
+        // ★修正：最初に設定をロードし、トークンがあればログイン状態にしておく
+        this._loadSettings();
+        if (this.AppData.Owner.Token) {
+            this.AppData.Context.IsLoggedIn = true;
+        }
+        // リクエストパラメータ取得
+        const params = new URLSearchParams(location.search);
+        this.AppData.Context.TargetArchiveId = params.get("archiveId");
+        // URLパラメータの mode を優先、なければ TargetArchiveId の有無で分岐、それ以外は CREATE
+        const urlMode = params.get("mode");
+        if (urlMode) {
+            this.AppData.Context.ScreenMode = urlMode;
+        } else if (this.AppData.Context.TargetArchiveId) {
+            this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+        } else {
+            this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+        }
+        // 処理前チェック：TargetArchiveIdが無く、未ログインならダイアログ表示（初期画面としてのCREATE用）
+        if (!this.AppData.Context.TargetArchiveId && !this.AppData.Context.IsLoggedIn) {
+            $Dialog.ShowLoginDialog();
+        }
+        // メイン処理
+        console.log("★App.Init", this.AppData, params);
         this._initViewport();
         await $LocalDb.Init();
-        this._initPollingTasks();
-        this._loadSettings(); 
         $UI.Init();
         this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
         this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD);
-        this.AppData.System.ScreenMode = new URLSearchParams(location.search).get("mode") ?? $Const.SCREEN_MODE.CREATE;
-        this.AppData.System.ArchiveId = new URLSearchParams(location.search).get("archiveId");
-        this.RefreshScreen();
+        await this.RefreshScreen();
+        this._initPollingTasks();
     },
     // カラーテーマ変更
     ChangeTheme(theme){
@@ -145,7 +163,7 @@ const AppManager = {
     // 追従設定の変更メソッド
     ChangeGpsTracking(isOn) {
         this.AppData.Owner.IsGpsTracking = isOn;
-        if (isOn && this.AppData.System.IsOnline) $Polling.Start($Polling.TASKS.GPS_FOLLOW);
+        if (isOn && this.AppData.Context.IsOnline) $Polling.Start($Polling.TASKS.GPS_FOLLOW);
         else $Polling.Stop($Polling.TASKS.GPS_FOLLOW);
         this._saveSettings();
     },
@@ -156,53 +174,62 @@ const AppManager = {
     },
     // 画面モード変更
     async RefreshScreen() {
+        console.log("App.RefreshScreen()", this.AppData.Context.ScreenMode, this.AppData.Context.IsLoggedIn);
         // アーカイブID
-        const archiveId = this.AppData.System.TargetArchiveId;
-        let isSuccess = false
+        const archiveId = this.AppData.Context.TargetArchiveId;
+        let isSuccess = false;
         // モードごとにデータ取得
-        switch (this.AppData.System.ScreenMode) {
+        switch (this.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
                 // 通知バー
                 $UI.NoticeUpdate("「＋」ボタンで地点メモを作成することができます");
-                isSuccess = await $Data.Access.GetUnMergeDetails({});
-                if (!isSuccess) return;
-                // システム情報を取得
-                $Data.Access.GetSystemInfo();
+                if (this.AppData.Context.IsLoggedIn) {
+                    isSuccess = await $Data.Access.GetUnMergeDetails({});
+                    if (!isSuccess) return;
+                    // システム情報を取得
+                    $Data.Access.GetSystemInfo();
+                }
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
                 // 通知バー
                 $UI.NoticeUpdate("画面下部の「操作ボタン」で各メモを移動できます");
                 if (!archiveId) {
-                    // 不正か？
-                    $Dialog.ShowLoginDialog();
+                    // 不正な場合はログインダイアログを出して待機
+                    if (!this.AppData.Context.IsLoggedIn) $Dialog.ShowLoginDialog();
                     return;
                 }
-                isSuccess = await $Data.Access.GetArchiveDetails({ archive_id: archiveId });
-                if (!isSuccess) return;
-                const archive = $Data.Store.GetArchive();
-                $TopBar.ChangeTitle(archive.title);
+                if (this.AppData.Context.IsLoggedIn) {
+                    isSuccess = await $Data.Access.GetArchiveDetails({ archive_id: archiveId });
+                    if (!isSuccess) return;
+                    const archive = $Data.Store.GetArchive();
+                    $TopBar.ChangeTitle(archive?.title || "");
+                }
                 break;
             case $Const.SCREEN_MODE.ARCHIVE_PUB:
-                // 通知バー
-                $UI.NoticeUpdate("公開データは「Open」にしないと公開されません");
                 if (!archiveId) {
-                    $Dialog.ShowLoginDialog();
+                    if (!this.AppData.Context.IsLoggedIn) $Dialog.ShowLoginDialog();
                     return;
                 }
+                // 通知バー
+                $UI.NoticeUpdate("公開データは「Open」にしないと公開されません");
                 isSuccess = await $Data.Access.GetArchiveDetailsPub({ archive_id: archiveId });
                 if (!isSuccess) return;
+                // 取得した直後にローカルDBへ同期
+                if (this.AppData.Context.IsLoggedIn) {
+                    await $Data.LocalDb.SetReactionsToLocalDb();
+                }
                 const archivePub = $Data.Store.GetArchive();
-                $TopBar.ChangeTitle(archivePub.title);
+                $TopBar.ChangeTitle(archivePub?.title || "");
                 break;
             case $Const.SCREEN_MODE.SEARCH:
                 // 通知バー
                 $UI.NoticeUpdate("画面範囲内のメモを検索できます");
                 $Data.Store.Clear();
-                $Marker.Clear()
+                $Marker.Clear();
                 break;
             default:
                 // 不正か？
-                $Dialog.ShowLoginDialog();
+                if (!this.AppData.Context.IsLoggedIn) $Dialog.ShowLoginDialog();
                 return;
         }
         // UIを更新

@@ -25,14 +25,14 @@ const _MarkerCore = {
             this.locationMarker = L.marker(this._map.getCenter(), { draggable: true }).addTo(this._map);
         }
         this.locationMarker.on("dragend", (e) => {
-            if ($App.AppData.System.ScreenMode !== $Const.SCREEN_MODE.CREATE) return;
+            if ($App.AppData.Context.ScreenMode !== $Const.SCREEN_MODE.CREATE) return;
             this.generateArrowToCurrent();
         });
     },
     // 画面モード変更時
     changeScreenMode(){
         // 業務ルール（画面モード）に基づく初期分岐
-        switch ($App.AppData.System.ScreenMode) {
+        switch ($App.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
                 // 新規登録
                 break;
@@ -102,7 +102,7 @@ const _MarkerCore = {
             const p = [pos.coords.latitude, pos.coords.longitude];
             // 現在地マーカー移動
             if (this.locationMarker) this.locationMarker.setLatLng(p);
-            if ($App.AppData.System.ScreenMode == $Const.SCREEN_MODE.CREATE) {
+            if ($App.AppData.Context.ScreenMode == $Const.SCREEN_MODE.CREATE) {
                 // マップ移動
                 this.generateArrowToCurrent();
                 this.focusToLocationMarker();
@@ -111,7 +111,7 @@ const _MarkerCore = {
     },
     // 矢印生成（まとめて）
     generateArrowList() {
-        if ($App.AppData.System.ScreenMode == $Const.SCREEN_MODE.SEARCH) return;
+        if ($App.AppData.Context.ScreenMode == $Const.SCREEN_MODE.SEARCH) return;
         setTimeout(() => {
             for (let i = 1; i < this._markerList.length; i++) {
                 const fromMarker = this._markerList[i - 1];
@@ -119,7 +119,7 @@ const _MarkerCore = {
                 const arrow = this.generateArrow(fromMarker, toMarker);
                 this._arrowList.push(arrow);
             }
-            if ($App.AppData.System.ScreenMode == $Const.SCREEN_MODE.CREATE) {
+            if ($App.AppData.Context.ScreenMode == $Const.SCREEN_MODE.CREATE) {
                 this.generateArrowToCurrent();
             }
         }, 100);
@@ -182,13 +182,13 @@ const _MarkerCore = {
             const btnAction = $Dom.QuerySelector("#btn-popup-action", el);
             const actionText = $Dom.QuerySelector(".js-action-text", el);
             // 画面モードによるアクションボタンの制御
-            if ($App.AppData.System.ScreenMode === $Const.SCREEN_MODE.SEARCH) {
+            if ($App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH) {
                 if (actionText) actionText.textContent = detail.a_title || "VIEW ARCHIVE";
                 if (btnAction) {
                     btnAction.onclick = (e) => {
                         e.stopPropagation();
-                        $App.AppData.System.ScreenMode = detail.is_public ? $Const.SCREEN_MODE.ARCHIVE_PUB : $Const.SCREEN_MODE.ARCHIVE;
-                        $App.AppData.System.TargetArchiveId = detail.archive_id;
+                        $App.AppData.Context.ScreenMode = detail.is_public ? $Const.SCREEN_MODE.ARCHIVE_PUB : $Const.SCREEN_MODE.ARCHIVE;
+                        $App.AppData.Context.TargetArchiveId = detail.archive_id;
                         $App.RefreshScreen();
                         this._map.closePopup();
                     };
@@ -245,7 +245,7 @@ const MarkerController = {
 	},
     // 描画リフレッシュ
     RefreshPointMarker() {
-        const details = $Data.Store.GetAllDetails();
+        const details = $Data.Store.GetDetails();
         if (!details) return;
         this.Clear();
         _MarkerCore.generateArrowList();
@@ -261,7 +261,7 @@ const MarkerController = {
                 _MarkerCore.clearArrow();
                 details[index].latitude = latLng.lat;
                 details[index].longitude = latLng.lng;
-                if ($App.AppData.System.ScreenMode !== $Const.SCREEN_MODE.SEARCH) {
+                if ($App.AppData.Context.ScreenMode !== $Const.SCREEN_MODE.SEARCH) {
                     _MarkerCore.generateArrowList();
                 }
                 this._currentIndex = index;
@@ -271,7 +271,7 @@ const MarkerController = {
     },
     // 画面モード変更時
     ChangeScreenMode(){
-        switch ($App.AppData.System.ScreenMode) {
+        switch ($App.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
                 _MarkerCore.refreshCurrentLocation();
                 this.FocusToLocationMarker();
@@ -292,10 +292,10 @@ const MarkerController = {
         // console.log("★FocusToCurrentMarker");
         const marker = _MarkerCore.getMarker(this._currentIndex);
         if (!marker) return;
-        const details = $Data.Store.GetAllDetails();
+        const details = $Data.Store.GetDetails();
         $Map.FocusToTargetMarker(marker, delay);
         _MarkerCore.toggleMarkerPopup(true, this._currentIndex, details[this._currentIndex]);
-        // if ($App.AppData.System.ScreenMode == $Const.SCREEN_MODE.ARCHIVE) {
+        // if ($App.AppData.Context.ScreenMode == $Const.SCREEN_MODE.ARCHIVE) {
             // ハイライト
             _MarkerCore.highlightMarker(true, this._currentIndex);
         // }
@@ -312,14 +312,14 @@ const MarkerController = {
         }
     },
     FocusNext() {
-        const details = $Data.Store.GetAllDetails();
+        const details = $Data.Store.GetDetails();
         if (details && this._currentIndex < details.length - 1) {
             this._currentIndex++;
             this.FocusToCurrentMarker();
         }
     },
     FocusLast() {
-        const details = $Data.Store.GetAllDetails();
+        const details = $Data.Store.GetDetails();
         if (details) {
             this._currentIndex = details.length - 1;
             this.FocusToCurrentMarker();
@@ -339,7 +339,7 @@ const MarkerController = {
     },
     // カレントデータ取得
     GetDataWithCurrentIndex() {
-        const details = $Data.Store.GetAllDetails();
+        const details = $Data.Store.GetDetails();
         return details[this._currentIndex];
     },
     // 変更を破棄して元に戻す

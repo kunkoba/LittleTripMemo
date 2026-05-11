@@ -227,6 +227,21 @@ public class AppController : _BaseController
     }
 
     /// <summary>
+    /// まとめ明細一覧取得（公開データ）
+    /// URL例: /api/GetArchiveDetailsPub/123
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet("api/GetArchiveDetailsPub/{archive_id}")] // GETに変更し、パスにIDを含める
+    public async Task<IActionResult> GetArchiveDetailsPub(int archive_id)
+    {
+        // 引数からReqオブジェクトを生成
+        var req = new GetArchiveDetailsPubService.GetArchiveDetailsPubReq(archive_id);
+        var result = await _getArchiveDetailsPubService.ExecuteAsync(req);
+
+        return OkWithBase(result);
+    }
+
+    /// <summary>
     /// リアクションの登録・更新。
     /// </summary>
     /// <param name="req"></param>

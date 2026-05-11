@@ -15,6 +15,7 @@ public class SearchByLocationPubService : _BaseService
         decimal lat_max,
         decimal lng_min,
         decimal lng_max,
+        string? keyword,
         int sortField,      // 1:作成順, 2:更新順, 3:リアクション順
         int? reactionType,  // sort_fieldが3の場合に使用
         int limit = 50
@@ -34,10 +35,23 @@ public class SearchByLocationPubService : _BaseService
     public async Task<Response> ExecuteAsync(SearchByLocationPubReq req)
     {
         await ValidateAsync(req);
-        var details = await _detailPubRepo.GetByLocationAsync(
-            req.lat_min, req.lat_max,
-            req.lng_min, req.lng_max,
-            req.sortField, req.reactionType, req.limit);
+
+        IEnumerable<TMemoDetailPub> details;
+
+        if (req.sortField == 3 && req.reactionType.HasValue)
+        {
+            // リアクション順（RANK）
+            details = await _detailPubRepo.GetByLocationRankAsync(
+                req.lat_min, req.lat_max, req.lng_min, req.lng_max,
+                req.keyword, req.reactionType.Value, req.limit);
+        }
+        else
+        {
+            // 作成順 or 更新順（BASIC）
+            details = await _detailPubRepo.GetByLocationBasicAsync(
+                req.lat_min, req.lat_max, req.lng_min, req.lng_max,
+                req.keyword, req.sortField, req.limit);
+        }
 
         SetAppFlags(details);
         return new Response(details);

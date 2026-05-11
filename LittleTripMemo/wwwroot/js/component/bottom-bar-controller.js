@@ -36,12 +36,13 @@ const _BottomCore = {
 					// TopBar から新しい構造のソート設定を取得
 					const sortSetting = $TopBar.GetSortSetting();
 					console.log(">>sortSetting", sortSetting);
-					// C# 側の引数名（sortField, reactionType）に合わせたパラメータ生成
+					// ▼ 修正: C# 側の引数名に合わせて searchWord をパラメータに追加
 					const params = {
 						...range,
 						sortField: sortSetting.sortField,
 						reactionType: sortSetting.reactionType,
-						limit: 50 // サーバー側のデフォルトに合わせて50件にする（任意で調整可能）
+						keyword: sortSetting.keyword,
+						limit: 50
 					};
 					// 通信処理（Public と Private でエンドポイントを分岐）
 					let isSuccess = false;
@@ -54,7 +55,7 @@ const _BottomCore = {
 					// 検索結果のリスト表示、またはマーカーの再描画
 					$Marker.RefreshPointMarker();
 					// 検索結果が0件だった場合の通知（任意）
-					const details = $Data.Store.GetAllDetails();
+					const details = $Data.Store.GetDetails();
 					if (details.length === 0) {
 						$Notice.Info("No matching location found.");
 					}
@@ -77,7 +78,7 @@ const _BottomCore = {
 		$Dom.ToggleShow(this.btnCreate, false);
 		$Dom.ToggleShow(this.btnSearch, false);
 		$Dom.ToggleShow(this.groupMove, false);
-		switch ($App.AppData.System.ScreenMode) {
+		switch ($App.AppData.Context.ScreenMode) {
 			case $Const.SCREEN_MODE.CREATE:
 				// 新規登録
 				$Dom.ToggleShow(this.btnCreate, true);
