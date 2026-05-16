@@ -28,7 +28,7 @@ window.$Const = {
         FUNNY:    { id: 1, emoji: '🤣' }, //笑える
         LOVE:     { id: 2, emoji: '😍' }, //好き
         SURPRISE: { id: 3, emoji: '😮' }, //びっくり
-        SAD:      { id: 4, emoji: '😢' }, //悲しい
+        SAD:      { id: 4, emoji: '😭' }, //悲しい
         REPORT:   { id: 5, emoji: '😡' }, //通報
     },
     // 通知種別アイコン

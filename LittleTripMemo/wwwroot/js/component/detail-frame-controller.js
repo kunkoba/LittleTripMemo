@@ -24,7 +24,7 @@ const _DetailFrameCore = {
                 this.btnReactionFunny = $Dom.GetElementById("detail-btn-funny");
                 this.btnReactionHelpful = $Dom.GetElementById("detail-btn-helpful");
                 this.btnReactionSurprise = $Dom.GetElementById("detail-btn-surprise");
-                this.btnReactionEmpathy = $Dom.GetElementById("detail-btn-empathy");
+                this.btnReactionSad = $Dom.GetElementById("detail-btn-sad");
                 // 
                 this.mapBarrier = $Dom.GetElementById("ui-map-barrier");
             }
@@ -105,7 +105,7 @@ const _DetailFrameCore = {
                 this.btnReactionFunny.addEventListener("click", () => this._onReactionClick("is_funny", 1));
                 this.btnReactionHelpful.addEventListener("click", () => this._onReactionClick("is_love", 2));
                 this.btnReactionSurprise.addEventListener("click", () => this._onReactionClick("is_surprise", 3));
-                this.btnReactionEmpathy.addEventListener("click", () => this._onReactionClick("is_sad", 4));
+                this.btnReactionSad.addEventListener("click", () => this._onReactionClick("is_sad", 4));
             }
         }
     },
@@ -164,10 +164,6 @@ const _DetailFrameCore = {
         const PANEL_HEIGHT = '80%';
         // 広告差分計算
         const isMobile = window.innerWidth < 768;
-        // const adSpace = document.getElementById("ad-space-pc");
-        // const adWidth = adSpace ? adSpace.offsetWidth : 0;
-        // const isMobile = (window.innerWidth - adWidth) < 768;
-        console.log(">isMobile:", isMobile);
         // メイン処理
         if (isShow) {
             $Map.LockMap(true);
@@ -181,7 +177,7 @@ const _DetailFrameCore = {
                 this.root.style.width = PANEL_WIDTH;
                 this.root.style.height = "100%";
             }
-            this.root.style.borderWidth = "2px";
+            // this.root.style.borderWidth = "2px";
             this.root.classList.remove("opacity-0", "translate-y-full");
             this.root.classList.add("opacity-100", "translate-y-0");
         } else {
@@ -213,7 +209,7 @@ const _DetailFrameCore = {
     async renderReactions(detail) {
         if (!detail) return;
         // --- 【追加】UIの初期化（リセット） ---
-        const btns = [this.btnReactionFunny, this.btnReactionHelpful, this.btnReactionSurprise, this.btnReactionEmpathy];
+        const btns = [this.btnReactionFunny, this.btnReactionHelpful, this.btnReactionSurprise, this.btnReactionSad];
         btns.forEach(btn => {
             if (!btn) return;
             $Dom.QuerySelector('.js-count', btn).textContent = "..."; // 取得中表示
@@ -226,19 +222,19 @@ const _DetailFrameCore = {
             funny:    (detail.count_funny || 0)    + (myLocal.is_funny ? 1 : 0),
             helpful:  (detail.count_helpful || 0)  + (myLocal.is_love ? 1 : 0),
             surprise: (detail.count_surprise || 0) + (myLocal.is_surprise ? 1 : 0),
-            empathy:  (detail.count_empathy || 0)  + (myLocal.is_sad ? 1 : 0)
+            sad:  (detail.count_sad || 0)  + (myLocal.is_sad ? 1 : 0)
         };
         // 3. UIに数値を反映
         if (this.btnReactionFunny)    $Dom.QuerySelector('.js-count', this.btnReactionFunny).textContent = counts.funny;
         if (this.btnReactionHelpful)  $Dom.QuerySelector('.js-count', this.btnReactionHelpful).textContent = counts.helpful;
         if (this.btnReactionSurprise) $Dom.QuerySelector('.js-count', this.btnReactionSurprise).textContent = counts.surprise;
-        if (this.btnReactionEmpathy)  $Dom.QuerySelector('.js-count', this.btnReactionEmpathy).textContent = counts.empathy;
+        if (this.btnReactionSad)  $Dom.QuerySelector('.js-count', this.btnReactionSad).textContent = counts.sad;
         // 4. 自分の状態を反映
         const states = [
             { el: this.btnReactionFunny,    active: myLocal.is_funny },
             { el: this.btnReactionHelpful,  active: myLocal.is_love },
             { el: this.btnReactionSurprise, active: myLocal.is_surprise },
-            { el: this.btnReactionEmpathy,  active: myLocal.is_sad }
+            { el: this.btnReactionSad,  active: myLocal.is_sad }
         ];
         states.forEach(item => {
             if (!item.el) return;

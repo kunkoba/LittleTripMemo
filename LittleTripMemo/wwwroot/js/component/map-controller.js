@@ -56,7 +56,7 @@ const _MapCore = {
         }
     },
     // 再計算ループ処理
-    resizeMap(delay = 100) {
+    resizeMap(delay = 1000) {
         const center = this._map.getCenter();
         let start = null;
         const sync = (time) => {

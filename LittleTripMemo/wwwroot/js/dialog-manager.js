@@ -22,20 +22,51 @@ const _DialogCore = {
         return frame;
     },
     // 1. _DialogCore の create メソッド修正
-    create({ title = "", content = "", buttons =[], onClose = null }) {
+    // 修正後：create メソッド（help機能追加版）
+    create({ title = "", content = "", buttons = [], headerButtons = [], help = null, onClose = null }) {
         const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
         const titleEl = $Dom.QuerySelector("#dialog-title", frame);
         const contentEl = $Dom.QuerySelector("#dialog-content", frame);
-        const btnCloseX = $Dom.QuerySelector("#dialog-btn-close-x", frame);
+        const headerActions = $Dom.QuerySelector("#dialog-header-actions", frame);
         const btnContainer = $Dom.QuerySelector("#dialog-button-container", frame);
         titleEl.textContent = title;
+        // --- ヘルプ・ヘッダーボタン（上段）の構築 ---
+        headerActions.innerHTML = ""; // 一旦クリア
+        // 【追加】help 引数がある場合、ヘルプボタンを先頭に追加
+        if (help) {
+            const btnHelp = document.createElement("button");
+            btnHelp.className = "w-9 h-9 bg-white rounded-full shadow-sm text-brand-5 flex items-center justify-center active:scale-95 text-[1rem] border border-brand-2 transition-transform font-black";
+            btnHelp.textContent = "?";
+            btnHelp.onclick = () => {
+                document.getElementById('ui-help-dialog-body').textContent = help;
+                document.getElementById('ui-help-dialog').classList.remove('hidden');
+            };
+            headerActions.appendChild(btnHelp);
+        }
+        // 引数のカスタムボタンを追加
+        if (headerButtons && headerButtons.length > 0) {
+            headerButtons.forEach(btnDef => {
+                const btn = document.createElement("button");
+                btn.className = "w-9 h-9 bg-white rounded-full shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1rem] border border-brand-2 transition-transform";
+                btn.innerHTML = btnDef.label;
+                if (btnDef.id) btn.id = btnDef.id;
+                btn.onclick = () => { if (btnDef.handler) btnDef.handler(); };
+                headerActions.appendChild(btn);
+            });
+        }
+        // 最後に「閉じる(✖)」ボタンを必ず追加
+        const btnCloseX = document.createElement("button");
+        btnCloseX.className = "w-9 h-9 bg-white rounded-full shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[0.8rem] border border-brand-2 transition-transform";
+        btnCloseX.textContent = "✖";
+        btnCloseX.onclick = () => this.close();
+        headerActions.appendChild(btnCloseX);
+        // ------------------------------------------
         if (content instanceof HTMLElement) {
             contentEl.innerHTML = "";
             contentEl.appendChild(content);
         } else {
             contentEl.innerHTML = content || "";
         }
-        btnCloseX.onclick = () => this.close();
         if (buttons && buttons.length > 0) {
             buttons.forEach(rowDef => {
                 const isArray = Array.isArray(rowDef);
@@ -45,7 +76,7 @@ const _DialogCore = {
                 if (!isArray && rowDef.rowId) rowDiv.id = rowDef.rowId;
                 if (!isArray && rowDef.isHidden) rowDiv.classList.add("hidden");
                 const sizeClass = items.length > 1 ? "flex-1" : "w-full";
-                const baseClass = `${sizeClass} font-black text-[0.8rem] h-12 rounded-2xl uppercase active:scale-95 transition-transform`;
+                const baseClass = `${sizeClass} font-black text-[0.8rem] h-12 rounded-[1rem] uppercase active:scale-95 transition-transform`;
                 const defaultColorClass = "bg-brand-5 text-white shadow-md";
                 items.forEach(btnDef => {
                     const btn = document.createElement("button");
@@ -64,8 +95,6 @@ const _DialogCore = {
                 btnContainer.appendChild(rowDiv);
             });
             btnContainer.classList.remove("hidden");
-        } else {
-            // btnContainer.classList.add("hidden");
         }
         frame._onClose = onClose;
         return frame;
@@ -111,6 +140,7 @@ const DialogController = {
             _DialogCore.open({
                 title: title,
                 content: el,
+                help: "",
                 // ダイアログが閉じた時に未解決ならキャンセル(false)扱い
                 onClose: () => {
                     if (!isResolved) resolve(false);
@@ -152,7 +182,7 @@ const DialogController = {
         _DialogCore.open({
             title: "LOGIN",
             content: el,
-            ok: null,
+            help: "aaaa",
         });
     },
     // 【基幹】システムメニューを表示
@@ -190,17 +220,19 @@ const DialogController = {
             if (isLoggedIn) {
                 if (await this.ShowConfirm({ title: "LOGOUT", message: "ログアウトしますか？" })) {
                     _DialogCore.closeAll();
-                    $App.AppData.Context.IsLoggedIn = false;
-                    $App.AppData.Owner.Token = null;
-                    $App._saveSettings();
-                    $Notice.Info("Logged out.");
+                    // ★ここを修正：AppManagerのログアウトを呼ぶ
+                    $App.Logout();
                     setTimeout(() => location.reload(), 500);
                 }
             } else {
                 this.ShowLoginDialog();
             }
         };
-        _DialogCore.open({ title: "SYSTEM MENU", content: el, ok: null });
+        _DialogCore.open({
+            title: "SYSTEM MENU",
+            content: el,
+            help: "",
+        });
     },
     // 【基幹】アプリメニューを表示
     ShowAppMenu() {
@@ -241,7 +273,11 @@ const DialogController = {
         b.archiveList.onclick = () => { this.ShowArchiveList(); };
         b.search.onclick = () => { $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH; $App.RefreshScreen(); _DialogCore.close(); };
         //
-        _DialogCore.open({ title: "APP MENU", content: el, ok: null });
+        _DialogCore.open({
+            title: "APP MENU",
+            content: el,
+            help: "",
+        });
     },
     // （システム）ユーザー設定メニュー（第2階層）
     ShowUserSettingsMenu() {
@@ -251,7 +287,11 @@ const DialogController = {
         $Dom.QuerySelector('#btn-set-gps', el).onclick = () => this.ShowGpsFollowConfig();
         $Dom.QuerySelector('#btn-set-currency', el).onclick = () => this.ShowCurrencyConfig();
         //
-        _DialogCore.open({ title: "USER SETTINGS", content: el, ok: null });
+        _DialogCore.open({
+            title: "USER SETTINGS",
+            content: el,
+            help: "",
+        });
     },
     // （システム）テーマ設定ダイアログ
     ShowThemeConfig() {
@@ -280,6 +320,7 @@ const DialogController = {
         _DialogCore.open({
             title: "THEME CONFIG",
             content: el,
+            help: "",
             buttons: [
                 {
                     label: "OK",
@@ -320,6 +361,7 @@ const DialogController = {
         _DialogCore.open({
             title: "MAP STYLE CONFIG",
             content: el,
+            help: "",
             buttons: [
                 {
                     label: "OK",
@@ -340,6 +382,7 @@ const DialogController = {
         _DialogCore.open({
             title: "CURRENCY CONFIG",
             content: el,
+            help: "",
             buttons: [
                 {
                     label: "OK",
@@ -376,6 +419,7 @@ const DialogController = {
         _DialogCore.open({
             title: "APP INFO",
             content: el,
+            help: "",
             buttons:[]
         });
     },
@@ -407,6 +451,7 @@ const DialogController = {
         _DialogCore.open({
             title: "FEEDBACKS",
             content: el,
+            help: "",
             buttons:[
                 {
                     label: "Write Feedback",
@@ -471,6 +516,7 @@ const DialogController = {
             // データが既にあれば編集（EDIT）、なければ新規（WRITE）
             title: myFeedback ? "EDIT FEEDBACK" : "WRITE FEEDBACK",
             content: el,
+            help: "",
             buttons: [[
                 {
                     label: "CANCEL",
@@ -501,36 +547,8 @@ const DialogController = {
             ]]
         });
     },
-    // アイコン選択ダイアログを表示
-    ShowIconPicker(items, onSelect) {
-        const el = document.createElement("div");
-        el.className = "grid grid-cols-5 gap-2 p-2 my-5";
-        // アイコン一覧を生成
-        items.forEach(item => {
-            const id = item.faceId ?? item.weatherId ?? item.id;
-            const btn = document.createElement("button");
-            btn.className = "aspect-square border-2 bg-white rounded active:scale-90 flex items-center justify-center p-1";
-            // 画像の流し込み
-            const img = document.createElement("img");
-            img.src = item.imgUrl || item.url;
-            img.className = "w-full h-full object-contain pointer-events-none";
-            // クリック時に値を適用して閉じる
-            btn.onclick = () => {
-                onSelect(id);
-                _DialogCore.closeAll();
-            };
-            btn.appendChild(img);
-            el.appendChild(btn);
-        });
-        // ダイアログを表示
-        _DialogCore.open({
-            title: "SELECT",
-            content: el,
-            ok: null
-        });
-    },
     // 絵文字選択（定数リスト＋履歴保存、入力欄反映・OK確定）
-    ShowEmojiPicker(onSelect, emojiList = $Const.FACE_EMOJIS) {
+    ShowEmojiPicker_2(onSelect, emojiList = $Const.FACE_EMOJIS) {
         const storageKey = 'ritomemo_emoji_history';
         let history = JSON.parse(localStorage.getItem(storageKey) || "[]");
         const el = $Dom.GenerateTemplate("tpl-emoji-picker");
@@ -540,7 +558,7 @@ const DialogController = {
         const renderGrid = () => {
             const combinedList = [...new Set([...emojiList, ...history])].slice(0, 50);
             combinedGrid.innerHTML = combinedList.map(e =>
-                `<button class="w-10 h-10 rounded-xl hover:bg-slate-50 active:bg-slate-100 active:scale-90 flex items-center justify-center text-[28px] leading-none transition-all">
+                `<button class="w-10 h-10 rounded-[1rem] hover:bg-slate-50 active:bg-slate-100 active:scale-90 flex items-center justify-center text-[28px] leading-none transition-all">
                     ${e}
                 </button>`
             ).join('');
@@ -565,6 +583,7 @@ const DialogController = {
         _DialogCore.open({
             title: "SELECT ICON",
             content: el,
+            help: "",
             buttons: [
                 [
                     {
@@ -591,12 +610,38 @@ const DialogController = {
             ]
         });
     },
+    // 絵文字選択（定数リスト＋履歴保存、入力欄反映・OK確定）
+    ShowEmojiPicker(onSelect) {
+        const el = $Dom.GenerateTemplate("tpl-emoji-picker");
+        const container = $Dom.QuerySelector('#emoji-combined-grid', el);
+        // Emoji Martのピッカーを初期化
+        const picker = new EmojiMart.Picker({
+            onEmojiSelect: (emoji) => {
+                // 絵文字を選択した瞬間に反映してダイアログを閉じる
+                onSelect(emoji.native);
+                _DialogCore.close();
+            },
+            locale: 'ja',            // 日本語化
+            previewPosition: 'none', // 下部のプレビューエリアを隠す
+            skinTonePosition: 'none', // スキントーン選択を隠す
+        });
+        // コンテナにピッカーを注入
+        container.appendChild(picker);
+        // ダイアログを表示
+        _DialogCore.open({
+            title: "SELECT ICON",
+            content: el,
+            help: "",
+            buttons: []
+        });
+    },
     // 座標・住所指定で移動する
     PointSearchGoogle(onOk) {
         const el = $Dom.GenerateTemplate('tpl-point-search-google');
         _DialogCore.open({
             title: "地点・住所検索",
             content: el,
+            help: "",
             buttons: [
                 {
                     label: "GO！",
@@ -645,7 +690,11 @@ const DialogController = {
             $App.ChangeGpsTracking(false);
             // _DialogCore.closeAll();
         };
-        _DialogCore.open({ title: "GPS TRACKING", content: el, ok: null });
+        _DialogCore.open({
+            title: "GPS TRACKING",
+            content: el,
+            help: "",
+        });
     },
     // 地点リスト（単一選択・ジャンプ機能）
     ShowDetailsTimeLine() {
@@ -698,19 +747,9 @@ const DialogController = {
         _DialogCore.open({
             title: "TRIP LOG",
             content: el,
+            help: "",
             buttons: []
         });
-        setTimeout(() => {
-            const activeFrame = _DialogCore.stack[_DialogCore.stack.length - 1];
-            if (activeFrame) {
-                const titleText = $Dom.QuerySelector('#dialog-title', activeFrame);
-                if (titleText) {
-                    titleText.classList.remove('truncate');
-                    titleText.classList.add('flex', 'flex-col', 'justify-center', 'leading-tight');
-                    titleText.innerHTML = `TRIP LOG <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1 not-italic">CHRONOLOGICAL ARCHIVE</span>`;
-                }
-            }
-        }, 10);
     },
     // まとめ親一覧選択
     ShowArchiveList() {
@@ -763,18 +802,18 @@ const DialogController = {
                         if (item.closed_flg) {
                             // Publicデータ（CLOSE）
                             badge.textContent = "Close";
-                            badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-md uppercase italic border border-slate-200 bg-white text-slate-400";
+                            badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-slate-200 bg-white text-slate-400";
                             leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-200"; // 左線グレー
                         } else {
                             // Publicデータ（OPEN）
                             badge.textContent = "OPEN";
-                            badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-md uppercase italic border border-blue-100 bg-brand-2 text-brand-5 shadow-sm";
+                            badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-blue-100 bg-brand-2 text-brand-5 shadow-sm";
                             leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-brand-5"; // 左線ブランドカラー
                         }
                     } else {
                         // 内部データ（PRIVATE）
                         badge.textContent = "PRIVATE";
-                        badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-md uppercase italic border border-slate-200 bg-slate-100 text-slate-400 shadow-sm";
+                        badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-slate-200 bg-slate-100 text-slate-400 shadow-sm";
                         leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800"; // 左線ブランドカラー
                     }
                     child.onclick = () => {
@@ -794,6 +833,7 @@ const DialogController = {
             _DialogCore.open({
                 title: "ARCHIVE LIST",
                 content: root,
+            help: "",
                 buttons: []
             });
         })();
@@ -830,7 +870,7 @@ const DialogController = {
                 const badge = $Dom.QuerySelector(".js-badge", child);
                 const leftBorder = $Dom.QuerySelector(".js-item-border", child);
                 badge.textContent = "PRIVATE";
-                badge.className = "js-badge text-[9px] font-black px-2 py-0.5 rounded-md uppercase italic border border-slate-200 bg-slate-100 text-slate-400 shadow-sm";
+                badge.className = "js-badge text-[9px] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-slate-200 bg-slate-100 text-slate-400 shadow-sm";
                 leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800";
                 // アイテムクリック時の処理（追加確認 ＆ API実行）
                 child.onclick = async () => {
@@ -855,6 +895,7 @@ const DialogController = {
             _DialogCore.open({
                 title: "SELECT ARCHIVE",
                 content: root,
+                help: "",
                 buttons: []
             });
         })();
@@ -888,12 +929,12 @@ const DialogController = {
                 const checkbox = $Dom.QuerySelector(".js-checkbox", card);
                 const mark = $Dom.QuerySelector(".js-check-mark", card);
                 if (isSel) {
-                    card.className = "js-item-card flex items-center gap-3 p-3 mb-2 rounded-2xl border-2 cursor-pointer active:scale-[0.98] transition-all border-brand-5 bg-white shadow-md";
-                    checkbox.className = "shrink-0 w-6 h-6 rounded-md border-2 flex items-center justify-center js-checkbox transition-colors border-brand-5 bg-brand-5";
+                    card.className = "js-item-card flex items-center gap-3 p-3 mb-2 rounded-[1rem] border-2 cursor-pointer active:scale-[0.98] transition-all border-brand-5 bg-white shadow-md";
+                    checkbox.className = "shrink-0 w-6 h-6 rounded-[1rem] border-2 flex items-center justify-center js-checkbox transition-colors border-brand-5 bg-brand-5";
                     mark.classList.remove("hidden");
                 } else {
-                    card.className = "js-item-card flex items-center gap-3 p-3 mb-2 rounded-2xl border-2 cursor-pointer active:scale-[0.98] transition-all border-brand-1 bg-white";
-                    checkbox.className = "shrink-0 w-6 h-6 rounded-md border-2 flex items-center justify-center js-checkbox transition-colors border-brand-2 bg-transparent";
+                    card.className = "js-item-card flex items-center gap-3 p-3 mb-2 rounded-[1rem] border-2 cursor-pointer active:scale-[0.98] transition-all border-brand-1 bg-white";
+                    checkbox.className = "shrink-0 w-6 h-6 rounded-[1rem] border-2 flex items-center justify-center js-checkbox transition-colors border-brand-2 bg-transparent";
                     mark.classList.add("hidden");
                 }
             });
@@ -937,6 +978,7 @@ const DialogController = {
         frame = _DialogCore.open({
             title: "SELECTION MODE",
             content: content,
+            help: "",
             buttons: [
                 [
                     {
@@ -1044,6 +1086,7 @@ const DialogController = {
         _DialogCore.open({
             title: "SEARCH RESULTS",
             content: el,
+            help: "",
             buttons: []
         });
         setTimeout(() => {
@@ -1135,8 +1178,9 @@ const DialogController = {
         _DialogCore.open({
             title: "ATMOSPHERE SETTING",
             content: el,
+            help: "",
             onClose: () => {
-                // キャンセル・✕ボタン・背景クリック時などにエフェクトを戻す
+                // キャンセル・✖ボタン・背景クリック時などにエフェクトを戻す
                 if (typeof Atmosphere !== 'undefined') {
                     Atmosphere.hide();
                     if (Atmosphere.canvas) Atmosphere.canvas.style.zIndex = '0';
@@ -1165,7 +1209,6 @@ const DialogController = {
         const archive = $Data.Store.GetArchive();
         if (!archive) return $Notice.Warn("Not found.");
         const el = $Dom.GenerateTemplate('tpl-view-archive');
-        // 参照画面の描画処理（保存後にも再利用してリフレッシュする）
         const renderView = () => {
             $Dom.QuerySelector('#view-mem-title', el).textContent = archive.title || "";
             $Dom.QuerySelector('#view-mem-body', el).textContent = archive.memo || "";
@@ -1178,8 +1221,7 @@ const DialogController = {
             } else {
                 $Dom.ToggleShow(urlWrapper, false);
             }
-            // 統計データの計算
-            const details = $Data.Store.GetDetails() ||[];
+            const details = $Data.Store.GetDetails() || [];
             const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
             $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
             const priceBox = $Dom.QuerySelector('#view-mem-price-box', el);
@@ -1187,24 +1229,21 @@ const DialogController = {
             const priceLabel = $Dom.QuerySelector('#view-mem-price-label', el);
             const displayCurrency = archive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
             if (totalPrice > 0) {
-                // priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-blue-100 bg-blue-50 shadow-sm";
                 priceVal.className = "text-[1.2rem] font-black text-blue-600";
                 priceLabel.className = "text-[8px] font-black uppercase text-blue-500 mb-1";
                 priceVal.innerHTML = `${totalPrice.toLocaleString()} <span class="text-[0.6rem] text-blue-400 ml-0.5">${displayCurrency}</span>`;
             } else if (totalPrice < 0) {
-                // priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-red-100 bg-red-50 shadow-sm";
                 priceVal.className = "text-[1.2rem] font-black text-red-600";
                 priceLabel.className = "text-[8px] font-black uppercase text-red-500 mb-1";
                 priceVal.innerHTML = `- ${Math.abs(totalPrice).toLocaleString()} <span class="text-[0.6rem] text-red-400 ml-0.5">${displayCurrency}</span>`;
             } else {
-                priceBox.className = "rounded-2xl p-3 flex flex-col items-center justify-center border border-brand-1 bg-white shadow-sm";
+                priceBox.className = "rounded-[1rem] p-3 flex flex-col items-center justify-center border border-brand-1 bg-white shadow-sm";
                 priceVal.className = "text-[1.2rem] font-black text-black-5";
                 priceLabel.className = "text-[8px] font-black uppercase text-black-3 mb-1";
                 priceVal.innerHTML = `0 <span class="text-[0.6rem] text-black-3 ml-0.5">${displayCurrency}</span>`;
             }
         };
         renderView();
-        // ユーザー情報の制御
         const btnUserProfile = $Dom.QuerySelector('#btn-mem-user-profile', el);
         const profile = $Data.Store.GetUserProfile();
         if (profile) {
@@ -1214,29 +1253,33 @@ const DialogController = {
         } else {
             $Dom.ToggleShow(btnUserProfile, false);
         }
-        // ダイアログフッターのボタン配列を構築（縦並びにするため配列をネストする）
-        const dialogButtons =[];
-        // 公開データなら「シェアボタン」を一番上に表示
+        // --- 【追加】ヘッダーボタンの定義 ---
+        const headerButtons = [];
+        if (archive.is_owner) {
+            headerButtons.push({
+                label: "✏️",
+                handler: () => this.ShowEditArchive(archive, renderView)
+            });
+        }
+        const dialogButtons = [];
         if (archive.is_public) {
             dialogButtons.push([{
                 label: "🔗 SHARE THIS ARCHIVE",
-                className: "w-full bg-blue-500 text-white font-bold py-3 rounded-2xl shadow-md mb-2",
+                className: "w-full bg-blue-500 text-white font-bold py-3 rounded-[1rem] shadow-md mb-2",
                 closesDialog: false,
                 handler: () => this.ShowShareArchive(archive, profile)
             }]);
         }
         if (archive.is_owner) {
-            const btnMainClass = "w-full bg-brand-5 text-white font-bold py-3 rounded-2xl text-[0.8rem] shadow-md active:scale-95 transition-transform";
-            const btnReleaseClass = "w-full bg-white text-red-400 border border-brand-4 font-bold py-3 rounded-2xl text-[0.8rem] shadow-sm active:scale-95 transition-transform";
+            const btnMainClass = "w-full bg-brand-5 text-white font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform";
+            const btnReleaseClass = "w-full bg-white text-red-400 border border-brand-4 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-sm active:scale-95 transition-transform";
             if (!archive.is_public) {
-                // Private ⇒ Public
                 dialogButtons.push([{
                     label: "Private　⇒　Public",
                     className: btnMainClass,
                     closesDialog: false,
                     handler: () => this._execStatusChange('PublishArchive', { archive_id: archive.archive_id }, "Switch to [Public]", "Do you want to make\nthis internal data [Public]？", "Set to [Public].", $Const.SCREEN_MODE.ARCHIVE_PUB)
                 }]);
-                // Archive ⇒ Details
                 dialogButtons.push([{
                     label: "Archive　⇒　Details",
                     className: btnReleaseClass,
@@ -1245,19 +1288,13 @@ const DialogController = {
                 }]);
             } else {
                 if (archive.closed_flg) {
-                    // Close ⇒ Open
                     dialogButtons.push([{
                         label: "Close　⇒　Open",
                         className: btnMainClass,
                         closesDialog: false,
-                        handler: () => this._execStatusChange(
-                            'OpenArchive', { archive_id: archive.archive_id }, "Switch to [Open]", 
-                            "Do you want to switch\nthis data to [Open]？", "Switched to [Open].", null, 
-                            () => $Data.Store.UpdateArchive({ closed_flg: false })
-                        )
+                        handler: () => this._execStatusChange('OpenArchive', { archive_id: archive.archive_id }, "Switch to [Open]", "Do you want to switch\nthis data to [Open]？", "Switched to [Open].", null, () => $Data.Store.UpdateArchive({ closed_flg: false }))
                     }]);
                 } else {
-                    // Open ⇒ Close
                     dialogButtons.push([{
                         label: "Open　⇒　Close",
                         className: btnMainClass,
@@ -1265,7 +1302,6 @@ const DialogController = {
                         handler: () => this._execStatusChange('CloseArchive', { archive_id: archive.archive_id }, "Switch to [Close]", "Do you want to switch\nthis data to [Close]？", "Switched to [Close].", null, () => $Data.Store.UpdateArchive({ closed_flg: true }))
                     }]);
                 }
-                // Public ⇒ Private
                 dialogButtons.push([{
                     label: "Public　⇒　Private",
                     className: btnReleaseClass,
@@ -1274,31 +1310,27 @@ const DialogController = {
                 }]);
             }
         } else {
-            // ▼ オーナーでない（他人の）アーカイブの場合は通報ボタンを表示する
             dialogButtons.push([{
                 label: "REPORT THIS ARCHIVE",
-                className: "w-full bg-white text-red-500 border border-red-500 font-bold py-3 rounded-2xl text-[0.8rem] shadow-sm active:scale-95 transition-transform",
+                className: "w-full bg-white text-red-500 border border-red-500 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-sm active:scale-95 transition-transform",
                 closesDialog: false,
                 handler: () => this.ShowReportPost(archive)
             }]);
         }
-        // _DialogCore に構築したボタン配列を渡す
-        const frame = _DialogCore.open({ title: "", content: el, buttons: dialogButtons });
-        // バッジと鉛筆ボタンの追加
-        const titleContainer = $Dom.QuerySelector('#dialog-title', frame);
-        const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
-        let badgeHtml = (!archive.is_public) ? `<span class="text-[0.6rem] font-black px-3 py-1 rounded-xl bg-gray-500 text-white border border-gray-200 shadow-sm">Private</span>` :
-                        (archive.closed_flg) ? `<span class="text-[0.6rem] font-black px-3 py-1 rounded-xl bg-gray-100 text-gray-500 border border-gray-200 shadow-sm">Close</span>` :
-                        `<span class="text-[0.6rem] font-black px-3 py-1 rounded-xl bg-brand-2 text-brand-5 border border-blue-100 shadow-sm">Open</span>`;
-        if (titleContainer) titleContainer.innerHTML = badgeHtml;
-        if (archive.is_owner && headerActions) {
-            const editBtn = document.createElement('button');
-            editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[0.8rem] border border-brand-2 transition-transform";
-            editBtn.innerHTML = "✏️";
-            // 編集ダイアログを「上に」開き、保存後に参照画面を描画し直す関数を渡す
-            editBtn.onclick = () => this.ShowEditArchive(archive, renderView);
-            headerActions.prepend(editBtn);
-        }
+        const frame = _DialogCore.open({ 
+            title: "Archive info",
+            content: el,
+            help: "",
+            headerButtons: headerButtons, // ここで上段ボタンを渡す
+            buttons: dialogButtons,
+        });
+        // const titleContainer = $Dom.QuerySelector('#dialog-title', frame);
+        // if (titleContainer) {
+        //     let badgeHtml = (!archive.is_public) ? `<span class="text-[0.6rem] font-black px-3 py-1 rounded-[1rem] bg-gray-500 text-white border border-gray-200 shadow-sm">Private</span>` :
+        //                     (archive.closed_flg) ? `<span class="text-[0.6rem] font-black px-3 py-1 rounded-[1rem] bg-gray-100 text-gray-500 border border-gray-200 shadow-sm">Close</span>` :
+        //                     `<span class="text-[0.6rem] font-black px-3 py-1 rounded-[1rem] bg-brand-2 text-brand-5 border border-blue-100 shadow-sm">Open</span>`;
+        //     titleContainer.innerHTML = badgeHtml;
+        // }
     },
     // まとめ親編集（上にスタックされる）
     ShowEditArchive(archive, onUpdate) {
@@ -1314,6 +1346,7 @@ const DialogController = {
         _DialogCore.open({
             title: "EDIT ARCHIVE",
             content: el,
+            help: "",
             buttons: [
                 [
                     {
@@ -1373,18 +1406,23 @@ const DialogController = {
             links.forEach(l => {
                 const a = document.createElement("a");
                 a.href = l; a.target = "_blank";
-                a.className = "flex items-center gap-2 p-3 bg-white rounded-xl border border-slate-100 shadow-sm text-blue-500 text-[0.7rem] font-bold truncate active:scale-95 transition-transform";
+                a.className = "flex items-center gap-2 p-3 bg-white rounded-[1rem] border border-slate-100 shadow-sm text-blue-500 text-[0.7rem] font-bold truncate active:scale-95 transition-transform";
                 a.innerHTML = `<span class="shrink-0 text-brand-3 text-[0.8rem]">🔗</span> <span class="truncate">${l}</span>`;
                 viewLinks.appendChild(a);
             });
         };
         renderView();
-        const frame = _DialogCore.open({ title: "USER PROFILE", content: el, buttons: [] });
+        const frame = _DialogCore.open({
+            title: "USER PROFILE",
+            content: el,
+            help: "",
+            buttons: []
+        });
         if (isOwner) {
             const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
             if (headerActions) {
                 const editBtn = document.createElement('button');
-                editBtn.className = "w-8 h-8 bg-white rounded-xl shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[0.8rem] border border-brand-2 transition-transform";
+                // editBtn.className = "w-8 h-8 bg-white rounded-[1rem] shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[0.8rem] border border-brand-2 transition-transform";
                 editBtn.innerHTML = "✏️";
                 editBtn.onclick = () => this.ShowEditProfile(profile, renderView);
                 headerActions.prepend(editBtn);
@@ -1420,6 +1458,7 @@ const DialogController = {
         _DialogCore.open({
             title: "EDIT PROFILE",
             content: el,
+            help: "",
             buttons: [
                 [
                     {
@@ -1464,6 +1503,7 @@ const DialogController = {
         _DialogCore.open({
             title: "NOTICE DETAILS",
             content: el,
+            help: "",
             buttons:[]
         });
     },
@@ -1486,7 +1526,9 @@ const DialogController = {
             root.appendChild(child);
         });
         _DialogCore.open({
-            title: "NOTIFICATIONS", content: root,
+            title: "NOTIFICATIONS",
+            content: root,
+            help: "",
             buttons:[]
         });
     },
@@ -1496,7 +1538,11 @@ const DialogController = {
         $Dom.QuerySelector('#btn-admin-notice', el).onclick = () => this.ShowAdminNoticeList();
         $Dom.QuerySelector('#btn-admin-report', el).onclick = () => this.ShowAdminReportList();
         $Dom.QuerySelector('#btn-admin-feedback', el).onclick = () => this.ShowAdminFeedbackList();
-        _DialogCore.open({ title: "ADMIN TOOLS", content: el, ok: null });
+        _DialogCore.open({
+            title: "ADMIN TOOLS",
+            content: el,
+            help: "",
+        });
     },
     // 通知管理リスト（API通信化）
     async ShowAdminNoticeList() {
@@ -1545,14 +1591,16 @@ const DialogController = {
         };
         await renderList();
         const frame = _DialogCore.open({
-            title: "NOTICE Mgmt", content: root,
+            title: "NOTICE Mgmt",
+            content: root,
+            help: "",
             buttons:[]
         });
         // 新規登録ボタン
         const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
         if (headerActions) {
             const addBtn = document.createElement('button');
-            addBtn.className = "w-8 h-8 bg-brand-5 rounded-xl shadow-sm text-white flex items-center justify-center active:scale-95 text-[1.2rem] border border-brand-5 transition-transform";
+            addBtn.className = "w-8 h-8 bg-brand-5 rounded-[1rem] shadow-sm text-white flex items-center justify-center active:scale-95 text-[1.2rem] border border-brand-5 transition-transform";
             addBtn.innerHTML = "＋";
             addBtn.onclick = () => this.ShowAdminNoticeEdit(null, () => {
                 _DialogCore.close();
@@ -1583,6 +1631,7 @@ const DialogController = {
         _DialogCore.open({
             title: isNew ? "NEW NOTICE" : "EDIT NOTICE",
             content: el,
+            help: "",
             buttons:[[
                 {
                     label: "CANCEL",
@@ -1637,6 +1686,7 @@ const DialogController = {
         _DialogCore.open({
             title: "REPORT Mgmt",
             content: root,
+            help: "",
             buttons:[]
         });
     },
@@ -1682,6 +1732,7 @@ const DialogController = {
         _DialogCore.open({
             title: "REPORT DETAILS",
             content: el,
+            help: "",
             buttons:[ { label: "BACK", className: "bg-slate-200 text-slate-500 shadow-sm", closesDialog: true } ]
         });
     },
@@ -1738,6 +1789,7 @@ const DialogController = {
         _DialogCore.open({
             title: "FEEDBACK Mgmt",
             content: root,
+            help: "",
             buttons:[]
         });
     },
@@ -1763,6 +1815,7 @@ const DialogController = {
             // データが既にあれば編集（EDIT）、なければ新規（SUBMIT）
             title: myReport ? "EDIT REPORT" : "REPORT SUBMIT",
             content: el,
+            help: "",
             buttons: [[
                 {
                     label: "CANCEL",
@@ -1816,6 +1869,7 @@ const DialogController = {
         _DialogCore.open({
             title: "SHARE ARCHIVE",
             content: el,
+            help: "",
             buttons: [{ label: "CLOSE", className: "bg-slate-400 text-white", closesDialog: true }]
         });
     },

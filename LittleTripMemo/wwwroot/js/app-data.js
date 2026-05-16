@@ -240,7 +240,7 @@ window.$Data = {
         GetArchiveList() {
             return this._archiveList;
         },
-        GetDetailsWithSort(field = "date", order = "asc") {
+        _sortData(field = "date", order = "asc") {
             if (!this._details || this._details.length === 0) return;
             const isAsc = order.toLowerCase() === "asc";
             this._details.sort((a, b) => {
@@ -260,7 +260,8 @@ window.$Data = {
                 return 0;
             });
         },
-        GetDetails() {
+        GetDetails(field = "date", order = "asc") {
+            this._sortData(field, order);
             return this._getDetails();
         },
         GetDetailByKey(archiveId, seq) {

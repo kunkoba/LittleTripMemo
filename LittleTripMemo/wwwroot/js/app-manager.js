@@ -72,31 +72,41 @@ const AppManager = {
             if (isOn) {
                 // オンライン
                 $Notice.Offline.Hide();
-                $Polling.Start($Polling.TASKS.DATA_SEND);   // データ送信監視開始
+                $Polling.Start($Polling.TASKS.DATA_DETAIL);   // データ送信監視開始
             } else {
                 // オフライン
                 $Notice.Offline.Show();
-                $Polling.Stop($Polling.TASKS.DATA_SEND);
+                $Polling.Stop($Polling.TASKS.DATA_DETAIL);
                 console.log("-- offline --");
             }
         }, 30);
-        // データ送信処理（秒）
-        $Polling.Add($Polling.TASKS.DATA_SEND, async () => {
-            if (await $LocalDb.Detail.GetCount() === 0) return;
-            await $Warn.CatchAsync(async () => {
-                // 全て $Data.LocalDb に任せる
-                await $Data.LocalDb.BulkSendDetails();
-                // 通知
-                $Notice.Info("Saved successfully.");
-            })();
-        }, 60);
-        // 現在地追従（秒）
-        $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
-            // 追従モードかつオンラインなら現在地を更新（フォーカスはしない）
-            if ($App.AppData.Owner.IsGpsTracking && $App.AppData.Context.IsOnline) {
+        if ($App.AppData.Owner.IsGpsTracking && $App.AppData.Context.IsOnline) {
+            // 現在地追従（秒）
+            $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
+                // 追従モードかつオンラインなら現在地を更新（フォーカスはしない）
                 $Marker.RefreshCurrentLocation();
-            }
-        }, 10);
+            }, 10);
+            // データ送信処理（秒）
+            $Polling.Add($Polling.TASKS.DATA_DETAIL, async () => {
+                if (await $LocalDb.Detail.GetCount() === 0) return;
+                await $Warn.CatchAsync(async () => {
+                    // 全て $Data.LocalDb に任せる
+                    await $Data.LocalDb.BulkSendDetails();
+                    // 通知
+                    $Notice.Info("Saved successfully.");
+                })();
+            }, 60);
+            // // データ送信処理（秒）
+            // $Polling.Add($Polling.TASKS.DATA_DETAIL, async () => {
+            //     if (await $LocalDb.Detail.GetCount() === 0) return;
+            //     await $Warn.CatchAsync(async () => {
+            //         // 全て $Data.LocalDb に任せる
+            //         await $Data.LocalDb.BulkSendDetails();
+            //         // 通知
+            //         $Notice.Info("Saved successfully.");
+            //     })();
+            // }, 60);
+        }
         // 定期タスク開始-----
         $Polling.Start($Polling.TASKS.OFFLINE_CHECK);
     },
@@ -236,6 +246,19 @@ const AppManager = {
         $UI.ChangeScreenMode();
         // マーカー更新
         $Marker.ChangeScreenMode();
+    },
+    // ログアウト処理
+    async Logout() {
+        if (firebase.apps.length) {
+            await firebase.auth().signOut();
+        }
+        // 1. メモリ上の認証情報をクリア
+        this.AppData.Context.IsLoggedIn = false;
+        this.AppData.Owner.Token = null;
+        // 2. ローカルストレージを更新（Tokenがnullの状態で上書き保存される）
+        this._saveSettings();
+        // 3. 必要であればIndexedDBのキャッシュ等も消すが、基本は上記2つで次回の自動ログインは防げます。
+        console.log("Token destroyed and logged out.");
     },
 };
 

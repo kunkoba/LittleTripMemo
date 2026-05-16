@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Emoji Mart サンプル</title>
+
+  <!-- Emoji Mart v5（React不要のブラウザ版） -->
+  <script src="https://unpkg.com/emoji-mart@5.6.0/dist/browser.js"></script>
+
+  <style>
+    dialog {
+      border: none;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <button id="open">絵文字を選ぶ</button>
+
+  <!-- ピッカーを置く場所 -->
+  <div id="picker" style="margin-top: 10px; display: none;"></div>
+
+  <!-- ダイアログ -->
+  <dialog id="dlg">
+    <div id="emoji" style="font-size: 40px; text-align:center;">🙂</div>
+    <button id="close">閉じる</button>
+  </dialog>
+
+  <script>
+    const pickerDiv = document.getElementById("picker");
+    const dlg = document.getElementById("dlg");
+    const emojiBox = document.getElementById("emoji");
+
+    let picker = null;
+
+    document.getElementById("open").onclick = () => {
+      if (!picker) {
+        picker = new EmojiMart.Picker({
+          onEmojiSelect: e => {
+            emojiBox.textContent = e.native; // ← 選んだ絵文字
+            dlg.showModal();                // ← ダイアログを開く
+          }
+        });
+        console.log(">picker:", picker);
+        pickerDiv.appendChild(picker);
+      }
+      pickerDiv.style.display = "block";
+    };
+
+    document.getElementById("close").onclick = () => dlg.close();
+  </script>
+
+</body>
+</html>

@@ -18,8 +18,6 @@
     <!-- Firebase SDK (compat版) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <!-- Emoji Mart v5 (React なしで使える UMD 版) -->
-    <script src="https://unpkg.com/emoji-mart@5.6.0/dist/browser.js"></script>
 
     <script>
         tailwind.config = {
@@ -57,7 +55,7 @@
     <!-- メインコンテンツ（親領域の枠にピッタリはめ込む） -->
     <div class="absolute inset-0">
         <!-- ■　アプリ上部 -->
-        <div id="ui-top-bar" class="absolute top-0 left-0 right-0 z-[1000] pointer-events-none">
+        <div id="ui-top-bar" class="absolute top-0 left-0 right-0 z-[1000]">
             <!-- ■　通知バー -->
             <div class="h-6 shadow-brand_ bg-black/20 flex items-center justify-center">
                 <div id="notice-bar-text" class="text-[0.7rem] font-bold text-white"></div>
@@ -69,16 +67,16 @@
                     <!-- まとめタイトル -->
                     <div class="p-0 flex justify-center">
                         <!-- 初期状態を黒背景にし、内部にアイコンとテキストの要素を分割 -->
-                        <button id="ui-archive-title" class="hidden py-1.5 px-4 flex items-center gap-2 bg-slate-800/50 rounded-full 
-                            text-white text-[0.8rem] font-bold shadow-brand max-w-full transition-colors pointer-events-auto">
+                        <button id="ui-archive-title" class="hidden py-1.5 px-4 flex items-center gap-2 bg-slate-800/50 rounded-full text-white text-[0.8rem] font-bold shadow-brand max-w-full transition-colors">
                             <span class="js-icon text-[1rem] shrink-0 drop-shadow-sm">🔒</span>
                             <span class="js-text truncate leading-none pt-0.5">タイトル</span>
                         </button>
                     </div>
                     <!-- 地点検索関連 -->
-                    <div id="ui-sort-group" class="hidden flex flex-col items-center ">
+                    <!-- ▼ 修正： items-center を追加して子要素を中央揃えに -->
+                    <div id="ui-sort-group" class="hidden flex flex-col items-center">
                         <!-- Public／Private -->
-                        <div id="sort-kbn" class="shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-0 rounded-full overflow-hidden pointer-events-auto">
+                        <div id="sort-kbn" class="shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-0 rounded-full overflow-hidden">
                             <button data-value="0" class="ui-btn h-full px-4 text-[12px] font-bold bg-brand-3 transition-colors">
                                 Private
                             </button>
@@ -87,7 +85,7 @@
                             </button>
                         </div>
                         <!-- 並び順 -->
-                        <div id="sort-field" class="shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-0 rounded-full overflow-hidden pointer-events-auto">
+                        <div id="sort-field" class="shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-0 rounded-full overflow-hidden">
                             <button data-value="1" class="ui-btn h-full px-3 text-[12px] font-bold bg-brand-3 transition-colors">
                                 Created
                             </button>
@@ -103,26 +101,28 @@
                             </button>
                         </div>
                         <!-- リアクション種別 -->
-                        <div id="sort-reaction" class="hidden shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-0 text-[14px] rounded-full overflow-hidden pointer-events-auto">
+                        <div id="sort-reaction" class="hidden shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-0 text-[14px] rounded-full overflow-hidden">
                             <button data-value="1" class="ui-btn h-full px-3 bg-brand-3 transition-colors">🤣</button>
                             <button data-value="2" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😍</button>
                             <button data-value="3" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😲</button>
                             <button data-value="4" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😉</button>
                         </div>
-                        <!-- 検索キーワード入力欄 -->
-                        <div id="sort-word" class="hidden shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-0 rounded-full overflow-hidden bg-white pointer-events-auto">
+                        <!-- ▼ ここにワード入力欄を追加 (フォントサイズ 1rem) -->
+                        <div id="sort-word" class="hidden shadow-brand w-fit mb-2 h-8 flex border-4 border-brand-0 text-black-0 rounded-full overflow-hidden bg-white">
                             <input type="text" id="input-sort-word" class="h-full px-3 text-[0.8rem] text-black-5 outline-none bg-transparent w-40 placeholder-slate-300" placeholder="Keyword...">
                         </div>
                     </div>
                     <!-- ★スマホ用広告スペース（PCでは非表示） -->
-                    <div id="ad-space-mobile" class="lg:hidden mt-2 mx-auto max-w-[320px] h-[50px] pointer-events-auto">
+                    <!-- ▼ 修正： mx-auto を追加して中央揃えに -->
+                    <div id="ad-space-mobile" class="lg:hidden mt-6 mx-auto max-w-[320px] h-[50px] ">
                         <div class="bg-white/80 backdrop-blur-sm w-full h-full border border-brand-2 shadow-brand flex items-center justify-center text-slate-400 text-[0.6rem] font-black tracking-widest pointer-events-auto">
                             ADD SPACE
                         </div>
                     </div>
                 </div>
             </div>
-
+            <!-- ■　Toast を積み上げるコンテナ -->
+            <div id="toast-container-2" class="pt-2 _fixed _top-[100px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
         </div>
         <!-- ■　メイン画面：地図＋詳細パネル -->
         <div class="absolute bottom-0 flex h-full w-full overflow-hidden flex-col md:flex-row">
@@ -131,60 +131,63 @@
             <!-- 明細閉じる用パネル -->
             <div id="ui-map-barrier" class="fixed inset-0 z-10 hidden bg-transparent"></div>
             <!-- ■　詳細パネル（右側スライド表示） -->
-            <div id="ui-detail-frame-id" class="translate-y-full flex flex-col bg-brand-0 overflow-hidden shrink-0 h-0 w-full 
-                md:h-full md:w-0 transition-all duration-400 shadow-2xl z-[1002]">
+            <div id="ui-detail-frame-id" class="translate-y-full flex flex-col bg-brand-0 overflow-hidden shrink-0 h-0 w-full md:h-full md:w-0 border-t md:border-t-0 md:border-l border-brand-2 transition-all duration-400 rounded-t-[2rem] md:rounded-none md:rounded-l-[2rem] shadow-2xl z-[1002]">
                 <!-- 詳細パネルのヘッダー -->
-                <div class="bg-brand-5 h-16 px-6 flex justify-between items-center shrink-0 border-2 border-brand-5 z-[1000] shadow-md">
-                    <h2 id="detail-title" class="text-[1.2rem] font-black italic text-brand-0 uppercase tracking-wider">Details</h2>
+                <div class="bg-slate-50 h-16 px-6 flex justify-between items-center shrink-0 border-b border-brand-1">
+                    <h2 id="detail-title" class="text-[1.2rem] font-black italic text-brand-5 uppercase tracking-wider">Details</h2>
                     <div class="flex gap-2">
                         <!-- ▼ ここに追加 -->
-                        <button id="detail-btn-earth" class="w-9 h-9 bg-white rounded-full shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">🌍</button>
-                        <button id="detail-btn-map"   class="w-9 h-9 bg-white rounded-full shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">🗺️</button>
-                        <button id="detail-btn-edit"  class="w-9 h-9 bg-white rounded-full shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">✏️</button>
-                        <button id="detail-btn-close" class="w-9 h-9 bg-white rounded-full shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">✖</button>
+                        <button id="detail-btn-earth" class="w-8 h-8 bg-white rounded-[1rem] shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">🌍</button>
+                        <button id="detail-btn-map"   class="w-8 h-8 bg-white rounded-[1rem] shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">🗺️</button>
+                        <button id="detail-btn-edit"  class="w-8 h-8 bg-white rounded-[1rem] shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">✏️</button>
+                        <button id="detail-btn-close" class="w-8 h-8 bg-white rounded-[1rem] shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">✖</button>
                     </div>
                 </div>
                 <!-- 詳細パネルの内容 (スクロールエリア) -->
-                <div id="ui-detail-content-id" class="flex-1 overflow-y-auto p-6">
-                    <!-- ■ 参照用（表示モード）：縦並び・左揃え・1rem 統一版 -->
-                    <div id="detail-display" class="hidden relative min-h-full flex flex-col bg-white">
-                        <!-- 背景用の巨大顔文字：上部に固定（スクロールしても動かない） -->
-                        <div class="sticky top-0 w-full h-0 pointer-events-none z-0 flex justify-center">
-                            <div id="detail-display-face_emoji_bg" class="text-[12rem] opacity-[0.1] leading-none select-none -translate-y-4 mt-12"></div>
-                        </div>
-                        <!-- メインコンテンツ：ここを縦並び・左揃えに設定 -->
-                        <div class="relative z-10 flex flex-col items-start gap-4">
-                            <!-- 1. 日付・時刻・顔文字を横並びに -->
-                            <div class="flex items-center gap-4 pb-1 w-fit">
-                                <div class="flex flex-col_ leading-tight gap-3 text-black font-bold text-[1.2rem]">
-                                    <span id="detail-display-memo_date" ></span>
-                                    <span id="detail-display-memo_time" ></span>
-                                    <!-- 顔文字（1rem） -->
-                                    <span id="detail-display-face_emoji" class="text-[1.5rem] leading-none"></span>
-                                </div>
-                            </div>
-                            <!-- 2. 金額（左揃え・1rem） -->
-                            <div id="detail-display-price-wrapper" class="hidden flex items-baseline italic">
-                                <span id="detail-display-memo_price" class="text-[1.2rem] font-black italic leading-none"></span>
-                                <span id="detail-display-price-unit" class="text-[0.7rem] font-bold text-slate-400 ml-1.5 uppercase"></span>
-                            </div>
-                            <!-- 4. タイトル（左揃え・1rem・左アクセント） -->
-                            <div class="border-l-4 border-brand-3 pl-3 py-0.5 mt-2">
-                                <h1 id="detail-display-title" class="text-[1rem] font-black text-slate-800 leading-tight break-all"></h1>
-                            </div>
-                            <!-- 5. 本文（左揃え・1rem以下） -->
-                            <div id="detail-display-body" class="text-[0.9rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-all pt-2"></div>
-                            <!-- 隠し項目 -->
-                            <span id="detail-display-weather_code" class="hidden"></span>
-                            <!-- 下部：Locationカード風のURLリンク -->
-                            <div id="detail-display-url-wrapper" class="hidden w-full pt-6">
-                                <a id="detail-display-link_url" href="" target="_blank" class="flex items-center bg-slate-50/50 border border-slate-100 border-l-4 border-cyan-400 rounded-[1rem] p-4 shadow-sm active:scale-[0.98] transition-transform">
-                                    <span class="text-[1.2rem] mr-4">📍</span>
-                                    <span class="text-[0.8rem] font-bold text-slate-700 truncate">Location Data / Link</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                <div id="ui-detail-content-id" class="flex-1 overflow-y-auto p-4">
+                    <!-- ■ 参照用（表示モード） -->
+<!-- ■ 参照用（表示モード）：縦並び・左揃え・1rem 統一版 -->
+<div id="detail-display" class="hidden relative min-h-full flex flex-col bg-white">
+    
+    <!-- 背景用の巨大顔文字：上部に固定（スクロールしても動かない） -->
+    <div class="sticky top-0 w-full h-0 pointer-events-none z-0 flex justify-center">
+        <div id="detail-display-face_emoji_bg" class="text-[12rem] opacity-[0.04] leading-none select-none -translate-y-4"></div>
+    </div>
+
+    <!-- メインコンテンツ：ここを縦並び・左揃えに設定 -->
+    <div class="relative z-10 flex flex-col items-start space-y-4 pt-4 px-4 pb-20">
+
+        <!-- 【1行目】日付・時刻・顔文字を横並びに -->
+        <div class="flex items-center gap-4 border-b border-cyan-400 pb-1 w-fit">
+            <div class="flex flex-col_ leading-tight gap-3">
+                <span id="detail-display-memo_date" class="text-[1rem] font-bold text-cyan-600 uppercase tracking-tight"></span>
+                <span id="detail-display-memo_time" class="text-[1rem] font-bold text-cyan-600 opacity-70"></span>
+                <!-- 顔文字（1rem） -->
+                <div id="detail-display-face_emoji" class="text-[1.5rem] leading-none"></div>
+            </div>
+        </div>
+        <!-- 2. 金額（左揃え・1rem） -->
+        <div id="detail-display-price-wrapper" class="hidden flex items-baseline">
+            <span id="detail-display-memo_price" class="text-[1rem] font-black italic leading-none"></span>
+            <span id="detail-display-price-unit" class="text-[0.7rem] font-bold text-slate-400 ml-1.5 uppercase"></span>
+        </div>
+        <!-- 4. タイトル（左揃え・1rem・左アクセント） -->
+        <div class="border-l-4 border-cyan-400 pl-3 py-0.5 mt-2">
+            <h1 id="detail-display-title" class="text-[1rem] font-black text-slate-800 leading-tight break-all"></h1>
+        </div>
+        <!-- 5. 本文（左揃え・1rem以下） -->
+        <div id="detail-display-body" class="text-[0.9rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-all pt-2"></div>
+        <!-- 隠し項目 -->
+        <span id="detail-display-weather_code" class="hidden"></span>
+        <!-- 下部：Locationカード風のURLリンク -->
+        <div id="detail-display-url-wrapper" class="hidden w-full pt-6">
+            <a id="detail-display-link_url" href="" target="_blank" class="flex items-center bg-slate-50/50 border border-slate-100 border-l-4 border-cyan-400 rounded-[1rem] p-4 shadow-sm active:scale-[0.98] transition-transform">
+                <span class="text-[1.2rem] mr-4">📍</span>
+                <span class="text-[0.8rem] font-bold text-slate-700 truncate">Location Data / Link</span>
+            </a>
+        </div>
+    </div>
+</div>
                     <!-- ■ 編集用（編集モード） -->
                     <form id="detail-edit" class="hidden space-y-6 text-black-4">
                         <!-- DATE & TIME -->
@@ -312,25 +315,24 @@
                         </div>
                     </form>
                 </div>
-
                 <!-- 詳細パネルのフッター (固定) -->
                 <div class="shrink-0 px-4 pb-6 pt-4 bg-slate-50 z-10">
                     <!-- （いいねボタン） -->
                     <div id="detail-group-reaction" class="flex justify-between gap-2 mb-4">
-                        <button id="detail-btn-funny"    class="flex-1 bg-white rounded-[1rem] py-2 shadow-sm border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
-                            <span class="text-[2rem]">🤣</span>
+                        <button id="detail-btn-funny" class="flex-1 bg-white rounded-[1rem] py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                            <span class="text-[1.2rem]">🤣</span>
                             <span class="text-[0.7rem] font-black text-brand-5 js-count mt-0.5">0</span>
                         </button>
-                        <button id="detail-btn-helpful"  class="flex-1 bg-white rounded-[1rem] py-2 shadow-sm border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
-                            <span class="text-[2rem]">😍</span>
+                        <button id="detail-btn-helpful" class="flex-1 bg-white rounded-[1rem] py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                            <span class="text-[1.2rem]">😍</span>
                             <span class="text-[0.7rem] font-black text-brand-5 js-count mt-0.5">0</span>
                         </button>
-                        <button id="detail-btn-surprise" class="flex-1 bg-white rounded-[1rem] py-2 shadow-sm border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
-                            <span class="text-[2rem]">😲</span>
+                        <button id="detail-btn-surprise" class="flex-1 bg-white rounded-[1rem] py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                            <span class="text-[1.2rem]">😲</span>
                             <span class="text-[0.7rem] font-black text-brand-5 js-count mt-0.5">0</span>
                         </button>
-                        <button id="detail-btn-sad"      class="flex-1 bg-white rounded-[1rem] py-2 shadow-sm border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
-                            <span class="text-[2rem]">😭</span>
+                        <button id="detail-btn-sad" class="flex-1 bg-white rounded-[1rem] py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                            <span class="text-[1.2rem]">😉</span>
                             <span class="text-[0.7rem] font-black text-brand-5 js-count mt-0.5">0</span>
                         </button>
                     </div>
@@ -344,35 +346,34 @@
                     </div>
                     <!-- （キャンセル・保存） -->
                     <div class="flex gap-4">
-                        <button id="detail-btn-cancel" class="flex-1 bg-slate-400 text-white font-black text-[1rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">CANCEL</button>
-                        <button id="detail-btn-save"   class="flex-1 bg-brand-5   text-white font-black text-[1rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">SAVE DATA</button>
+                        <button id="detail-btn-cancel" class="flex-1 bg-slate-400 text-white font-black text-[0.8rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">CANCEL</button>
+                        <button id="detail-btn-save" class="flex-1 bg-brand-5 text-white font-black text-[0.8rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">SAVE DATA</button>
                     </div>
                 </div>
-
             </div>
         </div>
         <!-- ■　アプリ下部 -->
-        <div class="absolute bottom-4 left-0 right-0 z-[1001] pointer-events-none">
+        <div class="absolute bottom-4 left-0 right-0 z-[1001]">
             <!-- ■　アイコンバー -->
             <div id="ui-bottom-bar" class="mx-2 bg-transparent flex items-center justify-between mb-3">
                 <!-- 左 -->
                 <div>
-                    <button id="btn-sys-menu" class="rounded-full shadow-brand border-2 border-brand-4 text-[1.2rem] w-10 h-10 bg-black text-white pointer-events-auto">
+                    <button id="btn-sys-menu" class="rounded-full shadow-brand border-2 border-brand-4 text-[1.2rem] w-10 h-10 bg-black text-white">
                         ⚙️
                     </button>
                 </div>
                 <!-- 中央 -->
                 <div>
                     <!-- 新規登録ボタン -->
-                    <button id="btn-create" class="rounded-full shadow-brand w-16 h-16 border-2 border-brand-5 bg-white/70 text-white font-black text-[24px] pointer-events-auto">
+                    <button id="btn-create" class="rounded-full shadow-brand w-16 h-16 border-2 border-brand-5 bg-white/70 text-white font-black text-[24px]">
                         ➕
                     </button>
                     <!-- 地点検索ボタン -->
-                    <button id="btn-search" class="rounded-full shadow-brand w-16 h-16 border-2 border-brand-5 bg-white/70 text-white font-black text-[24px] hidden pointer-events-auto">
+                    <button id="btn-search" class="rounded-full shadow-brand w-16 h-16 border-2 border-brand-5 bg-white/70 text-white font-black text-[24px] hidden">
                         🔎
                     </button>
                     <!-- index.html の下部バー内：ボトム移動ボタン群の修正 -->
-                    <div id="bot-group-move" class="hidden flex items-center bg-black/70 rounded-full px-2 py-1 shadow-md pointer-events-auto">
+                    <div id="bot-group-move" class="hidden flex items-center bg-black/70 rounded-full px-2 py-1 shadow-md">
                         <button id="btn-bot-move-first" class="w-10 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">≪</button>
                         <button id="btn-bot-move-prev"  class="w-10 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">◀</button>
                         <div class="w-px h-5 bg-white/30 mx-1"></div>
@@ -385,7 +386,7 @@
                 <!-- 右 -->
                 <div>
                     <!-- アプリメニュー -->
-                    <button id="btn-app-menu" class="rounded-full shadow-brand bg-white/70 text-brand-5 w-10 h-10 border-2 border-brand-4 text-[1rem] pointer-events-auto">
+                    <button id="btn-app-menu" class="rounded-full shadow-brand bg-white/70 text-brand-5 w-10 h-10 border-2 border-brand-4 text-[1rem] font-bold">
                         ☰
                     </button>
                 </div>
@@ -404,31 +405,10 @@
             <!-- テンプレート生成物 -->
         </div>
         <!-- ■　共通バックドロップ -->
-        <div id="ui-dialog-backdrop" class="z-[1999] absolute inset-0 hidden"></div>
+        <div id="ui-dialog-backdrop" class="z-[1999] fixed inset-0 hidden"></div>
 
         <!-- ■　Toast を積み上げるコンテナ -->
-        <div id="toast-container" class="absolute top-[200px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
-
-        <!-- ヘルプメッセージ -->
-        <div id="ui-help-dialog" onclick="if(event.target === this) this.classList.add('hidden')"
-            class="fixed inset-0 z-[3000] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
-            <div class="w-[92%] max-w-[480px] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-slate-300">
-                <!-- ヘッダー -->
-                <div class="h-12 flex items-center justify-between px-4 bg-slate-800 text-white">
-                    <span class="font-semibold text-[0.9rem] tracking-wide">
-                        Help Guide
-                    </span>
-                    <button onclick="document.getElementById('ui-help-dialog').classList.add('hidden')" 
-                        class="w-8 h-8 flex items-center justify-center rounded-md bg-slate-700 hover:bg-slate-600 active:scale-95 text-[0.75rem]">
-                        ✖
-                    </button>
-                </div>
-                <!-- 本文（流し込み前提） -->
-                <div id="ui-help-dialog-body"
-                    class="p-5 text-[0.85rem] text-slate-700 leading-6 whitespace-pre-wrap max-h-[65vh] overflow-y-auto bg-slate-50">
-                </div>
-            </div>
-        </div>
+        <div id="toast-container" class="fixed top-[20px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
 
         <!-- 【マップ】ポップアップ -->
         <template id="tpl-marker-popup">
@@ -473,6 +453,9 @@
     </div>
 
 </div>
+
+<!-- テスト用データ -->
+<!-- <script type="module" src="./js/test-data.js"></script> -->
 
 <!-- アプリ付属モジュール -->
 <script type="module" src="./js/app-const.js"></script>

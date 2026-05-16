@@ -92,22 +92,6 @@ window.$Dom = {
 
 // 汎用処理
 window.$Util = {
-    // 表情アイコン取得
-    GetImgDataByFaceId(faceId) {
-        // 定数リストから一致するfaceIdを持つ要素を検索
-        const list = $Const.FACE_ICONS;
-        const icon = list.find(item => item.faceId == faceId);
-        // 見つかればそのオブジェクトを、なければリストの先頭（デフォルト）を返す
-        return icon ? icon : list[0];
-    },
-    // 天気アイコン取得
-    GetImgDataByWeatherId(weatherId) {
-        // WEATHERについても同様に定数から検索
-        const list = $Const.WEATHER_ICONS;
-        const icon = list.find(item => item.weatherId == weatherId);
-        // 見つからない場合はリストの先頭をデフォルトとして返す
-        return icon ? icon : list[0];
-    },
     // 日付オブジェクトを文字列に変換（デフォルトをハイフン区切りに変更）
     FormatDate(dateObj = new Date(), format = 'YYYY-MM-DD') {
         dateObj = new Date(dateObj);
@@ -194,4 +178,33 @@ window.$Util = {
             return "Error fetching address";
         }
     },
+    // 絵文字ピッカー
+    ShowEmojiPicker(onSelect) {
+        const el = $Dom.GenerateTemplate("tpl-emoji-picker", "ui-dialog-root");
+        const container = $Dom.GetElementById('emoji-mart-container');
+        // Emoji Mart v5 の標準的な幅 352px を明示的に指定
+        const pickerWidth = 352;
+        const picker = new EmojiMart.Picker({
+            onEmojiSelect: (emoji) => {
+                onSelect(emoji.native);
+                el.remove();
+            },
+            locale: 'ja',
+            set: 'native',
+            width: pickerWidth, // ピッカー自体の幅を固定
+            perLine: 8,
+            maxHeight: 400,
+            navPosition: 'bottom',
+            previewPosition: 'none',
+            skinTonePosition: 'none',
+            cssVars: {
+                '--em-rgb-accent': 'var(--brand-lvl5)',
+                '--em-border': 'none'
+            }
+        });
+        container.appendChild(picker);
+        // 閉じる処理
+        $Dom.QuerySelector('.js-close', el).onclick = () => el.remove();
+        el.onclick = (e) => { if (e.target === el) el.remove(); };
+    }
 };

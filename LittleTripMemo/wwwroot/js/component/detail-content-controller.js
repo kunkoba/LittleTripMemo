@@ -13,6 +13,7 @@ const _DetailContentCore = {
                     this.displayDate = $Dom.GetElementById("detail-display-memo_date");
                     this.displayTime = $Dom.GetElementById("detail-display-memo_time");
                     this.displayFaceEmoji = $Dom.GetElementById("detail-display-face_emoji");
+                    this.displayFaceEmojiBg = $Dom.GetElementById("detail-display-face_emoji_bg"); // これを追加
                     this.displayWeatherEmoji = $Dom.GetElementById("detail-display-weather_code");
                     this.displayTitle = $Dom.GetElementById("detail-display-title");
                     this.displayBody = $Dom.GetElementById("detail-display-body");
@@ -74,7 +75,7 @@ const _DetailContentCore = {
             {
                 // 絵文字アイコン選択ボタンのクリックイベント
                 this.editFaceTrigger.addEventListener('click', () => {
-                    $Dialog.ShowEmojiPicker((emoji) => {
+                    $Util.ShowEmojiPicker((emoji) => {
                         // プレビュー（span等）のテキストを更新
                         this.editFacePreview.textContent = emoji;
                         // 隠しフィールド（face_emoji）に直接絵文字をセット
@@ -188,7 +189,6 @@ const _DetailContentCore = {
         } else {
             $Dom.ToggleShow(this.displayPriceWrapper, false);
         }
-
         // URLの表示制御
         if (detail.link_url) {
             $Dom.ToggleShow(this.displayUrlWrapper, true);
@@ -203,9 +203,8 @@ const _DetailContentCore = {
         } else {
             $Dom.ToggleShow(this.displayUrlWrapper, false);
         }
-
         this.displayFaceEmoji.textContent = detail.face_emoji || '😀';
-        // this.displayWeatherEmoji.textContent = detail.weather_code || 'はれ'; // デフォルトを文字に
+        this.displayFaceEmojiBg.textContent = detail.face_emoji || '😀';
         this.displayWeatherEmoji.textContent = detail.weather_code || '0000';
     },
     // 編集用反映

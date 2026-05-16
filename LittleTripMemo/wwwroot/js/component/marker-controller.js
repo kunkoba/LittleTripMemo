@@ -70,9 +70,9 @@ const _MarkerCore = {
             // 32pxの絵文字を中央配置（ひし形の対角線に合わせてコンテナを52pxに調整）
             const iconHtml = `
                 <div class="flex items-center justify-center" style="width: 52px; height: 52px;">
-                    <div class="bg-white/50 w-9 h-9 border-2 border-brand-1 shadow-brand flex items-center justify-center" 
+                    <div class="_bg-white/50 w-9 h-9 border-2 border-brand-1 shadow-brand flex items-center justify-center" 
                         style="transform: rotate(45deg);">
-                        <span class="text-[32px] e" style="transform: rotate(-45deg); display: block; line-height: 1;">
+                        <span class="text-[2rem]" style="transform: rotate(-45deg); display: block; line-height: 1;">
                             ${row.face_emoji || '😀'}
                         </span>
                     </div>
@@ -198,7 +198,7 @@ const _MarkerCore = {
                 if (btnAction) {
                     btnAction.onclick = (e) => {
                         e.stopPropagation();
-                        console.log("> toggleMarkerPopup:", detail);
+                        // console.log("> toggleMarkerPopup:", detail);
                         $DetailFrame.Open(detail);
                     };
                 }
@@ -257,6 +257,7 @@ const MarkerController = {
                 this.FocusToCurrentMarker();
             },
             onDragEnd: (index, latLng) => {
+                console.log(">onDragEnd:", latLng);
                 // ドラッグ完了後
                 _MarkerCore.clearArrow();
                 details[index].latitude = latLng.lat;

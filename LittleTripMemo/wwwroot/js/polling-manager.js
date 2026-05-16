@@ -29,9 +29,10 @@ const _PollingCore = {
 const PollingManager = {
     // タスク名定数（管理用）
     TASKS: {
-        OFFLINE_CHECK: "network_check",
-        DATA_SEND: "data_send",
         GPS_FOLLOW: "GPS_FOLLOW_TRACKING",
+        OFFLINE_CHECK: "network_check",
+        DATA_DETAIL: "data_detail",
+        DATA_REACTION: "data_reaction",
     },
     // 初期化
     Init(){

@@ -14,6 +14,7 @@ public class DetailPubRepository : _BaseRepository
     public async Task<int> InsertAsync(TMemoDetailPub detail)
     {
         detail.user_id = _user.UserId;
+
         const string sql = @"
             INSERT INTO t_memo_detail_pub (
                 archive_id, seq, user_id, latitude, longitude, title, body,
@@ -53,6 +54,8 @@ public class DetailPubRepository : _BaseRepository
 
     public async Task<IEnumerable<TMemoDetailPub>> GetByArchiveIdAsync(int archiveId)
     {
+        var loginUserId = _user.UserId;
+
         string sql = $@"
             SELECT 
                 d.*,
@@ -70,14 +73,20 @@ public class DetailPubRepository : _BaseRepository
                     COUNT(CASE WHEN reaction_type = 3 THEN 1 END) as count_surprise,
                     COUNT(CASE WHEN reaction_type = 4 THEN 1 END) as count_sad
                 FROM t_reaction_pub
+                WHERE user_id <> @login_user_id
                 GROUP BY archive_id, seq
             ) r
                 ON d.archive_id = r.archive_id
                 AND d.seq        = r.seq
             WHERE d.del_flg = false
-                AND d.archive_id = @archive_id";
+                AND d.archive_id = @archive_id
+            ORDER BY d.memo_date ASC, d.memo_time ASC";
 
-        return await QueryAsync<TMemoDetailPub>(sql, new { archive_id = archiveId });
+        return await QueryAsync<TMemoDetailPub>(sql, new
+        {
+            archive_id = archiveId,
+            login_user_id = loginUserId
+        });
     }
 
     /// <summary>
