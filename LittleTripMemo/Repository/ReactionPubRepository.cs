@@ -43,6 +43,25 @@ public class ReactionPubRepository : _BaseRepository
     }
 
     /// <summary>
+    /// 特定のアーカイブ内の指定された複数のseqに対して、自分のリアクションを物理削除
+    /// </summary>
+    public async Task<int> DeletePhysicalBySeqsAsync(int archiveId, IEnumerable<long> seqs)
+    {
+        const string sql = @"
+        DELETE FROM t_reaction_pub
+        WHERE archive_id = @archive_id
+          AND user_id    = @user_id
+          AND seq        = ANY(@seqs)";
+
+        return await ExecuteAsync(sql, new
+        {
+            archive_id = archiveId,
+            user_id = _user.UserId,
+            seqs = seqs.ToArray()
+        });
+    }
+
+    /// <summary>
     /// アーカイブIDに紐づく「自分の」全リアクションを取得
     /// GetArchiveDetailsPubService で使用
     /// </summary>

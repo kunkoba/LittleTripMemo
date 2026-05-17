@@ -30,6 +30,7 @@ public class AppController : _BaseController
     private readonly UpdateArchivePubService _updateArchivePubService;
     private readonly UpdateDetailPubService _updateDetailPubService;
     private readonly SearchByLocationPubService _searchByLocationPubService;
+    private readonly BulkSyncReactionService _bulkSyncReactionService;
     private readonly BulkSyncDetailsService _bulkSyncDetailsService;
 
     // コンストラクタに追加
@@ -53,6 +54,7 @@ public class AppController : _BaseController
         UpdateArchivePubService updateArchivePubService,
         UpdateDetailPubService updateDetailPubService,
         SearchByLocationPubService searchByLocationPubService,
+        BulkSyncReactionService ulkSyncReactionService,
         BulkSyncDetailsService bulkSyncDetailsService)
         : base(userContext)
     {
@@ -75,6 +77,7 @@ public class AppController : _BaseController
         _updateDetailPubService = updateDetailPubService;
         _searchByLocationPubService = searchByLocationPubService;
         _bulkSyncDetailsService = bulkSyncDetailsService;
+        _bulkSyncReactionService = ulkSyncReactionService;
     }
 
     /// <summary>
@@ -250,6 +253,13 @@ public class AppController : _BaseController
     public async Task<IActionResult> UpsertReaction([FromBody] UpsertReactionService.UpsertReactionReq req)
     {
         var result = await _upsertReactionService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    [HttpPost("api/BulkSyncReactions")]
+    public async Task<IActionResult> BulkSyncReactions([FromBody] BulkSyncReactionService.BulkSyncReactionReq req)
+    {
+        var result = await _bulkSyncReactionService.ExecuteAsync(req);
         return OkWithBase(result);
     }
 

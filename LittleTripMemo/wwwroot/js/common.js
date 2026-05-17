@@ -206,5 +206,22 @@ window.$Util = {
         // 閉じる処理
         $Dom.QuerySelector('.js-close', el).onclick = () => el.remove();
         el.onclick = (e) => { if (e.target === el) el.remove(); };
-    }
+    },
+    // urlアイコン
+    GetUrlIconHtml(url, size = 32) {
+		const u = url.toLowerCase();
+		let slug = "";
+		if (u.includes('youtube.com') || u.includes('youtu.be')) slug = "youtube";
+		else if (u.includes('instagram.com')) slug = "instagram";
+		else if (u.includes('twitter.com') || u.includes('x.com')) slug = "x";
+		else if (u.includes('facebook.com')) slug = "facebook";
+		else if (u.includes('github.com')) slug = "github";
+		else if (u.includes('tiktok.com')) slug = "tiktok";
+		if (slug) {
+			// Simple Icons CDN を使用して公式ロゴを取得
+			return `<img src="https://cdn.simpleicons.org/${slug}" width="${size}" height="${size}" style="width:${size}px; height:${size}px;" alt="${slug}">`;
+		}
+		// 判定不可の場合はGoogleのFaviconサービスをフォールバックとして使用
+		return `<img src="https://www.google.com/s2/favicons?sz=64&domain=${url}" width="${size}" height="${size}" style="width:${size}px; height:${size}px;" alt="icon">`;
+	},
 };

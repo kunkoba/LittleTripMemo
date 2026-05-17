@@ -725,17 +725,34 @@ const DialogController = {
             $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
             $Dom.QuerySelector(".js-body", child).textContent = item.body || "";
             // 金額のセットと色分け
+            const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
             const priceEl = $Dom.QuerySelector(".js-price", child);
-            if (priceEl) {
+            const priceUnitEl = $Dom.QuerySelector(".js-price-unit", child);
+            if (priceEl && priceWrapper) {
                 const price = Number(item.memo_price || 0);
-                if (price > 0) {
-                    priceEl.textContent = `+${price.toLocaleString()}`;
-                    priceEl.className = "js-price text-[0.8rem] font-black shrink-0 whitespace-nowrap text-blue-500";
-                } else if (price < 0) {
-                    priceEl.textContent = price.toLocaleString();
-                    priceEl.className = "js-price text-[0.8rem] font-black shrink-0 whitespace-nowrap text-red-500";
+                if (price !== 0) {
+                    // 金額がある場合は表示
+                    $Dom.ToggleShow(priceWrapper, true);
+                    // 通貨単位の取得（親アーカイブの設定、またはユーザー設定）
+                    let displayCurrency = $App.AppData.Owner.currency_unit || 'JPY';
+                    if (item.archive_id > 0) {
+                        const archiveList = $Data.Store.GetArchiveList() || [];
+                        const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
+                        if (targetArc && targetArc.currency_unit) {
+                            displayCurrency = targetArc.currency_unit;
+                        }
+                    }
+                    if (priceUnitEl) priceUnitEl.textContent = displayCurrency;
+                    if (price > 0) {
+                        priceEl.textContent = `+${price.toLocaleString()}`;
+                        priceEl.className = "js-price text-[1rem] font-black italic leading-none text-blue-500";
+                    } else if (price < 0) {
+                        priceEl.textContent = price.toLocaleString();
+                        priceEl.className = "js-price text-[1rem] font-black italic leading-none text-red-500";
+                    }
                 } else {
-                    priceEl.textContent = "";
+                    // 0円の時は枠ごと隠す
+                    $Dom.ToggleShow(priceWrapper, false);
                 }
             }
             child.onclick = () => {
@@ -750,6 +767,96 @@ const DialogController = {
             help: "",
             buttons: []
         });
+    },
+    // 地図用のシンプルリスト表示
+    ShowDetailsSimpleList() {
+        const details = $Data.Store.GetDetails();
+        if (!details || details.length === 0) {
+            $Notice.Warn("No data.");
+            return;
+        }
+        const el = $Dom.GenerateTemplate("tpl-list-parent");
+        el.className = "w-full text-black-3 mb-2 px-1 space-y-4";
+        const headerHtml = `
+            <div class="flex justify-between items-center mb-6 mt-2 px-1">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-red-500 shadow-sm shadow-red-500/30"></div>
+                    <span class="text-[0.6rem] font-black uppercase tracking-[0.2em] text-slate-500">HIT MEMOS</span>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-full px-3 py-1 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+                    <span class="text-[0.6rem] font-black text-slate-600 tracking-wider">${details.length} FOUND</span>
+                </div>
+            </div>
+        `;
+        el.insertAdjacentHTML('beforeend', headerHtml);
+        details.forEach((item, index) => {
+            const child = $Dom.GenerateTemplate("tpl-list-child-simple");
+            const dateStr = (item.memo_date || "").replace(/-/g, '.');
+            $Dom.QuerySelector(".js-date", child).textContent = dateStr;
+            $Dom.QuerySelector(".js-time", child).textContent = item.memo_time || "";
+            $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
+            $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
+            
+            // 本文の改行をスペースに置換してセット（1行に収まるように）
+            const bodyStr = (item.body || "").replace(/\r?\n/g, ' ');
+            $Dom.QuerySelector(".js-body", child).textContent = bodyStr;
+
+            // ▼ 修正：金額エリアのセットと表示制御
+            const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
+            const priceEl = $Dom.QuerySelector(".js-memo-price", child);
+            const currencyEl = $Dom.QuerySelector(".js-memo-currency", child);
+            
+            if (priceWrapper && priceEl && currencyEl) {
+                const price = Number(item.memo_price || 0);
+                if (price !== 0) {
+                    $Dom.ToggleShow(priceWrapper, true);
+                    
+                    let displayCurrency = $App.AppData.Owner.currency_unit || 'JPY';
+                    if (item.archive_id > 0) {
+                        const archiveList = $Data.Store.GetArchiveList() || [];
+                        const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
+                        if (targetArc && targetArc.currency_unit) {
+                            displayCurrency = targetArc.currency_unit;
+                        }
+                    }
+                    currencyEl.textContent = displayCurrency;
+
+                    if (price > 0) {
+                        priceEl.textContent = `+${price.toLocaleString()}`;
+                        priceEl.className = "js-memo-price text-[1rem] font-black italic leading-none text-blue-500";
+                    } else if (price < 0) {
+                        priceEl.textContent = price.toLocaleString();
+                        priceEl.className = "js-memo-price text-[1rem] font-black italic leading-none text-red-500";
+                    }
+                } else {
+                    // 0円の時はラッパーごと非表示にして隙間を詰める
+                    $Dom.ToggleShow(priceWrapper, false);
+                }
+            }
+
+            child.onclick = () => {
+                _DialogCore.closeAll();
+                $Marker.SelectMarker(index);
+            };
+            el.appendChild(child);
+        });
+        _DialogCore.open({
+            title: "SEARCH RESULTS",
+            content: el,
+            help: "",
+            buttons: []
+        });
+        setTimeout(() => {
+            const activeFrame = _DialogCore.stack[_DialogCore.stack.length - 1];
+            if (activeFrame) {
+                const titleText = $Dom.QuerySelector('#dialog-title', activeFrame);
+                if (titleText) {
+                    titleText.classList.remove('truncate');
+                    titleText.classList.add('flex', 'flex-col', 'justify-center', 'leading-tight');
+                    titleText.innerHTML = `SEARCH RESULTS <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1 not-italic">INDEPENDENT MEMOS</span>`;
+                }
+            }
+        }, 10);
     },
     // まとめ親一覧選択
     ShowArchiveList() {
@@ -1018,89 +1125,6 @@ const DialogController = {
         });
         updateSelectionUI(); // フッターボタン生成後に再度呼んで初期状態の disabled を反映
     },
-    // 地図用のシンプルリスト表示
-    ShowDetailsSimpleList() {
-        const details = $Data.Store.GetDetails();
-        if (!details || details.length === 0) {
-            $Notice.Warn("No data.");
-            return;
-        }
-        const el = $Dom.GenerateTemplate("tpl-list-parent");
-        el.className = "w-full text-black-3 mb-2 px-1 space-y-4";
-        const headerHtml = `
-            <div class="flex justify-between items-center mb-6 mt-2 px-1">
-                <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-red-500 shadow-sm shadow-red-500/30"></div>
-                    <span class="text-[0.6rem] font-black uppercase tracking-[0.2em] text-slate-500">HIT MEMOS</span>
-                </div>
-                <div class="bg-white border border-slate-100 rounded-full px-3 py-1 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
-                    <span class="text-[0.6rem] font-black text-slate-600 tracking-wider">${details.length} FOUND</span>
-                </div>
-            </div>
-        `;
-        el.insertAdjacentHTML('beforeend', headerHtml);
-        details.forEach((item, index) => {
-            const child = $Dom.GenerateTemplate("tpl-list-child-simple");
-            const dateStr = (item.memo_date || "").replace(/-/g, '.');
-            $Dom.QuerySelector(".js-date", child).textContent = dateStr;
-            $Dom.QuerySelector(".js-time", child).textContent = item.memo_time || "";
-            $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
-            $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
-            // 本文の改行をスペースに置換してセット
-            const bodyStr = (item.body || "").replace(/\r?\n/g, ' ');
-            $Dom.QuerySelector(".js-body", child).textContent = bodyStr;
-            // 金額のセットと色分け
-            const priceEl = $Dom.QuerySelector(".js-memo-price", child);
-            const currencyEl = $Dom.QuerySelector(".js-memo-currency", child);
-            if (priceEl && currencyEl) {
-                const price = Number(item.memo_price || 0);
-                // 通貨単位の判定
-                let displayCurrency = $App.AppData.Owner.currency_unit || 'JPY';
-                if (item.archive_id > 0) {
-                    const archiveList = $Data.Store.GetArchiveList() ||[];
-                    const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
-                    if (targetArc && targetArc.currency_unit) {
-                        displayCurrency = targetArc.currency_unit;
-                    }
-                }
-                if (price > 0) {
-                    priceEl.textContent = `+${price.toLocaleString()}`;
-                    priceEl.className = "js-memo-price text-[0.6rem] font-black text-blue-500";
-                    currencyEl.textContent = displayCurrency;
-                } else if (price < 0) {
-                    priceEl.textContent = price.toLocaleString();
-                    priceEl.className = "js-memo-price text-[0.6rem] font-black text-red-500";
-                    currencyEl.textContent = displayCurrency;
-                } else {
-                    // 0円の時は枠を詰めるために中身を空に
-                    priceEl.textContent = "";
-                    currencyEl.textContent = "";
-                }
-            }
-            child.onclick = () => {
-                _DialogCore.closeAll();
-                $Marker.SelectMarker(index);
-            };
-            el.appendChild(child);
-        });
-        _DialogCore.open({
-            title: "SEARCH RESULTS",
-            content: el,
-            help: "",
-            buttons: []
-        });
-        setTimeout(() => {
-            const activeFrame = _DialogCore.stack[_DialogCore.stack.length - 1];
-            if (activeFrame) {
-                const titleText = $Dom.QuerySelector('#dialog-title', activeFrame);
-                if (titleText) {
-                    titleText.classList.remove('truncate');
-                    titleText.classList.add('flex', 'flex-col', 'justify-center', 'leading-tight');
-                    titleText.innerHTML = `SEARCH RESULTS <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1 not-italic">INDEPENDENT MEMOS</span>`;
-                }
-            }
-        }, 10);
-    },
     // 状態変更の定型処理ヘルパー
     async _execStatusChange(methodName, params, confirmTitle, confirmMsg, successMsg, nextScreenMode = null, onUpdateStore = null) {
         // Promiseで結果を待つ
@@ -1210,37 +1234,45 @@ const DialogController = {
         if (!archive) return $Notice.Warn("Not found.");
         const el = $Dom.GenerateTemplate('tpl-view-archive');
         const renderView = () => {
-            $Dom.QuerySelector('#view-mem-title', el).textContent = archive.title || "";
-            $Dom.QuerySelector('#view-mem-body', el).textContent = archive.memo || "";
+            // ① 常に最新のデータを取得
+            const currentArchive = $Data.Store.GetArchive(); 
+            // ② タイトルと本文の反映
+            $Dom.QuerySelector('#view-mem-title', el).textContent = currentArchive.title || "";
+            $Dom.QuerySelector('#view-mem-body', el).textContent = currentArchive.memo || "";
+            // ③ ★リンクの反映（すべて currentArchive を参照するように統一）
             const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
-            const urlWrapper = $Dom.QuerySelector('#view-mem-url-wrapper', el);
-            if (archive.link_url) {
-                viewUrl.textContent = archive.link_url;
-                viewUrl.href = archive.link_url;
-                $Dom.ToggleShow(urlWrapper, true);
+            if (currentArchive.link_url) {
+                const iconHtml = $Util.GetUrlIconHtml(currentArchive.link_url, 28);
+                viewUrl.href = currentArchive.link_url;
+                viewUrl.innerHTML = iconHtml;
+                $Dom.ToggleShow(viewUrl, true); // 表示する
             } else {
-                $Dom.ToggleShow(urlWrapper, false);
+                $Dom.ToggleShow(viewUrl, false); // 隠す
             }
+            // ④ 件数の反映
             const details = $Data.Store.GetDetails() || [];
-            const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
             $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
-            const priceBox = $Dom.QuerySelector('#view-mem-price-box', el);
+            $Dom.QuerySelector('#btn-view-mem-timeline', el).onclick = () => {
+                this.ShowDetailsTimeLine();
+            };
+            // ⑤ 金額の反映
+            const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
             const priceVal = $Dom.QuerySelector('#mem-stat-price', el);
-            const priceLabel = $Dom.QuerySelector('#view-mem-price-label', el);
-            const displayCurrency = archive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
+            const priceUnit = $Dom.QuerySelector('#view-mem-price-unit', el);
+            const displayCurrency = currentArchive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
+            priceUnit.textContent = displayCurrency;
             if (totalPrice > 0) {
-                priceVal.className = "text-[1.2rem] font-black text-blue-600";
-                priceLabel.className = "text-[8px] font-black uppercase text-blue-500 mb-1";
-                priceVal.innerHTML = `${totalPrice.toLocaleString()} <span class="text-[0.6rem] text-blue-400 ml-0.5">${displayCurrency}</span>`;
+                priceVal.className = "text-[1.2rem] font-black text-blue-600 leading-none italic";
+                // priceUnit.className = "text-[0.7rem] font-black text-blue-500 uppercase tracking-widest mb-1 block leading-none";
+                priceVal.textContent = `+${totalPrice.toLocaleString()}`;
             } else if (totalPrice < 0) {
-                priceVal.className = "text-[1.2rem] font-black text-red-600";
-                priceLabel.className = "text-[8px] font-black uppercase text-red-500 mb-1";
-                priceVal.innerHTML = `- ${Math.abs(totalPrice).toLocaleString()} <span class="text-[0.6rem] text-red-400 ml-0.5">${displayCurrency}</span>`;
+                priceVal.className = "text-[1.2rem] font-black text-red-600 leading-none italic";
+                // priceUnit.className = "text-[0.7rem] font-black text-red-500 uppercase tracking-widest mb-1 block leading-none";
+                priceVal.textContent = `- ${Math.abs(totalPrice).toLocaleString()}`;
             } else {
-                priceBox.className = "rounded-[1rem] p-3 flex flex-col items-center justify-center border border-brand-1 bg-white shadow-sm";
-                priceVal.className = "text-[1.2rem] font-black text-black-5";
-                priceLabel.className = "text-[8px] font-black uppercase text-black-3 mb-1";
-                priceVal.innerHTML = `0 <span class="text-[0.6rem] text-black-3 ml-0.5">${displayCurrency}</span>`;
+                priceVal.className = "text-[1.2rem] font-black text-black-5 leading-none italic";
+                // priceUnit.className = "text-[0.7rem] font-black text-slate-400 uppercase tracking-widest mb-1 block leading-none";
+                priceVal.textContent = `0`;
             }
         };
         renderView();
@@ -1253,23 +1285,22 @@ const DialogController = {
         } else {
             $Dom.ToggleShow(btnUserProfile, false);
         }
-        // --- 【追加】ヘッダーボタンの定義 ---
+        // --- ヘッダーボタンの定義 ---
         const headerButtons = [];
+        if (archive.is_public) {
+            headerButtons.push({
+                label: "🔗",
+                handler: () => this.ShowShareArchive(archive, profile)
+            });
+        }
         if (archive.is_owner) {
             headerButtons.push({
                 label: "✏️",
                 handler: () => this.ShowEditArchive(archive, renderView)
             });
         }
+        // --- ボタンの定義 ---
         const dialogButtons = [];
-        if (archive.is_public) {
-            dialogButtons.push([{
-                label: "🔗 SHARE THIS ARCHIVE",
-                className: "w-full bg-blue-500 text-white font-bold py-3 rounded-[1rem] shadow-md mb-2",
-                closesDialog: false,
-                handler: () => this.ShowShareArchive(archive, profile)
-            }]);
-        }
         if (archive.is_owner) {
             const btnMainClass = "w-full bg-brand-5 text-white font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform";
             const btnReleaseClass = "w-full bg-white text-red-400 border border-brand-4 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-sm active:scale-95 transition-transform";
@@ -1317,20 +1348,13 @@ const DialogController = {
                 handler: () => this.ShowReportPost(archive)
             }]);
         }
-        const frame = _DialogCore.open({ 
+        const frame = _DialogCore.open({
             title: "Archive info",
             content: el,
             help: "",
             headerButtons: headerButtons, // ここで上段ボタンを渡す
             buttons: dialogButtons,
         });
-        // const titleContainer = $Dom.QuerySelector('#dialog-title', frame);
-        // if (titleContainer) {
-        //     let badgeHtml = (!archive.is_public) ? `<span class="text-[0.6rem] font-black px-3 py-1 rounded-[1rem] bg-gray-500 text-white border border-gray-200 shadow-sm">Private</span>` :
-        //                     (archive.closed_flg) ? `<span class="text-[0.6rem] font-black px-3 py-1 rounded-[1rem] bg-gray-100 text-gray-500 border border-gray-200 shadow-sm">Close</span>` :
-        //                     `<span class="text-[0.6rem] font-black px-3 py-1 rounded-[1rem] bg-brand-2 text-brand-5 border border-blue-100 shadow-sm">Open</span>`;
-        //     titleContainer.innerHTML = badgeHtml;
-        // }
     },
     // まとめ親編集（上にスタックされる）
     ShowEditArchive(archive, onUpdate) {
@@ -1358,6 +1382,7 @@ const DialogController = {
                         label: "SAVE DATA",
                         className: "bg-brand-4 text-white shadow-sm",
                         closesDialog: false,
+                        onClose: true,
                         handler: $Warn.CatchAsync(async () => {
                             const updatedFields = {
                                 title: editTitle.value, memo: editBody.value,
@@ -1404,30 +1429,28 @@ const DialogController = {
             viewLinks.innerHTML = "";
             const links =[pL1, pL2, pL3].filter(l => l && l.trim() !== "");
             links.forEach(l => {
-                const a = document.createElement("a");
-                a.href = l; a.target = "_blank";
-                a.className = "flex items-center gap-2 p-3 bg-white rounded-[1rem] border border-slate-100 shadow-sm text-blue-500 text-[0.7rem] font-bold truncate active:scale-95 transition-transform";
-                a.innerHTML = `<span class="shrink-0 text-brand-3 text-[0.8rem]">🔗</span> <span class="truncate">${l}</span>`;
-                viewLinks.appendChild(a);
-            });
+				const a = document.createElement("a");
+				a.href = l; a.target = "_blank";
+				a.className = "w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-md active:scale-90 transition-transform overflow-hidden";
+				// サイズ24pxでアイコンHTMLを取得して挿入
+				a.innerHTML = $Util.GetUrlIconHtml(l, 24);
+				a.title = l;
+				viewLinks.appendChild(a);
+			});
         };
         renderView();
-        const frame = _DialogCore.open({
-            title: "USER PROFILE",
-            content: el,
-            help: "",
-            buttons: []
-        });
-        if (isOwner) {
-            const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
-            if (headerActions) {
-                const editBtn = document.createElement('button');
-                // editBtn.className = "w-8 h-8 bg-white rounded-[1rem] shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[0.8rem] border border-brand-2 transition-transform";
-                editBtn.innerHTML = "✏️";
-                editBtn.onclick = () => this.ShowEditProfile(profile, renderView);
-                headerActions.prepend(editBtn);
-            }
-        }
+		const headerButtons = [];
+		if (isOwner) {
+			headerButtons.push({
+				label: "✏️",
+				handler: () => this.ShowEditProfile(profile, renderView)
+			});
+		}
+		_DialogCore.open({
+			title: "USER PROFILE",
+			content: el,
+			headerButtons: headerButtons
+		});
     },
     // プロフィール編集（上にスタックされる）
     ShowEditProfile(profile, onUpdate) {
@@ -1450,7 +1473,7 @@ const DialogController = {
         editLink3.value = profile.link3 || "";
         editDesc.addEventListener('input', () => editDescCount.textContent = editDesc.value.length);
         $Dom.QuerySelector('#btn-profile-icon-trigger', el).onclick = () => {
-            this.ShowEmojiPicker((emoji) => {
+            $Util.ShowEmojiPicker((emoji) => {
                 editIconPreview.textContent = emoji;
                 editIconInput.value = emoji;
             });
@@ -1849,28 +1872,27 @@ const DialogController = {
     // URL公開画面
     ShowShareArchive(archive, profile) {
         const el = $Dom.GenerateTemplate('tpl-share-archive');
-        // 1. 基本情報の反映
-        $Dom.QuerySelector('#share-user-icon', el).textContent = profile?.icon || "😀";
-        $Dom.QuerySelector('#share-archive-title', el).textContent = archive.title;
+        // 1. タイトルの反映
+        $Dom.QuerySelector('#share-archive-title', el).textContent = archive.title || "No Title";
         // 2. URLの生成 (現在のドメイン + パラメータ)
         const baseUrl = window.location.origin + window.location.pathname;
         const shareUrl = `${baseUrl}?mode=archive_pub&archiveId=${archive.archive_id}`;
-        const input = $Dom.QuerySelector('#share-url-input', el);
-        input.value = shareUrl;
         // 3. QRコードの生成 (無料APIを利用)
         const qrImg = $Dom.QuerySelector('#share-qr-image', el);
         qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`;
-        // 4. コピー処理
+        // 4. コピー処理 (ボタンをクリックでコピー)
         $Dom.QuerySelector('#btn-share-copy', el).onclick = () => {
             navigator.clipboard.writeText(shareUrl).then(() => {
                 $Notice.Info("URL copied to clipboard!");
+            }).catch(err => {
+                $Notice.Error("コピーに失敗しました");
             });
         };
         _DialogCore.open({
             title: "SHARE ARCHIVE",
             content: el,
             help: "",
-            buttons: [{ label: "CLOSE", className: "bg-slate-400 text-white", closesDialog: true }]
+            buttons: [] // CLOSEボタンは右上の✖で代用し、下部はコピーボタンのみにする
         });
     },
 };

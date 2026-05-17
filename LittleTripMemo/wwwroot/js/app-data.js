@@ -75,7 +75,14 @@ window.$Data = {
             if (data.ownerProfile) $App.AppData.Owner.Profile = data.ownerProfile;
             if (data.token) $App.AppData.Owner.Token = data.token;
             // ユーザ用：システムデータ
-            if (data.systemInfo) $App.AppData.Owner.systemInfo = data.systemInfo;
+            // if (data.systemInfo) $App.AppData.Owner.systemInfo = data.systemInfo;
+            if (data.systemInfo) {
+                $App.AppData.Owner.systemInfo = data.systemInfo;
+                // 通知の未読判定とローカルDBの掃除を非同期で実行
+                $Warn.CatchAsync(async () => {
+                    await $Data.LocalDb.CheckUnreadNotices();
+                })();
+            }
             if (data.myFeedback) $App.AppData.Owner.myFeedback = data.myFeedback;
             if (data.myReport) $App.AppData.Owner.myReport = data.myReport;
             // 管理者用：各取得APIのレスポンスを Admin に格納
@@ -150,7 +157,6 @@ window.$Data = {
         async GetArchiveDetailsPub_2(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/GetArchiveDetailsPub', params))();
         },
-        // get
         async GetArchiveDetailsPub(params = {}) {
             // 引数 params.archive_id を使用して URL を構築
             const url = `/api/GetArchiveDetailsPub/${params.archive_id}`;
@@ -158,9 +164,6 @@ window.$Data = {
             return await $Warn.CatchAsync(async () => {
                 return await this._fetchData('get', url, null); 
             })();
-        },
-        async UpsertReaction(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpsertReaction', params))();
         },
         async OpenArchive(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/OpenArchive', params))();
@@ -170,6 +173,9 @@ window.$Data = {
         },
         async BulkSyncDetails(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/BulkSyncDetails', params))();
+        },
+        async BulkSyncReactions(params = {}) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/BulkSyncReactions', params))();
         },
 
 
@@ -289,12 +295,18 @@ window.$Data = {
         },
         UpdateArchive(updatedFields) {
             if (!this._archive) return;
+            // メモリ上のデータ更新
             Object.assign(this._archive, updatedFields);
+            // ★追加：大元の生データも更新する
+            if ($Data.Access._rawData.archive) Object.assign($Data.Access._rawData.archive, updatedFields);
             if (this._archiveList) {
                 const target = this._archiveList.find(a => a.archive_id === this._archive.archive_id);
-                if (target) {
-                    Object.assign(target, updatedFields);
-                }
+                if (target) Object.assign(target, updatedFields);
+            }
+            // ★追加：大元の生リストデータも更新する
+            if ($Data.Access._rawData.archiveList) {
+                const rawTarget = $Data.Access._rawData.archiveList.find(a => a.archive_id === this._archive.archive_id);
+                if (rawTarget) Object.assign(rawTarget, updatedFields);
             }
         },
         GetUserProfile() {
@@ -363,5 +375,67 @@ window.$Data = {
                 $Notice.Info(`SyncReactions: Archive ${archiveId} の同期完了`);
             })();
         },
+        // バックグラウンドでリアクションを一括送信
+        async BulkSendReactions() {
+            // 1. 未送信（send_flag = 0）のリアクションデータを全件取得
+            const list = await $LocalDb.Reaction.GetUnsentAll();
+            if (!list || list.length === 0) return;
+            // 2. 二重送信を防ぐため、全件の送信フラグを一旦「送信中(1)」にする
+            for (const item of list) {
+                item.send_flag = 1;
+                await $LocalDb.Reaction.Save(item);
+            }
+            // 3. サーバー側のリクエスト形式に合わせてペイロードを作成
+            const payload = {
+                items: list.map(d => ({
+                    seq: d.seq,
+                    archive_id: d.archive_id,
+                    is_funny: d.is_funny,
+                    is_love: d.is_love,
+                    is_surprise: d.is_surprise,
+                    is_sad: d.is_sad
+                }))
+            };
+            // 4. 一括送信
+            const isSuccess = await $Data.Access.BulkSyncReactions(payload);
+            if (isSuccess) {
+                // 送信成功時：フラグ1のまま保持（同期済みデータとしてローカルDBに残す）
+                console.log(`リアクション ${list.length}件の同期が完了しました。`);
+            } else {
+                // 送信失敗時：環境が回復するまで待機するため、フラグを未送信(0)に戻す
+                console.error(`リアクション一括同期に失敗しました。`);
+                for (const item of list) {
+                    item.send_flag = 0;
+                    await $LocalDb.Reaction.Save(item);
+                }
+            }
+        },
+        // 通知の未読判定とクリーンアップ
+        async CheckUnreadNotices() {
+            const sysInfo = $App.AppData.Owner.systemInfo;
+            if (!sysInfo || !sysInfo.notifications) return;
+            console.log("-sysInfo:", sysInfo)
+            // 1. 期限切れの既読履歴をローカルDBから掃除
+            await $LocalDb.Notice.Cleanup();
+            // 2. 現在ローカルDBに残っている既読履歴を全取得
+            const readHistory = await $LocalDb.Notice.GetAll();
+            // 3. サーバーから来た通知リストと突合して未読件数をカウント
+            let unreadCount = 0;
+            sysInfo.notifications.forEach(notice => {
+                // ローカル履歴の中から同じseqのものを探す
+                const history = readHistory.find(h => h.seq === notice.seq);
+                // 履歴がない、またはサーバーの通知の方が新しい場合は「未読」
+                if (!history || new Date(notice.update_tim) > new Date(history.update_tim)) {
+                    notice.is_new = true; // メモリ上のデータに直接フラグを立てる
+                    unreadCount++;
+                } else {
+                    notice.is_new = false;
+                }
+            });
+            // 4. 未読件数を Context に保存（アイコンのバッジ表示用などに使える）
+            $App.AppData.Context.UnreadNoticeCount = unreadCount;
+            console.log(`[Notice] 未読件数: ${unreadCount}件`);
+            // ※ここにUI（設定アイコンなど）へ赤いドットを表示する処理を追加することも可能です。
+        }
     },
 };

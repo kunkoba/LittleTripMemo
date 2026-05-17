@@ -4,7 +4,7 @@
 <!-- トースト用 -->
 <template id="tpl-toast">
     <div class="flex justify-center w-full">
-        <div class="flex items-center justify-center px-4 py-2 _rounded-[1rem] shadow-md w-[80vw] max-w-[400px]
+        <div class="flex items-center justify-center px-4 py-2 shadow-md w-[80vw] max-w-[500px]
             opacity-0 translate-y-2 transition-all duration-300 pointer-events-auto z-[9999]">
             <span class="message text-[0.8rem] font-bold text-center w-full block"></span>
         </div>
@@ -38,7 +38,7 @@
         <!-- 左：軸 -->
         <div class="flex flex-col items-center mr-3 shrink-0">
             <div class="w-6 h-6 bg-brand-5 flex items-center justify-center js-node"></div>
-            <div class="flex-1 w-[2px] bg-brand-5 js-line"></div>
+            <!-- <div class="flex-1 w-[2px] bg-brand-5 js-line"></div> -->
         </div>
         <!-- 右側：内容 -->
         <div class="flex-1 min-w-0 pb-4"> <!-- ① 下余白をここへ移動 -->
@@ -57,7 +57,7 @@
     </div>
 </template>
 <!-- 【リスト子】シンプルリスト（検索結果・単発リスト用） -->
-<template id="tpl-list-child-simple">
+<template id="tpl-list-child-simple_2">
     <div class="js-item-card flex items-stretch p-0 rounded-[1rem] border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-[0_4px_10px_-4px_rgba(0,0,0,0.05)] overflow-hidden mb-3">
         <!-- 左：アイコン（背景色付きエリア） -->
         <div class="shrink-0 w-[72px] bg-brand-1/50 flex items-center justify-center border-r border-brand-1/30">
@@ -83,6 +83,34 @@
             <!-- 本文（2行で切り捨て） -->
             <div class="js-body text-[0.8rem] text-black-4 line-clamp-2 leading-snug"></div>
         </div>
+    </div>
+</template>
+<!-- 【リスト子】シンプルリスト（検索結果・単発リスト用） -->
+<template id="tpl-list-child-simple">
+    <div class="js-item-card relative flex flex-col p-3 rounded-[1rem] border border-slate-200 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-sm overflow-hidden mb-3">
+        <!-- 上部：日時、金額、右上に絵文字 -->
+        <div class="flex justify-between items-start mb-1">
+            <div class="flex flex-col gap-1">
+                <!-- 日時 -->
+                <div class="flex items-center gap-2">
+                    <span class="js-date text-[0.6rem] font-black text-slate-400 tracking-widest"></span>
+                    <span class="js-time text-[0.6rem] font-black text-slate-500 tracking-widest"></span>
+                </div>
+                <!-- 金額 -->
+                <div class="js-price-wrapper hidden flex items-baseline gap-1 mt-0.5">
+                    <span class="js-memo-price text-[1rem] font-black italic leading-none"></span>
+                    <span class="js-memo-currency text-[0.6rem] font-bold text-slate-400 ml-0.5"></span>
+                </div>
+            </div>
+            <!-- 右上絵文字 -->
+            <div class="shrink-0 text-[1.8rem] leading-none drop-shadow-sm js-face ml-2"></div>
+        </div>
+        
+        <!-- タイトル -->
+        <div class="js-title text-[0.85rem] font-black text-slate-800 truncate mb-0.5 mt-1"></div>
+        
+        <!-- 本文（1行のみ） -->
+        <div class="js-body text-[0.75rem] text-slate-500 truncate"></div>
     </div>
 </template>
 <!-- 【リスト親】グループヘッダー -->
@@ -136,7 +164,7 @@
                 <span class="flex-1 text-[0.8rem] font-black text-black-5 truncate js-title"></span>
             </div>
             <!-- 本文（行数を1行に制限し、上余白を詰める） -->
-            <div class="text-[0.7rem] text-black-3 line-clamp-1 mt-0.5 js-body"></div>
+            <div class="text-[0.6rem] text-black-3 line-clamp-1 mt-0.5 js-body"></div>
         </div>
         <!-- 絵文字を右端に配置し、サイズを少し調整 -->
         <div class="shrink-0 ml-1 text-[1.2rem] leading-none js-emoji"></div>
@@ -158,7 +186,7 @@
     </div>
 </template>
 <!-- 【リスト子】タイムラインアイテム -->
-<template id="tpl-timeline-item">
+<template id="tpl-timeline-item_2">
     <div class="relative flex items-stretch gap-2 group cursor-pointer active:scale-[0.98] transition-transform mb-2 mt-1">
         <!-- 左側：顔文字と時刻（ドットの代わり） -->
         <div class="shrink-0 w-10 flex flex-col items-center pt-2 z-10">
@@ -177,6 +205,33 @@
             </div>
             <!-- 🌟 本文：省略クラス（line-clamp-4）を外し、改行（whitespace-pre-wrap）を維持 -->
             <div class="js-body text-[0.8rem] text-black-4 leading-relaxed whitespace-pre-wrap break-all"></div>
+        </div>
+    </div>
+</template>
+<!-- 【リスト子】タイムラインアイテム -->
+<!-- 【リスト子】タイムラインアイテム -->
+<template id="tpl-timeline-item">
+    <div class="relative flex items-stretch gap-2 group cursor-pointer active:scale-[0.98] transition-transform mb-2 mt-1">
+        <!-- 左側：顔文字と時刻（ドットの代わり） -->
+        <div class="shrink-0 w-10 flex flex-col items-center pt-2 z-10">
+            <!-- 🌟 ドットを顔文字に変更 -->
+            <div class="js-face text-[24px] leading-none drop-shadow-sm bg-brand-0 pb-1"></div>
+            <!-- 時刻 -->
+            <div class="text-[0.6rem] font-black text-black-5 js-time tracking-wider bg-brand-0 px-1"></div>
+        </div>
+        <!-- 右側：カード -->
+        <div class="flex-1 bg-white rounded-[1rem] p-3 border border-slate-200 shadow-sm relative overflow-hidden mr-2 flex flex-col items-start gap-2">
+            <!-- 2. タイトル（左アクセント線） -->
+            <div class="border-l-4 border-brand-3 pl-2 py-0.5 w-full">
+                <div class="js-title text-[0.8rem] font-black text-black-5 break-all leading-tight"></div>
+            </div>
+            <!-- 1. 金額と単位（横並び） -->
+            <div class="js-price-wrapper pl-3 flex items-baseline italic w-full hidden">
+                <span class="js-price text-[1rem] font-black italic leading-none"></span>
+                <span class="js-price-unit text-[0.6rem] font-bold text-slate-400 ml-1.5 uppercase"></span>
+            </div>
+            <!-- 3. 本文 -->
+            <div class="js-body text-[0.8rem] text-black-4 leading-relaxed whitespace-pre-wrap break-all w-full"></div>
         </div>
     </div>
 </template>
@@ -223,16 +278,17 @@
 <!-- 【ダイアログ親】フレーム -->
 <template id="tpl-dialog-frame">
     <div class="absolute inset-0 z-[2000] pointer-events-none flex items-center justify-center bg-black/20">
-        <div class="pointer-events-auto w-[90%] max-w-[600px] min-h-[300px] max-h-[70vh] bg-brand-0 rounded-[1rem] shadow-2xl flex flex-col overflow-hidden border-2 border-brand-5 relative">
-            <div id="dialog-title-bar" class="h-16 flex items-center justify-between shrink-0 bg-brand-5 px-4 relative">
-                <div id="dialog-title" class="flex-1 flex items-center font-black italic text-brand-0 uppercase tracking-wider truncate pr-2"></div>
+        <div class="pointer-events-auto w-[90%] max-w-[600px] min-h-[400px] max-h-[70vh] bg-brand-0 rounded-[1rem] shadow-2xl flex flex-col overflow-hidden border-2 border-brand-5 relative">
+            <div id="dialog-title-bar" class="h-14 flex items-center justify-between bg-brand-1 shadow-md shrink-0 px-4 relative z-[1000]">
+                <div id="dialog-title" class="flex-1 flex items-center font-black italic text-brand-5 uppercase tracking-wider truncate pr-2"></div>
                 <div id="dialog-header-actions" class="flex items-center gap-2 shrink-0">
-                    <button id="dialog-btn-close-x" class="w-8 h-8 bg-white rounded-[1rem] shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1rem] transition-transform">✖</button>
+                    <button id="dialog-btn-close-x" class="w-9 h-9 bg-white rounded-[1rem] shadow-sm text-black-3 
+                        flex items-center justify-center active:scale-95 text-[1rem] transition-transform">✖</button>
                 </div>
             </div>
             <div id="dialog-content" class="flex-1 overflow-y-auto flex flex-col p-4 relative"></div>
             <!-- 修正: 常に表示し、flex-wrapで複数段に対応、min-hを設定 -->
-            <div id="dialog-button-container" class="_hidden z-[900] shrink-0 flex flex-col gap-3 p-4 bg-slate-50 "></div>
+            <div id="dialog-button-container" class="_hidden z-[900] shrink-0 flex flex-col gap-3 p-4 bg-brand-1 border"></div>
         </div>
     </div>
 </template>
@@ -279,7 +335,7 @@
 <!-- 【ダイアログ子】ログイン -->
 <template id="tpl-login">
     <div class="w-full text-black-5 my-3 space-y-5 px-2">
-        <div class="border-l-4 border-brand-5 pl-3">
+        <div class="border-l-4 border-brand-3 pl-3">
             <strong class="text-[1rem] tracking-wide">ログイン</strong>
         </div>
         <div class="text-[0.8rem] leading-relaxed space-y-2">
@@ -479,7 +535,7 @@
 <!-- 【ダイアログ子】地点・住所検索 -->
 <template id="tpl-point-search-google">
     <div class="w-full text-black-5 my-3 space-y-5 px-2">
-        <div class="border-l-4 border-brand-5 pl-3">
+        <div class="border-l-4 border-brand-3 pl-3">
             <strong class="text-[1rem] tracking-wide">地点を検索して移動</strong>
         </div>
         <div class="text-[0.8rem] leading-relaxed space-y-2">
@@ -592,45 +648,21 @@
 </template>
 <!-- 【ダイアログ子】通知詳細 -->
 <template id="tpl-view-notice">
-    <div class="w-full text-black-5 space-y-4 pt-2">
-        <div class="flex items-center gap-2 mb-2 px-2">
-            <span id="view-notice-icon" class="text-[24px]"></span>
-            <span id="view-notice-date" class="text-[0.7rem] font-black text-slate-400 tracking-wider"></span>
-        </div>
-        <div class="bg-brand-1 rounded-[1rem] shadow-sm border border-brand-1 p-4">
-            <div id="view-notice-title" class="text-[1rem] font-black text-black-5 break-all mb-3 tracking-wide"></div>
-            <hr class="border-brand-2 mb-3">
-            <div id="view-notice-body" class="text-[1rem] text-black-4 leading-relaxed whitespace-pre-wrap min-h-[100px]"></div>
-        </div>
-    </div>
-</template>
-<!-- 【ダイアログ子】まとめ親参照 -->
-<template id="tpl-view-archive">
-    <div class="w-full text-black-5 space-y-4">
-        <button id="btn-mem-user-profile" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-full shadow-sm active:scale-95 transition-transform w-fit">
-            <span id="view-mem-user-icon" class="text-[1.2rem] leading-none drop-shadow-sm"></span>
-            <span id="view-mem-user-id" class="text-[0.7rem] font-bold text-slate-600"></span>
-        </button>
-        <div class="bg-brand-1 rounded-[1rem] shadow-sm border border-brand-1 p-4">
-            <div id="view-mem-title" class="text-[1rem] font-black text-black-5 break-all mb-3 tracking-wide"></div>
-            <hr class="border-brand-2 mb-3">
-            <div id="view-mem-body" class="text-[1rem] text-black-4 leading-relaxed whitespace-pre-wrap min-h-[3rem]"></div>
-        </div>
-        <div id="view-mem-url-wrapper" class="bg-white rounded-[1rem] shadow-sm border border-brand-1 p-3 flex items-center gap-3">
-            <div class="shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-blue-50 text-blue-500 text-[0.7rem]">🔗</div>
-            <a id="view-mem-url" href="" target="_blank" class="flex-1 text-[0.7rem] text-blue-500 underline truncate font-bold"></a>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-            <div id="view-mem-price-box" class="rounded-[1rem] p-3 flex flex-col items-center justify-center shadow-sm transition-colors border">
-                <span id="view-mem-price-label" class="text-[8px] font-black uppercase mb-1">Total Price</span>
-                <div id="mem-stat-price" class="text-[1.2rem] font-black"></div>
-            </div>
-            <div class="rounded-[1rem] p-3 flex flex-col items-center justify-center border bg-white shadow-sm">
-                <span class="text-[8px] font-black uppercase text-black-3 mb-1">Total Memos</span>
-                <div id="mem-stat-count" class="text-[1.2rem] font-black text-black-5">0</div>
-            </div>
-        </div>
-    </div>
+	<div class="relative min-h-full flex flex-col bg-white px-1">
+		<!-- 1. ヘッダー（日付とアイコンを横並びに） -->
+		<div class="flex items-center gap-4 mb-6">
+			<div class="flex items-center gap-3 text-black font-bold text-[1rem] tracking-tight">
+				<span id="view-notice-date" class="text-slate-400"></span>
+				<span id="view-notice-icon" class="text-[1.5rem] leading-none drop-shadow-sm"></span>
+			</div>
+		</div>
+		<!-- 2. タイトル（左アクセント border-l-4） -->
+		<div class="border-l-4 border-brand-3 pl-3 py-0.5 mb-6">
+			<h1 id="view-notice-title" class="text-[1rem] font-black text-slate-800 leading-tight break-all"></h1>
+		</div>
+		<!-- 3. 本文（leading-[1.8] で統一） -->
+		<div id="view-notice-body" class="text-[0.9rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-all pt-2 min-h-[10rem]"></div>
+	</div>
 </template>
 <!-- 【ダイアログ子】まとめ親編集 -->
 <template id="tpl-edit-archive">
@@ -655,48 +687,57 @@
 </template>
 <!-- 【ダイアログ子】ユーザープロフィール参照 -->
 <template id="tpl-view-profile">
-    <div class="w-full text-black-5 space-y-4 px-2 pb-2">
-        <div class="flex flex-col items-center justify-center pb-4">
-            <div class="w-20 h-20 bg-white rounded-full shadow-md border-2 border-brand-2 flex items-center justify-center text-[48px] leading-none mb-3">
-                <span id="view-profile-icon">😀</span>
-            </div>
-            <h3 id="view-profile-nickname" class="text-[1.2rem] font-black text-black-5">Nickname</h3>
-            <p id="view-profile-userid" class="text-[0.7rem] text-slate-400 font-bold mt-1"></p>
-        </div>
-        <div class="bg-brand-1 rounded-[1rem] shadow-sm border border-brand-1 p-4">
-            <div id="view-profile-description" class="text-[1rem] text-black-4 leading-relaxed whitespace-pre-wrap min-h-[200px]"></div>
-        </div>
-        <div id="view-profile-links" class="space-y-2 mt-4"></div>
-    </div>
+	<div class="relative min-h-full flex flex-col bg-white px-1">
+		<!-- 1. ヘッダー（アイコンとユーザーID） -->
+		<div class="flex items-center gap-4 mb-4">
+			<div id="view-profile-icon" class="text-[4rem] leading-none drop-shadow-sm"></div>
+			<div class="flex flex-col">
+				<span id="view-profile-userid" class="text-[0.7rem] font-black text-slate-400 tracking-widest uppercase"></span>
+			</div>
+		</div>
+		<!-- 2. ニックネーム（左アクセント border-l-4） -->
+		<div class="border-l-4 border-brand-3 pl-3 py-0.5 my-3">
+			<h1 id="view-profile-nickname" class="text-[1.2rem] font-black text-slate-800 leading-tight break-all"></h1>
+		</div>
+		<!-- 3. 自己紹介（leading-[1.8]） -->
+		<div id="view-profile-description" class="text-[0.9rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-all pb-3 min-h-[5rem]"></div>
+		<!-- 4. リンクエリア -->
+		<div id="view-profile-links" class="gap-3 flex"></div>
+	</div>
 </template>
 <!-- 【ダイアログ子】ユーザープロフィール編集 -->
 <template id="tpl-edit-profile">
-    <div class="w-full text-black-5 space-y-4 px-2 pb-2">
-        <div class="flex flex-col items-center justify-center py-2">
-            <button id="btn-profile-icon-trigger" class="w-20 h-20 bg-white rounded-full shadow-md border-2 border-brand-3 flex items-center justify-center text-[48px] leading-none active:scale-95 transition-transform outline-none">
-                <span id="edit-profile-icon-preview">😀</span>
-                <input type="hidden" id="edit-profile-icon">
-            </button>
-            <div class="text-[0.6rem] text-slate-400 font-bold mt-2 uppercase tracking-widest">Tap to change</div>
-        </div>
-        <div>
-            <label class="block text-[0.7rem] font-bold mb-1 uppercase">Nickname</label>
-            <input id="edit-profile-nickname" type="text" maxlength="20" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
-        </div>
-        <div>
-            <div class="flex justify-between items-end mb-1">
-                <label class="block text-[0.7rem] font-bold uppercase">Description</label>
-                <span class="text-[0.6rem] font-bold text-slate-400"><span id="edit-profile-description-count">0</span>/200</span>
-            </div>
-            <textarea id="edit-profile-description" maxlength="200" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
-        </div>
-        <div>
-            <label class="block text-[0.7rem] font-bold mb-1 uppercase">Links</label>
-            <input id="edit-profile-link1" type="url" placeholder="https://... (Link 1)" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600 mb-2">
-            <input id="edit-profile-link2" type="url" placeholder="https://... (Link 2)" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600 mb-2">
-            <input id="edit-profile-link3" type="url" placeholder="https://... (Link 3)" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
-        </div>
-    </div>
+	<div class="w-full text-black-5 space-y-3 px-1 pb-1">
+		<!-- 1. アイコンとニックネームを1行に配置 -->
+		<div class="flex items-end gap-3 py-1">
+			<div class="shrink-0 flex flex-col items-center">
+				<!-- <label class="block text-[0.6rem] font-bold mb-1 uppercase text-slate-400">Icon</label> -->
+				<button id="btn-profile-icon-trigger" class="w-14 h-14 bg-white rounded-full shadow-md _border-2 _border-brand-3 flex items-center justify-center text-[2rem] leading-none active:scale-95 transition-transform outline-none">
+					<span id="edit-profile-icon-preview">😀</span>
+					<input type="hidden" id="edit-profile-icon">
+				</button>
+			</div>
+			<div class="flex-1">
+				<label class="block text-[0.7rem] font-bold mb-1 uppercase text-slate-400">Nickname</label>
+				<input id="edit-profile-nickname" type="text" maxlength="30" class="w-full border-2 border-brand-3 px-4 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
+			</div>
+		</div>
+		<!-- 2. 自己紹介（高さを h-48 から h-32 に縮小） -->
+		<div>
+			<div class="flex justify-between items-end mb-1">
+				<label class="block text-[0.7rem] font-bold uppercase text-slate-400">Description</label>
+				<span class="text-[0.6rem] font-bold text-slate-300"><span id="edit-profile-description-count">0</span>/200</span>
+			</div>
+			<textarea id="edit-profile-description" maxlength="200" class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-32 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none leading-relaxed"></textarea>
+		</div>
+		<!-- 3. リンク（上下の間隔を詰めて配置） -->
+		<div class="space-y-2">
+			<label class="block text-[0.7rem] font-bold uppercase text-slate-400">Social Links</label>
+			<input id="edit-profile-link1" type="url" placeholder="URL 1 (https://...)" class="w-full border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+			<input id="edit-profile-link2" type="url" placeholder="URL 2" class="w-full border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+			<input id="edit-profile-link3" type="url" placeholder="URL 3" class="w-full border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+		</div>
+	</div>
 </template>
 <!-- 【ダイアログ子】アプリ情報 -->
 <template id="tpl-app-info">
@@ -763,7 +804,7 @@
     </div>
 </template>
 <!-- 【ダイアログ子】まとめ共有用 -->
-<template id="tpl-share-archive">
+<template id="tpl-share-archive_2">
     <div class="w-full text-black-5 flex flex-col items-center py-4 space-y-6">
         <!-- プレビューエリア -->
         <div class="w-full bg-brand-1 rounded-[1rem] p-4 flex flex-col items-center border border-brand-2 shadow-sm">
@@ -784,6 +825,25 @@
                     📋
                 </button>
             </div>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】まとめ共有用 -->
+<template id="tpl-share-archive">
+    <div class="w-full text-black-5 flex flex-col items-center pt-6 pb-2 space-y-8">
+        <!-- 1. まとめタイトル -->
+        <div class="w-full px-4">
+            <div id="share-archive-title" class="text-[1.2rem] font-black text-black-5 text-center break-all leading-tight"></div>
+        </div>
+        <!-- 2. QRコード -->
+        <div class="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-200">
+            <img id="share-qr-image" src="" alt="QR Code" class="w-48 h-48 object-contain">
+        </div>
+        <!-- 3. URLボタン（クリップボード） -->
+        <div class="w-full">
+            <button id="btn-share-copy" class="w-full h-14 bg-brand-5 text-white font-black rounded-[1rem] shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 text-[0.9rem] uppercase tracking-widest">
+                <span class="text-[1.2rem] leading-none">📋</span> COPY SHARE URL
+            </button>
         </div>
     </div>
 </template>
@@ -823,6 +883,89 @@
         <div class="js-help-body text-[0.85rem] text-slate-600 leading-relaxed whitespace-pre-wrap pt-2"></div>
     </div>
 </template>
+<!-- 【ダイアログ子】まとめ親参照 -->
+<template id="tpl-view-archive_2">
+	<div class="relative min-h-full flex flex-col bg-white">
+		<!-- 1. ユーザー情報（明細の時刻/顔文字エリアのスタイルに追従） -->
+		<div class="gap-4 mb-6">
+			<button id="btn-mem-user-profile" class="flex items-baseline gap-2 active:opacity-60 transition-opacity">
+				<span id="view-mem-user-icon" class="text-[1.5rem] leading-none drop-shadow-sm"></span>
+				<span id="view-mem-user-id" class="text-[0.9rem] font-black text-slate-400 tracking-tight"></span>
+			</button>
+		</div>
+		<!-- 2. タイトル（左アクセント border-l-4） -->
+		<div class="border-l-4 border-brand-3 pl-4 py-1 mb-6">
+			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 leading-tight break-all"></h1>
+		</div>
+		<!-- 3. 本文（leading-[1.8] で明細と統一） -->
+		<div id="view-mem-body" class="text-[0.95rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-all mb-10">
+        </div>
+        <!-- 4. ボタン群 -->
+        <div class="mt-auto py-3 grid grid-cols-3 items-end mx-3">
+			<!-- 左：金額（左揃え） -->
+			<div id="view-mem-price-box" class="flex flex-col text-left">
+				<span id="view-mem-price-label" class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-2 block leading-none">total price</span>
+				<div id="mem-stat-price" class="text-[1.2rem] font-black italic leading-none"></div>
+			</div>
+			<!-- 中：リンク（中央揃え） -->
+			<div class="flex flex-col items-center justify-end">
+				<div id="view-mem-url-wrapper" class="hidden flex flex-col items-center justify-end rounded-full shadow-brand">
+					<span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-1.5 block leading-none">Link</span>
+					<a id="view-mem-url" href="" target="_blank" class="flex items-center justify-center w-8 h-8 rounded-md active:scale-90 transition-transform shadow-sm bg-white overflow-hidden">
+						<!-- ここにアイコンが挿入される -->
+					</a>
+				</div>
+			</div>
+			<!-- 右：件数（右揃え） -->
+			<div class="text-right flex flex-col items-end">
+				<span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-2 block leading-none">Total Items</span>
+				<div class="flex items-baseline justify-end gap-1 leading-none">
+					<span id="mem-stat-count" class="text-[1.2rem] font-black text-slate-800">0</span>
+					<span class="text-[0.7rem] font-bold text-slate-400 uppercase">memos</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+<!-- 【ダイアログ子】まとめ親参照 -->
+<template id="tpl-view-archive">
+	<div class="relative min-h-full flex flex-col bg-white">
+		<!-- 1. ユーザー情報（明細の時刻/顔文字エリアのスタイルに追従） -->
+		<div class="flex gap-4 py-3 ">
+			<button id="btn-mem-user-profile" class="flex items-baseline gap-2 active:opacity-60 transition-opacity">
+				<span id="view-mem-user-icon" class="text-[1.5rem] leading-none drop-shadow-sm"></span>
+				<span id="view-mem-user-id" class="text-[0.9rem] font-black text-slate-400 tracking-tight"></span>
+			</button>
+		</div>
+		<!-- 2. タイトル（左アクセント border-l-4） -->
+		<div class="border-l-4 border-brand-3 pl-4 mb-6">
+			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 leading-tight break-all"></h1>
+		</div>
+		<!-- 3. 本文（leading-[1.8] で明細と統一） -->
+		<div id="view-mem-body" class="text-[1rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-all pb-6">
+        </div>
+        <!-- 4. ボタン群 -->
+		<div class="mt-auto flex items-center justify-between gap-4 pb-6">
+			<!-- 左：金額（枠付き） -->
+			<div class="h-14 flex-1 shadow-md rounded-[1rem] flex flex-col items-center justify-center bg-white px-2">
+				<span id="view-mem-price-unit" class="text-[0.7rem] font-black uppercase tracking-widest mb-1 block leading-none"></span>
+				<div id="mem-stat-price" class="text-[1rem] font-black italic leading-none"></div>
+			</div>
+			<!-- 中：リンク（正円ボタン） -->
+			<a id="view-mem-url" href="" target="_blank" class="hidden shrink-0 w-14 h-14 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden">
+				<!-- ここにアイコンが挿入される -->
+			</a>
+			<!-- 右：件数（クリック可能なボタン） -->
+			<button id="btn-view-mem-timeline" class="h-14 flex-1 shadow-md rounded-[1rem] justify-center bg-white active:scale-95 transition-transform px-2 outline-none">
+				<div>
+                    <span id="mem-stat-count" class="text-[1.4rem] font-black text-slate-800 leading-none">0</span>
+                    <span class="text-[0.7rem] font-bold text-slate-400 uppercase leading-none">memos</span>
+                </div>
+			</button>
+		</div>
+	</div>
+</template>
+
 
 <!-- ============================================================= -->
 

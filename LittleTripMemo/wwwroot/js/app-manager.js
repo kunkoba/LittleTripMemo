@@ -72,20 +72,24 @@ const AppManager = {
             if (isOn) {
                 // オンライン
                 $Notice.Offline.Hide();
-                $Polling.Start($Polling.TASKS.DATA_DETAIL);   // データ送信監視開始
+                $Polling.Start($Polling.TASKS.DATA_DETAIL);
+                $Polling.Start($Polling.TASKS.DATA_REACTION);
             } else {
                 // オフライン
                 $Notice.Offline.Show();
                 $Polling.Stop($Polling.TASKS.DATA_DETAIL);
+                $Polling.Stop($Polling.TASKS.DATA_REACTION);
                 console.log("-- offline --");
             }
         }, 30);
-        if ($App.AppData.Owner.IsGpsTracking && $App.AppData.Context.IsOnline) {
-            // 現在地追従（秒）
-            $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
-                // 追従モードかつオンラインなら現在地を更新（フォーカスはしない）
-                $Marker.RefreshCurrentLocation();
-            }, 10);
+        if ($App.AppData.Context.IsOnline) {
+            if ($App.AppData.Owner.IsGpsTracking) {
+                // 現在地追従（秒）
+                $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
+                    // 追従モードかつオンラインなら現在地を更新（フォーカスはしない）
+                    $Marker.RefreshCurrentLocation();
+                }, 10);
+            }
             // データ送信処理（秒）
             $Polling.Add($Polling.TASKS.DATA_DETAIL, async () => {
                 if (await $LocalDb.Detail.GetCount() === 0) return;
@@ -93,19 +97,20 @@ const AppManager = {
                     // 全て $Data.LocalDb に任せる
                     await $Data.LocalDb.BulkSendDetails();
                     // 通知
-                    $Notice.Info("Saved successfully.");
+                    $Notice.Info("Details saved successfully.");
                 })();
             }, 60);
-            // // データ送信処理（秒）
-            // $Polling.Add($Polling.TASKS.DATA_DETAIL, async () => {
-            //     if (await $LocalDb.Detail.GetCount() === 0) return;
-            //     await $Warn.CatchAsync(async () => {
-            //         // 全て $Data.LocalDb に任せる
-            //         await $Data.LocalDb.BulkSendDetails();
-            //         // 通知
-            //         $Notice.Info("Saved successfully.");
-            //     })();
-            // }, 60);
+            // リアクションデータ送信処理（秒）
+            $Polling.Add($Polling.TASKS.DATA_REACTION, async () => {
+                // 未送信リアクションの件数をチェック
+                const unsent = await $LocalDb.Reaction.GetUnsentAll();
+                if (!unsent || unsent.length === 0) return;
+                await $Warn.CatchAsync(async () => {
+                    await $Data.LocalDb.BulkSendReactions();
+                    // 通知が必要な場合は以下をコメントイン
+                    $Notice.Info("Reactions saved successfully.");
+                })();
+            }, 60); // 60秒おきに実行
         }
         // 定期タスク開始-----
         $Polling.Start($Polling.TASKS.OFFLINE_CHECK);

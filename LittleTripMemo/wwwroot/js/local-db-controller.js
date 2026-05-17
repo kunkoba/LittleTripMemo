@@ -2,7 +2,7 @@
 const _LocalDbCore = {
     db: null,
     DB_NAME: "littleTripMemoDb",
-    VERSION: 2,
+    VERSION: 1,
     // トランザクションモード定義
     TRANSACTION_MODES: {
         READONLY: 'readonly',
@@ -13,6 +13,7 @@ const _LocalDbCore = {
         DETAIL: 'detailStore',
         // ARCHIVE: 'archiveStore',
         REACTION: 'reactionStore',
+        NOTICE: 'noticeStore',
     },
     // 初期化
     async init() {
@@ -55,13 +56,13 @@ const _LocalDbCore = {
         if (!db.objectStoreNames.contains(this.STORE_NAMES.DETAIL)) {
             const store = db.createObjectStore(this.STORE_NAMES.DETAIL, { keyPath: "dbid", autoIncrement: true });
         }
-        // // まとめ親
-        // if (!db.objectStoreNames.contains(this.STORE_NAMES.ARCHIVE)) {
-        //     const store = db.createObjectStore(this.STORE_NAMES.ARCHIVE, { keyPath: "dbid", autoIncrement: true });
-        // }
         // リアクション（archive_id と seq の複合キー）
         if (!db.objectStoreNames.contains(this.STORE_NAMES.REACTION)) {
             const store = db.createObjectStore(this.STORE_NAMES.REACTION, { keyPath: ["archive_id", "seq"] });
+        }
+        // 通知既読履歴（seqをキーとする）
+        if (!db.objectStoreNames.contains(this.STORE_NAMES.NOTICE)) {
+            const store = db.createObjectStore(this.STORE_NAMES.NOTICE, { keyPath: "seq" });
         }
     },
     // トランザクションからオブジェクトストアを取得
@@ -224,8 +225,8 @@ const _LocalDbCore = {
 const LocalDbController = {
     // ※※※※ データベースを削除する ※※※※
     RemoveDB(){
-        // // 基本的にコメントアウト
-        // _LocalDbCore.__deleteAllDatabases();
+        // 基本的にコメントアウト
+        _LocalDbCore.__deleteAllDatabases();
     },
     // 初期化
     async Init() {
@@ -336,9 +337,36 @@ const LocalDbController = {
             };
         }
     },
+    // 通知の既読履歴管理
+    Notice: {
+        storeName: _LocalDbCore.STORE_NAMES.NOTICE,
+        // 既読履歴の保存（詳細を開いた時に呼ぶ）
+        async Save(seq, update_tim, disp_to) {
+            const data = {
+                seq: Number(seq),
+                update_tim: update_tim,
+                disp_to: disp_to
+            };
+            return await _LocalDbCore.upsertData(this.storeName, data);
+        },
+        // 全件取得（一覧を開いた時の突合用）
+        async GetAll() {
+            return await _LocalDbCore.getAllData(this.storeName);
+        },
+        // 期限切れデータのクリーンアップ（一覧を開いた時などに呼ぶ）
+        async Cleanup() {
+            const now = new Date();
+            return await _LocalDbCore.deleteByFilter(this.storeName, (item) => {
+                if (!item.disp_to) return false;
+                const toDate = new Date(item.disp_to);
+                return now > toDate; // 現在時刻が disp_to を過ぎていれば削除対象
+            });
+        }
+    },
 };
 
-LocalDbController.RemoveDB();
+// LocalDbController.RemoveDB();
+
 // Public
 export default LocalDbController;
 

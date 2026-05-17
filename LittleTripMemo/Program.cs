@@ -123,6 +123,7 @@ builder.Services.AddScoped<UpdateArchivePubService>();
 builder.Services.AddScoped<UpdateDetailPubService>();
 builder.Services.AddScoped<SearchByLocationPubService>();
 builder.Services.AddScoped<BulkSyncDetailsService>();
+builder.Services.AddScoped<BulkSyncReactionService>(); 
 // ---- Sys / Infrastructure Service ----
 builder.Services.AddScoped<UpsertFeedbackService>();
 builder.Services.AddScoped<UpsertReportService>();

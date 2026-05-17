@@ -268,22 +268,6 @@ const _DetailFrameCore = {
         // 5. ローカルDBへ保存 ＆ UIを即座に再描画
         await $LocalDb.Reaction.Save(myLocal);
         await this.renderReactions(detail);
-        // // 6. サーバーへ送信（全てのフラグをリクエストに含める）
-        // $Warn.CatchAsync(async () => {
-        //     const isSuccess = await $Data.Access.UpsertReaction({
-        //         archive_id:   myLocal.archive_id,
-        //         seq:          myLocal.seq,
-        //         is_funny:     myLocal.is_funny,
-        //         is_love:      myLocal.is_love,
-        //         is_surprise:  myLocal.is_surprise,
-        //         is_sad:       myLocal.is_sad
-        //     });
-        //     if (isSuccess) {
-        //         // 送信成功時のみフラグを 1 に更新
-        //         myLocal.send_flag = 1;
-        //         await $LocalDb.Reaction.Save(myLocal);
-        //     }
-        // })();
     },
 };
 
