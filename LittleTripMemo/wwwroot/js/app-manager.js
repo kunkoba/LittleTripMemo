@@ -193,6 +193,8 @@ const AppManager = {
         // アーカイブID
         const archiveId = this.AppData.Context.TargetArchiveId;
         let isSuccess = false;
+        // システム情報を取得
+        $Data.Access.GetSystemInfo();
         // モードごとにデータ取得
         switch (this.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
@@ -201,8 +203,6 @@ const AppManager = {
                 if (this.AppData.Context.IsLoggedIn) {
                     isSuccess = await $Data.Access.GetUnMergeDetails({});
                     if (!isSuccess) return;
-                    // システム情報を取得
-                    $Data.Access.GetSystemInfo();
                 }
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:

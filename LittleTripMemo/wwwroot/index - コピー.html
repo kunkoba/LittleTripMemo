@@ -68,8 +68,8 @@
                     <div class="p-0 flex justify-center">
                         <!-- 初期状態を黒背景にし、内部にアイコンとテキストの要素を分割 -->
                         <button id="ui-archive-title" class="hidden py-1.5 px-4 flex items-center gap-2 bg-slate-800/50 rounded-full text-white text-[0.8rem] font-bold shadow-brand max-w-full transition-colors">
-                            <span class="js-icon text-[1rem] shrink-0 drop-shadow-sm">🔒</span>
-                            <span class="js-text truncate leading-none pt-0.5">タイトル</span>
+                            <span class="js-icon text-[1rem] shrink-0 drop-shadow-md">🔒</span>
+                            <span class="js-text truncate  pt-0.5">タイトル</span>
                         </button>
                     </div>
                     <!-- 地点検索関連 -->
@@ -137,10 +137,10 @@
                     <h2 id="detail-title" class="text-[1.2rem] font-black italic text-brand-5 uppercase tracking-wider">Details</h2>
                     <div class="flex gap-2">
                         <!-- ▼ ここに追加 -->
-                        <button id="detail-btn-earth" class="w-9 h-9 bg-white rounded-[1rem] shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">🌍</button>
-                        <button id="detail-btn-map"   class="w-9 h-9 bg-white rounded-[1rem] shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">🗺️</button>
-                        <button id="detail-btn-edit"  class="w-9 h-9 bg-white rounded-[1rem] shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">✏️</button>
-                        <button id="detail-btn-close" class="w-9 h-9 bg-white rounded-[1rem] shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">✖</button>
+                        <button id="detail-btn-earth" class="w-9 h-9 bg-white rounded-[1rem] shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">🌍</button>
+                        <button id="detail-btn-map"   class="w-9 h-9 bg-white rounded-[1rem] shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">🗺️</button>
+                        <button id="detail-btn-edit"  class="w-9 h-9 bg-white rounded-[1rem] shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">✏️</button>
+                        <button id="detail-btn-close" class="w-9 h-9 bg-white rounded-[1rem] shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">✖</button>
                     </div>
                 </div>
                 <!-- 詳細パネルの内容 (スクロールエリア) -->
@@ -151,7 +151,7 @@
     
     <!-- 背景用の巨大顔文字：上部に固定（スクロールしても動かない） -->
     <div class="sticky top-0 w-full h-0 pointer-events-none z-0 flex justify-center">
-        <div id="detail-display-face_emoji_bg" class="text-[12rem] opacity-[0.04] leading-none select-none -translate-y-4"></div>
+        <div id="detail-display-face_emoji_bg" class="text-[12rem] opacity-[0.04]  select-none -translate-y-4"></div>
     </div>
 
     <!-- メインコンテンツ：ここを縦並び・左揃えに設定 -->
@@ -159,29 +159,29 @@
 
         <!-- 【1行目】日付・時刻・顔文字を横並びに -->
         <div class="flex items-center gap-4 border-b border-cyan-400 pb-1 w-fit">
-            <div class="flex flex-col_ leading-tight gap-3">
+            <div class="flex flex-col_  gap-3">
                 <span id="detail-display-memo_date" class="text-[1rem] font-bold text-cyan-600 uppercase tracking-tight"></span>
                 <span id="detail-display-memo_time" class="text-[1rem] font-bold text-cyan-600 opacity-70"></span>
                 <!-- 顔文字（1rem） -->
-                <div id="detail-display-face_emoji" class="text-[1.5rem] leading-none"></div>
+                <div id="detail-display-face_emoji" class="text-[1.5rem] "></div>
             </div>
         </div>
         <!-- 2. 金額（左揃え・1rem） -->
         <div id="detail-display-price-wrapper" class="hidden flex items-baseline">
-            <span id="detail-display-memo_price" class="text-[1rem] font-black italic leading-none"></span>
+            <span id="detail-display-memo_price" class="text-[1rem] font-black italic "></span>
             <span id="detail-display-price-unit" class="text-[0.7rem] font-bold text-slate-400 ml-1.5 uppercase"></span>
         </div>
         <!-- 4. タイトル（左揃え・1rem・左アクセント） -->
         <div class="border-l-4 border-cyan-400 pl-3 py-0.5 mt-2">
-            <h1 id="detail-display-title" class="text-[1rem] font-black text-slate-800 leading-tight break-all"></h1>
+            <h1 id="detail-display-title" class="text-[1rem] font-black text-slate-800  break-all"></h1>
         </div>
         <!-- 5. 本文（左揃え・1rem以下） -->
-        <div id="detail-display-body" class="text-[0.9rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-all pt-2"></div>
+        <div id="detail-display-body" class="text-[0.9rem] text-slate-600  whitespace-pre-wrap break-all pt-2"></div>
         <!-- 隠し項目 -->
         <span id="detail-display-weather_code" class="hidden"></span>
         <!-- 下部：Locationカード風のURLリンク -->
         <div id="detail-display-url-wrapper" class="hidden w-full pt-6">
-            <a id="detail-display-link_url" href="" target="_blank" class="flex items-center bg-slate-50/50 border border-slate-100 border-l-4 border-cyan-400 rounded-[1rem] p-4 shadow-sm active:scale-[0.98] transition-transform">
+            <a id="detail-display-link_url" href="" target="_blank" class="flex items-center bg-slate-50/50 border border-slate-100 border-l-4 border-cyan-400 rounded-[1rem] p-4 shadow-md active:scale-[0.98] transition-transform">
                 <span class="text-[1.2rem] mr-4">📍</span>
                 <span class="text-[0.8rem] font-bold text-slate-700 truncate">Location Data / Link</span>
             </a>
@@ -319,19 +319,19 @@
                 <div class="shrink-0 px-4 pb-6 pt-4 bg-slate-50 z-10">
                     <!-- （いいねボタン） -->
                     <div id="detail-group-reaction" class="flex justify-between gap-2 mb-4">
-                        <button id="detail-btn-funny" class="flex-1 bg-white rounded-[1rem] py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                        <button id="detail-btn-funny" class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[1.2rem]">🤣</span>
                             <span class="text-[0.7rem] font-black text-brand-5 js-count mt-0.5">0</span>
                         </button>
-                        <button id="detail-btn-helpful" class="flex-1 bg-white rounded-[1rem] py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                        <button id="detail-btn-helpful" class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[1.2rem]">😍</span>
                             <span class="text-[0.7rem] font-black text-brand-5 js-count mt-0.5">0</span>
                         </button>
-                        <button id="detail-btn-surprise" class="flex-1 bg-white rounded-[1rem] py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                        <button id="detail-btn-surprise" class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[1.2rem]">😲</span>
                             <span class="text-[0.7rem] font-black text-brand-5 js-count mt-0.5">0</span>
                         </button>
-                        <button id="detail-btn-sad" class="flex-1 bg-white rounded-[1rem] py-2 shadow-sm border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                        <button id="detail-btn-sad" class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 flex flex-col items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[1.2rem]">😉</span>
                             <span class="text-[0.7rem] font-black text-brand-5 js-count mt-0.5">0</span>
                         </button>
@@ -412,27 +412,27 @@
 
         <!-- 【マップ】ポップアップ -->
         <template id="tpl-marker-popup">
-            <div class="relative w-full bg-white rounded-[1rem] shadow-sm p-4 pt-5 overflow-hidden flex flex-col">
+            <div class="relative w-full bg-white rounded-[1rem] shadow-md p-4 pt-5 overflow-hidden flex flex-col">
                 <!-- 右上のインデックスフラッグ -->
-                <div class="absolute top-0 right-0 w-[42px] h-[42px] bg-brand-2 text-brand-5 font-black text-[1.2rem] flex items-center justify-center rounded-bl-[1.5rem] shadow-sm">
-                    <span class="index leading-none pb-1 pl-1"></span>
+                <div class="absolute top-0 right-0 w-[42px] h-[42px] bg-brand-2 text-brand-5 font-black text-[1.2rem] flex items-center justify-center rounded-bl-[1.5rem] shadow-md">
+                    <span class="index  pb-1 pl-1"></span>
                 </div>
                 <!-- 日時 -->
                 <div class="text-[0.8rem] font-black text-brand-5 mb-1.5 tracking-widest">
                     <span class="time"></span>
                 </div>
                 <!-- タイトル -->
-                <div class="text-[0.8rem] font-black text-black-5 leading-tight mb-2 line-clamp-2 pr-8 relative z-10">
+                <div class="text-[0.8rem] font-black text-black-5  mb-2 line-clamp-2 pr-8 relative z-10">
                     <span class="title"></span>
                 </div>
                 <!-- 本文 -->
-                <div class="text-[0.7rem] text-black-3 line-clamp-4 leading-relaxed mb-4">
+                <div class="text-[0.7rem] text-black-3 line-clamp-4  mb-4">
                     <span class="body"></span>
                 </div>
                 <!-- アクションボタン -->
                 <button id="btn-popup-action" class="w-full h-10 bg-brand-2 text-brand-5 font-black text-[0.7rem] rounded-[1rem] flex items-center justify-center gap-1 uppercase shadow-md active:scale-95 transition-transform tracking-widest">
                     <span class="js-action-text px-4 truncate"></span>
-                    <!-- <span class="text-[0.8rem] leading-none mb-0.5">›</span> -->
+                    <!-- <span class="text-[0.8rem]  mb-0.5">›</span> -->
                 </button>
             </div>
         </template>

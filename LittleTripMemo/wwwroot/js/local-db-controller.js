@@ -77,7 +77,7 @@ const _LocalDbCore = {
             try {
                 const store = this._getStore(storeName, this.TRANSACTION_MODES.READWRITE);
                 const request = store.put(data);
-                // request.onsuccess = () => resolve(true);
+                console.log(">upsertData:", storeName, data);
                 request.onsuccess = (event) => {
                     // 採番されたIDをデータ本体のdbidに書き戻す（参照渡しを利用）
                     data.dbid = event.target.result;

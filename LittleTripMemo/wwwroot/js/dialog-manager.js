@@ -35,7 +35,7 @@ const _DialogCore = {
         // 【追加】help 引数がある場合、ヘルプボタンを先頭に追加
         if (help) {
             const btnHelp = document.createElement("button");
-            btnHelp.className = "w-9 h-9 bg-white rounded-full shadow-sm text-brand-5 flex items-center justify-center active:scale-95 text-[1rem] border border-brand-2 transition-transform font-black";
+            btnHelp.className = "w-9 h-9 bg-white rounded-full shadow-md text-brand-5 flex items-center justify-center active:scale-95 text-[1rem] border border-brand-2 transition-transform font-black";
             btnHelp.textContent = "?";
             btnHelp.onclick = () => {
                 document.getElementById('ui-help-dialog-body').textContent = help;
@@ -47,7 +47,7 @@ const _DialogCore = {
         if (headerButtons && headerButtons.length > 0) {
             headerButtons.forEach(btnDef => {
                 const btn = document.createElement("button");
-                btn.className = "w-9 h-9 bg-white rounded-full shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1rem] border border-brand-2 transition-transform";
+                btn.className = "w-9 h-9 bg-white rounded-full shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[1rem] border border-brand-2 transition-transform";
                 btn.innerHTML = btnDef.label;
                 if (btnDef.id) btn.id = btnDef.id;
                 btn.onclick = () => { if (btnDef.handler) btnDef.handler(); };
@@ -56,7 +56,7 @@ const _DialogCore = {
         }
         // 最後に「閉じる(✖)」ボタンを必ず追加
         const btnCloseX = document.createElement("button");
-        btnCloseX.className = "w-9 h-9 bg-white rounded-full shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[0.8rem] border border-brand-2 transition-transform";
+        btnCloseX.className = "w-9 h-9 bg-white rounded-full shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[0.8rem] border border-brand-2 transition-transform";
         btnCloseX.textContent = "✖";
         btnCloseX.onclick = () => this.close();
         headerActions.appendChild(btnCloseX);
@@ -150,7 +150,7 @@ const DialogController = {
                     [
                         {
                             label: "CANCEL",
-                            className: "bg-slate-400 text-white shadow-sm",
+                            className: "bg-slate-400 text-white shadow-md",
                             handler: () => { isResolved = true; resolve(false); }
                         },
                         {
@@ -231,7 +231,7 @@ const DialogController = {
         _DialogCore.open({
             title: "SYSTEM MENU",
             content: el,
-            help: "",
+            help: "システムメニュー\nシステムメニュー",
         });
     },
     // 【基幹】アプリメニューを表示
@@ -276,7 +276,7 @@ const DialogController = {
         _DialogCore.open({
             title: "APP MENU",
             content: el,
-            help: "",
+            help: "アプリメ\nニュー",
         });
     },
     // （システム）ユーザー設定メニュー（第2階層）
@@ -290,7 +290,7 @@ const DialogController = {
         _DialogCore.open({
             title: "USER SETTINGS",
             content: el,
-            help: "",
+            help: "ユーザシステム\nメニュー",
         });
     },
     // （システム）テーマ設定ダイアログ
@@ -520,7 +520,7 @@ const DialogController = {
             buttons: [[
                 {
                     label: "CANCEL",
-                    className: "bg-slate-200 text-slate-500 shadow-sm",
+                    className: "bg-slate-200 text-slate-500 shadow-md",
                     closesDialog: true
                 },
                 {
@@ -558,7 +558,7 @@ const DialogController = {
         const renderGrid = () => {
             const combinedList = [...new Set([...emojiList, ...history])].slice(0, 50);
             combinedGrid.innerHTML = combinedList.map(e =>
-                `<button class="w-10 h-10 rounded-[1rem] hover:bg-slate-50 active:bg-slate-100 active:scale-90 flex items-center justify-center text-[28px] leading-none transition-all">
+                `<button class="w-10 h-10 rounded-[1rem] hover:bg-slate-50 active:bg-slate-100 active:scale-90 flex items-center justify-center text-[28px]  transition-all">
                     ${e}
                 </button>`
             ).join('');
@@ -588,7 +588,7 @@ const DialogController = {
                 [
                     {
                         label: "CANCEL",
-                        className: "bg-slate-100 text-slate-400 shadow-sm",
+                        className: "bg-slate-100 text-slate-400 shadow-md",
                         closesDialog: true
                     },
                     {
@@ -745,10 +745,10 @@ const DialogController = {
                     if (priceUnitEl) priceUnitEl.textContent = displayCurrency;
                     if (price > 0) {
                         priceEl.textContent = `+${price.toLocaleString()}`;
-                        priceEl.className = "js-price text-[1rem] font-black italic leading-none text-blue-500";
+                        priceEl.className = "js-price text-[1rem] font-black italic  text-blue-500";
                     } else if (price < 0) {
                         priceEl.textContent = price.toLocaleString();
-                        priceEl.className = "js-price text-[1rem] font-black italic leading-none text-red-500";
+                        priceEl.className = "js-price text-[1rem] font-black italic  text-red-500";
                     }
                 } else {
                     // 0円の時は枠ごと隠す
@@ -780,7 +780,7 @@ const DialogController = {
         const headerHtml = `
             <div class="flex justify-between items-center mb-6 mt-2 px-1">
                 <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-red-500 shadow-sm shadow-red-500/30"></div>
+                    <div class="w-2 h-2 rounded-full bg-red-500 shadow-md shadow-red-500/30"></div>
                     <span class="text-[0.6rem] font-black uppercase tracking-[0.2em] text-slate-500">HIT MEMOS</span>
                 </div>
                 <div class="bg-white border border-slate-100 rounded-full px-3 py-1 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
@@ -823,10 +823,10 @@ const DialogController = {
 
                     if (price > 0) {
                         priceEl.textContent = `+${price.toLocaleString()}`;
-                        priceEl.className = "js-memo-price text-[1rem] font-black italic leading-none text-blue-500";
+                        priceEl.className = "js-memo-price text-[1rem] font-black italic  text-blue-500";
                     } else if (price < 0) {
                         priceEl.textContent = price.toLocaleString();
-                        priceEl.className = "js-memo-price text-[1rem] font-black italic leading-none text-red-500";
+                        priceEl.className = "js-memo-price text-[1rem] font-black italic  text-red-500";
                     }
                 } else {
                     // 0円の時はラッパーごと非表示にして隙間を詰める
@@ -852,7 +852,7 @@ const DialogController = {
                 const titleText = $Dom.QuerySelector('#dialog-title', activeFrame);
                 if (titleText) {
                     titleText.classList.remove('truncate');
-                    titleText.classList.add('flex', 'flex-col', 'justify-center', 'leading-tight');
+                    titleText.classList.add('flex', 'flex-col', 'justify-center', '');
                     titleText.innerHTML = `SEARCH RESULTS <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1 not-italic">INDEPENDENT MEMOS</span>`;
                 }
             }
@@ -914,13 +914,13 @@ const DialogController = {
                         } else {
                             // Publicデータ（OPEN）
                             badge.textContent = "OPEN";
-                            badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-blue-100 bg-brand-2 text-brand-5 shadow-sm";
+                            badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-blue-100 bg-brand-2 text-brand-5 shadow-md";
                             leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-brand-5"; // 左線ブランドカラー
                         }
                     } else {
                         // 内部データ（PRIVATE）
                         badge.textContent = "PRIVATE";
-                        badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-slate-200 bg-slate-100 text-slate-400 shadow-sm";
+                        badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-slate-200 bg-slate-100 text-slate-400 shadow-md";
                         leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800"; // 左線ブランドカラー
                     }
                     child.onclick = () => {
@@ -977,7 +977,7 @@ const DialogController = {
                 const badge = $Dom.QuerySelector(".js-badge", child);
                 const leftBorder = $Dom.QuerySelector(".js-item-border", child);
                 badge.textContent = "PRIVATE";
-                badge.className = "js-badge text-[9px] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-slate-200 bg-slate-100 text-slate-400 shadow-sm";
+                badge.className = "js-badge text-[9px] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-slate-200 bg-slate-100 text-slate-400 shadow-md";
                 leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800";
                 // アイテムクリック時の処理（追加確認 ＆ API実行）
                 child.onclick = async () => {
@@ -1214,7 +1214,7 @@ const DialogController = {
                 [
                     {
                         label: "CANCEL",
-                        className: "bg-slate-400 text-white shadow-sm"
+                        className: "bg-slate-400 text-white shadow-md"
                         // onCloseが自動で呼ばれるのでhandlerは不要
                     },
                     {
@@ -1262,16 +1262,16 @@ const DialogController = {
             const displayCurrency = currentArchive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
             priceUnit.textContent = displayCurrency;
             if (totalPrice > 0) {
-                priceVal.className = "text-[1.2rem] font-black text-blue-600 leading-none italic";
-                // priceUnit.className = "text-[0.7rem] font-black text-blue-500 uppercase tracking-widest mb-1 block leading-none";
+                priceVal.className = "text-[1.2rem] font-black text-blue-600  italic";
+                // priceUnit.className = "text-[0.7rem] font-black text-blue-500 uppercase tracking-widest mb-1 block ";
                 priceVal.textContent = `+${totalPrice.toLocaleString()}`;
             } else if (totalPrice < 0) {
-                priceVal.className = "text-[1.2rem] font-black text-red-600 leading-none italic";
-                // priceUnit.className = "text-[0.7rem] font-black text-red-500 uppercase tracking-widest mb-1 block leading-none";
+                priceVal.className = "text-[1.2rem] font-black text-red-600  italic";
+                // priceUnit.className = "text-[0.7rem] font-black text-red-500 uppercase tracking-widest mb-1 block ";
                 priceVal.textContent = `- ${Math.abs(totalPrice).toLocaleString()}`;
             } else {
-                priceVal.className = "text-[1.2rem] font-black text-black-5 leading-none italic";
-                // priceUnit.className = "text-[0.7rem] font-black text-slate-400 uppercase tracking-widest mb-1 block leading-none";
+                priceVal.className = "text-[1.2rem] font-black text-black-5  italic";
+                // priceUnit.className = "text-[0.7rem] font-black text-slate-400 uppercase tracking-widest mb-1 block ";
                 priceVal.textContent = `0`;
             }
         };
@@ -1303,7 +1303,7 @@ const DialogController = {
         const dialogButtons = [];
         if (archive.is_owner) {
             const btnMainClass = "w-full bg-brand-5 text-white font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform";
-            const btnReleaseClass = "w-full bg-white text-red-400 border border-brand-4 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-sm active:scale-95 transition-transform";
+            const btnReleaseClass = "w-full bg-white text-red-400 border border-brand-4 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform";
             if (!archive.is_public) {
                 dialogButtons.push([{
                     label: "Private　⇒　Public",
@@ -1343,7 +1343,7 @@ const DialogController = {
         } else {
             dialogButtons.push([{
                 label: "REPORT THIS ARCHIVE",
-                className: "w-full bg-white text-red-500 border border-red-500 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-sm active:scale-95 transition-transform",
+                className: "w-full bg-white text-red-500 border border-red-500 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform",
                 closesDialog: false,
                 handler: () => this.ShowReportPost(archive)
             }]);
@@ -1375,12 +1375,12 @@ const DialogController = {
                 [
                     {
                         label: "CANCEL",
-                        className: "bg-slate-200 text-slate-500 shadow-sm",
+                        className: "bg-slate-200 text-slate-500 shadow-md",
                         closesDialog: true
                     },
                     {
                         label: "SAVE DATA",
-                        className: "bg-brand-4 text-white shadow-sm",
+                        className: "bg-brand-4 text-white shadow-md",
                         closesDialog: false,
                         onClose: true,
                         handler: $Warn.CatchAsync(async () => {
@@ -1486,12 +1486,12 @@ const DialogController = {
                 [
                     {
                         label: "CANCEL",
-                        className: "bg-slate-200 text-slate-500 shadow-sm",
+                        className: "bg-slate-200 text-slate-500 shadow-md",
                         closesDialog: true
                     },
                     {
                         label: "SAVE",
-                        className: "bg-brand-4 text-white shadow-sm",
+                        className: "bg-brand-4 text-white shadow-md",
                         closesDialog: false,
                         handler: $Warn.CatchAsync(async () => {
                             const updatedFields = {
@@ -1515,46 +1515,55 @@ const DialogController = {
         });
     },
     // 通知詳細ダイアログ
-    ShowNoticeDetail(notice) {
-        // ...既存コードそのまま...
-        const el = $Dom.GenerateTemplate('tpl-view-notice');
-        const icon = $Const.NOTICE_ICONS[notice.kind] || '📢';
-        $Dom.QuerySelector('#view-notice-icon', el).textContent = icon;
-        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, "YYYY.MM.DD HH:mm");
-        $Dom.QuerySelector('#view-notice-title', el).textContent = notice.title;
-        $Dom.QuerySelector('#view-notice-body', el).textContent = notice.body;
-        _DialogCore.open({
-            title: "NOTICE DETAILS",
-            content: el,
-            help: "",
-            buttons:[]
-        });
-    },
-    // 通知一覧ダイアログ（API通信化）
-    async ShowNoticeList() {
-        const notices = $App.AppData.Owner.systemInfo.notifications ||[];
-        if (notices.length === 0) {
-            $Notice.Warn("データはありません");
-            return;
-        }
-        const root = $Dom.GenerateTemplate("tpl-list-parent");
-        root.className = "w-full text-black-3 mb-2 px-1";
-        notices.forEach(item => {
-            const child = $Dom.GenerateTemplate("tpl-list-child-notice");
-            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, "YYYY.MM.DD");
-            const icon = $Const.NOTICE_ICONS[item.kind] || '📢';
-            $Dom.QuerySelector(".js-title", child).textContent = `${icon} ${item.title}`;
-            $Dom.QuerySelector(".js-body", child).textContent = item.body;
-            child.onclick = () => this.ShowNoticeDetail(item);
-            root.appendChild(child);
-        });
-        _DialogCore.open({
-            title: "NOTIFICATIONS",
-            content: root,
-            help: "",
-            buttons:[]
-        });
-    },
+	ShowNoticeDetail(notice) {
+		const el = $Dom.GenerateTemplate('tpl-view-notice');
+		const icon = $Const.NOTICE_ICONS[notice.kind] || '📢';
+		$Dom.QuerySelector('#view-notice-icon', el).textContent = icon;
+		$Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, "YYYY.MM.DD HH:mm");
+		$Dom.QuerySelector('#view-notice-title', el).textContent = notice.title;
+		$Dom.QuerySelector('#view-notice-body', el).textContent = notice.body;
+		_DialogCore.open({
+			title: "NOTICE DETAILS",
+			content: el
+		});
+	},
+	async ShowNoticeList() {
+		const notices = $App.AppData.Owner.systemInfo.notifications || [];
+		if (notices.length === 0) {
+			$Notice.Warn("データはありません");
+			return;
+		}
+		const STORAGE_KEY = 'ritomemo_notice_history';
+		// 1. ローカルから既読履歴 { seq: update_tim } を取得
+		const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+		const root = $Dom.GenerateTemplate("tpl-list-parent");
+		root.className = "w-full text-black-3 mb-2 px-1";
+		notices.forEach(item => {
+			const child = $Dom.GenerateTemplate("tpl-list-child-notice");
+			// 2. 履歴に存在し、かつ更新日時が一致していれば既読。それ以外は未読(isNew)
+			const isRead = history[item.seq] === item.update_tim;
+			const isNew = !isRead;
+			const badge = $Dom.QuerySelector(".js-badge-new", child);
+			if (badge) $Dom.ToggleShow(badge, isNew);
+			$Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, "YYYY.MM.DD");
+			const icon = $Const.NOTICE_ICONS[item.kind] || '📢';
+			$Dom.QuerySelector(".js-title", child).textContent = `${icon} ${item.title}`;
+			$Dom.QuerySelector(".js-body", child).textContent = item.body;
+			child.onclick = () => {
+				// 3. クリック時に履歴を更新（未読を既読にする）
+				const currentHistory = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+				currentHistory[item.seq] = item.update_tim;
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(currentHistory));
+				if (badge) $Dom.ToggleShow(badge, false);
+				this.ShowNoticeDetail(item);
+			};
+			root.appendChild(child);
+		});
+		_DialogCore.open({
+			title: "NOTIFICATIONS",
+			content: root
+		});
+	},
     // 【管理者機能】管理者メニュー
     ShowAdminMenu() {
         const el = $Dom.GenerateTemplate('tpl-menu-admin');
@@ -1594,13 +1603,13 @@ const DialogController = {
                 const badge = $Dom.QuerySelector(".js-badge-status", child);
                 if (isPublic) {
                     badge.textContent = "公開中";
-                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-brand-3 bg-brand-5 text-white";
+                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md border border-brand-3 bg-brand-5 text-white";
                 } else if (now < fromDate) {
                     badge.textContent = "公開前";
-                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-slate-300 bg-slate-100 text-slate-500";
+                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md border border-slate-300 bg-slate-100 text-slate-500";
                 } else {
                     badge.textContent = "公開終了";
-                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-slate-300 bg-slate-500 text-white";
+                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md border border-slate-300 bg-slate-500 text-white";
                 }
                 // 編集を開き、保存成功時は一覧を閉じて開き直す
                 child.onclick = () => {
@@ -1623,7 +1632,7 @@ const DialogController = {
         const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
         if (headerActions) {
             const addBtn = document.createElement('button');
-            addBtn.className = "w-8 h-8 bg-brand-5 rounded-[1rem] shadow-sm text-white flex items-center justify-center active:scale-95 text-[1.2rem] border border-brand-5 transition-transform";
+            addBtn.className = "w-8 h-8 bg-brand-5 rounded-[1rem] shadow-md text-white flex items-center justify-center active:scale-95 text-[1.2rem] border border-brand-5 transition-transform";
             addBtn.innerHTML = "＋";
             addBtn.onclick = () => this.ShowAdminNoticeEdit(null, () => {
                 _DialogCore.close();
@@ -1658,7 +1667,7 @@ const DialogController = {
             buttons:[[
                 {
                     label: "CANCEL",
-                    className: "bg-slate-200 text-slate-500 shadow-sm",
+                    className: "bg-slate-200 text-slate-500 shadow-md",
                     closesDialog: true
                 },
                 {
@@ -1756,7 +1765,7 @@ const DialogController = {
             title: "REPORT DETAILS",
             content: el,
             help: "",
-            buttons:[ { label: "BACK", className: "bg-slate-200 text-slate-500 shadow-sm", closesDialog: true } ]
+            buttons:[ { label: "BACK", className: "bg-slate-200 text-slate-500 shadow-md", closesDialog: true } ]
         });
     },
     // 管理者：フィードバックリスト（無限スクロール）
@@ -1842,7 +1851,7 @@ const DialogController = {
             buttons: [[
                 {
                     label: "CANCEL",
-                    className: "bg-slate-200 text-slate-500 shadow-sm",
+                    className: "bg-slate-200 text-slate-500 shadow-md",
                     closesDialog: true
                 },
                 {

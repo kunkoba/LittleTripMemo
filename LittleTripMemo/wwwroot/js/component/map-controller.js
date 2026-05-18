@@ -25,7 +25,7 @@ const _MapCore = {
         this._map = L.map(this.root, {
             zoomControl: true,
             attributionControl: false
-        }).setView(this.currentPoint, 18);
+        }).setView(this.currentPoint, 15);
         this.setMapStyle($App.AppData.Owner.MapStyle);
     },
     // 地図機能の物理的なロック処理
