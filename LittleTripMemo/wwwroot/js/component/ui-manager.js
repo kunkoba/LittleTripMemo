@@ -4,12 +4,6 @@ const _UI_Core = {
     init() {
 		// 要素取得
 		this.noticeText = $Dom.GetElementById('notice-bar-text');
-		// // イベント登録
-		// document.addEventListener('click', (e) => {
-		// 	if (!e.target.closest('#btn-sys-menu') && !e.target.closest('#btn-app-menu')) {
-		// 		this.closeAllPop();
-		// 	}
-        // });
     },
 	// カラーテーマの変更
 	setTheme(theme){
@@ -80,7 +74,11 @@ const UI_Manager = {
 	ToggleIconBar(isShow){
 		$TopBar.ToggleRoot(isShow);
 		$BotBar.ToggleRoot(isShow);
-	}
+	},
+	// 通知バッジの更新
+	UpdateNoticeBadge(count){
+		$TopBar.UpdateNoticeBadge(count);
+	},
 };
 
 // Public

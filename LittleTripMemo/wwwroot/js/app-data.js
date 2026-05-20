@@ -18,20 +18,6 @@ window.$Data = {
         },
         // サーバー通信の基礎
         async _fetchData(method, url, params, isDebug = false) {
-            // const isLoggedIn = $App.AppData.Context.IsLoggedIn;
-            // // ログイン不要なAPIのリスト（ホワイトリスト）
-            // const publicEndpoints = [
-            //     '/api/GetArchiveDetailsPub',
-            //     '/api/Account/LoginFirebase' // ログイン自体は通す
-            // ];
-            // // ホワイトリストに含まれているかチェック
-            // const isPublic = publicEndpoints.some(path => url.startsWith(path));
-            // // 未ログインかつ、公開用ではないAPIを叩こうとしたらブロック
-            // if (!isLoggedIn && !isPublic) {
-            //     $Notice.Warn("Please log in to use this feature.");
-            //     $Dialog.ShowLoginDialog();
-            //     return false;
-            // }
             // メイン処理
             console.log("▼ Access:", this.baseUrl + url, params);
             const token = $App.AppData.Owner.Token;
@@ -415,31 +401,28 @@ window.$Data = {
         async CheckUnreadNotices() {
             const sysInfo = $App.AppData.Owner.systemInfo;
             if (!sysInfo || !sysInfo.notifications) return;
-            console.log("-sysInfo:", sysInfo);
             // 1. 期限切れの既読履歴をローカルDBから掃除
             await $LocalDb.Notice.Cleanup();
             // 2. 現在ローカルDBに残っている既読履歴を全取得
             const readHistory = await $LocalDb.Notice.GetAll();
             // 3. サーバーから来た通知リストと突合して未読件数をカウント
             let unreadCount = 0;
-            // ★ forEach を for...of に変更
             for (const notice of sysInfo.notifications) {
                 // ローカル履歴の中から同じseqのものを探す
                 const history = readHistory.find(h => h.seq === notice.seq);
                 // 履歴がない、またはサーバーの通知の方が新しい場合は「未読」
                 if (!history || new Date(notice.update_tim) > new Date(history.update_tim)) {
-                    notice.is_new = true; // メモリ上のデータに直接フラグを立てる
-                    // ★ Saveの引数を (seq, update_tim, disp_to) に修正し、変数も notice に合わせる
-                    await $LocalDb.Notice.Save(notice.seq, notice.update_tim, notice.disp_to);
+                    notice.is_new = true; // メモリ上のデータに未読フラグを立てる
                     unreadCount++;
                 } else {
                     notice.is_new = false;
                 }
             }
-            // 4. 未読件数を Context に保存（アイコンのバッジ表示用などに使える）
+            // 4. 未読件数を Context に保存し、UIを更新
             $App.AppData.Context.UnreadNoticeCount = unreadCount;
             console.log(`[Notice] 未読件数: ${unreadCount}件`);
-            // ※ここにUI（設定アイコンなど）へ赤いドットを表示する処理を追加することも可能です。
+            // メニューアイコンの赤丸を更新
+            if (window.$UI) window.$UI.UpdateNoticeBadge(unreadCount);
         },
     },
 };

@@ -14,6 +14,7 @@ const _TopCore = {
                 this.sortReaction = $Dom.GetElementById('sort-reaction');
                 this.sortWord = $Dom.GetElementById('sort-word');
                 this.btnSysMenu = $Dom.GetElementById('btn-sys-menu');
+                this.badgeSysMenu = $Dom.GetElementById('badge-sys-menu');
             }
             // イベント登録
             {
@@ -193,6 +194,13 @@ const _TopCore = {
         const selected = $Dom.QuerySelector("button.bg-brand-3", container);
         return selected ? selected.dataset.value : null;
     },
+    // 通知の未読バッジ（赤丸）をシステムアイコンに付ける
+    updateNoticeBadge(count) {
+        if (this.badgeSysMenu) {
+            // カウントが1以上なら true(表示)、0なら false(非表示)
+            $Dom.ToggleShow(this.badgeSysMenu, count > 0);
+        }
+    },
 };
 
 // 窓口
@@ -216,6 +224,10 @@ const TopBarController = {
     // まとめ親タイトル変更
     ChangeTitle(title){
         _TopCore.changeTitle(title);
+    },
+    // トップバーコントローラー窓口の末尾に追加
+    UpdateNoticeBadge(count){
+        _TopCore.updateNoticeBadge(count);
     },
 };
 

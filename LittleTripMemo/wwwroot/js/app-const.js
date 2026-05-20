@@ -5,7 +5,7 @@ window.$Const = {
         NAME: "Little Trip Memoあああ",
         DEVELOPER: "kunkoba",
         VERSION: "1.0.0",
-        OFFICIAL_SITE: "http://127.0.0.1:5501/index.html",
+        OFFICIAL_SITE: "https://hinekulemonstudio.web.app/",
         LICENSE: "?????????????",
     },
     // 画面モード
@@ -31,10 +31,16 @@ window.$Const = {
         SAD:      { id: 4, emoji: '😭' }, //悲しい
         REPORT:   { id: 5, emoji: '😡' }, //通報
     },
-    // 通知種別アイコン
-    NOTICE_ICONS: {
-        0: '🤔', // その他
-        1: '⚠️', // 重要
-        2: '📢', // 周知
+    // // 通知種別アイコン
+    // NOTICE_ICONS: {
+    //     0: '🤔', // その他
+    //     1: '⚠️', // 重要
+    //     2: '📢', // 周知
+    // },
+    // 通知種別の定数
+    NOTICE_KIND: {
+        OTHER:     { id: 0, emoji: '🤔', label: 'Other' },
+        IMPORTANT: { id: 1, emoji: '⚠️', label: 'Important' },
+        NOTICE:    { id: 2, emoji: '📢', label: 'Notice' },
     },
 };

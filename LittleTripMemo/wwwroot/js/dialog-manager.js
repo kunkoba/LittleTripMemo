@@ -207,6 +207,16 @@ const DialogController = {
         // 3. ログイン/ログアウトボタンのラベル反映
         const authLabel = $Dom.QuerySelector('span:last-child', b.auth);
         authLabel.textContent = isLoggedIn ? "LOGOUT" : "LOGIN";
+
+        const unreadCount = $App.AppData.Context.UnreadNoticeCount || 0;
+        if (unreadCount > 0) {
+            const labelSpan = $Dom.QuerySelector('span:last-child', b.notice);
+            labelSpan.classList.add("flex", "items-center", "gap-2");
+            if (!labelSpan.querySelector('.badge-new')) {
+                labelSpan.insertAdjacentHTML('beforeend', `<span class="badge-new ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full tracking-wider mt-0.5">NEW</span>`);
+            }
+        }
+
         // 4. 各ボタンのイベント登録
         b.profile.onclick = async () => {
             const isSuccess = await $Data.Access.GetProfile();
@@ -310,7 +320,7 @@ const DialogController = {
                     <button id="th-btn-red" class="w-12 h-12 bg-[#ef4444] border-2 border-white shadow-md active:scale-95 transition-transform"></button>
                     <button id="th-btn-yellow" class="w-12 h-12 bg-[#eab308] border-2 border-white shadow-md active:scale-95 transition-transform"></button>
                 </div>
-                <div class="space-y-1">${previewItems}</div>
+                <div class="space-y-1 px-6">${previewItems}</div>
             </div>`;
         const el = document.createElement('div');
         el.style.width = "100%";
@@ -434,7 +444,6 @@ const DialogController = {
         const scoreAvg = sysInfo.score_avg || 0;
         $Dom.QuerySelector(".js-avg-score", el).textContent = scoreAvg.toFixed(1);
         $Dom.QuerySelector(".js-avg-stars", el).textContent = "★".repeat(Math.round(scoreAvg)) + "☆".repeat(5 - Math.round(scoreAvg));
-        $Dom.QuerySelector(".js-total-reviews", el).textContent = `Recent ${feedbackList.length} feedbackList`;
         if (feedbackList.length === 0) {
             container.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
         } else {
@@ -447,7 +456,6 @@ const DialogController = {
                 container.appendChild(child);
             });
         }
-        // $Dom.QuerySelector('#btn-post-review', el).onclick = () => this.ShowReviewPost();
         _DialogCore.open({
             title: "FEEDBACKS",
             content: el,
@@ -777,18 +785,18 @@ const DialogController = {
         }
         const el = $Dom.GenerateTemplate("tpl-list-parent");
         el.className = "w-full text-black-3 mb-2 px-1 space-y-4";
-        const headerHtml = `
-            <div class="flex justify-between items-center mb-6 mt-2 px-1">
-                <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-red-500 shadow-md shadow-red-500/30"></div>
-                    <span class="text-[0.6rem] font-black uppercase tracking-[0.2em] text-slate-500">HIT MEMOS</span>
-                </div>
-                <div class="bg-white border border-slate-100 rounded-full px-3 py-1 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
-                    <span class="text-[0.6rem] font-black text-slate-600 tracking-wider">${details.length} FOUND</span>
-                </div>
-            </div>
-        `;
-        el.insertAdjacentHTML('beforeend', headerHtml);
+        // const headerHtml = `
+        //     <div class="flex justify-between items-center mb-6 mt-2 px-1">
+        //         <div class="flex items-center gap-2">
+        //             <div class="w-2 h-2 rounded-full bg-red-500 shadow-md shadow-red-500/30"></div>
+        //             <span class="text-[0.6rem] font-black uppercase tracking-[0.2em] text-slate-500">HIT MEMOS</span>
+        //         </div>
+        //         <div class="bg-white border border-slate-100 rounded-full px-3 py-1 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+        //             <span class="text-[0.6rem] font-black text-slate-600 tracking-wider">${details.length} FOUND</span>
+        //         </div>
+        //     </div>
+        // `;
+        // el.insertAdjacentHTML('beforeend', headerHtml);
         details.forEach((item, index) => {
             const child = $Dom.GenerateTemplate("tpl-list-child-simple");
             const dateStr = (item.memo_date || "").replace(/-/g, '.');
@@ -914,7 +922,7 @@ const DialogController = {
                         } else {
                             // Publicデータ（OPEN）
                             badge.textContent = "OPEN";
-                            badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-blue-100 bg-brand-2 text-brand-5 shadow-md";
+                            badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-blue-100 bg-brand-2 text-brand-5 _shadow-md";
                             leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-brand-5"; // 左線ブランドカラー
                         }
                     } else {
@@ -1517,8 +1525,8 @@ const DialogController = {
     // 通知詳細ダイアログ
 	ShowNoticeDetail(notice) {
 		const el = $Dom.GenerateTemplate('tpl-view-notice');
-		const icon = $Const.NOTICE_ICONS[notice.kind] || '📢';
-		$Dom.QuerySelector('#view-notice-icon', el).textContent = icon;
+		const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === notice.kind) || $Const.NOTICE_KIND.NOTICE;
+		$Dom.QuerySelector('#view-notice-icon', el).textContent = kindObj.emoji;
 		$Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, "YYYY.MM.DD HH:mm");
 		$Dom.QuerySelector('#view-notice-title', el).textContent = notice.title;
 		$Dom.QuerySelector('#view-notice-body', el).textContent = notice.body;
@@ -1527,33 +1535,43 @@ const DialogController = {
 			content: el
 		});
 	},
-	async ShowNoticeList() {
+    // 通知リスト表示
+    async ShowNoticeList() {
 		const notices = $App.AppData.Owner.systemInfo.notifications || [];
 		if (notices.length === 0) {
 			$Notice.Warn("データはありません");
 			return;
 		}
-		const STORAGE_KEY = 'ritomemo_notice_history';
-		// 1. ローカルから既読履歴 { seq: update_tim } を取得
-		const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
 		const root = $Dom.GenerateTemplate("tpl-list-parent");
 		root.className = "w-full text-black-3 mb-2 px-1";
 		notices.forEach(item => {
 			const child = $Dom.GenerateTemplate("tpl-list-child-notice");
-			// 2. 履歴に存在し、かつ更新日時が一致していれば既読。それ以外は未読(isNew)
-			const isRead = history[item.seq] === item.update_tim;
-			const isNew = !isRead;
+            // child自身に直接クラスを追加する
+			if (item.kind === 0) {
+				child.classList.add("border-l-2", "border-slate-300");
+			} else {
+				child.classList.add("border-l-2", "border-brand-3");
+			}
+			// メモリ上の未読フラグを使用
+			const isNew = item.is_new;
 			const badge = $Dom.QuerySelector(".js-badge-new", child);
 			if (badge) $Dom.ToggleShow(badge, isNew);
 			$Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, "YYYY.MM.DD");
-			const icon = $Const.NOTICE_ICONS[item.kind] || '📢';
-			$Dom.QuerySelector(".js-title", child).textContent = `${icon} ${item.title}`;
+            const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === item.kind) || $Const.NOTICE_KIND.NOTICE;
+            $Dom.QuerySelector('.js-icon', child).textContent = kindObj.emoji;
+			$Dom.QuerySelector(".js-title", child).textContent = item.title;
 			$Dom.QuerySelector(".js-body", child).textContent = item.body;
-			child.onclick = () => {
-				// 3. クリック時に履歴を更新（未読を既読にする）
-				const currentHistory = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-				currentHistory[item.seq] = item.update_tim;
-				localStorage.setItem(STORAGE_KEY, JSON.stringify(currentHistory));
+			child.onclick = async () => {
+				// ★クリック時に IndexedDB に保存して既読化する
+                if (item.is_new) {
+                    item.is_new = false; // メモリ上も既読に
+                    await $LocalDb.Notice.Save(item.seq, item.update_tim, item.disp_to);
+                    // 未読カウントを減らしてUI(歯車アイコンの赤丸)を即時更新
+                    if ($App.AppData.Context.UnreadNoticeCount > 0) {
+                        $App.AppData.Context.UnreadNoticeCount--;
+                        $UI.UpdateNoticeBadge($App.AppData.Context.UnreadNoticeCount);
+                    }
+                }
 				if (badge) $Dom.ToggleShow(badge, false);
 				this.ShowNoticeDetail(item);
 			};
@@ -1594,8 +1612,8 @@ const DialogController = {
             sorted.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-notice");
                 $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, "YYYY.MM.DD HH:mm");
-                const icon = $Const.NOTICE_ICONS[item.kind] || '📢';
-                $Dom.QuerySelector(".js-title", child).textContent = `${icon} ${item.title}`;
+                const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === item.kind) || $Const.NOTICE_KIND.NOTICE;
+                $Dom.QuerySelector(".js-title", child).textContent = `${kindObj.emoji} ${item.title}`;
                 $Dom.QuerySelector(".js-body", child).textContent = item.body;
                 const fromDate = new Date(item.disp_from);
                 const toDate = new Date(item.disp_to);
@@ -1603,13 +1621,13 @@ const DialogController = {
                 const badge = $Dom.QuerySelector(".js-badge-status", child);
                 if (isPublic) {
                     badge.textContent = "公開中";
-                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md border border-brand-3 bg-brand-5 text-white";
+                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 _rounded-full uppercase tracking-wider shadow-md border border-brand-3 bg-brand-5 text-white";
                 } else if (now < fromDate) {
                     badge.textContent = "公開前";
-                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md border border-slate-300 bg-slate-100 text-slate-500";
+                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 _rounded-full uppercase tracking-wider shadow-md border border-slate-300 bg-slate-100 text-slate-500";
                 } else {
                     badge.textContent = "公開終了";
-                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md border border-slate-300 bg-slate-500 text-white";
+                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 _rounded-full uppercase tracking-wider shadow-md border border-slate-300 bg-slate-500 text-white";
                 }
                 // 編集を開き、保存成功時は一覧を閉じて開き直す
                 child.onclick = () => {
@@ -1646,8 +1664,8 @@ const DialogController = {
         const isNew = !noticeItem;
         const target = isNew ? {
             seq: 0, title: "", body: "", kind: 0,
-            disp_from: $Util.FormatDate(new Date(), "YYYY-MM-DDTHH:mm"),
-            disp_to: "2099-12-31T23:59",
+            disp_from: $Util.FormatDate(new Date(), "YYYY-MM-DD"), // 時間を消す
+            disp_to: "2099-12-31", // 時間を消す
         } : { ...noticeItem };
         const el = $Dom.GenerateTemplate("tpl-admin-notice-edit");
         const selKind = $Dom.QuerySelector('#edit-notice-kind', el);
@@ -1655,11 +1673,20 @@ const DialogController = {
         const inptBody = $Dom.QuerySelector('#edit-notice-body', el);
         const inptFrom = $Dom.QuerySelector('#edit-notice-from', el);
         const inptTo = $Dom.QuerySelector('#edit-notice-to', el);
+        // 定数からセレクトボックスの選択肢を動的生成
+        selKind.innerHTML = "";
+        Object.values($Const.NOTICE_KIND).forEach(k => {
+            const opt = document.createElement("option");
+            opt.value = k.id;
+            opt.textContent = `${k.id}: ${k.label} ${k.emoji}`;
+            selKind.appendChild(opt);
+        });
+        // 値をセット
         selKind.value = target.kind;
         inptTitle.value = target.title;
         inptBody.value = target.body;
-        inptFrom.value = target.disp_from;
-        inptTo.value = target.disp_to;
+        inptFrom.value = $Util.FormatDate(target.disp_from, "YYYY-MM-DD");
+        inptTo.value = $Util.FormatDate(target.disp_to, "YYYY-MM-DD");
         _DialogCore.open({
             title: isNew ? "NEW NOTICE" : "EDIT NOTICE",
             content: el,

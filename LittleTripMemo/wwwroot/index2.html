@@ -1,57 +1,273 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Emoji Mart サンプル</title>
-
-  <!-- Emoji Mart v5（React不要のブラウザ版） -->
-  <script src="https://unpkg.com/emoji-mart@5.6.0/dist/browser.js"></script>
-
-  <style>
-    dialog {
-      border: none;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>絵文字アイコン</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts with Emoji Support -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Color Emoji', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        /* Scrollbar styles for emoji list */
+        .emoji-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .emoji-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .emoji-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 99px;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col items-center justify-center p-6">
 
-  <button id="open">絵文字を選ぶ</button>
+    <div class="flex flex-col items-center gap-6 w-full max-w-lg">
+        
+        <!-- Instruction Message -->
+        <div class="text-center">
+            <h1 id="status-message" class="text-lg font-bold text-slate-700">
+                1つ目の絵文字を選択してください
+            </h1>
+        </div>
 
-  <!-- ピッカーを置く場所 -->
-  <div id="picker" style="margin-top: 10px; display: none;"></div>
+        <!-- Preview Section (Clean layout with small icon OUTSIDE the large icon border) -->
+        <div class="w-[300px] flex flex-col gap-3">
+            
+            <!-- [枠外・左上] 小さいアイコン 2rem (32px) -->
+            <div class="flex items-center gap-2 self-start">
+                <div class="relative w-8 h-8 bg-white rounded-lg overflow-hidden border border-slate-200/80 shadow-md flex items-center justify-center" id="small-icon-preview">
+                    <!-- Small Emoji 1 (Exactly 80% = 25.6px boundary) -->
+                    <div class="absolute left-0 top-0 w-[25.6px] h-[25.6px] flex items-center justify-center overflow-visible">
+                        <div id="emoji1-small-view" class="text-[20px] leading-none select-none text-slate-200">❓</div>
+                    </div>
+                    <!-- Small Emoji 2 (Exactly 40% = 12.8px boundary) -->
+                    <div class="absolute right-0.5 bottom-0.5 w-[12.8px] h-[12.8px] flex items-center justify-center overflow-visible">
+                        <div id="emoji2-small-view" class="text-[10px] leading-none select-none text-slate-200">❓</div>
+                    </div>
+                </div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">2rem (32px)</span>
+            </div>
 
-  <!-- ダイアログ -->
-  <dialog id="dlg">
-    <div id="emoji" style="font-size: 40px; text-align:center;">🙂</div>
-    <button id="close">閉じる</button>
-  </dialog>
+            <!-- [大きいアイコン] Large 300px Icon -->
+            <div class="relative w-[300px] h-[300px] bg-white rounded-[48px] overflow-hidden border border-slate-200/80 shadow-2xl" id="icon-preview">
+                
+                <!-- 1st Emoji Container (Exactly 80% = 240px wide/high) -->
+                <div id="emoji1-box" class="absolute left-1 top-1 w-[240px] h-[240px] flex items-center justify-center overflow-visible">
+                    <div id="emoji1-view" class="text-[195px] leading-none select-none text-slate-200">❓</div>
+                </div>
+                
+                <!-- 2nd Emoji Container (Exactly 40% = 120px wide/high) -->
+                <div id="emoji2-box" class="absolute right-2 bottom-2 w-[120px] h-[120px] flex items-center justify-center overflow-visible">
+                    <div id="emoji2-view" class="text-[95px] leading-none select-none text-slate-200">❓</div>
+                </div>
+                
+            </div>
+            
+        </div>
 
-  <script>
-    const pickerDiv = document.getElementById("picker");
-    const dlg = document.getElementById("dlg");
-    const emojiBox = document.getElementById("emoji");
+        <!-- Reset button -->
+        <button id="reset-btn" onclick="resetSelection()" class="invisible px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all border border-slate-200">
+            やり直す
+        </button>
 
-    let picker = null;
+        <!-- Huge Emoji Library & Selection Panel -->
+        <div class="w-full bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
+            <!-- Library Header & Search -->
+            <div class="flex flex-col sm:flex-row gap-3 justify-between items-center pb-3 border-b border-slate-100 mb-3">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">絵文字ライブラリ</span>
+                <input type="text" id="emoji-search" placeholder="絵文字を検索..." class="w-full sm:w-48 px-3 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-300">
+            </div>
 
-    document.getElementById("open").onclick = () => {
-      if (!picker) {
-        picker = new EmojiMart.Picker({
-          onEmojiSelect: e => {
-            emojiBox.textContent = e.native; // ← 選んだ絵文字
-            dlg.showModal();                // ← ダイアログを開く
-          }
-        });
-        console.log(">picker:", picker);
-        pickerDiv.appendChild(picker);
-      }
-      pickerDiv.style.display = "block";
-    };
+            <!-- Category Switcher Tabs -->
+            <div class="flex gap-1 overflow-x-auto pb-2 mb-2 text-xs scrollbar-none" id="category-tabs">
+                <!-- Dynamically generated tabs -->
+            </div>
 
-    document.getElementById("close").onclick = () => dlg.close();
-  </script>
+            <!-- Library Grid -->
+            <div class="h-64 overflow-y-auto emoji-scroll" id="emoji-grid-container">
+                <div class="grid grid-cols-6 sm:grid-cols-8 gap-1 text-center" id="emoji-grid">
+                    <!-- Loaded via JavaScript dynamically -->
+                </div>
+            </div>
+        </div>
 
+    </div>
+
+    <script>
+        // Massive Emoji Library dataset grouped by official categories
+        const emojiLibrary = {
+            "smileys": {
+                name: "表情・人",
+                emojis: ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "👋", "🤚", "🖐", "✋", "🖖", "👌", "🤌", "🤏", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆", "🖕", "👇", "☝️", "👍", "👎", "✊", "👊", "🤛", "🤜", "👏", "🙌", "👐", "🤲", "🤝", "🙏", "✍️", "💅", "🤳", "💪", "🦾", "🦿", "🦵", "🦶", "👂", "🦻", "👃", "🧠", "🫀", "🫁", "🦷", "🦴", "👀", "👁", "👅", "👄", "💋", "🩸"]
+            },
+            "animals": {
+                name: "動物・自然",
+                emojis: ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐻‍❄️", "🐨", "🐯", "🦁", "🐮", "🐷", "🐽", "🐸", "🐵", "🙈", "🙉", "🙊", "🐒", "🐔", "🐧", "🐦", "🐤", "🐣", "🐥", "🦆", "🦅", "🦉", "🦇", "🐺", "🐗", "🐴", "🦄", "🐝", "🪱", "🐛", "🦋", "🐌", "🐞", "🐜", "🪰", "🪲", "🪳", "蚊", "🦟", "🦗", "🕷", "🕸", "🦂", "🐢", "🐍", "🦎", "🐙", "🦑", "🦞", "🦀", "🐡", "🐠", "🐟", "🐬", "🐳", "🐋", "🦈", "🐊", "🐅", "🐆", "🦓", "🦍", "🦧", "🐘", "🦛", "🦏", "🐪", "🐫", "🦒", "🦘", "🦬", "🐑", "🐏", "🐐", "🦌", "🐕", "🐩", "🐈", "🐈‍⬛", "🐓", "🦃", "🦚", "🦜", "🦢", "🦩", "🕊", "🐇", "🦝", "🦨", "🦡", "🦦", "🦥", "🐁", "🐀", "🐿", "🦔", "🌵", "🎄", "🌲", "🌳", "🌴", "🌱", "🌿", "☘️", "🍀", "🎍", "🎋", "🍃", "🍂", "🍁", "🍄", "🐚", "🌾", "💐", "🌷", "🌹", "🥀", "🌺", "🌸", "🌼", "🌻", "🌞", "🌝", "🌙", "🌍", "🌎", "🌏", "🪐", "💫", "⭐️", "🌟", "✨", "⚡️", "💥", "🔥", "🌈", "☀️", "🌤", "⛅️", "🌥", "☁️", "🌧", "⛈", "❄️", "☃️", "💨", "💧", "💦", "☔️", "🌊"]
+            },
+            "food": {
+                name: "食べ物・飲料",
+                emojis: ["🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈", "🍒", "🍑", "🥭", "🍍", "🥥", "🥝", "🍅", "🍆", "🥑", "🥦", "🥬", "🥒", "🌶", "🫑", "🌽", "🥕", "🧄", "🧅", "🥔", "🍠", "🥐", "🥯", "🍞", "🥖", "🥨", "🥞", " waffle", "🧇", "🧀", "🍖", "🍗", "🥩", "🥓", "🍔", "🍟", "🍕", "🌭", "🥪", "🌮", "🌯", "🫔", "🥗", "🍿", "🧈", "🧂", "🥫", "🍱", "🍘", "🍙", "🍚", "🍛", "🍜", "🍝", "🍢", "🍣", "🍤", "🍥", "🥮", "🍡", "🥟", "🥡", "🍦", "🍧", "🍨", "🍩", "🍪", "🎂", "🍰", "🧁", "🥧", "🍫", "🍬", "🍭", "プリン", "🍮", "🍯", "🥛", "☕️", "🍵", "🧉", "🍶", "🍾", "🍷", "🍸", "🍹", "🍺", "🍻", "🥂", "🥃", "🥤", "🧋", "🧃", "🧊"]
+            },
+            "travel": {
+                name: "旅行・場所",
+                emojis: ["🚗", "🚕", "🚙", "🚌", "🚎", "🏎", "🚓", "🚑", "🚒", "🚐", "🛻", "🚚", "🚛", "🚜", "🦯", "🦽", "🦼", "🚲", "🛴", "🛹", "🛼", "🛵", "🏍", "🛺", "🚨", "🚔", "🚍", "🚘", "🚖", "🚡", "🚠", "🚟", "🚃", "🚋", "🚞", "🚝", "🚄", "🚅", "🚈", "🚂", "🚆", "🚇", "🚊", "🚉", "✈️", "🛫", "🛬", "🪂", "💺", "🚁", "🛰", "🚀", "🛸", "⛵️", "🛶", "🚤", "🛥", "🛳", "⛴", "🚢", "⚓️", "🛟", "🗺", "🧭", "🏔", "⛰", "🌋", "🗻", "🏕", "🏖", "🏜", "🏝", "🏞", "Stadium", "🏟", "🏛", "🏗", "🧱", "🪨", "🪵", "🏘", "🏙", "🏚", "🏢", "post", "🏣", "🏤", "🏥", "🏦", "🏨", "🏩", "🏪", "🏫", "🏬", "🏭", "🏯", "🏰", "💒", "🗼", "🗽", "⛩", "🕌", "🛕", "教会", "⛪️", "♨️"]
+            },
+            "activities": {
+                name: "活動・スポーツ",
+                emojis: ["⚽️", "🏀", "🏈", "⚾️", "🥎", "🎾", "🏐", "🏉", "🥏", "🎱", "🪀", "🏓", "🏸", "🏒", "🏑", "🥍", "🏏", "🪃", "🥅", "⛳️", "🪁", "🏹", "🎣", "🤿", "🥊", "🥋", "🎽", "🛹", "🛼", "🛷", "⛸", "🥌", "🎿", "⛷", "🏂", "🪂", "🏋️", "🤼", "🤸‍♀️", "⛹️", "🤺", "🤾", "🏌️", "🏇", "🧘‍♀️", "🏄", "🏊", "🤽", "🚣", "🧗", "🚴", "🏆", "🥇", "🥈", "🥉", "🏅", "🎖", "🎟", "🎫", "🎗", "🎪", "🎭", "🖼", "🎨", "📣", "🎬", "🎤", "🎧", "🎼", "🎹", "🥁", "🪘", "🎷", "🎺", "🎸", "🪕", "🎻", "🎲", "♟", "🎯", "🎳", "🎮", "🎰", "🧩"]
+            },
+            "objects": {
+                name: "道具・物",
+                emojis: ["👑", "💎", "💄", "💍", "💼", "🎒", "👓", "🕶", "🥽", "🔑", "🗝", "🔐", "🔒", "🔓", "🛎", "🚪", "🛌", "🛋", "🚽", "shower", "🧼", "🪥", "🧽", "🪞", "🧴", "🧸", "✉️", "📦", "🏷", "🎈", "🎉", "🎊", "🏮", "🔮", "🩹", "🩺", "💊", "💉", "🔬", "🔭", "🧹", "🪣", "🛠", "🔨", "🔧", "⚙️", "🪜", "⛓", "🧲", "💣", "🧨", "🚬", "⚰️", "⚱️", "💈", "🔋", "🔌", "💡", "🔦", "🕯", "🧯", "💸", "🪙", "💰", "💳", "⚖️", "🛡", "⚔️", "🔫"]
+            },
+            "symbols": {
+                name: "記号・国旗",
+                emojis: ["❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟", "🕉", "☸️", "✡️", "🔯", "🕎", "☯️", "☦️", "🛐", "⛎", "♈️", "♉️", "♊️", "♋️", "♌️", "♍️", "♎️", "♏️", "♐️", "♑️", "♒️", "♓️", "📳", "📴", "⚠️", "⚡️", "♨️", "🛑", "📛", "🚫", "❌", "⭕️", "💯", "💢", "💬", "👁‍🗨", "🇯🇵", "🇺🇸", "🇰🇷", "🇨🇳", "🇩🇪", "🇬🇧", "🇫🇷", "🇮🇹", "🇪🇸", "🇷🇺", "🇨🇦", "🇦🇺", "🇧🇷", "🇮🇳", "🇺🇦"]
+            }
+        };
+
+        let step = 0; // 0 = choosing 1st, 1 = choosing 2nd, 2 = complete
+        let activeTab = "smileys";
+
+        const el = {
+            status: document.getElementById('status-message'),
+            emoji1: document.getElementById('emoji1-view'),
+            emoji2: document.getElementById('emoji2-view'),
+            emoji1Small: document.getElementById('emoji1-small-view'),
+            emoji2Small: document.getElementById('emoji2-small-view'),
+            resetBtn: document.getElementById('reset-btn'),
+            categoryTabs: document.getElementById('category-tabs'),
+            emojiGrid: document.getElementById('emoji-grid'),
+            emojiSearch: document.getElementById('emoji-search')
+        };
+
+        // Render Tabs
+        function initCategoryTabs() {
+            el.categoryTabs.innerHTML = '';
+            Object.keys(emojiLibrary).forEach(tabId => {
+                const tabData = emojiLibrary[tabId];
+                const btn = document.createElement('button');
+                btn.className = `px-3 py-1.5 rounded-full font-semibold text-xs whitespace-nowrap transition-all ${
+                    tabId === activeTab 
+                    ? "bg-slate-800 text-white shadow-sm" 
+                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                }`;
+                btn.innerText = tabData.name;
+                btn.onclick = () => {
+                    activeTab = tabId;
+                    initCategoryTabs();
+                    renderEmojiGrid();
+                };
+                el.categoryTabs.appendChild(btn);
+            });
+        }
+
+        // Render Emojis matching Tab and/or Search
+        function renderEmojiGrid(searchQuery = '') {
+            el.emojiGrid.innerHTML = '';
+            let emojisToRender = [];
+
+            if (searchQuery.trim() !== '') {
+                const query = searchQuery.toLowerCase();
+                Object.values(emojiLibrary).forEach(cat => {
+                    cat.emojis.forEach(emoji => {
+                        if (emoji.includes(query)) {
+                            emojisToRender.push(emoji);
+                        }
+                    });
+                });
+                emojisToRender = [...new Set(emojisToRender)]; // Deduplicate
+            } else {
+                emojisToRender = emojiLibrary[activeTab].emojis;
+            }
+
+            emojisToRender.forEach(emoji => {
+                const button = document.createElement('button');
+                button.className = "text-3xl p-2 hover:bg-slate-100 active:scale-90 rounded-xl transition-all flex items-center justify-center select-none";
+                button.innerText = emoji;
+                button.onclick = () => selectEmoji(emoji);
+                el.emojiGrid.appendChild(button);
+            });
+
+            if (emojisToRender.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = "col-span-full py-8 text-center text-sm text-slate-400";
+                emptyMsg.innerText = "一致する絵文字がありません";
+                el.emojiGrid.appendChild(emptyMsg);
+            }
+        }
+
+        // Input search listener
+        el.emojiSearch.oninput = (e) => {
+            renderEmojiGrid(e.target.value);
+        };
+
+        // Emoji selection processing
+        function selectEmoji(emoji) {
+            if (step === 0) {
+                // Set first emoji on both large and small views
+                el.emoji1.innerText = emoji;
+                el.emoji1.classList.remove('text-slate-200');
+                el.emoji1.classList.add('text-slate-800');
+                
+                el.emoji1Small.innerText = emoji;
+                el.emoji1Small.classList.remove('text-slate-200');
+                el.emoji1Small.classList.add('text-slate-800');
+                
+                // Move to next step
+                step = 1;
+                el.status.innerText = "2つ目の絵文字を選択してください";
+            } else if (step === 1) {
+                // Set second emoji on both large and small views
+                el.emoji2.innerText = emoji;
+                el.emoji2.classList.remove('text-slate-200');
+                el.emoji2.classList.add('text-slate-800');
+                
+                el.emoji2Small.innerText = emoji;
+                el.emoji2Small.classList.remove('text-slate-200');
+                el.emoji2Small.classList.add('text-slate-800');
+                
+                // Complete
+                step = 2;
+                el.status.innerText = "アイコンが完成しました";
+                el.resetBtn.classList.remove('invisible');
+            }
+        }
+
+        // Clear selection state
+        function resetSelection() {
+            step = 0;
+            // Reset Large
+            el.emoji1.innerText = "❓";
+            el.emoji2.innerText = "❓";
+            el.emoji1.classList.remove('text-slate-800');
+            el.emoji2.classList.remove('text-slate-800');
+            el.emoji1.classList.add('text-slate-200');
+            el.emoji2.classList.add('text-slate-200');
+            
+            // Reset Small
+            el.emoji1Small.innerText = "❓";
+            el.emoji2Small.innerText = "❓";
+            el.emoji1Small.classList.remove('text-slate-800');
+            el.emoji2Small.classList.remove('text-slate-800');
+            el.emoji1Small.classList.add('text-slate-200');
+            el.emoji2Small.classList.add('text-slate-200');
+            
+            el.status.innerText = "1つ目の絵文字を選択してください";
+            el.resetBtn.classList.add('invisible');
+        }
+
+        // Run setup
+        window.onload = () => {
+            initCategoryTabs();
+            renderEmojiGrid();
+        };
+    </script>
 </body>
 </html>

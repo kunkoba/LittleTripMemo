@@ -57,35 +57,6 @@
     </div>
 </template>
 <!-- 【リスト子】シンプルリスト（検索結果・単発リスト用） -->
-<template id="tpl-list-child-simple_2">
-    <div class="js-item-card flex items-stretch p-0 rounded-[1rem] border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-[0_4px_10px_-4px_rgba(0,0,0,0.05)] overflow-hidden mb-3">
-        <!-- 左：アイコン（背景色付きエリア） -->
-        <div class="shrink-0 w-[72px] bg-brand-1/50 flex items-center justify-center border-r border-brand-1/30">
-            <span class="js-face text-[36px] drop-shadow-md"></span>
-        </div>
-        <!-- 右：内容 -->
-        <div class="flex-1 min-w-0 p-3 pl-4 flex flex-col justify-center">
-            <div class="flex items-center gap-2 mb-1 justify-between">
-                <!-- 日時 -->
-                <div class="bg-slate-100 rounded-full px-2 py-0.5 flex items-center gap-2">
-                    <span class="js-date text-[0.7rem] font-black text-slate-500 tracking-wider"></span>
-                    <span class="w-px h-2 bg-slate-300"></span>
-                    <span class="js-time text-[0.7rem] font-black text-black-5 tracking-wider"></span>
-                </div>
-                <!-- 金額と通貨単位 -->
-                <div class="flex items-baseline gap-0.5">
-                    <span class="js-memo-price text-[0.6rem] font-black"></span>
-                    <span class="js-memo-currency text-[9px] font-black text-slate-400 ml-0.5"></span>
-                </div>
-            </div>
-            <!-- タイトル -->
-            <div class="js-title text-[0.8rem] font-black text-black-5 truncate mb-0.5"></div>
-            <!-- 本文（2行で切り捨て） -->
-            <div class="js-body text-[0.8rem] text-black-4 line-clamp-2 "></div>
-        </div>
-    </div>
-</template>
-<!-- 【リスト子】シンプルリスト（検索結果・単発リスト用） -->
 <template id="tpl-list-child-simple">
     <div class="js-item-card relative flex flex-col p-3 rounded-[1rem] border border-slate-200 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3">
         <!-- 上部：日時、金額、右上に絵文字 -->
@@ -105,12 +76,10 @@
             <!-- 右上絵文字 -->
             <div class="shrink-0 text-[1.8rem]  drop-shadow-md js-face ml-2"></div>
         </div>
-        
         <!-- タイトル -->
-        <div class="js-title text-[0.85rem] font-black text-slate-800 truncate mb-0.5 mt-1"></div>
-        
+        <div class="js-title text-[0.9rem] font-black text-slate-800 truncate mb-0.5 mt-1"></div>
         <!-- 本文（1行のみ） -->
-        <div class="js-body text-[0.75rem] text-slate-500 truncate"></div>
+        <div class="js-body text-[0.7rem] text-slate-500 truncate"></div>
     </div>
 </template>
 <!-- 【リスト親】グループヘッダー -->
@@ -128,13 +97,13 @@
     <div class="js-item-card relative bg-white rounded-[1rem] shadow-md border border-brand-1 mb-3 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform">
         <!-- 左のアクセントボーダー -->
         <div class="js-item-border absolute left-0 top-0 bottom-0 w-1"></div>
-        <div class="p-2 pl-4 flex flex-col gap-1">
+        <div class="p-3 pl-4 flex flex-col gap-1">
             <div class="flex justify-between items-start mb-1">
-                <span class="js-update-tim text-[0.7rem] font-bold text-black-2 tracking-wider"></span>
+                <span class="js-update-tim text-[0.7rem] font-bold text-black-2 tracking-wider italic"></span>
                 <span class="js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic shadow-md tracking-wider"></span>
             </div>
-            <div class="js-title text-[0.7rem] font-black text-black-5 truncate mb-1"></div>
-            <div class="js-memo text-[0.6rem] text-black-3 line-clamp-1 whitespace-pre-wrap"></div>
+            <div class="js-title text-[0.9rem] font-black text-black-5 truncate mb-1"></div>
+            <div class="js-memo text-[0.7rem] text-black-3 line-clamp-1"></div>
             <div class="flex justify-end mt-1">
                 <div class="flex items-center gap-1 text-[0.7rem] font-bold text-black-3">
                     <span class="text-[0.7rem] opacity-70">🗂️</span>
@@ -209,7 +178,6 @@
     </div>
 </template>
 <!-- 【リスト子】タイムラインアイテム -->
-<!-- 【リスト子】タイムラインアイテム -->
 <template id="tpl-timeline-item">
     <div class="relative flex items-stretch gap-2 group cursor-pointer active:scale-[0.98] transition-transform mb-2 mt-1">
         <!-- 左側：顔文字と時刻（ドットの代わり） -->
@@ -237,33 +205,41 @@
 </template>
 <!-- 【リスト子】通知一覧用 -->
 <template id="tpl-list-child-notice">
-    <div class="js-item-card flex items-stretch p-0 rounded-[1rem] border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3 relative">
-        <div class="flex-1 min-w-0 p-3 pl-4">
-            <!-- 新着バッジ -->
-            <span class="js-badge-new hidden absolute top-3 right-3 bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md">NEW</span>
-            <div class="text-[0.6rem] font-black text-slate-400 tracking-wider mb-1 js-date"></div>
-            <div class="text-[0.8rem] font-black text-black-5 truncate pr-10 mb-1 js-title"></div>
-            <div class="text-[0.7rem] text-black-3 line-clamp-1 js-body "></div>
+    <div class="js-item-card flex p-4 rounded-[1rem] bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-sm overflow-hidden mb-3 relative min-h-[5.5rem] border-l-4 border-brand-3">
+        <!-- 右上の固定要素（NEWバッジ ＋ アイコン） -->
+        <div class="absolute top-4 right-4 flex items-start gap-2 z-10">
+            <span class="js-badge-new hidden bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm mt-1">NEW</span>
+            <span class="js-icon text-[1.8rem] leading-none drop-shadow-sm"></span>
+        </div>
+        <!-- テキストエリア（右側にアイコン用の余白 pr-16 を空ける） -->
+        <div class="flex-1 min-w-0 pr-16 flex flex-col justify-center">
+            <!-- 1行目: 日時 -->
+            <div class="text-[0.7rem] text-slate-400 tracking-wider js-date mb-2 italic"></div>
+            <!-- 2行目: タイトル -->
+            <div class="text-[0.9rem] font-black text-black-5 truncate js-title mb-2 leading-tight border-l-4 border-brand-3 pl-3"></div>
+            <!-- 3行目: 本文（2行で省略表示） -->
+            <div class="text-[0.7rem] text-black-4 line-clamp-2 js-body leading-relaxed break-all"></div>
         </div>
     </div>
 </template>
 <!-- 【リスト子】レビューアイテム -->
 <template id="tpl-list-child-review">
-    <div class="bg-white p-3 rounded-[1rem] border border-slate-100 shadow-md">
-        <div class="flex justify-between items-center mb-2">
-            <div class="js-stars text-[0.8rem] text-yellow-500 tracking-widest "></div>
-            <div class="js-date text-[0.6rem] font-bold text-slate-400"></div>
+    <!-- 下線で区切る（最後の要素は下線を消す） -->
+    <div class="p-4 border-b border-slate-100 last:border-b-0 flex flex-col">
+        <div class="flex justify-between items-center mb-1.5">
+            <div class="js-stars text-[1rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></div>
+            <div class="js-date text-[0.7rem] font-black text-slate-400 tracking-wider"></div>
         </div>
-        <div class="js-body text-[0.8rem] text-black-4  whitespace-pre-wrap break-all"></div>
+        <div class="js-body text-[0.7rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all"></div>
     </div>
 </template>
 <!-- 【リスト子】管理者通知一覧用 -->
 <template id="tpl-admin-list-child-notice">
-    <div class="js-item-card flex items-stretch p-0 rounded-[1rem] border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3 relative">
+    <div class="js-item-card flex items-stretch p-0 _rounded-[1rem] border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3 relative">
         <div class="flex-1 min-w-0 p-3 pl-4">
             <div class="flex justify-between items-start mb-1">
                 <div class="text-[0.6rem] font-black text-slate-400 tracking-wider js-date"></div>
-                <span class="js-badge-status text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md border"></span>
+                <span class="js-badge-status text-[9px] font-black px-2 py-0.5 _rounded-full uppercase tracking-wider shadow-md border"></span>
             </div>
             <div class="text-[0.8rem] font-black text-black-5 truncate pr-2 mb-1 js-title"></div>
             <div class="text-[0.7rem] text-black-3 line-clamp-1 js-body "></div>
@@ -413,11 +389,11 @@
 </template>
 <!-- 【リスト子】管理者通報集計一覧用 -->
 <template id="tpl-admin-list-child-report-summary">
-    <div class="js-item-card flex items-stretch p-0 rounded-[1rem] border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3 relative">
+    <div class="js-item-card flex items-stretch p-0 rounded-[1rem] border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-sm overflow-hidden mb-3 relative">
         <div class="flex-1 min-w-0 p-3 pl-4">
             <div class="flex justify-between items-start mb-1">
                 <div class="text-[0.6rem] font-black text-slate-500 tracking-wider js-target-user"></div>
-                <span class="js-badge-count text-[0.6rem] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md border border-red-200 bg-red-50 text-red-600"></span>
+                <span class="js-badge-count text-[0.6rem] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-red-200 bg-red-50 text-red-600"></span>
             </div>
             <div class="text-[0.8rem] font-black text-black-5 truncate pr-2 mb-1 js-archive-title"></div>
             <div class="text-[0.6rem] text-slate-400 font-bold js-archive-id"></div>
@@ -463,8 +439,7 @@
         <div>
             <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Kind</label>
             <select id="edit-notice-kind" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
-                <option value="0">0: Other 📢</option>
-                <option value="1">1: Important ⚠️</option>
+                <!-- JavaScript側で定数から動的に生成します -->
             </select>
         </div>
         <div>
@@ -473,16 +448,16 @@
         </div>
         <div>
             <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Body</label>
-            <textarea id="edit-notice-body" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-32 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+            <textarea id="edit-notice-body" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
         <div class="grid grid-cols-2 gap-3">
             <div>
                 <label class="block text-[0.6rem] font-bold mb-1 uppercase text-black-3">Disp From</label>
-                <input id="edit-notice-from" type="datetime-local" class="w-full border-2 border-brand-3 px-2 py-2 text-[0.7rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
+                <input id="edit-notice-from" type="date" class="w-full border-2 border-brand-3 px-2 py-1 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
             </div>
             <div>
                 <label class="block text-[0.6rem] font-bold mb-1 uppercase text-black-3">Disp To</label>
-                <input id="edit-notice-to" type="datetime-local" class="w-full border-2 border-brand-3 px-2 py-2 text-[0.7rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
+                <input id="edit-notice-to" type="date" class="w-full border-2 border-brand-3 px-2 py-1 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
             </div>
         </div>
     </div>
@@ -661,7 +636,7 @@
 			<h1 id="view-notice-title" class="text-[1rem] font-black text-slate-800  break-all"></h1>
 		</div>
 		<!-- 3. 本文（ で統一） -->
-		<div id="view-notice-body" class="text-[0.9rem] text-slate-600  whitespace-pre-wrap break-all pt-2 min-h-[10rem]"></div>
+		<div id="view-notice-body" class="text-[0.9rem] text-slate-600 leading-[2] whitespace-pre-wrap break-all pt-2 min-h-[10rem]"></div>
 	</div>
 </template>
 <!-- 【ダイアログ子】まとめ親編集 -->
@@ -700,9 +675,9 @@
 			<h1 id="view-profile-nickname" class="text-[1.2rem] font-black text-slate-800  break-all"></h1>
 		</div>
 		<!-- 3. 自己紹介（） -->
-		<div id="view-profile-description" class="text-[0.9rem] text-slate-600  whitespace-pre-wrap break-all pb-3 min-h-[5rem]"></div>
+		<div id="view-profile-description" class="text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-all min-h-[200px] overflow-y-auto"></div>
 		<!-- 4. リンクエリア -->
-		<div id="view-profile-links" class="gap-3 flex mt-3"></div>
+		<div id="view-profile-links" class="gap-3 flex my-3"></div>
 	</div>
 </template>
 <!-- 【ダイアログ子】ユーザープロフィール編集 -->
@@ -726,9 +701,9 @@
 		<div>
 			<div class="flex justify-between items-end mb-1">
 				<label class="block text-[0.7rem] font-bold uppercase text-slate-400">Description</label>
-				<span class="text-[0.6rem] font-bold text-slate-300"><span id="edit-profile-description-count">0</span>/200</span>
+				<span class="text-[0.6rem] font-bold text-slate-300"><span id="edit-profile-description-count">0</span>/300</span>
 			</div>
-			<textarea id="edit-profile-description" maxlength="200" class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-32 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none "></textarea>
+			<textarea id="edit-profile-description" maxlength="300" class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none "></textarea>
 		</div>
 		<!-- 3. リンク（上下の間隔を詰めて配置） -->
 		<div class="space-y-2">
@@ -741,51 +716,82 @@
 </template>
 <!-- 【ダイアログ子】アプリ情報 -->
 <template id="tpl-app-info">
-    <div class="w-full space-y-4 px-2 text-black-5">
-        <div class="flex flex-col items-center justify-center py-6">
-            <div class="w-20 h-20 bg-brand-5 rounded-[1rem] shadow-md flex items-center justify-center text-white text-[32px] font-black mb-3">LM</div>
-            <h3 class="text-[1.2rem] font-black uppercase tracking-widest text-brand-5 js-app-name"></h3>
-            <p class="text-[0.7rem] text-black-3 font-bold mt-1 js-app-version"></p>
-        </div>
-        <div class="space-y-2">
-            <div class="flex justify-between items-center p-3 bg-white rounded-[1rem] border border-brand-2 shadow-md">
-                <span class="text-[0.7rem] font-bold text-black-3 uppercase">Developer</span>
-                <span class="text-[0.8rem] font-black text-black-5 js-app-developer"></span>
+    <div class="w-full flex flex-col h-full bg-slate-50/50 pb-6">
+        <!-- 上部：ロゴ＆アプリ名エリア -->
+        <div class="flex flex-col items-center justify-center pt-10 pb-8">
+            <div class="w-24 h-24 bg-gradient-to-br from-brand-4 to-brand-5 rounded-[1.5rem] shadow-lg flex items-center justify-center text-white text-[2.5rem] font-black mb-5">
+                <span class="drop-shadow-sm leading-none mt-1">LM</span>
             </div>
-            <button id="btn-info-review" class="w-full flex justify-between items-center p-3 bg-white rounded-[1rem] border border-brand-2 shadow-md active:scale-95 transition-transform">
-                <span class="text-[0.7rem] font-bold text-black-3 uppercase">Feedback & Rating</span>
-                <div class="flex items-center gap-2">
-                    <span class="text-[1rem] font-black text-yellow-500  js-app-score">★ 0.0</span>
-                    <span class="text-[1rem] text-brand-3 ">›</span>
+            <h3 class="text-[1.1rem] font-black uppercase tracking-widest text-slate-800 js-app-name text-center leading-tight px-4"></h3>
+            <p class="text-[0.7rem] text-slate-400 font-bold tracking-widest mt-2 js-app-version"></p>
+        </div>
+
+        <!-- 下部：リストエリア (iOS風のグループリスト) -->
+        <div class="px-4 w-full">
+            <div class="bg-white rounded-[1rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                
+                <!-- Developer -->
+                <div class="flex justify-between items-center p-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1.2rem] opacity-80 leading-none">👤</span>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Developer</span>
+                    </div>
+                    <span class="text-[0.8rem] font-black text-slate-800 js-app-developer"></span>
                 </div>
-            </button>
-            <a id="link-info-official" href="" target="_blank" class="w-full flex justify-between items-center p-3 bg-white rounded-[1rem] border border-brand-2 shadow-md active:scale-95 transition-transform">
-                <span class="text-[0.7rem] font-bold text-black-3 uppercase">Official Site</span>
-                <span class="text-blue-500 text-[0.7rem] font-bold">Open 🔗</span>
-            </a>
-            <button id="btn-info-license" class="w-full flex justify-between items-center p-3 bg-white rounded-[1rem] border border-brand-2 shadow-md active:scale-95 transition-transform">
-                <span class="text-[0.7rem] font-bold text-black-3 uppercase">License</span>
-                <span class="text-[1rem] text-brand-3 ">›</span>
-            </button>
+                
+                <!-- Feedback & Rating -->
+                <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1.2rem] opacity-80 leading-none">⭐</span>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Feedback & Rating</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[0.9rem] font-black text-yellow-500 leading-none js-app-score">★ 0.0</span>
+                        <span class="text-slate-300 text-[1.2rem] font-normal leading-none -mt-0.5">›</span>
+                    </div>
+                </button>
+                <!-- Official Site -->
+                <a id="link-info-official" href="" target="_blank" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1.2rem] opacity-80 leading-none">🌍</span>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Official Site</span>
+                    </div>
+                    <div class="flex items-center gap-1 bg-blue-50 text-blue-500 px-3 py-1 rounded-full border border-blue-100">
+                        <span class="text-[0.65rem] font-black uppercase tracking-wider mt-px">Open</span>
+                        <span class="text-[0.7rem] leading-none">↗</span>
+                    </div>
+                </a>
+                <!-- License -->
+                <button id="btn-info-license" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1.2rem] opacity-80 leading-none">📜</span>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">License</span>
+                    </div>
+                    <span class="text-slate-300 text-[1.2rem] font-normal leading-none -mt-0.5">›</span>
+                </button>
+            </div>
         </div>
     </div>
 </template>
 <!-- 【ダイアログ子】レビュー一覧 -->
 <template id="tpl-review-list">
-    <div class="w-full flex flex-col h-full">
-        <div class="flex items-center justify-between bg-white p-4 rounded-[1rem] shadow-md border border-brand-2 mb-4 shrink-0">
-            <div class="flex flex-col">
-                <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Average Rating</span>
-                <div class="flex items-baseline gap-2 mt-1">
-                    <span class="text-[32px] font-black text-black-5  js-avg-score">0.0</span>
-                    <span class="text-[0.8rem] font-bold text-yellow-500 tracking-widest js-avg-stars"></span>
-                </div>
-            </div>
-            <div class="text-right">
-                <span class="text-[0.6rem] font-bold text-black-3 js-total-reviews"></span>
+    <div class="w-full flex flex-col h-full bg-slate-50 pb-2">
+        
+        <!-- 上部：総評 (固定エリア) -->
+        <div class="shrink-0 flex flex-col items-center justify-center py-6 bg-white border-b border-slate-200 shadow-sm z-10">
+            <span class="text-[0.65rem] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Average Rating</span>
+            <span class="text-[4rem] font-black text-slate-800 leading-none js-avg-score tracking-tighter">0.0</span>
+            <span class="text-[1.2rem] text-yellow-500 tracking-widest mt-2 js-avg-stars drop-shadow-sm"></span>
+        </div>
+        
+        <!-- 下部：個別レビューリスト (スクロールエリア) -->
+        <div class="flex-1 overflow-y-auto p-4">
+            <!-- 1つの白いボックスにリストをまとめる -->
+            <div class="bg-white rounded-[1rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col js-review-container">
+                <!-- ここに子要素が追加される -->
             </div>
         </div>
-        <div class="js-review-container flex-1 overflow-y-auto space-y-3 pb-4"></div>
+        
     </div>
 </template>
 <!-- 【ダイアログ子】通報投稿 -->
@@ -884,55 +890,11 @@
     </div>
 </template>
 <!-- 【ダイアログ子】まとめ親参照 -->
-<template id="tpl-view-archive_2">
-	<div class="relative min-h-full flex flex-col bg-white">
-		<!-- 1. ユーザー情報（明細の時刻/顔文字エリアのスタイルに追従） -->
-		<div class="gap-4 mb-6">
-			<button id="btn-mem-user-profile" class="flex items-baseline gap-2 active:opacity-60 transition-opacity">
-				<span id="view-mem-user-icon" class="text-[1.5rem]  drop-shadow-md"></span>
-				<span id="view-mem-user-id" class="text-[0.9rem] font-black text-slate-400 tracking-tight"></span>
-			</button>
-		</div>
-		<!-- 2. タイトル（左アクセント border-l-4） -->
-		<div class="border-l-4 border-brand-3 pl-4 py-1 mb-6">
-			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800  break-all"></h1>
-		</div>
-		<!-- 3. 本文（ で明細と統一） -->
-		<div id="view-mem-body" class="text-[0.95rem] text-slate-600  whitespace-pre-wrap break-all mb-10">
-        </div>
-        <!-- 4. ボタン群 -->
-        <div class="mt-auto py-3 grid grid-cols-3 items-end mx-3">
-			<!-- 左：金額（左揃え） -->
-			<div id="view-mem-price-box" class="flex flex-col text-left">
-				<span id="view-mem-price-label" class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-2 block ">total price</span>
-				<div id="mem-stat-price" class="text-[1.2rem] font-black italic "></div>
-			</div>
-			<!-- 中：リンク（中央揃え） -->
-			<div class="flex flex-col items-center justify-end">
-				<div id="view-mem-url-wrapper" class="hidden flex flex-col items-center justify-end rounded-full shadow-brand">
-					<span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ">Link</span>
-					<a id="view-mem-url" href="" target="_blank" class="flex items-center justify-center w-8 h-8 rounded-md active:scale-90 transition-transform shadow-md bg-white overflow-hidden">
-						<!-- ここにアイコンが挿入される -->
-					</a>
-				</div>
-			</div>
-			<!-- 右：件数（右揃え） -->
-			<div class="text-right flex flex-col items-end">
-				<span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-2 block ">Total Items</span>
-				<div class="flex items-baseline justify-end gap-1 ">
-					<span id="mem-stat-count" class="text-[1.2rem] font-black text-slate-800">0</span>
-					<span class="text-[0.7rem] font-bold text-slate-400 uppercase">memos</span>
-				</div>
-			</div>
-		</div>
-	</div>
-</template>
-<!-- 【ダイアログ子】まとめ親参照 -->
 <template id="tpl-view-archive">
 	<div class="relative min-h-full flex flex-col bg-white">
 		<!-- 1. ユーザー情報（明細の時刻/顔文字エリアのスタイルに追従） -->
 		<div class="flex gap-4 pb-6">
-			<button id="btn-mem-user-profile" class="border rounded-full p-2 pl-4 pr-6 shadow-md flex items-baseline gap-2 active:opacity-60 transition-opacity">
+			<button id="btn-mem-user-profile" class="border rounded-full pb-1 pl-4 pr-6 shadow-md flex items-baseline gap-2 active:opacity-60 transition-opacity">
 				<span id="view-mem-user-icon" class="text-[1.5rem]  drop-shadow-md"></span>
 				<span id="view-mem-user-id" class="text-[0.9rem] font-black text-slate-400 tracking-tight"></span>
 			</button>
@@ -942,10 +904,10 @@
 			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800  break-all"></h1>
 		</div>
 		<!-- 3. 本文（ で明細と統一） -->
-		<div id="view-mem-body" class="text-[1rem] text-slate-600  whitespace-pre-wrap break-all pb-6">
+		<div id="view-mem-body" class="text-[1rem] text-slate-600 min-h-[100px] whitespace-pre-wrap break-all pb-6">
         </div>
         <!-- 4. ボタン群 -->
-		<div class="mt-auto flex items-center justify-between gap-4 pb-6">
+		<div class="mt-auto flex items-center justify-between pb-6 gap-4">
 			<!-- 左：金額（枠付き） -->
 			<div class="h-14 flex-1 shadow-md rounded-[1rem] flex flex-col items-center justify-center bg-white px-2">
 				<span id="view-mem-price-unit" class="text-[0.7rem] font-black uppercase tracking-widest mb-1 block "></span>

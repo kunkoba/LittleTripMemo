@@ -103,7 +103,7 @@
                             </button>
                         </div>
                         <!-- リアクション種別 -->
-                        <div id="sort-reaction" class="hidden shadow-brand w-fit mb-2 h-8 flex text-black-0 text-[14px] rounded-full overflow-hidden pointer-events-auto">
+                        <div id="sort-reaction" class="hidden shadow-brand w-fit mb-2 h-10 flex text-black-0 text-[1.5rem] rounded-full overflow-hidden pointer-events-auto">
                             <button data-value="1" class="ui-btn h-full px-3 bg-brand-3 transition-colors">🤣</button>
                             <button data-value="2" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😍</button>
                             <button data-value="3" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😲</button>
@@ -111,7 +111,7 @@
                         </div>
                         <!-- 検索キーワード入力欄 -->
                         <div id="sort-word" class="hidden shadow-brand w-fit mb-2 h-8 flex text-black-0 rounded-full overflow-hidden bg-white pointer-events-auto">
-                            <input type="text" id="input-sort-word" class="h-full px-3 text-[0.8rem] text-black-5 outline-none bg-transparent w-40 placeholder-slate-300" placeholder="Keyword...">
+                            <input type="text" id="input-sort-word" class="h-full px-3 text-[1rem] text-black-5 outline-none bg-transparent w-40 placeholder-slate-300" placeholder="Keyword...">
                         </div>
                     </div>
                     <!-- ★スマホ用広告スペース（PCでは非表示） -->
@@ -156,18 +156,18 @@
                         <div class="relative z-10 flex flex-col items-start gap-4">
                             <!-- 1. 日付・時刻・顔文字を横並びに -->
                             <div class="gap-4 w-fit">
-                                <div class="flex items-center gap-3 text-black font-bold text-[1.2rem]">
+                                <div class="flex items-center gap-3 text-black font-bold text-[1rem] text-slate-500 italic">
                                     <div>
                                         <span id="detail-display-memo_date" ></span>
                                         <span id="detail-display-memo_time" ></span>
                                     </div>
                                     <!-- 顔文字（1rem） -->
-                                    <span id="detail-display-face_emoji" class="text-[1.5rem] _hidden"></span>
+                                    <span id="detail-display-face_emoji" class="text-[1.5rem] hidden"></span>
                                 </div>
                             </div>
                             <!-- 4. タイトル（左揃え・1rem・左アクセント） -->
                             <div class="border-l-4 border-brand-3 pl-3 py-0.5 mt-2">
-                                <h1 id="detail-display-title" class="text-[1rem] font-black text-slate-800  break-all"></h1>
+                                <h1 id="detail-display-title" class="text-[1.2rem] font-black text-slate-800  break-all"></h1>
                             </div>
                             <!-- 2. 金額（左揃え・1rem） -->
                             <div id="detail-display-price-wrapper" class="hidden pl-3 flex items-baseline italic">
@@ -175,7 +175,7 @@
                                 <span id="detail-display-price-unit" class="text-[0.7rem] font-bold text-slate-400 ml-1.5 uppercase"></span>
                             </div>
                             <!-- 5. 本文（左揃え・1rem以下） -->
-                            <div id="detail-display-body" class="text-[0.9rem] text-slate-600  whitespace-pre-wrap break-all pt-2"></div>
+                            <div id="detail-display-body" class="text-[1rem] text-slate-600 whitespace-pre-wrap break-all leading-[2]"></div>
                             <!-- 隠し項目 -->
                             <span id="detail-display-weather_code" class="hidden"></span>
                             <!-- 下部：Locationカード風のURLリンク -->
@@ -269,7 +269,7 @@
                                 <div class="text-[0.6rem] text-black-2 font-bold"><span id="detail-count-body">0</span>/500</div>
                             </div>
                             <textarea name="body" id="detail-edit-body" maxlength="500" 
-                                class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+                                class="leading-[2] w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
                         </div>
                         <!-- PRICE -->
                         <div>
@@ -359,8 +359,11 @@
             <div id="ui-bottom-bar" class="mx-2 bg-transparent flex items-center justify-between mb-3">
                 <!-- 左 -->
                 <div>
-                    <button id="btn-sys-menu" class="rounded-full shadow-brand border-2 border-brand-4 text-[1.2rem] w-10 h-10 bg-black text-white pointer-events-auto">
+                    <!-- relative を追加 -->
+                    <button id="btn-sys-menu" class="relative rounded-full shadow-brand border-2 border-brand-4 text-[1.2rem] w-10 h-10 bg-black text-white pointer-events-auto">
                         ⚙️
+                        <!-- バッジをあらかじめ仕込んでおく（初期は hidden） -->
+                        <span id="badge-sys-menu" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full pointer-events-none"></span>
                     </button>
                 </div>
                 <!-- 中央 -->
@@ -440,19 +443,19 @@
                     <span class="index  pb-1 pl-1"></span>
                 </div>
                 <!-- 日時 -->
-                <div class="text-[0.8rem] font-black text-brand-5 mb-1.5 tracking-widest">
+                <div class="text-[0.8rem] mb-1.5 tracking-widest font-black text-slate-400 italic">
                     <span class="time"></span>
                 </div>
                 <!-- タイトル -->
-                <div class="text-[0.8rem] font-black text-black-5  mb-2 line-clamp-2 pr-8 relative z-10">
+                <div class="text-[0.8rem] border-l-4 border-brand-3 pl-3 font-black text-black-5  mb-2 line-clamp-2 pr-8 relative z-10">
                     <span class="title"></span>
                 </div>
                 <!-- 本文 -->
-                <div class="text-[0.7rem] text-black-3 line-clamp-4  mb-4">
+                <div class="text-[0.7rem] text-black-3 line-clamp-3 leading-[2] overflow-y-auto">
                     <span class="body"></span>
                 </div>
                 <!-- アクションボタン -->
-                <button id="btn-popup-action" class="w-full h-10 bg-brand-2 text-brand-5 font-black text-[0.7rem] rounded-[1rem] flex items-center justify-center gap-1 uppercase shadow-md active:scale-95 transition-transform tracking-widest">
+                <button id="btn-popup-action" class="mt-3 w-full h-10 bg-brand-2 text-brand-5 font-black text-[0.7rem] rounded-[1rem] flex items-center justify-center gap-1 uppercase shadow-md active:scale-95 transition-transform tracking-widest">
                     <span class="js-action-text px-4 truncate"></span>
                     <!-- <span class="text-[0.8rem]  mb-0.5">›</span> -->
                 </button>
