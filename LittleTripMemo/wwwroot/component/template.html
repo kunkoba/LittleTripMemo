@@ -379,39 +379,42 @@
 </template>
 <!-- 【リスト子】管理者フィードバック一覧用 -->
 <template id="tpl-admin-list-child-feedback">
-    <div class="js-item-card flex flex-col p-3 rounded-[1rem] border border-brand-1 bg-white mb-3 shadow-md">
-        <div class="flex justify-between items-center mb-1">
-            <span class="text-[0.6rem] font-black text-slate-400 js-date"></span>
-            <span class="text-[0.6rem] font-bold text-white bg-brand-5 px-2 py-0.5 rounded-full js-score"></span>
+    <button class="js-item-card w-full flex flex-col p-4 rounded-[1rem] border border-brand-1 bg-white mb-3 shadow-sm">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-[0.7rem] font-black text-slate-400 tracking-wider js-date italic"></span>
+            <span class="js-score text-[0.9rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
         </div>
-        <div class="text-[0.7rem] text-black-5  whitespace-pre-wrap break-all js-body mt-1"></div>
-    </div>
+        <div class="text-left text-[0.75rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all js-body"></div>
+    </button>
 </template>
 <!-- 【リスト子】管理者通報集計一覧用 -->
+<!-- 管理画面：通報サマリーの子要素テンプレート -->
 <template id="tpl-admin-list-child-report-summary">
-    <div class="js-item-card flex items-stretch p-0 rounded-[1rem] border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-sm overflow-hidden mb-3 relative">
-        <div class="flex-1 min-w-0 p-3 pl-4">
-            <div class="flex justify-between items-start mb-1">
-                <div class="text-[0.6rem] font-black text-slate-500 tracking-wider js-target-user"></div>
-                <span class="js-badge-count text-[0.6rem] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm border border-red-200 bg-red-50 text-red-600"></span>
-            </div>
-            <div class="text-[0.8rem] font-black text-black-5 truncate pr-2 mb-1 js-archive-title"></div>
-            <div class="text-[0.6rem] text-slate-400 font-bold js-archive-id"></div>
+    <div class="relative bg-white border-b border-brand-1 p-4 flex flex-col gap-1 cursor-pointer active:bg-slate-50">
+        <!-- 右上に件数（不足していた .js-badge-count を追加） -->
+        <div class="absolute top-3 right-3 bg-red-500 text-white text-[0.7rem] font-black px-2.5 py-1 rounded-full shadow-sm">
+            <span class="js-report-count js-badge-count">0</span>
+        </div>
+        <!-- 1行目：タイトル -->
+        <div class="text-[0.9rem] font-black text-black-5 pr-16 truncate">
+            <span class="js-archive-title">タイトル</span>
+        </div>
+        <!-- 2行目：ターゲットユーザー -->
+        <div class="text-[0.7rem] font-medium text-slate-400">
+            <span class="js-target-user">0000-0000...</span>
         </div>
     </div>
 </template>
 <!-- 【ダイアログ子】管理者通報詳細（ダイアログ全体） -->
 <template id="tpl-admin-report-detail">
     <div class="w-full text-black-5 flex flex-col h-full overflow-hidden">
-        <!-- 上部：対象まとめ情報・リンク -->
+        <!-- 上部：対象情報（ボタンを削除） -->
         <div class="shrink-0 p-4 border-b border-brand-2 bg-slate-50 relative">
             <div class="text-[0.6rem] font-black text-slate-400 mb-1 uppercase tracking-widest">Target User</div>
             <div class="text-[0.8rem] font-black text-black-5 mb-3 js-target-user break-all"></div>
             <div class="text-[0.6rem] font-black text-slate-400 mb-1 uppercase tracking-widest">Target Archive</div>
             <div class="text-[0.8rem] font-black text-black-5 mb-4 js-archive-title break-all"></div>
-            <button id="btn-admin-open-archive" class="w-full bg-brand-5 text-white font-black py-3 rounded-[1rem] text-[0.7rem] shadow-md uppercase active:scale-95 transition-transform flex items-center justify-center gap-2">
-                <span class="text-[1rem]">🔗</span> OPEN PUBLIC ARCHIVE
-            </button>
+            <!-- ここにあった btn-admin-open-archive ボタンを削除 -->
         </div>
         <!-- 下部：通報詳細リスト -->
         <div class="flex-1 overflow-y-auto p-2 bg-brand-0">

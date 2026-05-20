@@ -169,7 +169,9 @@ public class TReactionPub
     {
         public Guid target_user_id { get; set; }
         public long archive_id { get; set; }
+        public string archive_title { get; set; } = string.Empty; // 追加
         public long report_count { get; set; }
+    
     }
 
 #endregion

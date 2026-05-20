@@ -1736,8 +1736,7 @@ const DialogController = {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-summary");
                 $Dom.QuerySelector(".js-target-user", child).textContent = `Target: ${item.target_user_name || item.target_user_id}`;
                 $Dom.QuerySelector(".js-archive-title", child).textContent = item.archive_title || "Unknown Title";
-                $Dom.QuerySelector(".js-archive-id", child).textContent = `Archive ID: ${item.archive_id}`;
-                $Dom.QuerySelector(".js-badge-count", child).textContent = `${item.report_count} Reports`;
+                $Dom.QuerySelector(".js-badge-count", child).textContent = `${item.report_count}`;
                 child.onclick = () => this.ShowAdminReportDetail(item);
                 root.appendChild(child);
             });
@@ -1751,39 +1750,25 @@ const DialogController = {
     },
     // 管理者：通報詳細
     async ShowAdminReportDetail(summaryItem) {
-        // ★ リストから指定されたターゲットユーザとアーカイブIDで詳細をAPI取得
+        // 詳細データをAPI取得
         const isSuccess = await $Data.Access.GetReportDetails({
             target_user_id: summaryItem.target_user_id,
             archive_id: summaryItem.archive_id
         });
         if (!isSuccess) return;
-        // 取得した詳細データ
-        const reports = $App.AppData.Admin.reports ||[];
+        const reports = $App.AppData.Admin.reports || [];
         const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
-        // 上部：対象情報（集計データから表示）
+        // データの反映
         $Dom.QuerySelector(".js-target-user", el).textContent = summaryItem.target_user_id;
-        $Dom.QuerySelector(".js-archive-title", el).textContent = `Archive ID: ${summaryItem.archive_id}`;
-        // 上部：まとめ親（Public）を開くボタン
-        $Dom.QuerySelector("#btn-admin-open-archive", el).onclick = async () => {
-            const isOk = await this.ShowConfirm({ title: "OPEN ARCHIVE", message: "この Public まとめデータを開きますか？" });
-            if (!isOk) return;
-            _DialogCore.closeAll();
-            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
-            $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
-            await $App.RefreshScreen();
-        };
+        $Dom.QuerySelector(".js-archive-title", el).textContent = summaryItem.archive_title || "Unknown Title";
         const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
         if (reports.length === 0) {
             listContainer.innerHTML = `<div class="text-[0.7rem] text-slate-400 p-2">詳細データがありません</div>`;
         } else {
-            // 通報日時（report_tim）の新しい順（降順）にソートして描画
             reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
-                // 通報者
                 $Dom.QuerySelector(".js-reporter-user", child).textContent = `From: ${rep.reporter_user_id}`;
-                // 通報日時
                 $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim, "YYYY.MM.DD HH:mm");
-                // 通報内容
                 $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
                 listContainer.appendChild(child);
             });
@@ -1792,7 +1777,22 @@ const DialogController = {
             title: "REPORT DETAILS",
             content: el,
             help: "",
-            buttons:[ { label: "BACK", className: "bg-slate-200 text-slate-500 shadow-md", closesDialog: true } ]
+            // ボタン設定を修正：BACKを消し、OPENボタンを下段に配置
+            buttons: [
+                {
+                    label: "🔗 OPEN PUBLIC ARCHIVE",
+                    className: "bg-red-500 text-white shadow-md",
+                    closesDialog: false,
+                    handler: async () => {
+                        const isOk = await this.ShowConfirm({ title: "OPEN ARCHIVE", message: "この Public まとめデータを開きますか？" });
+                        if (!isOk) return;
+                        _DialogCore.closeAll();
+                        $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+                        $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
+                        await $App.RefreshScreen();
+                    }
+                }
+            ]
         });
     },
     // 管理者：フィードバックリスト（無限スクロール）
@@ -1810,7 +1810,9 @@ const DialogController = {
             items.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");
                 $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim || new Date(), "YYYY.MM.DD HH:mm");
-                $Dom.QuerySelector(".js-score", child).textContent = `Score: ${item.score || 0}`;
+                // $Dom.QuerySelector(".js-score", child).textContent = `Score: ${item.score || 0}`;
+                const score = item.score || 0;
+                $Dom.QuerySelector(".js-score", child).textContent = "★".repeat(score) + "☆".repeat(5 - score);
                 $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
                 root.appendChild(child);
             });

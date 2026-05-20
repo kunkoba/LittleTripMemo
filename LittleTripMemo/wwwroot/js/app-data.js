@@ -179,14 +179,23 @@ window.$Data = {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertNotification', params))();
         },
         async GetReportSummary(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportSummary', params))();
+            // return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportSummary', params))();
+            console.warn("TEST: GetMockData(REPORT_SUMMARY) を使用します");
+            $App.AppData.Admin.reportSummary = $Const.GetMockData('REPORT_SUMMARY', 50);
+            return true;
         },
         // public record GetReportDetailsReq(Guid target_user_id, long archive_id);
         async GetReportDetails(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportDetails', params))();
+            // return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportDetails', params))();
+            console.warn("TEST: GetMockData(REPORT_DETAIL) を使用します");
+            $App.AppData.Admin.reports = $Const.GetMockData('REPORT_DETAIL', 50);
+            return true;
         },
         async GetAllFeedback(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllFeedback', params))();
+            // return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllFeedback', params))();
+            console.warn("TEST: GetMockData(FEEDBACK) を使用します");
+            $App.AppData.Admin.feedbackList = $Const.GetMockData('FEEDBACK', 50);
+            return true;
         },
         async GetAllNotifications(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllNotifications', params))();
