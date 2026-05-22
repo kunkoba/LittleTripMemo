@@ -61,8 +61,7 @@ public class SysController : _BaseController
         _adminUnpublishArchiveService = adminUnpublishArchiveService;
     }
 
-    #region "System"
-
+#region "System"
 
     /// <summary>
     /// フィードバック登録更新（ユーザ）
@@ -209,21 +208,23 @@ public class SysController : _BaseController
         return OkWithBase(result);
     }
 
-    #endregion
+#endregion
 
-    #region "Admin"
-        [HttpPost("api/Sys/AdminCloseArchive")]
-        public async Task<IActionResult> AdminCloseArchive([FromBody] AdminCloseArchivePubService.Request req)
-        {
-            var result = await _adminCloseArchivePubService.ExecuteAsync(req);
-            return OkWithBase(result);
-        }
+#region "Admin"
 
-        [HttpPost("api/Sys/AdminUnpublishArchive")]
-        public async Task<IActionResult> AdminUnpublishArchive([FromBody] AdminUnpublishArchiveService.Request req)
-        {
-            var result = await _adminUnpublishArchiveService.ExecuteAsync(req);
-            return OkWithBase(result);
-        }
-    #endregion
+    [HttpPost("api/Sys/AdminCloseArchive")]
+    public async Task<IActionResult> AdminCloseArchive([FromBody] AdminCloseArchivePubService.Request req)
+    {
+        var result = await _adminCloseArchivePubService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    [HttpPost("api/Sys/AdminUnpublishArchive")]
+    public async Task<IActionResult> AdminUnpublishArchive([FromBody] AdminUnpublishArchiveService.Request req)
+    {
+        var result = await _adminUnpublishArchiveService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+#endregion
 }

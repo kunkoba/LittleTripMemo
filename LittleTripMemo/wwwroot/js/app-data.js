@@ -211,6 +211,14 @@ window.$Data = {
         async GetSystemInfo(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetSystemInfo', params))();
         },
+        // public record Request(int archive_id, Guid target_user_id);
+        async AdminCloseArchive(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/AdminCloseArchive', params))();
+        },
+        // public record Request(int archive_id, Guid target_user_id);
+        async AdminUnpublishArchive(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/AdminUnpublishArchive', params))();
+        },
     },
     // データ操作・取得のメソッド群
     Store: {

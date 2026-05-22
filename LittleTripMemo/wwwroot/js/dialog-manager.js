@@ -1240,6 +1240,9 @@ const DialogController = {
     ShowArchiveInfo() {
         const archive = $Data.Store.GetArchive();
         if (!archive) return $Notice.Warn("Not found.");
+        // 管理者かどうかの判定
+        const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.plan === "Admin";
+        //
         const el = $Dom.GenerateTemplate('tpl-view-archive');
         const renderView = () => {
             // ① 常に最新のデータを取得
@@ -1295,6 +1298,37 @@ const DialogController = {
         }
         // --- ヘッダーボタンの定義 ---
         const headerButtons = [];
+        // ① 管理者専用の強制アクションボタン（Publicの場合のみ表示）
+        if (isAdmin && archive.is_public) {
+            // 【注意】強制Close
+            if (!archive.closed_flg) {
+                headerButtons.push({
+                    label: "⛔",
+                    handler: async () => {
+                        const isOk = await this.ShowConfirm({ title: "ADMIN: CLOSE", message: "【注意】\n強制的にClose状態にしますか？" });
+                        if (!isOk) return;
+                        const isSuccess = await $Data.Access.AdminCloseArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
+                        if (!isSuccess) return;
+                        $Notice.Info("強制的にCloseしました");
+                        _DialogCore.closeAll();
+                        await $App.RefreshScreen(); // 画面を更新して反映
+                    }
+                });
+            }
+            // 【警告】強制Private戻し
+            headerButtons.push({
+                label: "🚫",
+                handler: async () => {
+                    const isOk = await this.ShowConfirm({ title: "ADMIN: UNPUBLISH", message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？" });
+                    if (!isOk) return;
+                    const isSuccess = await $Data.Access.AdminUnpublishArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
+                    if (!isSuccess) return;
+                    $Notice.Info("強制的にPrivateに戻しました");
+                    _DialogCore.closeAll();
+                    await $App.RefreshScreen(); // 画面を更新して反映
+                }
+            });
+        }
         if (archive.is_public) {
             headerButtons.push({
                 label: "🔗",
