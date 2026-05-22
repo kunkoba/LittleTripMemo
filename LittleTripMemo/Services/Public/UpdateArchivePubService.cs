@@ -13,7 +13,7 @@ public class UpdateArchivePubService : _BaseService
         int archive_id,
         string title,
         string memo,
-        string link_url
+        string? link_url
     );
     public record Response(int archiveId);
 

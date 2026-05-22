@@ -11,7 +11,7 @@ public class UpsertNotificationService : _BaseService
         long seq,
         string title,
         string body,
-        string link_url,
+        string? link_url,
         short kind,
         DateTime disp_from,
         DateTime disp_to

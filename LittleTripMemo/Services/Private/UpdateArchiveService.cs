@@ -13,7 +13,7 @@ public class UpdateArchiveService : _BaseService
         int archive_id,
         string title,
         string memo,
-        string link_url,
+        string? link_url,
         string currency_unit
     );
     public record Response(int archiveId);

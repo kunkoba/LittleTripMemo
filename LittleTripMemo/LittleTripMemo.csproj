@@ -19,6 +19,8 @@
     <Compile Remove="wwwroot - コピー %285%29\**" />
     <Compile Remove="wwwroot - コピー %286%29\**" />
     <Compile Remove="wwwroot - コピー\**" />
+    <Compile Remove="wwwroot copy2\**" />
+    <Compile Remove="wwwroot copy3\**" />
     <Compile Remove="wwwroot copy\**" />
     <Compile Remove="wwwroot\**" />
     <Compile Remove="_DEL\**" />
@@ -34,6 +36,8 @@
     <Content Remove="wwwroot - コピー %285%29\**" />
     <Content Remove="wwwroot - コピー %286%29\**" />
     <Content Remove="wwwroot - コピー\**" />
+    <Content Remove="wwwroot copy2\**" />
+    <Content Remove="wwwroot copy3\**" />
     <Content Remove="wwwroot copy\**" />
     <Content Remove="wwwroot\**" />
     <Content Remove="_DEL\**" />
@@ -49,6 +53,8 @@
     <EmbeddedResource Remove="wwwroot - コピー %285%29\**" />
     <EmbeddedResource Remove="wwwroot - コピー %286%29\**" />
     <EmbeddedResource Remove="wwwroot - コピー\**" />
+    <EmbeddedResource Remove="wwwroot copy2\**" />
+    <EmbeddedResource Remove="wwwroot copy3\**" />
     <EmbeddedResource Remove="wwwroot copy\**" />
     <EmbeddedResource Remove="wwwroot\**" />
     <EmbeddedResource Remove="_DEL\**" />
@@ -64,6 +70,8 @@
     <None Remove="wwwroot - コピー %285%29\**" />
     <None Remove="wwwroot - コピー %286%29\**" />
     <None Remove="wwwroot - コピー\**" />
+    <None Remove="wwwroot copy2\**" />
+    <None Remove="wwwroot copy3\**" />
     <None Remove="wwwroot copy\**" />
     <None Remove="wwwroot\**" />
     <None Remove="_DEL\**" />

@@ -207,7 +207,6 @@ const DialogController = {
         // 3. ログイン/ログアウトボタンのラベル反映
         const authLabel = $Dom.QuerySelector('span:last-child', b.auth);
         authLabel.textContent = isLoggedIn ? "LOGOUT" : "LOGIN";
-
         const unreadCount = $App.AppData.Context.UnreadNoticeCount || 0;
         if (unreadCount > 0) {
             const labelSpan = $Dom.QuerySelector('span:last-child', b.notice);
@@ -216,16 +215,15 @@ const DialogController = {
                 labelSpan.insertAdjacentHTML('beforeend', `<span class="badge-new ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full tracking-wider mt-0.5">NEW</span>`);
             }
         }
-
         // 4. 各ボタンのイベント登録
         b.profile.onclick = async () => {
             const isSuccess = await $Data.Access.GetProfile();
-            if (isSuccess && $App.AppData.Owner.Profile) this.ShowUserProfile($App.AppData.Owner.Profile, true);
+            if (isSuccess && $App.AppData.Owner.Profile) {_DialogCore.close(); this.ShowUserProfile($App.AppData.Owner.Profile, true)};
         };
-        b.config.onclick = () => this.ShowUserSettingsMenu();
-        b.notice.onclick = () => this.ShowNoticeList();
-        b.version.onclick = () => this.ShowAppInfo();
-        b.admin.onclick = () => this.ShowAdminMenu();
+        b.config.onclick = () => {_DialogCore.close(); this.ShowUserSettingsMenu()};
+        b.notice.onclick = () => {_DialogCore.close(); this.ShowNoticeList()};
+        b.version.onclick = () => {_DialogCore.close(); this.ShowAppInfo()};
+        b.admin.onclick = () => {_DialogCore.close(); this.ShowAdminMenu()};
         b.auth.onclick = async () => {
             if (isLoggedIn) {
                 if (await this.ShowConfirm({ title: "LOGOUT", message: "ログアウトしますか？" })) {
@@ -556,69 +554,6 @@ const DialogController = {
         });
     },
     // 絵文字選択（定数リスト＋履歴保存、入力欄反映・OK確定）
-    ShowEmojiPicker_2(onSelect, emojiList = $Const.FACE_EMOJIS) {
-        const storageKey = 'ritomemo_emoji_history';
-        let history = JSON.parse(localStorage.getItem(storageKey) || "[]");
-        const el = $Dom.GenerateTemplate("tpl-emoji-picker");
-        const inputCustom = $Dom.QuerySelector('#input-custom-emoji', el);
-        const combinedGrid = $Dom.QuerySelector('#emoji-combined-grid', el);
-        // グリッド描画処理
-        const renderGrid = () => {
-            const combinedList = [...new Set([...emojiList, ...history])].slice(0, 50);
-            combinedGrid.innerHTML = combinedList.map(e =>
-                `<button class="w-10 h-10 rounded-[1rem] hover:bg-slate-50 active:bg-slate-100 active:scale-90 flex items-center justify-center text-[28px]  transition-all">
-                    ${e}
-                </button>`
-            ).join('');
-            $Dom.QuerySelectorAll('button', combinedGrid).forEach(btn => {
-                btn.onclick = () => {
-                    // クリック時は入力欄に反映するだけ
-                    inputCustom.value = btn.textContent.trim();
-                };
-            });
-        };
-        // 初期描画
-        renderGrid();
-        // 履歴クリア
-        $Dom.QuerySelector('#btn-clear-emoji', el).onclick = async () => {
-            const isOk = await this.ShowConfirm({ title: "CLEAR HISTORY", message: "履歴を削除しますか？" });
-            if (!isOk) return;
-            localStorage.removeItem(storageKey);
-            history =[];
-            renderGrid();
-        };
-        // ダイアログを表示
-        _DialogCore.open({
-            title: "SELECT ICON",
-            content: el,
-            help: "",
-            buttons: [
-                [
-                    {
-                        label: "CANCEL",
-                        className: "bg-slate-100 text-slate-400 shadow-md",
-                        closesDialog: true
-                    },
-                    {
-                        label: "OK",
-                        className: "bg-brand-5 text-white shadow-md",
-                        closesDialog: false,
-                        handler: () => {
-                            const val = inputCustom.value.trim();
-                            if (val) {
-                                // 履歴を更新して確定
-                                history = [val, ...history.filter(e => e !== val)].slice(0, 50);
-                                localStorage.setItem(storageKey, JSON.stringify(history));
-                                onSelect(val);
-                            }
-                            _DialogCore.close();
-                        }
-                    }
-                ]
-            ]
-        });
-    },
-    // 絵文字選択（定数リスト＋履歴保存、入力欄反映・OK確定）
     ShowEmojiPicker(onSelect) {
         const el = $Dom.GenerateTemplate("tpl-emoji-picker");
         const container = $Dom.QuerySelector('#emoji-combined-grid', el);
@@ -785,18 +720,6 @@ const DialogController = {
         }
         const el = $Dom.GenerateTemplate("tpl-list-parent");
         el.className = "w-full text-black-3 mb-2 px-1 space-y-4";
-        // const headerHtml = `
-        //     <div class="flex justify-between items-center mb-6 mt-2 px-1">
-        //         <div class="flex items-center gap-2">
-        //             <div class="w-2 h-2 rounded-full bg-red-500 shadow-md shadow-red-500/30"></div>
-        //             <span class="text-[0.6rem] font-black uppercase tracking-[0.2em] text-slate-500">HIT MEMOS</span>
-        //         </div>
-        //         <div class="bg-white border border-slate-100 rounded-full px-3 py-1 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
-        //             <span class="text-[0.6rem] font-black text-slate-600 tracking-wider">${details.length} FOUND</span>
-        //         </div>
-        //     </div>
-        // `;
-        // el.insertAdjacentHTML('beforeend', headerHtml);
         details.forEach((item, index) => {
             const child = $Dom.GenerateTemplate("tpl-list-child-simple");
             const dateStr = (item.memo_date || "").replace(/-/g, '.');
@@ -1298,37 +1221,6 @@ const DialogController = {
         }
         // --- ヘッダーボタンの定義 ---
         const headerButtons = [];
-        // ① 管理者専用の強制アクションボタン（Publicの場合のみ表示）
-        if (isAdmin && archive.is_public) {
-            // 【注意】強制Close
-            if (!archive.closed_flg) {
-                headerButtons.push({
-                    label: "⛔",
-                    handler: async () => {
-                        const isOk = await this.ShowConfirm({ title: "ADMIN: CLOSE", message: "【注意】\n強制的にClose状態にしますか？" });
-                        if (!isOk) return;
-                        const isSuccess = await $Data.Access.AdminCloseArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
-                        if (!isSuccess) return;
-                        $Notice.Info("強制的にCloseしました");
-                        _DialogCore.closeAll();
-                        await $App.RefreshScreen(); // 画面を更新して反映
-                    }
-                });
-            }
-            // 【警告】強制Private戻し
-            headerButtons.push({
-                label: "🚫",
-                handler: async () => {
-                    const isOk = await this.ShowConfirm({ title: "ADMIN: UNPUBLISH", message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？" });
-                    if (!isOk) return;
-                    const isSuccess = await $Data.Access.AdminUnpublishArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
-                    if (!isSuccess) return;
-                    $Notice.Info("強制的にPrivateに戻しました");
-                    _DialogCore.closeAll();
-                    await $App.RefreshScreen(); // 画面を更新して反映
-                }
-            });
-        }
         if (archive.is_public) {
             headerButtons.push({
                 label: "🔗",
@@ -1339,6 +1231,11 @@ const DialogController = {
             headerButtons.push({
                 label: "✏️",
                 handler: () => this.ShowEditArchive(archive, renderView)
+            });
+        } else {
+            headerButtons.push({
+                label: "🚫",
+                handler: () => this.ShowReportPost(archive)
             });
         }
         // --- ボタンの定義 ---
@@ -1383,11 +1280,46 @@ const DialogController = {
                 }]);
             }
         } else {
+            // dialogButtons.push([{
+            //     label: "REPORT THIS ARCHIVE",
+            //     className: "w-full bg-white text-red-500 border border-red-500 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform",
+            //     closesDialog: false,
+            //     handler: () => this.ShowReportPost(archive)
+            // }]);
+        }
+        // --- 管理者専用ボタン ---
+        if (isAdmin && archive.is_public) {
+            // 【注意】強制Close
+            if (!archive.closed_flg) {
+                dialogButtons.push([{
+                    label: "【ADMIN】強制 Close",
+                    className: "w-full bg-red-500 text-white font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform",
+                    closesDialog: false,
+                    handler: async () => {
+                        const isOk = await this.ShowConfirm({ title: "ADMIN: CLOSE", message: "【注意】\n強制的にClose状態にしますか？" });
+                        if (!isOk) return;
+                        const isSuccess = await $Data.Access.AdminCloseArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
+                        if (!isSuccess) return;
+                        $Notice.Info("強制的にCloseしました");
+                        _DialogCore.closeAll();
+                        await $App.RefreshScreen(); // 画面を更新して反映
+                    }
+                }]);
+            }
+            // 【警告】強制Private戻し
             dialogButtons.push([{
-                label: "REPORT THIS ARCHIVE",
-                className: "w-full bg-white text-red-500 border border-red-500 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform",
+                label: "【ADMIN】強制 Privateに戻す",
+                className: "w-full bg-white text-red-600 border-2 border-red-500 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-sm active:scale-95 transition-transform",
                 closesDialog: false,
-                handler: () => this.ShowReportPost(archive)
+                handler: async () => {
+                    const isOk = await this.ShowConfirm({ title: "ADMIN: UNPUBLISH", message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？" });
+                    if (!isOk) return;
+                    const isSuccess = await $Data.Access.AdminUnpublishArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
+                    if (!isSuccess) return;
+                    $Notice.Info("強制的にPrivateに戻しました");
+                    _DialogCore.closeAll();
+                    await $App.RefreshScreen(); // 画面を更新して反映
+                }
             }]);
         }
         const frame = _DialogCore.open({
@@ -1564,6 +1496,17 @@ const DialogController = {
 		$Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, "YYYY.MM.DD HH:mm");
 		$Dom.QuerySelector('#view-notice-title', el).textContent = notice.title;
 		$Dom.QuerySelector('#view-notice-body', el).textContent = notice.body;
+        // リンクURLの表示制御
+        const urlWrapper = $Dom.QuerySelector('#view-notice-url-wrapper', el);
+        if (notice.link_url && notice.link_url.trim() !== "") {
+            $Dom.ToggleShow(urlWrapper, true);
+            const urlLink = $Dom.QuerySelector('#view-notice-url', el);
+            const urlText = $Dom.QuerySelector('#view-notice-url span:last-child', el);
+            urlLink.href = notice.link_url;
+            urlText.textContent = notice.link_url; // リンクの文字列を表示
+        } else {
+            $Dom.ToggleShow(urlWrapper, false);
+        }
 		_DialogCore.open({
 			title: "NOTICE DETAILS",
 			content: el
@@ -1698,6 +1641,7 @@ const DialogController = {
         const isNew = !noticeItem;
         const target = isNew ? {
             seq: 0, title: "", body: "", kind: 0,
+            link_url: "",
             disp_from: $Util.FormatDate(new Date(), "YYYY-MM-DD"), // 時間を消す
             disp_to: "2099-12-31", // 時間を消す
         } : { ...noticeItem };
@@ -1705,6 +1649,7 @@ const DialogController = {
         const selKind = $Dom.QuerySelector('#edit-notice-kind', el);
         const inptTitle = $Dom.QuerySelector('#edit-notice-title', el);
         const inptBody = $Dom.QuerySelector('#edit-notice-body', el);
+        const inptUrl = $Dom.QuerySelector('#edit-notice-url', el);
         const inptFrom = $Dom.QuerySelector('#edit-notice-from', el);
         const inptTo = $Dom.QuerySelector('#edit-notice-to', el);
         // 定数からセレクトボックスの選択肢を動的生成
@@ -1719,6 +1664,7 @@ const DialogController = {
         selKind.value = target.kind;
         inptTitle.value = target.title;
         inptBody.value = target.body;
+        inptUrl.value = target.link_url || "";
         inptFrom.value = $Util.FormatDate(target.disp_from, "YYYY-MM-DD");
         inptTo.value = $Util.FormatDate(target.disp_to, "YYYY-MM-DD");
         _DialogCore.open({
@@ -1740,9 +1686,10 @@ const DialogController = {
                             seq: target.seq,
                             title: inptTitle.value.trim() || "No Title",
                             body: inptBody.value.trim(),
+                            link_url: inptUrl.value.trim(),
                             kind: Number(selKind.value),
-                            disp_from: inptFrom.value,
-                            disp_to: inptTo.value
+                            disp_from: inptFrom.value + "T00:00:00",
+                            disp_to: inptTo.value + "T23:59:59"
                         };
                         const isSuccess = await $Data.Access.UpsertNotification(req);
                         if (!isSuccess) return;

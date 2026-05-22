@@ -10,7 +10,7 @@ const _DetailFrameCore = {
                 this.btnEarth = $Dom.GetElementById("detail-btn-earth");
                 this.btnMap  = $Dom.GetElementById("detail-btn-map");
                 this.btnEdit = $Dom.GetElementById("detail-btn-edit");
-                // this.root = $Dom.GetElementById("ui-detail-id");
+                this.btnReport = $Dom.GetElementById("detail-btn-report");
                 this.btnClose = $Dom.GetElementById("detail-btn-close");
                 this.btnCancel = $Dom.GetElementById("detail-btn-cancel");
                 this.btnSave = $Dom.GetElementById("detail-btn-save");
@@ -50,6 +50,26 @@ const _DetailFrameCore = {
                     } else {
                         $Notice.Warn("No location data.");
                     }
+                });
+                // 通報ボタンクリック時の処理
+                this.btnReport.addEventListener("click", () => {
+                    const data = $DetailContent.GetFormEditData();
+                    if (!data || !data.archive_id) return;
+                    let targetUserId = data.user_id; // 明細に直接IDがあればそれを使う
+                    const archive = $Data.Store.GetArchive();
+                    // 現在開いているアーカイブが一致すれば、そこからオーナーIDを取得
+                    if (archive && archive.archive_id === data.archive_id) {
+                        targetUserId = archive.user_id;
+                    }
+                    if (!targetUserId) {
+                        $Notice.Warn("ユーザー情報が取得できないため通報できません。");
+                        return;
+                    }
+                    // 擬似的なarchiveオブジェクトを作ってダイアログへ渡す
+                    $Dialog.ShowReportPost({
+                        archive_id: data.archive_id,
+                        user_id: targetUserId
+                    });
                 });
                 // 編集切替ボタン
                 this.btnEdit.addEventListener("click", () => {
@@ -295,16 +315,17 @@ const DetailFrameController = {
             // 1. 新規入力時
             $DetailContent.RenderDetail(null, true); // 編集モードで描画
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, false);
+            $Dom.ToggleShow(_DetailFrameCore.btnReport, false);
             $Dom.ToggleShow(_DetailFrameCore.btnSave, true);
             $Dom.ToggleShow(_DetailFrameCore.btnCancel, true);
             $Dom.ToggleShow(_DetailFrameCore.groupMove, false);
             $Dom.ToggleShow(_DetailFrameCore.groupReaction, false);
         } else {
             // 2. 既存データ参照時
-            $DetailContent.RenderDetail(detail, false); // 参照モードで描画
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, isOwner);
+            $Dom.ToggleShow(_DetailFrameCore.btnReport, !isOwner && isPublic);
+            $DetailContent.RenderDetail(detail, false);
             $Dom.ToggleShow(_DetailFrameCore.btnSave, false);
-            // $Dom.ToggleShow(_DetailFrameCore.btnCancel, false);
             $Dom.ToggleShow(_DetailFrameCore.groupMove, true);
             // リアクションボタンの制御
             if (isPublic) {

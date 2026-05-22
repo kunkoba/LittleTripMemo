@@ -155,29 +155,6 @@
     </div>
 </template>
 <!-- 【リスト子】タイムラインアイテム -->
-<template id="tpl-timeline-item_2">
-    <div class="relative flex items-stretch gap-2 group cursor-pointer active:scale-[0.98] transition-transform mb-2 mt-1">
-        <!-- 左側：顔文字と時刻（ドットの代わり） -->
-        <div class="shrink-0 w-10 flex flex-col items-center pt-2 z-10">
-            <!-- 🌟 ドットを顔文字に変更 -->
-            <div class="js-face text-[24px]  bg-brand-0 pb-1"></div>
-            <!-- 時刻 -->
-            <div class="text-[0.6rem] font-black text-black-5 js-time tracking-wider bg-brand-0 px-1"></div>
-        </div>
-        <!-- 右側：カード -->
-        <div class="flex-1 bg-white rounded-[1rem] p-3 border border-slate-200 shadow-md relative overflow-hidden mr-2">
-            <!-- 🌟 タイトルと金額 -->
-            <div class="flex justify-between items-start mb-1.5 gap-2">
-                <div class="js-title text-[0.7rem] font-black text-black-5 break-all flex-1 "></div>
-                <!-- 追加：金額 -->
-                <div class="js-price text-[0.7rem] font-black shrink-0 whitespace-nowrap"></div>
-            </div>
-            <!-- 🌟 本文：省略クラス（line-clamp-4）を外し、改行（whitespace-pre-wrap）を維持 -->
-            <div class="js-body text-[0.8rem] text-black-4  whitespace-pre-wrap break-all"></div>
-        </div>
-    </div>
-</template>
-<!-- 【リスト子】タイムラインアイテム -->
 <template id="tpl-timeline-item">
     <div class="relative flex items-stretch gap-2 group cursor-pointer active:scale-[0.98] transition-transform mb-2 mt-1">
         <!-- 左側：顔文字と時刻（ドットの代わり） -->
@@ -455,20 +432,29 @@
 <!-- 【ダイアログ子】管理者通知編集 -->
 <template id="tpl-admin-notice-edit">
     <div class="w-full text-black-5 space-y-4 pt-2 px-2">
+        <!-- 種別 -->
         <div>
             <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Kind</label>
             <select id="edit-notice-kind" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
                 <!-- JavaScript側で定数から動的に生成します -->
             </select>
         </div>
+        <!-- タイトル -->
         <div>
             <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Title</label>
             <input id="edit-notice-title" type="text" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
         </div>
+        <!-- 本文 -->
         <div>
             <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Body</label>
             <textarea id="edit-notice-body" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
+        <!-- リンクURL -->
+        <div>
+            <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Link URL</label>
+            <input id="edit-notice-url" type="url" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-500" placeholder="https://...">
+        </div>
+        <!-- 表示期間 -->
         <div class="grid grid-cols-2 gap-3">
             <div>
                 <label class="block text-[0.6rem] font-bold mb-1 uppercase text-black-3">Disp From</label>
@@ -656,6 +642,13 @@
 		</div>
 		<!-- 3. 本文（ で統一） -->
 		<div id="view-notice-body" class="text-[0.9rem] text-slate-600 leading-[2] whitespace-pre-wrap break-all pt-2 min-h-[10rem]"></div>
+        <!-- 4. リンク表示エリア -->
+		<div id="view-notice-url-wrapper" class="hidden w-full pt-6 pb-2 mt-auto">
+            <a id="view-notice-url" href="" target="_blank" class="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-[1rem] p-3 shadow-sm active:scale-95 transition-transform text-blue-600">
+                <span class="text-[1.2rem] leading-none">🔗</span>
+                <span class="text-[0.75rem] font-bold truncate flex-1"></span>
+            </a>
+        </div>
 	</div>
 </template>
 <!-- 【ダイアログ子】まとめ親編集 -->
@@ -795,7 +788,6 @@
 <!-- 【ダイアログ子】レビュー一覧 -->
 <template id="tpl-review-list">
     <div class="w-full flex flex-col h-full bg-slate-50 pb-2">
-        
         <!-- 上部：総評 (固定エリア) -->
         <div class="shrink-0 flex flex-col items-center justify-center py-6 bg-white border-b border-slate-200 shadow-sm z-10">
             <span class="text-[0.65rem] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Average Rating</span>
@@ -810,7 +802,6 @@
                 <!-- ここに子要素が追加される -->
             </div>
         </div>
-        
     </div>
 </template>
 <!-- 【ダイアログ子】通報投稿 -->
@@ -825,31 +816,6 @@
                 <span class="text-[0.6rem] font-bold text-black-2"><span id="report-text-count">0</span>/300</span>
             </div>
             <textarea id="input-report-body" maxlength="300" placeholder="問題のある箇所や理由を具体的に記入してください" class="w-full border-2 border-brand-3 p-3 text-[0.8rem] h-32 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
-        </div>
-    </div>
-</template>
-<!-- 【ダイアログ子】まとめ共有用 -->
-<template id="tpl-share-archive_2">
-    <div class="w-full text-black-5 flex flex-col items-center py-4 space-y-6">
-        <!-- プレビューエリア -->
-        <div class="w-full bg-brand-1 rounded-[1rem] p-4 flex flex-col items-center border border-brand-2 shadow-md">
-            <div id="share-user-icon" class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[1.5rem] shadow-md mb-2"></div>
-            <div id="share-archive-title" class="text-[1rem] font-black text-black-5 text-center break-all px-2"></div>
-        </div>
-        <!-- QRコード -->
-        <div class="bg-white p-4 rounded-[1rem] shadow-md border border-brand-1">
-            <img id="share-qr-image" src="" alt="QR Code" class="w-40 h-40 object-contain">
-        </div>
-        <!-- URLコピーエリア -->
-        <div class="w-full space-y-2">
-            <label class="block text-[0.6rem] font-black text-slate-400 uppercase tracking-widest px-1">Share URL</label>
-            <div class="flex gap-2">
-                <input id="share-url-input" type="text" readonly 
-                    class="flex-1 bg-slate-50 border-2 border-brand-2 rounded-[1rem] px-4 py-3 text-[0.7rem] font-bold text-blue-500 outline-none">
-                <button id="btn-share-copy" class="shrink-0 w-12 h-12 bg-brand-5 text-white rounded-[1rem] shadow-md active:scale-95 transition-transform flex items-center justify-center text-[1.2rem]">
-                    📋
-                </button>
-            </div>
         </div>
     </div>
 </template>
@@ -870,13 +836,6 @@
                 <span class="text-[1.2rem] ">📋</span> COPY SHARE URL
             </button>
         </div>
-    </div>
-</template>
-<!-- 【ダイアログ子】絵文字選択（固定・履歴・入力） -->
-<template id="tpl-emoji-picker_2">
-    <div class="w-full bg-white p-2">
-        <!-- ここにピッカーが注入される -->
-        <div id="emoji-combined-grid" class="w-full flex justify-center"></div>
     </div>
 </template>
 <!-- 【ダイアログ子】絵文字ピッカー -->
