@@ -387,8 +387,24 @@
         <div class="text-left text-[0.75rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all js-body"></div>
     </button>
 </template>
+<!-- 【ダイアログ子】管理者フィードバック詳細（新しく追加） -->
+<template id="tpl-admin-feedback-detail">
+    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden p-2 bg-white">
+        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+            <span class="text-[0.8rem] font-black text-slate-400 tracking-wider js-date italic"></span>
+            <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
+        </div>
+        <div class="mb-4 px-2">
+            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">User ID</span>
+            <div class="text-[0.75rem] font-bold text-slate-600 js-user-id break-all mt-1"></div>
+        </div>
+        <div class="flex-1 overflow-y-auto px-2 pb-4">
+            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Feedback Detail</span>
+            <div class="text-[0.85rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all js-body mt-2 h-48 overflow-y-auto"></div>
+        </div>
+    </div>
+</template>
 <!-- 【リスト子】管理者通報集計一覧用 -->
-<!-- 管理画面：通報サマリーの子要素テンプレート -->
 <template id="tpl-admin-list-child-report-summary">
     <div class="relative bg-white border-b border-brand-1 p-4 flex flex-col gap-1 cursor-pointer active:bg-slate-50">
         <!-- 右上に件数（不足していた .js-badge-count を追加） -->
@@ -432,7 +448,7 @@
                 <div class="text-[0.6rem] font-bold text-slate-500 js-reporter-user truncate pr-2"></div>
                 <div class="text-[0.6rem] font-bold text-slate-400 js-report-tim shrink-0"></div>
             </div>
-            <div class="text-[0.7rem] text-black-5  whitespace-pre-wrap break-all js-report-body"></div>
+            <div class="text-[0.6rem] text-black-5 whitespace-pre-wrap break-all js-report-body"></div>
         </div>
     </div>
 </template>

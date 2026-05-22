@@ -51,17 +51,6 @@ window.$Const.GetMockData = function(key, count = 10) {
     const now = new Date();
     for (let i = 1; i <= count; i++) {
         switch (key) {
-            // case 'NOTICE': // 通知データ
-            //     list.push({
-            //         seq: i,
-            //         kind: i % 3, // 0:その他, 1:重要, 2:周知
-            //         title: `テスト通知タイトル ${i}号`,
-            //         body: `${i}番目の通知内容です。これはシステムから自動生成されたテスト用の文章です。重要なアップデート情報が含まれている可能性があります。`,
-            //         update_tim: new Date(now.getTime() - i * 3600000).toISOString(), // 1時間ずつ遡る
-            //         disp_from: "2024-01-01T00:00",
-            //         disp_to: "2099-12-31T23:59"
-            //     });
-            //     break;
             case 'REPORT_SUMMARY': // 管理者：通報集計
                 list.push({
                     target_user_name: `User_${i}`,
@@ -75,7 +64,7 @@ window.$Const.GetMockData = function(key, count = 10) {
                 list.push({
                     reporter_user_id: `reporter-guid-${i}`,
                     report_tim: new Date(now.getTime() - i * 600000).toISOString(),
-                    body: `${i}番目の通報理由：不適切なコンテンツが含まれています。規約違反の疑いがあります。あああああああああああああああああああああああああああああああああ`
+                    body: `${i}番目の通報理由：\n不適切なコンテンツが含まれています。\n規約違反の疑いがあります。\nあああああああああああああああああああああああ\nああああああああああ`
                 });
                 break;
             case 'FEEDBACK': // フィードバック

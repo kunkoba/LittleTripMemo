@@ -24,6 +24,8 @@ public class GetUserProfileService : _BaseService
 
     public async Task<Response> ExecuteAsync(Guid userId)
     {
+        await ValidateAsync(userId);
+
         var user = await _userManager.FindByIdAsync(userId.ToString());
         BusinessException.ThrowIf(user == null, "ユーザーが存在しません");
 
@@ -36,4 +38,14 @@ public class GetUserProfileService : _BaseService
             (user.Id == _user.UserId)
         );
     }
+
+    private async Task ValidateAsync(Guid userId)
+    {
+        // 他のサービス同様、コンテキストと引数のチェックを徹底
+        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(userId == Guid.Empty, "対象のユーザーIDが指定されていません");
+
+        await Task.CompletedTask;
+    }
+
 }

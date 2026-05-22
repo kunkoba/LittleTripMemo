@@ -19,6 +19,8 @@ public class SysController : _BaseController
     private readonly GetMyFeedbackService _getMyFeedbackService;
     private readonly GetMyReportService _getMyReportService;
     private readonly DeleteMyReportService _deleteMyReportService;
+    private readonly SendUserNotificationService _sendUserNotificationService;
+    private readonly GetMyUserNotificationsService _getMyUserNotificationsService;
 
     public SysController(
         UserContext user,
@@ -32,7 +34,9 @@ public class SysController : _BaseController
         GetReportDetailsService getReportDetailsService,
         GetMyFeedbackService getMyFeedbackService,
         GetMyReportService getMyReportService,
-        DeleteMyReportService deleteMyReportService
+        DeleteMyReportService deleteMyReportService,
+        SendUserNotificationService sendUserNotificationService,
+        GetMyUserNotificationsService getMyUserNotificationsService
     ) : base(user)
     {
         _upsertFeedbackService = upsertFeedbackService;
@@ -46,7 +50,17 @@ public class SysController : _BaseController
         _getMyFeedbackService = getMyFeedbackService;
         _getMyReportService = getMyReportService;
         _deleteMyReportService = deleteMyReportService;
+        _sendUserNotificationService = sendUserNotificationService;
+        _getMyUserNotificationsService = getMyUserNotificationsService;
     }
+
+    #region "System"
+
+    #endregion
+
+    #region "Admin"
+
+    #endregion
 
     /// <summary>
     /// フィードバック登録更新（ユーザ）
@@ -170,6 +184,26 @@ public class SysController : _BaseController
     public async Task<IActionResult> DeleteMyReport([FromBody] DeleteMyReportService.DeleteMyReportReq req)
     {
         var result = await _deleteMyReportService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// 個人宛通知の送信（管理者専用）
+    /// </summary>
+    [HttpPost("api/Sys/SendUserNotification")]
+    public async Task<IActionResult> SendUserNotification([FromBody] SendUserNotificationService.Request req)
+    {
+        var result = await _sendUserNotificationService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// 自分宛ての個人通知を取得（ユーザー用）
+    /// </summary>
+    [HttpPost("api/Sys/GetMyUserNotifications")]
+    public async Task<IActionResult> GetMyUserNotifications()
+    {
+        var result = await _getMyUserNotificationsService.ExecuteAsync();
         return OkWithBase(result);
     }
 

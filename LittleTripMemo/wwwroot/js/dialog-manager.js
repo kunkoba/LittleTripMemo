@@ -1798,7 +1798,7 @@ const DialogController = {
     // 管理者：フィードバックリスト（無限スクロール）
     async ShowAdminFeedbackList() {
         let skip = 0;
-        const take = 100;
+        const take = 20;
         // ★ 実行時に即データアクセスし、エラーの場合は開かずに終了
         const isSuccess = await $Data.Access.GetAllFeedback({ skip, take });
         if (!isSuccess) return;
@@ -1814,6 +1814,7 @@ const DialogController = {
                 const score = item.score || 0;
                 $Dom.QuerySelector(".js-score", child).textContent = "★".repeat(score) + "☆".repeat(5 - score);
                 $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
+                child.onclick = () => this.ShowAdminFeedbackDetail(item);
                 root.appendChild(child);
             });
         };
@@ -1852,6 +1853,30 @@ const DialogController = {
             content: root,
             help: "",
             buttons:[]
+        });
+    },
+    // 管理者：フィードバック詳細
+    ShowAdminFeedbackDetail(item) {
+        const el = $Dom.GenerateTemplate("tpl-admin-feedback-detail");
+        $Dom.QuerySelector(".js-date", el).textContent = $Util.FormatDate(item.create_tim || new Date(), "YYYY.MM.DD HH:mm");
+        const score = item.score || 0;
+        $Dom.QuerySelector(".js-score", el).textContent = "★".repeat(score) + "☆".repeat(5 - score);
+        // ユーザーIDなどがあれば表示（APIにuser_idが含まれていれば入るようにしています）
+        $Dom.QuerySelector(".js-user-id", el).textContent = item.user_id || "Unknown User";
+        $Dom.QuerySelector(".js-body", el).textContent = item.body || "（内容なし）";
+        _DialogCore.open({
+            title: "FEEDBACK DETAILS",
+            content: el,
+            help: "",
+            buttons: [
+                [
+                    { 
+                        label: "BACK", 
+                        className: "bg-slate-200 text-slate-500 shadow-sm", 
+                        closesDialog: true 
+                    }
+                ]
+            ]
         });
     },
     // 通報投稿画面

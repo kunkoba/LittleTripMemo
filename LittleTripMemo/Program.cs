@@ -97,6 +97,7 @@ builder.Services.AddScoped<ReactionPubRepository>();
 builder.Services.AddScoped<SysFeedbackRepository>();
 builder.Services.AddScoped<SysNotificationRepository>();
 builder.Services.AddScoped<SysReportRepository>();
+builder.Services.AddScoped<SysUserNotificationRepository>();
 
 // ---- Service（業務ロジック層） ----
 
@@ -136,6 +137,8 @@ builder.Services.AddScoped<GetReportDetailsService>();
 builder.Services.AddScoped<GetMyFeedbackService>();
 builder.Services.AddScoped<GetMyReportService>();
 builder.Services.AddScoped<DeleteMyReportService>();
+builder.Services.AddScoped<SendUserNotificationService>();
+builder.Services.AddScoped<GetMyUserNotificationsService>();
 
 
 // ======================================================================

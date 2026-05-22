@@ -129,14 +129,24 @@ public class TReactionPub
         public DateTime report_tim { get; set; }
     }
 
+    // 個人向け通知
+    public class TSysUserNotification
+    {
+        public long seq { get; set; }   // ただの連番
+        public Guid user_id { get; set; }     // 対象ユーザー
+        public string emoji { get; set; } = string.Empty;
+        public string body { get; set; } = string.Empty;
+        public DateTime send_tim { get; set; }
+    }
+
 #endregion
 
 #region "DTO"
 
-    /// <summary>
-    /// まとめ親リスト（private＋public）
-    /// </summary>
-    public class DtoArchive
+/// <summary>
+/// まとめ親リスト（private＋public）
+/// </summary>
+public class DtoArchive
     {
         public long archive_id { get; set; } = 0;
         public Guid user_id { get; set; }

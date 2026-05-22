@@ -141,9 +141,6 @@ window.$Data = {
         async SearchByLocationPub(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/SearchByLocationPub', params))();
         },
-        async GetArchiveDetailsPub_2(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/GetArchiveDetailsPub', params))();
-        },
         async GetArchiveDetailsPub(params = {}) {
             // 引数 params.archive_id を使用して URL を構築
             const url = `/api/GetArchiveDetailsPub/${params.archive_id}`;
