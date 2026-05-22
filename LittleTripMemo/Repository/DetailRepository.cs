@@ -174,6 +174,15 @@ public class DetailRepository : _BaseRepository
         return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
     }
 
+    // 管理者用：対象ユーザーの TableId を指定して復元
+    public async Task<int> AdminRestoreByKeyAsync(int archiveId, Guid targetUserId, int targetTableId)
+    {
+        string sql = $@"
+        UPDATE t_memo_detail_{targetTableId} SET del_flg = false, update_tim = CURRENT_TIMESTAMP 
+        WHERE archive_id = @archive_id AND user_id = @target_user_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId, target_user_id = targetUserId });
+    }
+
     /// <summary>
     /// 地点検索用の明細取得。指定された緯度・経度の範囲内にある明細を取得する。
     /// </summary>

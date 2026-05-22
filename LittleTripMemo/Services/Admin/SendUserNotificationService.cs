@@ -3,7 +3,7 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 
-namespace LittleTripMemo.Services.Sys;
+namespace LittleTripMemo.Services.Admin;
 
 public class SendUserNotificationService : _BaseService
 {

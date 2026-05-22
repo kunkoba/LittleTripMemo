@@ -38,6 +38,7 @@ public class SysNotificationRepository : _BaseRepository
                 seq, 
                 title, 
                 body, 
+                link_url,
                 kind, 
                 disp_from, 
                 disp_to, 
@@ -46,6 +47,7 @@ public class SysNotificationRepository : _BaseRepository
                 CASE WHEN @seq = 0 THEN nextval('t_sys_notifications_seq_seq') ELSE @seq END, 
                 @title, 
                 @body, 
+                @link_url,
                 @kind, 
                 @disp_from, 
                 @disp_to, 
@@ -54,6 +56,7 @@ public class SysNotificationRepository : _BaseRepository
             ON CONFLICT (seq) DO UPDATE SET
                 title = EXCLUDED.title,
                 body = EXCLUDED.body,
+                link_url = EXCLUDED.link_url,
                 kind = EXCLUDED.kind,
                 disp_from = EXCLUDED.disp_from,
                 disp_to = EXCLUDED.disp_to,

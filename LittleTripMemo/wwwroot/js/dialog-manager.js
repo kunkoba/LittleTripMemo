@@ -928,7 +928,7 @@ const DialogController = {
                     } else {
                         // 内部データ（PRIVATE）
                         badge.textContent = "PRIVATE";
-                        badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-slate-200 bg-slate-100 text-slate-400 shadow-md";
+                        badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-slate-200 bg-slate-100 text-slate-400";
                         leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800"; // 左線ブランドカラー
                     }
                     child.onclick = () => {
@@ -1548,9 +1548,9 @@ const DialogController = {
 			const child = $Dom.GenerateTemplate("tpl-list-child-notice");
             // child自身に直接クラスを追加する
 			if (item.kind === 0) {
-				child.classList.add("border-l-2", "border-slate-300");
+				child.classList.add("border-l-4", "border-slate-300");
 			} else {
-				child.classList.add("border-l-2", "border-brand-3");
+				child.classList.add("border-l-4", "border-brand-3");
 			}
 			// メモリ上の未読フラグを使用
 			const isNew = item.is_new;

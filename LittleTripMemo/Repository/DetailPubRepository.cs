@@ -104,6 +104,22 @@ public class DetailPubRepository : _BaseRepository
     }
 
     /// <summary>
+    /// 管理者権限で削除
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <param name="targetUserId"></param>
+    /// <returns></returns>
+    public async Task<int> AdminDeletePhysicalByArchiveIdAsync(int archiveId, Guid targetUserId)
+    {
+        const string sql = @"
+        DELETE FROM t_memo_detail_pub 
+        WHERE archive_id = @archive_id 
+          AND user_id    = @target_user_id"; // 所有者チェック追加
+
+        return await ExecuteAsync(sql, new { archive_id = archiveId, target_user_id = targetUserId });
+    }
+
+    /// <summary>
     /// 通常検索（軽量）：作成順(1) または 更新順(2)
     /// </summary>
     public async Task<IEnumerable<TMemoDetailPub>> GetByLocationBasicAsync(

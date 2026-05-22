@@ -1,5 +1,6 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.Controllers;
+using LittleTripMemo.Services.Admin;
 using LittleTripMemo.Services.Sys;
 using Microsoft.AspNetCore.Mvc;
 using static GetAllFeedbackService;
@@ -21,6 +22,8 @@ public class SysController : _BaseController
     private readonly DeleteMyReportService _deleteMyReportService;
     private readonly SendUserNotificationService _sendUserNotificationService;
     private readonly GetMyUserNotificationsService _getMyUserNotificationsService;
+    private readonly AdminCloseArchivePubService _adminCloseArchivePubService;
+    private readonly AdminUnpublishArchiveService _adminUnpublishArchiveService;
 
     public SysController(
         UserContext user,
@@ -36,7 +39,9 @@ public class SysController : _BaseController
         GetMyReportService getMyReportService,
         DeleteMyReportService deleteMyReportService,
         SendUserNotificationService sendUserNotificationService,
-        GetMyUserNotificationsService getMyUserNotificationsService
+        GetMyUserNotificationsService getMyUserNotificationsService,
+        AdminCloseArchivePubService adminCloseArchivePubService,
+        AdminUnpublishArchiveService adminUnpublishArchiveService
     ) : base(user)
     {
         _upsertFeedbackService = upsertFeedbackService;
@@ -52,15 +57,12 @@ public class SysController : _BaseController
         _deleteMyReportService = deleteMyReportService;
         _sendUserNotificationService = sendUserNotificationService;
         _getMyUserNotificationsService = getMyUserNotificationsService;
+        _adminCloseArchivePubService　= adminCloseArchivePubService;
+        _adminUnpublishArchiveService = adminUnpublishArchiveService;
     }
 
     #region "System"
 
-    #endregion
-
-    #region "Admin"
-
-    #endregion
 
     /// <summary>
     /// フィードバック登録更新（ユーザ）
@@ -207,4 +209,21 @@ public class SysController : _BaseController
         return OkWithBase(result);
     }
 
+    #endregion
+
+    #region "Admin"
+        [HttpPost("api/Sys/AdminCloseArchive")]
+        public async Task<IActionResult> AdminCloseArchive([FromBody] AdminCloseArchivePubService.Request req)
+        {
+            var result = await _adminCloseArchivePubService.ExecuteAsync(req);
+            return OkWithBase(result);
+        }
+
+        [HttpPost("api/Sys/AdminUnpublishArchive")]
+        public async Task<IActionResult> AdminUnpublishArchive([FromBody] AdminUnpublishArchiveService.Request req)
+        {
+            var result = await _adminUnpublishArchiveService.ExecuteAsync(req);
+            return OkWithBase(result);
+        }
+    #endregion
 }

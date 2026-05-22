@@ -49,6 +49,19 @@ public class ExceptionHandling
             };
             _logger.LogWarning("業務エラーが発生: {Message}", bEx.Message);
         }
+        else if (ex is System.Net.Sockets.SocketException ||
+             ex.Message.Contains("Failed to connect") ||
+             ex.InnerException?.Message.Contains("Failed to connect") == true)
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            errorRes = new ErrorResponse
+            {
+                Message = "データベースサーバーに接続できません。システム管理者に連絡してください。",
+                ErrorCode = "DB_CONNECTION_FAILED",
+                DebugInfo = ex.Message
+            };
+            _logger.LogCritical(ex, "データベース接続エラーが発生しました。DBが起動しているか、設定(Port/Host)を確認してください。");
+        }
         else if (ex is Npgsql.PostgresException pgEx)
         {
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;

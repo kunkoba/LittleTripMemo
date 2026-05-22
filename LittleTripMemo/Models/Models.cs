@@ -96,7 +96,7 @@ public class TReactionPub
     public int reaction_type { get; set; } = 0;
 }
 
-#region "システム関連"
+#region "System"
 
     // フィードバック
     public class TSysFeedback
@@ -113,6 +113,7 @@ public class TReactionPub
         public long seq { get; set; }
         public string title { get; set; } = string.Empty;
         public string body { get; set; } = string.Empty;
+        public string link_url { get; set; } = string.Empty; // ★追加
         public short kind { get; set; }
         public DateTime disp_from { get; set; }
         public DateTime disp_to { get; set; }
@@ -181,7 +182,14 @@ public class DtoArchive
         public long archive_id { get; set; }
         public string archive_title { get; set; } = string.Empty; // 追加
         public long report_count { get; set; }
-    
+
+        //// ★ 追加：通報されているユーザーの情報
+        //public string user_icon { get; set; } = string.Empty;
+        //public string user_nick_name { get; set; } = string.Empty;
+        //public string user_description { get; set; } = string.Empty;
+        //public string user_link1 { get; set; } = string.Empty;
+        //public string user_link2 { get; set; } = string.Empty;
+        //public string user_link3 { get; set; } = string.Empty;
     }
 
 #endregion

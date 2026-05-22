@@ -132,4 +132,16 @@ public class ArchiveRepository : _BaseRepository
             AND user_id = @user_id";
         return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
     }
+
+    /// <summary>
+    /// 管理者権限で復活
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <param name="targetUserId"></param>
+    /// <returns></returns>
+    public async Task<int> AdminRestoreByKeyAsync(int archiveId, Guid targetUserId)
+    {
+        const string sql = "UPDATE t_memo_archive SET del_flg = false, update_tim = CURRENT_TIMESTAMP WHERE archive_id = @archive_id AND user_id = @target_user_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId, target_user_id = targetUserId });
+    }
 }

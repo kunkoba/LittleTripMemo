@@ -45,26 +45,19 @@ public class SysReportRepository : _BaseRepository
     /// <param name="minCount">抽出対象とする最小通報件数</param>
     public async Task<IEnumerable<DtoReportSummary>> GetReportSummaryAsync(int minCount = 10)
     {
-        //const string sql2 = @"
-        //    SELECT 
-        //        target_user_id, 
-        //        archive_id, 
-        //        COUNT(1) AS report_count
-        //    FROM t_sys_reports
-        //    GROUP BY target_user_id, archive_id
-        //    HAVING COUNT(*) >= @min_count
-        //    ORDER BY report_count DESC";
-
         const string sql = @"
         SELECT 
             r.target_user_id, 
             r.archive_id, 
-            a.title AS archive_title, 
+            COALESCE(a.title, '（不明または削除済み）') AS archive_title, 
             COUNT(1) AS report_count
         FROM t_sys_reports r
         LEFT JOIN t_memo_archive_pub a 
             ON r.archive_id = a.archive_id
-        GROUP BY r.target_user_id, r.archive_id, a.title
+        GROUP BY 
+            r.target_user_id, 
+            r.archive_id, 
+            a.title
         HAVING COUNT(*) >= @min_count
         ORDER BY report_count DESC";
 
@@ -84,6 +77,7 @@ public class SysReportRepository : _BaseRepository
         WHERE target_user_id = @target_user_id 
           AND archive_id = @archive_id 
         ORDER BY report_tim DESC";
+
         return await QueryAsync<TSysReport>(sql, new { target_user_id = targetUserId, archive_id = archiveId });
     }
 

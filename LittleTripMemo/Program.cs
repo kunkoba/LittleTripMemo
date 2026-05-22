@@ -8,6 +8,7 @@ using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Services;
+using LittleTripMemo.Services.Admin;
 using LittleTripMemo.Services.Sys;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -139,6 +140,8 @@ builder.Services.AddScoped<GetMyReportService>();
 builder.Services.AddScoped<DeleteMyReportService>();
 builder.Services.AddScoped<SendUserNotificationService>();
 builder.Services.AddScoped<GetMyUserNotificationsService>();
+builder.Services.AddScoped<AdminCloseArchivePubService>();
+builder.Services.AddScoped<AdminUnpublishArchiveService>();
 
 
 // ======================================================================

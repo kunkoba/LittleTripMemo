@@ -97,4 +97,39 @@ public class ArchivePubRepository : _BaseRepository
           AND user_id    = @user_id";
         return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
     }
+
+    /// <summary>
+    /// 管理者による強制クローズ（closed_flg = true）
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <param name="targetUserId"></param>
+    /// <returns></returns>
+    public async Task<int> AdminCloseByKeyAsync(int archiveId, Guid targetUserId)
+    {
+        const string sql = @"
+        UPDATE t_memo_archive_pub 
+        SET closed_flg = true, 
+            update_tim = CURRENT_TIMESTAMP 
+        WHERE archive_id = @archive_id 
+          AND user_id    = @target_user_id"; // 所有者チェック追加
+
+        return await ExecuteAsync(sql, new { archive_id = archiveId, target_user_id = targetUserId });
+    }
+
+    /// <summary>
+    /// 管理者による物理削除
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <param name="targetUserId"></param>
+    /// <returns></returns>
+    public async Task<int> AdminDeletePhysicalByKeyAsync(int archiveId, Guid targetUserId)
+    {
+        const string sql = @"
+        DELETE FROM t_memo_archive_pub 
+        WHERE archive_id = @archive_id 
+          AND user_id    = @target_user_id"; // 所有者チェック追加
+
+        return await ExecuteAsync(sql, new { archive_id = archiveId, target_user_id = targetUserId });
+    }
+
 }

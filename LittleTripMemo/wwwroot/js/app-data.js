@@ -19,7 +19,7 @@ window.$Data = {
         // サーバー通信の基礎
         async _fetchData(method, url, params, isDebug = false) {
             // メイン処理
-            console.log("▼ Access:", this.baseUrl + url, params);
+            // console.log("▼ Access:", this.baseUrl + url, params);
             const token = $App.AppData.Owner.Token;
             const options = {
                 method: method.toUpperCase(),
@@ -47,7 +47,7 @@ window.$Data = {
                 throw err;
             }
             const result = await response.json();
-            console.log("■ Result:", url, result);
+            // console.log("■ Result:", url, result);
             const data = structuredClone(result.data);  // 値渡し
             // メイン処理
             $App.AppData.Context.IsLoggedIn = result.is_logged_in ?? false;
@@ -176,17 +176,17 @@ window.$Data = {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertNotification', params))();
         },
         async GetReportSummary(params = {}) {
-            // return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportSummary', params))();
-            console.warn("TEST: GetMockData(REPORT_SUMMARY) を使用します");
-            $App.AppData.Admin.reportSummary = $Const.GetMockData('REPORT_SUMMARY', 50);
-            return true;
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportSummary', params))();
+            // console.warn("TEST: GetMockData(REPORT_SUMMARY) を使用します");
+            // $App.AppData.Admin.reportSummary = $Const.GetMockData('REPORT_SUMMARY', 50);
+            // return true;
         },
         // public record GetReportDetailsReq(Guid target_user_id, long archive_id);
         async GetReportDetails(params) {
-            // return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportDetails', params))();
-            console.warn("TEST: GetMockData(REPORT_DETAIL) を使用します");
-            $App.AppData.Admin.reports = $Const.GetMockData('REPORT_DETAIL', 50);
-            return true;
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportDetails', params))();
+            // console.warn("TEST: GetMockData(REPORT_DETAIL) を使用します");
+            // $App.AppData.Admin.reports = $Const.GetMockData('REPORT_DETAIL', 50);
+            // return true;
         },
         async GetAllFeedback(params = {}) {
             // return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllFeedback', params))();
