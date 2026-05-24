@@ -61,11 +61,12 @@ const _BottomCore = {
 					}
 				});
 				// 移動ボタン
-				this.btnFirst.addEventListener('click', () => {$Marker.FocusFirst();});
-				this.btnPrev.addEventListener('click', () => {$Marker.FocusPrev();});
-				this.btnNext.addEventListener('click', () => {$Marker.FocusNext();});
-				this.btnLast.addEventListener('click', () => {$Marker.FocusLast();});
-				this.btnOpen.addEventListener('click', () => {
+				this.btnFirst.addEventListener('click', () => { $Marker.FocusFirst(); });
+				this.btnPrev.addEventListener('click',  () => { $Marker.FocusPrev();  });
+				this.btnNext.addEventListener('click',  () => { $Marker.FocusNext();  });
+				this.btnLast.addEventListener('click',  () => { $Marker.FocusLast();  });
+				this.btnOpen.addEventListener('click',  () => {
+					$Marker.ClosePopup();
                     $Marker.FocusToCurrentMarker();
 					$DetailFrame.Open($Marker.GetDataWithCurrentIndex());
 				});

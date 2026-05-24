@@ -40,7 +40,16 @@ public class GetArchiveDetailsPubService : _BaseService
 
         // 親取得
         var archive = await _archivePubRepo.GetByKeyAsync(req.archive_id);
+        
+        // 存在チェック
         BusinessException.ThrowIf(archive == null, "アーカイブが見つかりません");
+        
+        // 「非公開(closed)」かつ「所有者ではない」場合はエラーにする
+        if (archive.closed_flg && archive.user_id != _user.UserId)
+        {
+            throw new BusinessException("このアーカイブは現在非公開に設定されています。");
+        }
+
         SetAppFlags(archive);
 
         // 明細取得（リアクション集計含む）

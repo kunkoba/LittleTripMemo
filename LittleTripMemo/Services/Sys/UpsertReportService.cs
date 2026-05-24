@@ -15,7 +15,7 @@ public class UpsertReportService : _BaseService
     public async Task<Response> ExecuteAsync(UpsertReportReq req)
     {
         await ValidateAsync(req);
-        await _repo.InsertAsync(new TSysReport { target_user_id = req.target_user_id, archive_id = req.archive_id, body = req.body });
+        await _repo.UpsertAsync(new TSysReport { target_user_id = req.target_user_id, archive_id = req.archive_id, body = req.body });
         return new Response(true);
     }
 

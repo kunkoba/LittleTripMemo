@@ -52,6 +52,14 @@ window.$Data = {
             // メイン処理
             $App.AppData.Context.IsLoggedIn = result.is_logged_in ?? false;
             $App.AppData.Owner.plan = result.plan;
+            // 取得データを内部に保持
+            this._setData(data); // ← 切り出し
+            // ベース情報をStoreに保持
+            $Data.Store.Restore();
+            return true;
+        },
+        // 取得データを内部に保持
+        _setData(data) {
             if (data.archiveId) $App.AppData.Context.TargetArchiveId = data.archiveId;
             // アプリ基幹のデータ
             if (data.archive) this._rawData.archive = data.archive;
@@ -77,10 +85,7 @@ window.$Data = {
             if (data.reportSummary) $App.AppData.Admin.reportSummary = data.reportSummary;
             if (data.reports) $App.AppData.Admin.reports = data.reports;
             if (data.feedbackList) $App.AppData.Admin.feedbackList = data.feedbackList;
-            console.log(">>$App.AppData:", $App.AppData);
-            // ベース情報をStoreに保持
-            $Data.Store.Restore();
-            return true;
+            // console.log(">>$App.AppData:", $App.AppData);
         },
         // --- (既存のアプリアクセスメソッド群省略なし) ---
         async LoginToServer(email) {
@@ -434,7 +439,7 @@ window.$Data = {
             }
             // 4. 未読件数を Context に保存し、UIを更新
             $App.AppData.Context.UnreadNoticeCount = unreadCount;
-            console.log(`[Notice] 未読件数: ${unreadCount}件`);
+            // console.log(`[Notice] 未読件数: ${unreadCount}件`);
             // メニューアイコンの赤丸を更新
             if (window.$UI) window.$UI.UpdateNoticeBadge(unreadCount);
         },

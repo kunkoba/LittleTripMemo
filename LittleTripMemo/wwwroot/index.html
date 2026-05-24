@@ -127,9 +127,10 @@
         <!-- ■　メイン画面：地図＋詳細パネル -->
         <div class="absolute bottom-0 flex h-full w-full overflow-hidden flex-col md:flex-row">
             <!-- ■　地図エリア -->
-            <div id="ui-map-id" class="w-full h-full z-0"></div>
-            <!-- 明細閉じる用パネル -->
-            <div id="ui-map-barrier" class="fixed inset-0 z-10 hidden bg-transparent"></div>
+            <div id="ui-map-id" class="w-full h-full z-0">
+                <!-- 明細閉じる用パネル -->
+                <div id="ui-map-barrier" class="fixed inset-0 z-[750] hidden bg-transparent"></div>
+            </div>
             <!-- ■　詳細パネル（右側スライド表示） -->
             <div id="ui-detail-frame-id" class="translate-y-full flex flex-col bg-brand-0 overflow-hidden shrink-0 h-0 w-full 
                 md:h-full md:w-0 transition-all duration-400 shadow-2xl z-[1002]">
@@ -158,6 +159,9 @@
                 <div id="ui-detail-content-id" class="flex-1 overflow-y-auto p-6">
                     <!-- ■ 参照用（表示モード）：縦並び・左揃え・1rem 統一版 -->
                     <div id="detail-display" class="hidden relative min-h-full flex flex-col bg-white">
+                        <!-- 右上の正円インデックスバッジ -->
+                        <div class="js-index-badge absolute -top-3 -right-3 w-12 h-12 rounded-full bg-brand-4 border-2 border-white text-white font-black text-[1.4rem] flex items-center justify-center shadow-md z-20">
+                        </div>
                         <!-- 背景用の巨大顔文字：上部に固定（スクロールしても動かない） -->
                         <div class="sticky top-0 w-full h-0 pointer-events-none z-0 flex justify-center">
                             <div id="detail-display-face_emoji_bg" class="text-[12rem] opacity-[0.1]  select-none -translate-y-4 mt-36"></div>
@@ -190,7 +194,8 @@
                             <span id="detail-display-weather_code" class="hidden"></span>
                             <!-- 下部：Locationカード風のURLリンク -->
                             <div id="detail-display-url-wrapper" class="hidden w-full pt-6">
-                                <a id="detail-display-link_url" href="" target="_blank" class="flex items-center bg-slate-50/50 border border-slate-100 border-l-4 border-cyan-400 rounded-[1rem] p-4 shadow-md active:scale-[0.98] transition-transform">
+                                <a id="detail-display-link_url" href="" target="_blank" 
+                                    class="flex items-center bg-slate-50/50 border border-slate-100 border-l-4 border-cyan-400 rounded-[1rem] p-4 shadow-md active:scale-[0.98] transition-transform">
                                     <span class="text-[1.2rem] mr-4">📍</span>
                                     <span class="text-[0.8rem] font-bold text-slate-700 truncate">Location Data / Link</span>
                                 </a>
@@ -263,12 +268,9 @@
                                     >
                                 </div>
                                 <!-- 右側：固定サイズボタン -->
-                                <button
-                                    id="btn-address-name"
-                                    type="button"
-                                    class="w-10 h-10 rounded-[1rem] bg-white flex items-center justify-center text-[24px] outline-none active:scale-95"
-                                >
-                                    📍
+                                <button id="btn-address-name" type="button"
+                                    class="w-10 h-10 rounded-[1rem] bg-white flex items-center justify-center text-[24px] outline-none active:scale-95">
+                                    👇
                                 </button>
                             </div>
                         </div>
@@ -347,7 +349,7 @@
                         </button>
                     </div>
                     <!-- index.html 詳細パネルフッター内：マーカー移動ボタンの修正 -->
-                    <div id="detail-group-move" class="flex items-center justify-center bg-black rounded-full px-2 py-1 mb-4 shadow-md">
+                    <div id="detail-group-move" class="flex items-center justify-center bg-black/70 rounded-full px-2 py-1 mb-4 shadow-md">
                         <button id="detail-btn-first" class="w-12 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">≪</button>
                         <button id="detail-btn-prev"  class="w-12 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">◀</button>
                         <div class="w-px h-6 bg-white/30 mx-4"></div>
@@ -448,9 +450,9 @@
         <!-- 【マップ】ポップアップ -->
         <template id="tpl-marker-popup">
             <div class="relative w-full bg-white rounded-[1rem] shadow-md p-4 pt-5 overflow-hidden flex flex-col">
-                <!-- 右上のインデックスフラッグ -->
-                <div class="absolute top-0 right-0 w-[42px] h-[42px] bg-brand-2 text-brand-5 font-black text-[1.2rem] flex items-center justify-center rounded-bl-[1.5rem] shadow-md">
-                    <span class="index  pb-1 pl-1"></span>
+                <!-- 右上の正円インデックスバッジ（枠外にはみ出させる） -->
+                <div class="absolute top-1 right-1 w-10 h-10 rounded-full bg-brand-4 text-white font-black text-[1.2rem] flex items-center justify-center shadow-md border-2 border-white z-20">
+                    <span class="index"></span>
                 </div>
                 <!-- 日時 -->
                 <div class="text-[0.8rem] mb-1.5 tracking-widest font-black text-slate-400 italic">

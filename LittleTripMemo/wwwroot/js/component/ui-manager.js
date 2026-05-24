@@ -46,8 +46,24 @@ const UI_Manager = {
     // 画面モード変更時
     ChangeScreenMode(){
 		const mode = $App.AppData.Context.ScreenMode;
-		// // 通知バー
-		// this.NoticeUpdate("りとめも（Littele Trip Memo） >> " + $App.AppData.Context.ScreenMode);
+        // 通知バー
+        switch (mode) {
+            case $Const.SCREEN_MODE.CREATE:
+                $UI.NoticeUpdate("「＋」ボタンで地点メモを作成することができます");
+                break;
+            case $Const.SCREEN_MODE.ARCHIVE:
+                $UI.NoticeUpdate("画面下部の「操作ボタン」で各メモを移動できます");
+                break;
+            case $Const.SCREEN_MODE.ARCHIVE_PUB:
+                $UI.NoticeUpdate("公開データは「Open」にしないと公開されません");
+                break;
+            case $Const.SCREEN_MODE.SEARCH:
+                $UI.NoticeUpdate("画面範囲内のメモを検索できます");
+                break;
+            default:
+				$Dialog.ShowLoginDialog();
+                return;
+        }
 		// アイコンバー
 		$TopBar.ChangeScreenMode();
 		$BotBar.ChangeScreenMode();

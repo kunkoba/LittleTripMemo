@@ -42,7 +42,7 @@ public class GetUserProfileService : _BaseService
     private async Task ValidateAsync(Guid userId)
     {
         // 他のサービス同様、コンテキストと引数のチェックを徹底
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
+        //BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(userId == Guid.Empty, "対象のユーザーIDが指定されていません");
 
         await Task.CompletedTask;

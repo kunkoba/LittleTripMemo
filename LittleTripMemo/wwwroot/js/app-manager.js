@@ -189,62 +189,75 @@ const AppManager = {
     },
     // 画面モード変更
     async RefreshScreen() {
-        console.log("App.RefreshScreen()", this.AppData.Context.ScreenMode, this.AppData.Context.IsLoggedIn);
+        console.log(`App.RefreshScreen->[${this.AppData.Context.ScreenMode}]  Login->[${this.AppData.Context.IsLoggedIn}]`)
         // アーカイブID
         const archiveId = this.AppData.Context.TargetArchiveId;
         let isSuccess = false;
         // システム情報を取得
-        $Data.Access.GetSystemInfo();
+        if (this.AppData.Context.IsLoggedIn) {
+            $Data.Access.GetSystemInfo();
+        }
         // モードごとにデータ取得
         switch (this.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
-                // 通知バー
-                $UI.NoticeUpdate("「＋」ボタンで地点メモを作成することができます");
                 if (this.AppData.Context.IsLoggedIn) {
                     isSuccess = await $Data.Access.GetUnMergeDetails({});
-                    if (!isSuccess) return;
+                    if (!isSuccess) {
+                        $Dialog.ShowLoginDialog();
+                        return;
+                    };
                 }
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
-                // 通知バー
-                $UI.NoticeUpdate("画面下部の「操作ボタン」で各メモを移動できます");
                 if (!archiveId) {
                     // 不正な場合はログインダイアログを出して待機
                     if (!this.AppData.Context.IsLoggedIn) $Dialog.ShowLoginDialog();
+                    this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
                     return;
                 }
                 if (this.AppData.Context.IsLoggedIn) {
                     isSuccess = await $Data.Access.GetArchiveDetails({ archive_id: archiveId });
-                    if (!isSuccess) return;
-                    const archive = $Data.Store.GetArchive();
-                    $TopBar.ChangeTitle(archive?.title || "");
+                    if (!isSuccess) {
+                        this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                        // return;
+                    } else {
+                        const archive = $Data.Store.GetArchive();
+                        $TopBar.ChangeTitle(archive?.title || "");
+                    };
                 }
                 break;
             case $Const.SCREEN_MODE.ARCHIVE_PUB:
                 if (!archiveId) {
                     if (!this.AppData.Context.IsLoggedIn) $Dialog.ShowLoginDialog();
+                    this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                    this.RefreshScreen();
                     return;
                 }
-                // 通知バー
-                $UI.NoticeUpdate("公開データは「Open」にしないと公開されません");
                 isSuccess = await $Data.Access.GetArchiveDetailsPub({ archive_id: archiveId });
-                if (!isSuccess) return;
-                // 取得した直後にローカルDBへ同期
-                if (this.AppData.Context.IsLoggedIn) {
-                    await $Data.LocalDb.SetReactionsToLocalDb();
-                }
-                const archivePub = $Data.Store.GetArchive();
-                $TopBar.ChangeTitle(archivePub?.title || "");
+                if (!isSuccess) {
+                    if (!this.AppData.Context.IsLoggedIn) {
+                        $Dialog.ShowLoginDialog();
+                        return;
+                    }
+                    this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                    this.RefreshScreen();
+                    return;
+                } else {
+                    // 取得した直後にローカルDBへ同期
+                    if (this.AppData.Context.IsLoggedIn) {
+                        await $Data.LocalDb.SetReactionsToLocalDb();
+                    }
+                    const archivePub = $Data.Store.GetArchive();
+                    $TopBar.ChangeTitle(archivePub?.title || "");
+                };
                 break;
             case $Const.SCREEN_MODE.SEARCH:
-                // 通知バー
-                $UI.NoticeUpdate("画面範囲内のメモを検索できます");
                 $Data.Store.Clear();
                 $Marker.Clear();
                 break;
             default:
                 // 不正か？
-                if (!this.AppData.Context.IsLoggedIn) $Dialog.ShowLoginDialog();
+                $Dialog.ShowLoginDialog();
                 return;
         }
         // UIを更新

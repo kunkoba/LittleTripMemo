@@ -23,7 +23,7 @@ const _DialogCore = {
     },
     // 1. _DialogCore の create メソッド修正
     // 修正後：create メソッド（help機能追加版）
-    create({ title = "", content = "", buttons = [], headerButtons = [], help = null, onClose = null }) {
+    create({ title = "", content = "", buttons = [], headerButtons = [], help = null, onClose = null, theme = null }) {
         const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
         const titleEl = $Dom.QuerySelector("#dialog-title", frame);
         const contentEl = $Dom.QuerySelector("#dialog-content", frame);
@@ -67,6 +67,24 @@ const _DialogCore = {
         } else {
             contentEl.innerHTML = content || "";
         }
+        // 通報用レイアウト
+        if (theme && theme === "black") {
+            const frameBg = $Dom.QuerySelector(".pointer-events-auto", frame);
+            const titleBar = $Dom.QuerySelector("#dialog-title-bar", frame);
+            const titleText = $Dom.QuerySelector("#dialog-title", frame);
+            // 外枠から角丸と色を外し、黒い直線的な枠にする
+            frameBg.classList.remove("rounded-[1rem]", "border-brand-5", "bg-brand-0");
+            frameBg.classList.add("rounded-none", "border-black", "bg-white");
+            // ヘッダーを黒ベース＋赤文字にする
+            titleBar.classList.remove("bg-brand-1");
+            titleBar.classList.add("bg-black");
+            titleText.classList.remove("text-brand-5");
+            titleText.classList.add("text-red-500");
+            // ボタンエリアの背景も白（角丸なし）に
+            btnContainer.classList.remove("bg-brand-1");
+            btnContainer.classList.add("bg-white", "border-t", "border-slate-300");
+        }
+        // 
         if (buttons && buttons.length > 0) {
             buttons.forEach(rowDef => {
                 const isArray = Array.isArray(rowDef);
@@ -252,6 +270,7 @@ const DialogController = {
             create: $Dom.QuerySelector('#btn-app-create', el),
             current: $Dom.QuerySelector('#btn-app-current', el),
             restore: $Dom.QuerySelector('#btn-app-restore', el),
+            archiveInfo: $Dom.QuerySelector('#btn-app-info', el),
             detailList: $Dom.QuerySelector('#btn-app-list', el),
             batch:   $Dom.QuerySelector('#btn-app-batch', el),
             point:   $Dom.QuerySelector('#btn-app-point', el),
@@ -259,7 +278,6 @@ const DialogController = {
             search: $Dom.QuerySelector('#btn-app-search', el),
         };
         // 表示制御（取得済みの変数を使用）
-        console.log("modemode:", mode);
         if (mode === $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.create, false);
         if (mode === $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.batch, true);
         if (mode === $Const.SCREEN_MODE.SEARCH) $Dom.ToggleShow(b.point, true);
@@ -272,14 +290,42 @@ const DialogController = {
             $Dom.ToggleShow(b.search, false);
         }
         // イベント登録（取得済みの変数を使用）
-        b.create.onclick = () => { $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; _DialogCore.close(); $App.RefreshScreen(); };
-        b.current.onclick = () => { $Marker.RefreshCurrentLocation(); $Marker.FocusToLocationMarker(); _DialogCore.close(); };
-        b.restore.onclick = () => { $Marker.RestoreMarkers(); _DialogCore.close(); };
-        b.detailList.onclick = () => mode === $Const.SCREEN_MODE.SEARCH ? this.ShowDetailsSimpleList() : this.ShowDetailsTimeLine();
-        b.batch.onclick = () => { this.ShowMultiSelectTimeline({ onOk: (l) => console.log(l) }); };
-        b.point.onclick = () => { this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18)); };
-        b.archiveList.onclick = () => { this.ShowArchiveList(); };
-        b.search.onclick = () => { $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH; $App.RefreshScreen(); _DialogCore.close(); };
+        b.create.onclick = () => {
+            _DialogCore.close();
+            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+            $App.RefreshScreen();
+        };
+        b.current.onclick = () => {
+            _DialogCore.close();
+            $Marker.RefreshCurrentLocation();
+            $Marker.FocusToLocationMarker();
+        };
+        b.restore.onclick = () => {
+            _DialogCore.close();
+            $Marker.RestoreMarkers();
+        };
+        b.archiveInfo.onclick = () => {
+            _DialogCore.close();
+            this.ShowArchiveInfo();
+        }
+        b.detailList.onclick = () => {
+            mode === $Const.SCREEN_MODE.SEARCH ? this.ShowDetailsSimpleList() : this.ShowDetailsTimeLine();
+        }
+        b.batch.onclick = () => {
+            this.ShowMultiSelectTimeline({ onOk: (l) => console.log(l) });
+        };
+        b.point.onclick = () => {
+            this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18));
+        };
+        b.archiveList.onclick = () => {
+            _DialogCore.close();
+            this.ShowArchiveList();
+        };
+        b.search.onclick = () => {
+            _DialogCore.close();
+            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH;
+            $App.RefreshScreen();
+        };
         //
         _DialogCore.open({
             title: "APP MENU",
@@ -663,6 +709,10 @@ const DialogController = {
             }
             // アイテムの描画
             const child = $Dom.GenerateTemplate("tpl-timeline-item");
+            // インデックス番号のセット
+            const indexBadge = $Dom.QuerySelector(".js-index-badge", child);
+            if (indexBadge) indexBadge.textContent = (index + 1);
+            //
             $Dom.QuerySelector(".js-time", child).textContent = item.memo_time || "";
             $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
             $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
@@ -727,16 +777,13 @@ const DialogController = {
             $Dom.QuerySelector(".js-time", child).textContent = item.memo_time || "";
             $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
             $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
-            
             // 本文の改行をスペースに置換してセット（1行に収まるように）
             const bodyStr = (item.body || "").replace(/\r?\n/g, ' ');
             $Dom.QuerySelector(".js-body", child).textContent = bodyStr;
-
             // ▼ 修正：金額エリアのセットと表示制御
             const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
             const priceEl = $Dom.QuerySelector(".js-memo-price", child);
             const currencyEl = $Dom.QuerySelector(".js-memo-currency", child);
-            
             if (priceWrapper && priceEl && currencyEl) {
                 const price = Number(item.memo_price || 0);
                 if (price !== 0) {
@@ -764,7 +811,6 @@ const DialogController = {
                     $Dom.ToggleShow(priceWrapper, false);
                 }
             }
-
             child.onclick = () => {
                 _DialogCore.closeAll();
                 $Marker.SelectMarker(index);
@@ -783,7 +829,7 @@ const DialogController = {
                 const titleText = $Dom.QuerySelector('#dialog-title', activeFrame);
                 if (titleText) {
                     titleText.classList.remove('truncate');
-                    titleText.classList.add('flex', 'flex-col', 'justify-center', '');
+                    titleText.classList.add('flex', 'flex-col', 'justify-center');
                     titleText.innerHTML = `SEARCH RESULTS <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1 not-italic">INDEPENDENT MEMOS</span>`;
                 }
             }
@@ -1279,16 +1325,9 @@ const DialogController = {
                     handler: () => this._execStatusChange('UnpublishArchive', { archive_id: archive.archive_id }, "Switch to [Private]", "Do you want to revert\nthis data to Private？", "Reverted to [Private].", $Const.SCREEN_MODE.ARCHIVE)
                 }]);
             }
-        } else {
-            // dialogButtons.push([{
-            //     label: "REPORT THIS ARCHIVE",
-            //     className: "w-full bg-white text-red-500 border border-red-500 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform",
-            //     closesDialog: false,
-            //     handler: () => this.ShowReportPost(archive)
-            // }]);
         }
         // --- 管理者専用ボタン ---
-        if (isAdmin && archive.is_public) {
+        if (isAdmin && archive.is_public && !archive.is_owner) {
             // 【注意】強制Close
             if (!archive.closed_flg) {
                 dialogButtons.push([{
@@ -1861,7 +1900,7 @@ const DialogController = {
         });
     },
     // 通報投稿画面
-    async ShowReportPost(archive) {
+    async ShowReportPost_2(archive) {
         // ダイアログを開く前に、自分が過去にこのアーカイブを通報したか取得
         const reqParam = { target_user_id: archive.user_id, archive_id: archive.archive_id };
         const isSuccess = await $Data.Access.GetMyReport(reqParam);
@@ -1911,6 +1950,73 @@ const DialogController = {
                     }
                 }
             ]]
+        });
+    },
+    // 通報投稿画面
+    async ShowReportPost(archive) {
+        // ダイアログを開く前に、自分が過去にこのアーカイブを通報したか取得
+        const reqParam = { target_user_id: archive.user_id, archive_id: archive.archive_id };
+        const isSuccess = await $Data.Access.GetMyReport(reqParam);
+        if (!isSuccess) return;
+        // 取得したデータがあれば初期値として設定
+        const myReport = $App.AppData.Owner.myReport || null;
+        let currentBody = myReport ? (myReport.body || "") : "";
+        const el = $Dom.GenerateTemplate("tpl-report-post");
+        const inputBody = $Dom.QuerySelector('#input-report-body', el);
+        const countBody = $Dom.QuerySelector('#report-text-count', el);
+        // 初期値の反映
+        inputBody.value = currentBody;
+        countBody.textContent = currentBody.length;
+        inputBody.addEventListener("input", () => {
+            countBody.textContent = inputBody.value.length;
+        });
+        // 下部のボタン定義
+        const dialogButtons = [];
+        // 1段目：送信（SUBMIT）ボタン
+        dialogButtons.push([{
+            label: "SUBMIT",
+            className: "w-full bg-red-600 text-white shadow-none rounded-none",
+            closesDialog: false,
+            handler: async () => {
+                const body = inputBody.value.trim();
+                if (!body) {
+                    $Notice.Warn("通報内容を入力してください。");
+                    return;
+                }
+                const req = {
+                    target_user_id: archive.user_id,
+                    archive_id: archive.archive_id,
+                    body: body
+                };
+                const isSubmitSuccess = await $Data.Access.UpsertReport(req);
+                if (!isSubmitSuccess) return;
+                $Notice.Info("通報を送信しました。管理者が確認します。");
+                _DialogCore.close();
+            }
+        }]);
+        // 2段目：既に通報済みの場合のみ「削除（取り消し）」ボタンを配置
+        if (myReport) {
+            dialogButtons.push([{
+                label: "取り消す (DELETE)",
+                className: "w-full bg-white text-slate-800 border-2 border-slate-800 shadow-none rounded-none",
+                closesDialog: false,
+                handler: async () => {
+                    const isOk = await this.ShowConfirm({ title: "DELETE REPORT", message: "通報を取り消しますか？" });
+                    if (!isOk) return;
+                    const isDelSuccess = await $Data.Access.DeleteMyReport({ archive_id: archive.archive_id });
+                    if (!isDelSuccess) return;
+                    $App.AppData.Owner.myReport = null; // メモリ上からも削除
+                    $Notice.Info("通報を取り消しました。");
+                    _DialogCore.close();
+                }
+            }]);
+        }
+        _DialogCore.open({
+            theme: "black", // これを指定することで全体が黒ベース・角丸なしになる
+            title: myReport ? "EDIT REPORT" : "REPORT SUBMIT",
+            content: el,
+            help: "",
+            buttons: dialogButtons // そのまま配列を渡す
         });
     },
     // URL公開画面

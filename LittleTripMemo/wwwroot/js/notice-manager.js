@@ -4,9 +4,9 @@ const Notice = {
         const root = $Dom.GenerateTemplate("tpl-toast", "toast-container");
         const el = $Dom.QuerySelector("div", root);
         const config = {
-            info:  { bg: "rgb(0, 0, 255)" }, // 緑
-            warn:  { bg: "rgb(255, 166, 0)" }, // オレンジ
-            error: { bg: "rgb(255, 0, 0)" }, // 赤
+            info:  { bg: "rgb(54, 202, 51)" }, // 緑
+            warn:  { bg: "rgb(255, 179, 38)" }, // オレンジ
+            error: { bg: "rgb(255, 78, 78)" }, // 赤
         };
         const c = config[type] || config.info;
         el.style.background = c.bg;

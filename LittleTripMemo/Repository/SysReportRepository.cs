@@ -14,27 +14,31 @@ public class SysReportRepository : _BaseRepository
     }
 
     /// <summary>
-    /// 通報内容を新規登録
+    /// 通報内容の登録・更新 (Upsert)
     /// </summary>
-    public async Task<int> InsertAsync(TSysReport report)
+    public async Task<int> UpsertAsync(TSysReport report)
     {
         // ログイン中のユーザーを通報者としてセット
         report.reporter_user_id = _user.UserId;
 
         const string sql = @"
-            INSERT INTO t_sys_reports (
-                reporter_user_id, 
-                target_user_id, 
-                archive_id, 
-                body, 
-                report_tim
-            ) VALUES (
-                @reporter_user_id, 
-                @target_user_id, 
-                @archive_id, 
-                @body, 
-                CURRENT_TIMESTAMP
-            )";
+        INSERT INTO t_sys_reports (
+            reporter_user_id, 
+            target_user_id, 
+            archive_id, 
+            body, 
+            report_tim
+        ) VALUES (
+            @reporter_user_id, 
+            @target_user_id, 
+            @archive_id, 
+            @body, 
+            CURRENT_TIMESTAMP
+        )
+        ON CONFLICT (reporter_user_id, target_user_id, archive_id) 
+        DO UPDATE SET
+            body       = EXCLUDED.body,
+            report_tim = CURRENT_TIMESTAMP";
 
         return await ExecuteAsync(sql, report);
     }

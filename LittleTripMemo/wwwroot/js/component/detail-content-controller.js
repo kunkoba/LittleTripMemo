@@ -10,10 +10,11 @@ const _DetailContentCore = {
                 // --- 参照用（Displayモード） ---
                 {
                     this.displayRoot = $Dom.GetElementById("detail-display");
+                    this.displayIndexBadge = $Dom.QuerySelector(".js-index-badge", this.displayRoot);
                     this.displayDate = $Dom.GetElementById("detail-display-memo_date");
                     this.displayTime = $Dom.GetElementById("detail-display-memo_time");
                     this.displayFaceEmoji = $Dom.GetElementById("detail-display-face_emoji");
-                    this.displayFaceEmojiBg = $Dom.GetElementById("detail-display-face_emoji_bg"); // これを追加
+                    this.displayFaceEmojiBg = $Dom.GetElementById("detail-display-face_emoji_bg");
                     this.displayWeatherEmoji = $Dom.GetElementById("detail-display-weather_code");
                     this.displayTitle = $Dom.GetElementById("detail-display-title");
                     this.displayBody = $Dom.GetElementById("detail-display-body");
@@ -158,6 +159,11 @@ const _DetailContentCore = {
     },
     // 参照用反映
     _renderDisplayMode(detail) {
+        // バッジに番号をセット
+        if (this.displayIndexBadge) {
+            this.displayIndexBadge.textContent = ($Marker._currentIndex + 1);
+        }
+        //
         this.displayDate.textContent = detail.memo_date;
         this.displayTime.textContent = detail.memo_time;
         this.displayTitle.textContent = detail.title;
