@@ -44,11 +44,22 @@
 <body class="overflow-hidden bg-brand-1 fixed inset-0 touch-none flex">
 
 <!-- ★PC用広告サイドバー（左側に固定） -->
-<div id="ad-space-pc" class="hidden lg:flex w-[250px] shrink-0 bg-slate-50 border-r border-brand-2 z-[2000] flex-col items-center justify-center shadow-md relative">
-    <div class="text-slate-400 text-[0.6rem] font-black tracking-widest uppercase mb-2">Advertisement</div>
-    <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-400 text-[0.8rem] font-bold shadow-inner">
-        AD BANNER
+<div id="ad-space-pc" class="hidden lg:flex w-[250px] shrink-0 bg-slate-50 border-r border-brand-2 z-[2000] flex-col items-center justify-center shadow-md relative gap-8">
+    <!-- 広告1 -->
+    <div class="flex flex-col items-center">
+        <div class="text-slate-400 text-[0.6rem] font-black tracking-widest uppercase mb-2">Advertisement</div>
+        <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-400 text-[0.8rem] font-bold shadow-inner">
+            AD BANNER 1
+        </div>
     </div>
+    <!-- 広告2 -->
+    <div class="flex flex-col items-center">
+        <div class="text-slate-400 text-[0.6rem] font-black tracking-widest uppercase mb-2">Advertisement</div>
+        <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-400 text-[0.8rem] font-bold shadow-inner">
+            AD BANNER 2
+        </div>
+    </div>
+
 </div>
 
 <!-- アプリ全体のルートコンテナ（flex-1 で残り幅を使い、min-w-0ではみ出しを防ぐ） -->
@@ -160,7 +171,7 @@
                     <!-- ■ 参照用（表示モード）：縦並び・左揃え・1rem 統一版 -->
                     <div id="detail-display" class="hidden relative min-h-full flex flex-col bg-white">
                         <!-- 右上の正円インデックスバッジ -->
-                        <div class="js-index-badge absolute -top-3 -right-3 w-12 h-12 rounded-full bg-brand-4 border-2 border-white text-white font-black text-[1.4rem] flex items-center justify-center shadow-md z-20">
+                        <div class="js-index-badge absolute -top-3 -right-3 w-10 h-10 rounded-full bg-brand-4 border-2 border-white text-white font-black text-[1.2rem] flex items-center justify-center shadow-md z-20">
                         </div>
                         <!-- 背景用の巨大顔文字：上部に固定（スクロールしても動かない） -->
                         <div class="sticky top-0 w-full h-0 pointer-events-none z-0 flex justify-center">
@@ -367,6 +378,12 @@
         </div>
         <!-- ■　アプリ下部 -->
         <div class="absolute bottom-4 left-0 right-0 z-[1001] pointer-events-none">
+            <!-- ★追加: スマホ用広告スペース（下段） -->
+            <div id="ad-space-mobile-bottom" class="lg:hidden mx-auto mb-4 w-[320px] h-[50px] pointer-events-auto shadow-md">
+                <div class="bg-white w-full h-full border border-brand-2 flex items-center justify-center text-slate-400 text-[0.6rem] font-black tracking-widest rounded-sm">
+                    AD BANNER BOTTOM
+                </div>
+            </div>
             <!-- ■　アイコンバー -->
             <div id="ui-bottom-bar" class="mx-2 bg-transparent flex items-center justify-between mb-3">
                 <!-- 左 -->

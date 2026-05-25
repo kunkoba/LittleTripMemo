@@ -224,4 +224,26 @@ window.$Util = {
 		// 判定不可の場合はGoogleのFaviconサービスをフォールバックとして使用
 		return `<img src="https://www.google.com/s2/favicons?sz=64&domain=${url}" width="${size}" height="${size}" style="width:${size}px; height:${size}px;" alt="icon">`;
 	},
+    // IDを難読化（URL用）
+    EncodeId(id) {
+        if (!id) return "";
+        // 1. 文字列化して標準のBase64エンコード
+        // btoaはバイナリ文字列用なので、日本語が含まれないID数値ならこれで十分です
+        const base64 = btoa(id.toString()).replace(/=+$/, ""); // パディング削除
+        // 2. 文字列を反転させて推測しにくくする
+        return base64.split("").reverse().join("");
+    },
+    // 必要であればJS側でも戻せるようにしておく
+    DecodeId(encoded) {
+        if (!encoded) return 0;
+        try {
+            const reversed = encoded.split("").reverse().join("");
+            // パディング復元
+            let b64 = reversed;
+            while (b64.length % 4 !== 0) b64 += "=";
+            return parseInt(atob(b64));
+        } catch (e) {
+            return 0;
+        }
+    }
 };

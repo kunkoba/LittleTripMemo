@@ -483,7 +483,7 @@
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Restore Map</span>
         </button>
-        <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
             <span class="col-span-1 flex justify-center text-[1.2rem]">➕</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Create Memo</span>
@@ -493,7 +493,7 @@
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Archive List</span>
         </button>
-        <button id="btn-app-info" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-info" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
             <span class="col-span-1 flex justify-center text-[1.2rem]">📁</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">archive info</span>
@@ -508,7 +508,7 @@
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">[Merge] Or [Add]</span>
         </button>
-        <button id="btn-app-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
             <span class="col-span-1 flex justify-center text-[1.2rem]">🔎</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Map Search</span>
@@ -683,20 +683,17 @@
 <!-- 【ダイアログ子】ユーザープロフィール参照 -->
 <template id="tpl-view-profile">
 	<div class="relative min-h-full flex flex-col bg-white px-1">
-		<!-- 1. ヘッダー（アイコンとユーザーID） -->
-		<div class="flex items-center gap-4 mb-4">
-			<div id="view-profile-icon" class="text-[4rem]  drop-shadow-md"></div>
-			<div class="flex flex-col">
-				<span id="view-profile-userid" class="text-[0.7rem] font-black text-slate-400 tracking-widest uppercase"></span>
+		<!-- 1. ヘッダー（アイコンとニックネーム） -->
+		<div class="flex items-center gap-4 mb-6">
+			<div id="view-profile-icon" class="text-[4rem] drop-shadow-md shrink-0"></div>
+			<div class="flex flex-col flex-1 min-w-0">
+                <!-- ニックネームをここに移動し、サイズを少し大きく（1.4rem） -->
+				<h1 id="view-profile-nickname" class="text-[1.2rem] font-black text-slate-800 break-all leading-tight"></h1>
 			</div>
 		</div>
-		<!-- 2. ニックネーム（左アクセント border-l-4） -->
-		<div class="border-l-4 border-brand-3 pl-3 py-0.5 my-3">
-			<h1 id="view-profile-nickname" class="text-[1.2rem] font-black text-slate-800  break-all"></h1>
-		</div>
-		<!-- 3. 自己紹介（） -->
+		<!-- 2. 自己紹介 -->
 		<div id="view-profile-description" class="text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-all min-h-[200px] overflow-y-auto"></div>
-		<!-- 4. リンクエリア -->
+        <!-- 3. リンクエリア -->
 		<div id="view-profile-links" class="gap-3 flex my-3"></div>
 	</div>
 </template>
@@ -712,9 +709,12 @@
 					<input type="hidden" id="edit-profile-icon">
 				</button>
 			</div>
-			<div class="flex-1">
-				<label class="block text-[0.7rem] font-bold mb-1 uppercase text-slate-400">Nickname</label>
-				<input id="edit-profile-nickname" type="text" maxlength="30" class="w-full border-2 border-brand-3 px-4 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
+            <div class="flex-1">
+				<div class="flex justify-between items-end mb-1">
+					<label class="block text-[0.7rem] font-bold uppercase text-slate-400">Nickname</label>
+					<span class="text-[0.6rem] font-bold text-slate-300"><span id="edit-profile-nickname-count">0</span>/20</span>
+				</div>
+				<input id="edit-profile-nickname" type="text" maxlength="20" class="w-full border-2 border-brand-3 px-4 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
 			</div>
 		</div>
 		<!-- 2. 自己紹介（高さを h-48 から h-32 に縮小） -->
@@ -867,7 +867,7 @@
 		<div class="flex gap-4 pb-6">
 			<button id="btn-mem-user-profile" class="border rounded-full pb-1 pl-4 pr-6 shadow-md flex items-baseline gap-2 active:opacity-60 transition-opacity">
 				<span id="view-mem-user-icon" class="text-[1.5rem]  drop-shadow-md"></span>
-				<span id="view-mem-user-id" class="text-[0.9rem] font-black text-slate-400 tracking-tight"></span>
+				<span id="view-mem-user-id" class="text-[0.8rem] font-black text-slate-400 tracking-tight line-clamp-1"></span>
 			</button>
 		</div>
 		<!-- 2. タイトル（左アクセント border-l-4） -->

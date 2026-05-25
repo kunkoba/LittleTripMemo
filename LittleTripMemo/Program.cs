@@ -319,13 +319,13 @@ app.UseMiddleware<ExceptionHandling>();
 // ■ SPA エントリーポイント設定
 // ======================================================================
 
-// ルートアクセス時に index.html を返す（SPA の起点）
-app.UseDefaultFiles(new DefaultFilesOptions
-{
-    DefaultFileNames = { "index.html" }
-});
-// 静的ファイル配信
-app.UseStaticFiles();
+//// ルートアクセス時に index.html を返す（SPA の起点）
+//app.UseDefaultFiles(new DefaultFilesOptions
+//{
+//    DefaultFileNames = { "index.html" }
+//});
+//// 静的ファイル配信
+//app.UseStaticFiles();
 
 
 

@@ -278,10 +278,16 @@ const DialogController = {
             search: $Dom.QuerySelector('#btn-app-search', el),
         };
         // 表示制御（取得済みの変数を使用）
-        if (mode === $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.create, false);
+        if (mode === $Const.SCREEN_MODE.ARCHIVE) $Dom.ToggleShow(b.create, true);
+        if (mode === $Const.SCREEN_MODE.ARCHIVE_PUB) $Dom.ToggleShow(b.create, true);
+        if (mode === $Const.SCREEN_MODE.SEARCH) $Dom.ToggleShow(b.create, true);
         if (mode === $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.batch, true);
         if (mode === $Const.SCREEN_MODE.SEARCH) $Dom.ToggleShow(b.point, true);
-        if (mode == $Const.SCREEN_MODE.SEARCH) $Dom.ToggleShow(b.search, false);
+        if (mode == $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.search, true);
+        if (mode === $Const.SCREEN_MODE.ARCHIVE) $Dom.ToggleShow(b.search, true);
+        if (mode === $Const.SCREEN_MODE.ARCHIVE_PUB) $Dom.ToggleShow(b.search, true);
+        if (mode == $Const.SCREEN_MODE.ARCHIVE) $Dom.ToggleShow(b.archiveInfo, true);
+        if (mode == $Const.SCREEN_MODE.ARCHIVE_PUB) $Dom.ToggleShow(b.archiveInfo, true);
         // 未ログインなら
         if (!isLoggedIn) {
             $Dom.ToggleShow(b.create, false);
@@ -1076,7 +1082,7 @@ const DialogController = {
                             if (!isOk) return;
                             const isSuccess = await $Data.Access.MergeDetails({
                                 seqs,
-                                title: "TripMemory_" + $Util.FormatDate(new Date(), 'YYYYMMDD_HHmmss'),
+                                title: "メモのまとめタイトル_" + $Util.FormatDate(new Date(), 'YYYYMMDD_HHmmss'),
                                 currency_unit: $App.AppData.Owner.currency_unit || 'JPY'
                             });
                             if (!isSuccess) return;
@@ -1436,7 +1442,7 @@ const DialogController = {
             const pL3   = profile.link3 || "";
             $Dom.QuerySelector('#view-profile-icon', el).textContent = pIcon;
             $Dom.QuerySelector('#view-profile-nickname', el).textContent = pName;
-            $Dom.QuerySelector('#view-profile-userid', el).textContent = profile.user_id || "";
+            // $Dom.QuerySelector('#view-profile-userid', el).textContent = profile.user_id || "";
             $Dom.QuerySelector('#view-profile-description', el).textContent = pDesc;
             const viewLinks = $Dom.QuerySelector('#view-profile-links', el);
             viewLinks.innerHTML = "";
@@ -1471,6 +1477,7 @@ const DialogController = {
         const editIconPreview = $Dom.QuerySelector('#edit-profile-icon-preview', el);
         const editIconInput = $Dom.QuerySelector('#edit-profile-icon', el);
         const editNickname = $Dom.QuerySelector('#edit-profile-nickname', el);
+        const editNicknameCount = $Dom.QuerySelector('#edit-profile-nickname-count', el);
         const editDesc = $Dom.QuerySelector('#edit-profile-description', el);
         const editDescCount = $Dom.QuerySelector('#edit-profile-description-count', el);
         const editLink1 = $Dom.QuerySelector('#edit-profile-link1', el);
@@ -1479,12 +1486,14 @@ const DialogController = {
         editIconPreview.textContent = profile.icon || "😀";
         editIconInput.value = profile.icon || "😀";
         editNickname.value = profile.nickName || "";
+        editNicknameCount.textContent = (profile.nickName || "").length;
         editDesc.value = profile.description || "";
         editDescCount.textContent = (profile.description || "").length;
         editLink1.value = profile.link1 || "";
         editLink2.value = profile.link2 || "";
         editLink3.value = profile.link3 || "";
         editDesc.addEventListener('input', () => editDescCount.textContent = editDesc.value.length);
+        editNickname.addEventListener('input', () => editNicknameCount.textContent = editNickname.value.length);
         $Dom.QuerySelector('#btn-profile-icon-trigger', el).onclick = () => {
             $Util.ShowEmojiPicker((emoji) => {
                 editIconPreview.textContent = emoji;
@@ -2026,7 +2035,8 @@ const DialogController = {
         $Dom.QuerySelector('#share-archive-title', el).textContent = archive.title || "No Title";
         // 2. URLの生成 (現在のドメイン + パラメータ)
         const baseUrl = window.location.origin + window.location.pathname;
-        const shareUrl = `${baseUrl}?mode=archive_pub&archiveId=${archive.archive_id}`;
+        const encodedId = $Util.EncodeId(archive.archive_id);
+        const shareUrl = `${baseUrl}?mode=archive_pub&encodedId=${encodedId}`;
         // 3. QRコードの生成 (無料APIを利用)
         const qrImg = $Dom.QuerySelector('#share-qr-image', el);
         qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`;

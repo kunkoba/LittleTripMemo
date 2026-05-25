@@ -147,8 +147,9 @@ window.$Data = {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/SearchByLocationPub', params))();
         },
         async GetArchiveDetailsPub(params = {}) {
+            const encodedId = $Util.EncodeId(params.archive_id);
             // 引数 params.archive_id を使用して URL を構築
-            const url = `/api/GetArchiveDetailsPub/${params.archive_id}`;
+            const url = `/api/GetArchiveDetailsPub/${encodedId}`;
             // GET リクエストとして実行 (_fetchData の method 引数を 'get' に)
             return await $Warn.CatchAsync(async () => {
                 return await this._fetchData('get', url, null); 

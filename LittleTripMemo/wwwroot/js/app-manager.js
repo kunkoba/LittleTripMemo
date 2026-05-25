@@ -139,9 +139,10 @@ const AppManager = {
         }
         // リクエストパラメータ取得
         const params = new URLSearchParams(location.search);
-        this.AppData.Context.TargetArchiveId = params.get("archiveId");
-        // URLパラメータの mode を優先、なければ TargetArchiveId の有無で分岐、それ以外は CREATE
         const urlMode = params.get("mode");
+        const targetArchiveId = $Util.DecodeId(params.get("encodedId"));
+        // URLパラメータの mode を優先、なければ TargetArchiveId の有無で分岐、それ以外は CREATE
+        this.AppData.Context.TargetArchiveId = targetArchiveId;
         if (urlMode) {
             this.AppData.Context.ScreenMode = urlMode;
         } else if (this.AppData.Context.TargetArchiveId) {
@@ -189,7 +190,7 @@ const AppManager = {
     },
     // 画面モード変更
     async RefreshScreen() {
-        console.log(`App.RefreshScreen->[${this.AppData.Context.ScreenMode}]  Login->[${this.AppData.Context.IsLoggedIn}]`)
+        console.log("App.RefreshScreen:", this.AppData.Context.ScreenMode)
         // アーカイブID
         const archiveId = this.AppData.Context.TargetArchiveId;
         let isSuccess = false;

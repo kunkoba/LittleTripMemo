@@ -223,29 +223,34 @@ public class AppController : _BaseController
             return OkWithBase(result);
         }
 
-        /// <summary>
-        /// まとめ明細一覧取得（公開データ）
-        /// </summary>
-        /// <param name="req"></param>
-        /// <returns></returns>
-        [AllowAnonymous]
-        [HttpPost("api/GetArchiveDetailsPub")]
-        public async Task<IActionResult> GetArchiveDetailsPub([FromBody] GetArchiveDetailsPubService.GetArchiveDetailsPubReq req)
-        {
-            var result = await _getArchiveDetailsPubService.ExecuteAsync(req);
-            return OkWithBase(result);
-        }
+        ///// <summary>
+        ///// まとめ明細一覧取得（公開データ）
+        ///// </summary>
+        ///// <param name="req"></param>
+        ///// <returns></returns>
+        //[AllowAnonymous]
+        //[HttpPost("api/GetArchiveDetailsPub")]
+        //public async Task<IActionResult> GetArchiveDetailsPub([FromBody] GetArchiveDetailsPubService.GetArchiveDetailsPubReq req)
+        //{
+        //    var result = await _getArchiveDetailsPubService.ExecuteAsync(req);
+        //    return OkWithBase(result);
+        //}
 
         /// <summary>
         /// まとめ明細一覧取得（公開データ）
         /// URL例: /api/GetArchiveDetailsPub/123
         /// </summary>
         [AllowAnonymous]
-        [HttpGet("api/GetArchiveDetailsPub/{archive_id}")] // GETに変更し、パスにIDを含める
-        public async Task<IActionResult> GetArchiveDetailsPub(int archive_id)
+        [HttpGet("api/GetArchiveDetailsPub/{encodedId}")] // GETに変更し、パスにIDを含める
+        public async Task<IActionResult> GetArchiveDetailsPub(string encodedId)
         {
+            int archiveId = ServiceUtilities.DecodeId(encodedId);
+
+            // 不正なID（デコード失敗）なら 404 か 400
+            if (archiveId <= 0) return NotFound();
+
             // 引数からReqオブジェクトを生成
-            var req = new GetArchiveDetailsPubService.GetArchiveDetailsPubReq(archive_id);
+            var req = new GetArchiveDetailsPubService.GetArchiveDetailsPubReq(archiveId);
             var result = await _getArchiveDetailsPubService.ExecuteAsync(req);
 
             return OkWithBase(result);

@@ -77,7 +77,7 @@ public static class ServiceUtilities
     /// </summary>
     /// <param name="origin">元の文字列</param>
     /// <returns>エンコード済み文字列</returns>
-    public static string EncodeBase64(string origin)
+    public static string EncodeBase64_2(string origin)
     {
         if (string.IsNullOrEmpty(origin))
             return string.Empty;
@@ -96,7 +96,7 @@ public static class ServiceUtilities
     /// </summary>
     /// <param name="encoded">エンコード済み文字列</param>
     /// <returns>復号後の文字列</returns>
-    public static string DecodeBase64(string encoded)
+    public static string DecodeBase64_2(string encoded)
     {
         if (string.IsNullOrEmpty(encoded))
             return string.Empty;
@@ -113,6 +113,40 @@ public static class ServiceUtilities
 
         var bytes = Convert.FromBase64String(reversed);
         return System.Text.Encoding.UTF8.GetString(bytes);
+    }
+
+    /// <summary>
+    /// JSの $Util.EncodeId で難読化された文字列を int に戻す
+    /// </summary>
+    public static int DecodeId(string? encodedId)
+    {
+        if (string.IsNullOrEmpty(encodedId)) return 0;
+
+        try
+        {
+            // 1. 反転を戻す
+            char[] charArray = encodedId.ToCharArray();
+            Array.Reverse(charArray);
+            string reversed = new string(charArray);
+
+            // 2. Base64のパディング(=)を補完（4の倍数にする）
+            int mod4 = reversed.Length % 4;
+            if (mod4 > 0)
+            {
+                reversed += new string('=', 4 - mod4);
+            }
+
+            // 3. Base64デコードして数値に戻す
+            byte[] data = Convert.FromBase64String(reversed);
+            string decodedString = System.Text.Encoding.UTF8.GetString(data);
+
+            return int.Parse(decodedString);
+        }
+        catch
+        {
+            // 不正な文字列が送られてきた場合は安全に0を返す
+            return 0;
+        }
     }
 
     #endregion
