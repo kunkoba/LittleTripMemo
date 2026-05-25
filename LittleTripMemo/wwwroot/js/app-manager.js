@@ -214,13 +214,13 @@ const AppManager = {
                     // 不正な場合はログインダイアログを出して待機
                     if (!this.AppData.Context.IsLoggedIn) $Dialog.ShowLoginDialog();
                     this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    return;
+                    window.history.replaceState(null, '', window.location.pathname); // URLをクリア
+                    // return;
                 }
                 if (this.AppData.Context.IsLoggedIn) {
                     isSuccess = await $Data.Access.GetArchiveDetails({ archive_id: archiveId });
                     if (!isSuccess) {
                         this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                        // return;
                     } else {
                         const archive = $Data.Store.GetArchive();
                         $TopBar.ChangeTitle(archive?.title || "");
@@ -231,8 +231,9 @@ const AppManager = {
                 if (!archiveId) {
                     if (!this.AppData.Context.IsLoggedIn) $Dialog.ShowLoginDialog();
                     this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    this.RefreshScreen();
-                    return;
+                    window.history.replaceState(null, '', window.location.pathname); // URLをクリア
+                    // this.RefreshScreen();
+                    // return;
                 }
                 isSuccess = await $Data.Access.GetArchiveDetailsPub({ archive_id: archiveId });
                 if (!isSuccess) {
@@ -241,8 +242,9 @@ const AppManager = {
                         return;
                     }
                     this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    this.RefreshScreen();
-                    return;
+                    window.history.replaceState(null, '', window.location.pathname); // エラー時にURLをクリア
+                    // this.RefreshScreen();
+                    // return;
                 } else {
                     // 取得した直後にローカルDBへ同期
                     if (this.AppData.Context.IsLoggedIn) {

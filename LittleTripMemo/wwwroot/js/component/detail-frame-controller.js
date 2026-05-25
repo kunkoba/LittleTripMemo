@@ -7,6 +7,7 @@ const _DetailFrameCore = {
             // 要素取得
             {
                 this.root = $Dom.GetElementById(this._elementId);
+                this.btnCurrent = $Dom.GetElementById("detail-btn-current");
                 this.btnEarth = $Dom.GetElementById("detail-btn-earth");
                 this.btnMap  = $Dom.GetElementById("detail-btn-map");
                 this.btnEdit = $Dom.GetElementById("detail-btn-edit");
@@ -30,6 +31,11 @@ const _DetailFrameCore = {
             }
             // イベント登録
             {
+                // 現在地移動（アプリメニューと同じ処理）
+                this.btnCurrent.addEventListener("click", () => {
+                    $Marker.RefreshCurrentLocation();
+                    $Marker.FocusToLocationMarker();
+                });
                 // Google Earth連携（追加）
                 this.btnEarth.addEventListener("click", () => {
                     const data = $DetailContent.GetFormEditData();
@@ -326,6 +332,7 @@ const DetailFrameController = {
         if (isNew) {
             // 1. 新規入力時
             $DetailContent.RenderDetail(null, true); // 編集モードで描画
+            $Dom.ToggleShow(_DetailFrameCore.btnCurrent, true);
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, false);
             $Dom.ToggleShow(_DetailFrameCore.btnReport, false);
             $Dom.ToggleShow(_DetailFrameCore.btnSave, true);
@@ -334,6 +341,7 @@ const DetailFrameController = {
             $Dom.ToggleShow(_DetailFrameCore.groupReaction, false);
         } else {
             // 2. 既存データ参照時
+            $Dom.ToggleShow(_DetailFrameCore.btnCurrent, false);
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, isOwner);
             $Dom.ToggleShow(_DetailFrameCore.btnReport, !isOwner && isPublic);
             $DetailContent.RenderDetail(detail, false);
