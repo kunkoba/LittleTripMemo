@@ -227,6 +227,11 @@ const _MarkerCore = {
     getLocationMarkerPos(){
         return this.locationMarker?.getLatLng();
     },
+    // 指定インデックスのマーカー座標を返す
+    getCurrentMarkerPos(index) {
+        const marker = this._markerList[index];
+        return marker ? marker.getLatLng() : null;
+    },
 };
 
 // マーカー管理の窓口（状態管理と指示出し）
@@ -329,6 +334,9 @@ const MarkerController = {
     },
     GetLocationMarkerPos() {
         return _MarkerCore.getLocationMarkerPos();
+    },
+    GetCurrentMarkerPos() {
+        return _MarkerCore.getCurrentMarkerPos(this._currentIndex);
     },
     RefreshCurrentLocation() {
         _MarkerCore.refreshCurrentLocation();

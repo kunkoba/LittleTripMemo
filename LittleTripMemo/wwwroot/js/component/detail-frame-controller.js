@@ -178,7 +178,7 @@ const _DetailFrameCore = {
         this.renderReactions(detail);
     },
     // 詳細パネルの開閉と関連UIの更新
-    toggleDetailPanel(isShow) {
+    toggleDetailPanel(isShow, targetPos = null) {
         // パネル占有サイズ設定
         const PANEL_WIDTH = '500px';
         const PANEL_HEIGHT = '80%';
@@ -223,7 +223,13 @@ const _DetailFrameCore = {
         // アイコン表示切替
         $UI.ToggleIconBar(!isShow);
         // 地図リサイズ
-        $Map.ResizeMap();
+        // $Map.ResizeMap();
+        // パネル展開アニメーション中、ターゲット座標を中心に固定する
+        if (isShow) {
+            $Map.ResizeMap(400, targetPos);
+        } else {
+            $Map.ResizeMap(400);
+        }
     },
     // リアクションのカウントと状態を反映する
     async renderReactions(detail) {
@@ -305,9 +311,15 @@ const DetailFrameController = {
     Open(detail) {
         // ▼ 画面を開く前にポップアップを閉じる
         $Marker.ClosePopup();
-        // 
-        _DetailFrameCore.toggleDetailPanel(true);
         const isNew = !detail;
+        // パネルを開く際、中心に固定するターゲット座標を決定
+        let targetPos = null;
+        if (isNew) {
+            targetPos = $Marker.GetLocationMarkerPos(); // 新規作成時は現在地マーカー
+        } else {
+            targetPos = $Marker.GetCurrentMarkerPos(); // 既存データ時は選択中のマーカー
+        }
+        _DetailFrameCore.toggleDetailPanel(true, targetPos);
         const isOwner = detail?.is_owner ?? true;
         // ScreenMode または detailのプロパティでPublicデータか判定
         const isPublic = $App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.ARCHIVE_PUB || detail?.is_public === true;

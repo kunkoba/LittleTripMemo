@@ -66,8 +66,9 @@ const _BottomCore = {
 				this.btnNext.addEventListener('click',  () => { $Marker.FocusNext();  });
 				this.btnLast.addEventListener('click',  () => { $Marker.FocusLast();  });
 				this.btnOpen.addEventListener('click',  () => {
-					$Marker.ClosePopup();
-                    $Marker.FocusToCurrentMarker();
+                    // ★先に「遅延ゼロ(0)」でマーカーを画面中央に瞬間移動させる
+                    $Marker.FocusToCurrentMarker(0);
+                    // ★その直後に詳細パネルを開くことで、マーカーが中心に固定されたままスムーズにアニメーションする
 					$DetailFrame.Open($Marker.GetDataWithCurrentIndex());
 				});
 			}
