@@ -53,10 +53,10 @@ public class SysReportRepository : _BaseRepository
         SELECT 
             r.target_user_id, 
             r.archive_id, 
-            COALESCE(a.title, '（不明または削除済み）') AS archive_title, 
+            a.title AS archive_title, 
             COUNT(1) AS report_count
         FROM t_sys_reports r
-        LEFT JOIN t_memo_archive_pub a 
+        INNER JOIN t_memo_archive_pub a 
             ON r.archive_id = a.archive_id
         GROUP BY 
             r.target_user_id, 

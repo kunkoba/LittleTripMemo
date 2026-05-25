@@ -32,9 +32,21 @@ const _DetailFrameCore = {
             // イベント登録
             {
                 // 現在地移動（アプリメニューと同じ処理）
-                this.btnCurrent.addEventListener("click", () => {
+                this.btnCurrent.addEventListener("click", async () => {
+                    $Notice.Info("現在地を取得しています...");
+                    // 1. 地図とマーカーの移動は既存の処理に「投げっぱなし」にする
                     $Marker.RefreshCurrentLocation();
                     $Marker.FocusToLocationMarker();
+                    // 2. それとは完全に独立して、裏で現在地を取得し、終わったらフォームに直接書き込む
+                    $Util.GetCurrentPosition().then(pos => {
+                        const latInput = document.getElementById("detail-edit-latitude");
+                        const lngInput = document.getElementById("detail-edit-longitude");
+                        if (latInput) latInput.value = pos.coords.latitude;
+                        if (lngInput) lngInput.value = pos.coords.longitude;
+                        $Notice.Info("現在地を更新しました");
+                    }).catch(err => {
+                        console.warn("フォームへの現在地反映をスキップしました", err);
+                    });
                 });
                 // Google Earth連携（追加）
                 this.btnEarth.addEventListener("click", () => {
@@ -184,7 +196,7 @@ const _DetailFrameCore = {
         this.renderReactions(detail);
     },
     // 詳細パネルの開閉と関連UIの更新
-    toggleDetailPanel(isShow, targetPos = null) {
+    toggleDetailPanel(isShow) {
         // パネル占有サイズ設定
         const PANEL_WIDTH = '500px';
         const PANEL_HEIGHT = '80%';
@@ -228,14 +240,8 @@ const _DetailFrameCore = {
         }
         // アイコン表示切替
         $UI.ToggleIconBar(!isShow);
-        // 地図リサイズ
-        // $Map.ResizeMap();
-        // パネル展開アニメーション中、ターゲット座標を中心に固定する
-        if (isShow) {
-            $Map.ResizeMap(400, targetPos);
-        } else {
-            $Map.ResizeMap(400);
-        }
+        // 不要な条件分岐を消し、シンプルにリサイズだけを呼ぶ
+        $Map.ResizeMap(400);
     },
     // リアクションのカウントと状態を反映する
     async renderReactions(detail) {
@@ -318,14 +324,15 @@ const DetailFrameController = {
         // ▼ 画面を開く前にポップアップを閉じる
         $Marker.ClosePopup();
         const isNew = !detail;
-        // パネルを開く際、中心に固定するターゲット座標を決定
-        let targetPos = null;
-        if (isNew) {
-            targetPos = $Marker.GetLocationMarkerPos(); // 新規作成時は現在地マーカー
-        } else {
-            targetPos = $Marker.GetCurrentMarkerPos(); // 既存データ時は選択中のマーカー
-        }
-        _DetailFrameCore.toggleDetailPanel(true, targetPos);
+        // // パネルを開く際、中心に固定するターゲット座標を決定
+        // let targetPos = null;
+        // if (isNew) {
+        //     targetPos = $Marker.GetLocationMarkerPos(); // 新規作成時は現在地マーカー
+        // } else {
+        //     targetPos = $Marker.GetCurrentMarkerPos(); // 既存データ時は選択中のマーカー
+        // }
+        // _DetailFrameCore.toggleDetailPanel(true, targetPos);
+        _DetailFrameCore.toggleDetailPanel(true);
         const isOwner = detail?.is_owner ?? true;
         // ScreenMode または detailのプロパティでPublicデータか判定
         const isPublic = $App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.ARCHIVE_PUB || detail?.is_public === true;

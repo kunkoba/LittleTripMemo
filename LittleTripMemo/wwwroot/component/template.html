@@ -185,14 +185,14 @@
 </template>
 <!-- 【リスト子】通知一覧用 -->
 <template id="tpl-list-child-notice">
-    <div class="js-item-card flex p-4 rounded-[1rem] bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3 relative min-h-[5.5rem] border-l-4 border-brand-3">
+    <div class="js-item-card flex p-4 rounded-[1rem] bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md relative border-l-4 border-brand-3 mb-6">
         <!-- 右上の固定要素（NEWバッジ ＋ アイコン） -->
-        <div class="absolute top-4 right-4 flex items-start gap-2 z-10">
+        <div class="absolute top-1 right-3 flex items-start gap-2 z-10">
             <span class="js-badge-new hidden bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm mt-1">NEW</span>
             <span class="js-icon text-[1.8rem] leading-none drop-shadow-sm"></span>
         </div>
-        <!-- テキストエリア（右側にアイコン用の余白 pr-16 を空ける） -->
-        <div class="flex-1 min-w-0 pr-16 flex flex-col justify-center">
+        <!-- テキストエリア -->
+        <div class="flex-1 min-w-0 flex flex-col justify-center">
             <!-- 1行目: 日時 -->
             <div class="text-[0.7rem] text-slate-400 tracking-wider js-date mb-2 italic"></div>
             <!-- 2行目: タイトル -->
@@ -205,12 +205,12 @@
 <!-- 【リスト子】レビューアイテム -->
 <template id="tpl-list-child-review">
     <!-- 下線で区切る（最後の要素は下線を消す） -->
-    <div class="p-4 border-b border-slate-100 last:border-b-0 flex flex-col">
+    <div class="p-4 pb-2 border-b border-slate-100 last:border-b-0 flex flex-col">
         <div class="flex justify-between items-center mb-1.5">
             <div class="js-stars text-[1rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></div>
-            <div class="js-date text-[0.7rem] font-black text-slate-400 tracking-wider"></div>
+            <div class="js-date text-[0.7rem] font-black text-slate-400 tracking-wider italic"></div>
         </div>
-        <div class="js-body text-[0.7rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all"></div>
+        <div class="js-body text-[0.7rem] text-slate-700 leading-relaxed line-clamp-1 break-all"></div>
     </div>
 </template>
 <!-- 【リスト子】管理者通知一覧用 -->
@@ -244,7 +244,7 @@
             </div>
             <div id="dialog-content" class="flex-1 overflow-y-auto flex flex-col m-4 relative pr-2"></div>
             <!-- 修正: 常に表示し、flex-wrapで複数段に対応、min-hを設定 -->
-            <div id="dialog-button-container" class="_hidden z-[900] shrink-0 flex flex-col gap-3 p-4 bg-brand-1 border"></div>
+            <div id="dialog-button-container" class="z-[900] shrink-0 flex flex-col gap-3 p-4 bg-brand-1 border"></div>
         </div>
     </div>
 </template>
@@ -319,7 +319,7 @@
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">User Settings</span>
         </button>
         <button id="btn-sys-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">🔔</span>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">📢</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Notifications</span>
         </button>
@@ -364,14 +364,14 @@
             <span class="text-[0.7rem] font-black text-slate-400 tracking-wider js-date italic"></span>
             <span class="js-score text-[0.9rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
         </div>
-        <div class="text-left text-[0.75rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all js-body"></div>
+        <div class="text-left text-[0.75rem] text-slate-700 break-all js-body line-clamp-1"></div>
     </button>
 </template>
 <!-- 【ダイアログ子】管理者フィードバック詳細（新しく追加） -->
 <template id="tpl-admin-feedback-detail">
     <div class="w-full text-black-5 flex flex-col h-full overflow-hidden p-2 bg-white">
         <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
-            <span class="text-[0.8rem] font-black text-slate-400 tracking-wider js-date italic"></span>
+            <span class="text-[0.9rem] font-black text-slate-400 tracking-wider js-date italic"></span>
             <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
         </div>
         <div class="mb-4 px-2">
@@ -421,19 +421,18 @@
 </template>
 <!-- 【リスト子】管理者通報詳細アイテム -->
 <template id="tpl-admin-list-child-report-item">
-    <div class="bg-white p-3 rounded-[1rem] border border-slate-200 shadow-md relative overflow-hidden">
+    <div class="bg-white p-3 border border-slate-200 shadow-md relative overflow-hidden">
         <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-400"></div>
         <div class="pl-2">
             <div class="flex justify-between items-center mb-1">
-                <div class="text-[0.6rem] font-bold text-slate-500 js-reporter-user truncate pr-2"></div>
                 <div class="text-[0.6rem] font-bold text-slate-400 js-report-tim shrink-0"></div>
             </div>
-            <div class="text-[0.6rem] text-black-5 whitespace-pre-wrap break-all js-report-body"></div>
+            <div class="text-[0.6rem] text-black-5 break-all js-report-body line-clamp-1"></div>
         </div>
     </div>
 </template>
 <!-- 【ダイアログ子】管理者通知編集 -->
-<template id="tpl-admin-notice-edit">
+<template id="tpl-admin-notice-edit_2">
     <div class="w-full text-black-5 space-y-4 pt-2 px-2">
         <!-- 種別 -->
         <div>
@@ -451,6 +450,49 @@
         <div>
             <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Body</label>
             <textarea id="edit-notice-body" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+        </div>
+        <!-- リンクURL -->
+        <div>
+            <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Link URL</label>
+            <input id="edit-notice-url" type="url" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-500" placeholder="https://...">
+        </div>
+        <!-- 表示期間 -->
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-[0.6rem] font-bold mb-1 uppercase text-black-3">Disp From</label>
+                <input id="edit-notice-from" type="date" class="w-full border-2 border-brand-3 px-2 py-1 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
+            </div>
+            <div>
+                <label class="block text-[0.6rem] font-bold mb-1 uppercase text-black-3">Disp To</label>
+                <input id="edit-notice-to" type="date" class="w-full border-2 border-brand-3 px-2 py-1 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
+            </div>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】管理者通知編集 -->
+<template id="tpl-admin-notice-edit">
+    <div class="w-full text-black-5 space-y-4 pt-2 px-2">
+        <!-- 種別 -->
+        <div>
+            <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Kind</label>
+            <select id="edit-notice-kind" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
+            </select>
+        </div>
+        <!-- タイトル (修正箇所) -->
+        <div>
+            <div class="flex justify-between items-end mb-1">
+                <label class="block text-[0.7rem] font-bold uppercase text-black-3">Title</label>
+                <span class="text-[0.6rem] text-black-2 font-bold"><span id="edit-notice-title-count">0</span>/30</span>
+            </div>
+            <input id="edit-notice-title" type="text" maxlength="30" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
+        </div>
+        <!-- 本文 (修正箇所) -->
+        <div>
+            <div class="flex justify-between items-end mb-1">
+                <label class="block text-[0.7rem] font-bold uppercase text-black-3">Body</label>
+                <span class="text-[0.6rem] text-black-2 font-bold"><span id="edit-notice-body-count">0</span>/300</span>
+            </div>
+            <textarea id="edit-notice-body" maxlength="300" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
         <!-- リンクURL -->
         <div>
@@ -621,7 +663,7 @@
 <template id="tpl-review-post">
     <div class="w-full text-black-5 px-2 space-y-6 pt-4">
         <div class="text-center">
-            <label class="block text-[0.7rem] font-black text-black-3 uppercase tracking-widest mb-3">Tap to Rate</label>
+            <label class="block text-[0.7rem] font-black text-black-3 uppercase tracking-widest">Tap to Rate</label>
             <div id="review-star-input" class="flex justify-center gap-1 text-[40px] "></div>
             <input type="hidden" id="input-review-rating" value="5">
         </div>
@@ -630,7 +672,8 @@
                 <label class="block text-[0.7rem] font-black text-black-3 uppercase tracking-widest">Review (Optional)</label>
                 <span class="text-[0.6rem] font-bold text-black-2"><span id="review-text-count">0</span>/300</span>
             </div>
-            <textarea id="input-review-body" maxlength="300" placeholder="アプリの感想をお聞かせください" class="w-full border-2 border-brand-3 p-3 text-[0.8rem] h-32 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+            <textarea id="input-review-body" maxlength="300" placeholder="アプリの感想をお聞かせください" 
+                class="w-full border-2 border-brand-3 p-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
     </div>
 </template>
@@ -639,17 +682,17 @@
 	<div class="relative min-h-full flex flex-col bg-white px-1">
 		<!-- 1. ヘッダー（日付とアイコンを横並びに） -->
 		<div class="flex items-center gap-4 mb-6">
-			<div class="flex items-center gap-3 text-black font-bold text-[1rem] italic">
-				<span id="view-notice-date" class="text-slate-400"></span>
-				<span id="view-notice-icon" class="text-[1.5rem]  drop-shadow-md"></span>
+            <div class="flex items-center gap-3 text-black font-bold text-[1rem]">
+                <span id="view-notice-icon" class="text-[1.5rem]  drop-shadow-md"></span>
+                <span id="view-notice-date" class="text-slate-400 italic"></span>
 			</div>
 		</div>
 		<!-- 2. タイトル（左アクセント border-l-4） -->
 		<div class="border-l-4 border-brand-3 pl-3 py-0.5 mb-6">
-			<h1 id="view-notice-title" class="text-[1rem] font-black text-slate-800  break-all"></h1>
+			<h1 id="view-notice-title" class="text-[1.2rem] font-black text-slate-800  break-all"></h1>
 		</div>
 		<!-- 3. 本文（ で統一） -->
-		<div id="view-notice-body" class="text-[0.9rem] text-slate-600 leading-[2] whitespace-pre-wrap break-all pt-2 h-[300px] overflow-y-auto pr-2"></div>
+		<div id="view-notice-body" class="text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-all pt-2 h-[300px] overflow-y-auto pr-2"></div>
         <!-- 4. リンク表示エリア -->
 		<div id="view-notice-url-wrapper" class="hidden w-full pt-6 pb-2 mt-auto">
             <a id="view-notice-url" href="" target="_blank" class="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-[1rem] p-3 shadow-sm active:scale-95 transition-transform text-blue-600">
@@ -662,18 +705,28 @@
 <!-- 【ダイアログ子】まとめ親編集 -->
 <template id="tpl-edit-archive">
     <div class="w-full text-black-5 space-y-4">
+        <!-- タイトル -->
         <div>
-            <label class="block text-[0.7rem] font-bold mb-1 uppercase">Trip Title</label>
-            <input id="edit-mem-title" type="text" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
+            <div class="flex justify-between items-end mb-1">
+                <label class="block text-[0.7rem] font-bold uppercase">Trip Title</label>
+                <span class="text-[0.6rem] text-slate-300 font-bold"><span id="edit-mem-title-count">0</span>/30</span>
+            </div>
+            <input id="edit-mem-title" type="text" maxlength="30" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
         </div>
+        <!-- 本文 -->
         <div>
-            <label class="block text-[0.7rem] font-bold mb-1 uppercase">Description / Memo</label>
-            <textarea id="edit-mem-body" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none leading-[2]"></textarea>
+            <div class="flex justify-between items-end mb-1">
+                <label class="block text-[0.7rem] font-bold uppercase">Description / Memo</label>
+                <span class="text-[0.6rem] text-slate-300 font-bold"><span id="edit-mem-body-count">0</span>/300</span>
+            </div>
+            <textarea id="edit-mem-body" maxlength="300" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none leading-[2]"></textarea>
         </div>
+        <!-- リンクURL -->
         <div>
             <label class="block text-[0.7rem] font-bold mb-1 uppercase">Link URL</label>
             <input id="edit-mem-url" type="url" placeholder="https://..." class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
         </div>
+        <!-- 通貨単位 -->
         <div>
             <label class="block text-[0.7rem] font-bold mb-1 uppercase">Currency</label>
             <input id="edit-mem-currency" type="text" maxlength="5" placeholder="JPY, USD..." class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white uppercase text-black-5">
@@ -911,7 +964,7 @@
                 <span class="text-[0.6rem] font-bold text-black-2"><span id="report-text-count">0</span>/300</span>
             </div>
             <textarea id="input-report-body" maxlength="300" placeholder="問題のある箇所や理由を具体的に記入してください" 
-                class="w-full border-2 border-brand-3 p-3 text-[0.8rem] h-32 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+                class="w-full border-2 border-brand-3 p-3 text-[1rem] h-[300px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
     </div>
 </template>

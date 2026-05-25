@@ -96,7 +96,7 @@ const _MarkerCore = {
         });
     },
     // 現在地マーカーの更新
-    refreshCurrentLocation() { // ★引数追加
+    async refreshCurrentLocation() {
         $Warn.CatchAsync(async () => {
             const pos = await $Util.GetCurrentPosition();
             const p = [pos.coords.latitude, pos.coords.longitude];
@@ -107,6 +107,7 @@ const _MarkerCore = {
                 this.generateArrowToCurrent();
                 this.focusToLocationMarker();
             }
+            return p;
         })();
     },
     // 矢印生成（まとめて）
@@ -338,8 +339,8 @@ const MarkerController = {
     GetCurrentMarkerPos() {
         return _MarkerCore.getCurrentMarkerPos(this._currentIndex);
     },
-    RefreshCurrentLocation() {
-        _MarkerCore.refreshCurrentLocation();
+    async RefreshCurrentLocation() {
+        return await _MarkerCore.refreshCurrentLocation();
     },
     RefreshCurrentArrow() {
         _MarkerCore.generateArrowToCurrent();

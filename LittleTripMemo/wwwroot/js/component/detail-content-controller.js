@@ -60,7 +60,6 @@ const _DetailContentCore = {
                     if (this.btnAddress) {
                         this.btnAddress.addEventListener('click', async () => {
                             const data = $DetailContent.GetFormEditData();
-                            console.log(data)
                             const addressName = await $Util.GetAddressName(data.latitude, data.longitude, "jp");
                             this.editTitle.value = addressName;
                         });

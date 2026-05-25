@@ -19,7 +19,7 @@ window.$Data = {
         // サーバー通信の基礎
         async _fetchData(method, url, params, isDebug = false) {
             // メイン処理
-            // console.log("▼ Access:", this.baseUrl + url, params);
+            console.log("▼ Access:", this.baseUrl + url, params);
             const token = $App.AppData.Owner.Token;
             const options = {
                 method: method.toUpperCase(),
@@ -47,7 +47,7 @@ window.$Data = {
                 throw err;
             }
             const result = await response.json();
-            // console.log("■ Result:", url, result);
+            console.log("■ Result:", url, result);
             const data = structuredClone(result.data);  // 値渡し
             // メイン処理
             $App.AppData.Context.IsLoggedIn = result.is_logged_in ?? false;

@@ -278,16 +278,23 @@ const DialogController = {
             search: $Dom.QuerySelector('#btn-app-search', el),
         };
         // 表示制御（取得済みの変数を使用）
-        if (mode === $Const.SCREEN_MODE.ARCHIVE) $Dom.ToggleShow(b.create, true);
-        if (mode === $Const.SCREEN_MODE.ARCHIVE_PUB) $Dom.ToggleShow(b.create, true);
-        if (mode === $Const.SCREEN_MODE.SEARCH) $Dom.ToggleShow(b.create, true);
-        if (mode === $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.batch, true);
-        if (mode === $Const.SCREEN_MODE.SEARCH) $Dom.ToggleShow(b.point, true);
-        if (mode == $Const.SCREEN_MODE.CREATE) $Dom.ToggleShow(b.search, true);
-        if (mode === $Const.SCREEN_MODE.ARCHIVE) $Dom.ToggleShow(b.search, true);
-        if (mode === $Const.SCREEN_MODE.ARCHIVE_PUB) $Dom.ToggleShow(b.search, true);
-        if (mode == $Const.SCREEN_MODE.ARCHIVE) $Dom.ToggleShow(b.archiveInfo, true);
-        if (mode == $Const.SCREEN_MODE.ARCHIVE_PUB) $Dom.ToggleShow(b.archiveInfo, true);
+        switch (mode) {
+            case $Const.SCREEN_MODE.CREATE:
+                $Dom.ToggleShow(b.batch, true);
+                $Dom.ToggleShow(b.search, true);
+                break;
+            case $Const.SCREEN_MODE.ARCHIVE:
+                case $Const.SCREEN_MODE.ARCHIVE_PUB:
+                $Dom.ToggleShow(b.create, true);
+                $Dom.ToggleShow(b.search, true);
+                $Dom.ToggleShow(b.archiveInfo, true);
+                break;
+            case $Const.SCREEN_MODE.SEARCH:
+                $Dom.ToggleShow(b.create, true);
+                $Dom.ToggleShow(b.point, true);
+                $Dom.ToggleShow(b.search, true);
+                break;
+        }
         // 未ログインなら
         if (!isLoggedIn) {
             $Dom.ToggleShow(b.create, false);
@@ -1273,7 +1280,7 @@ const DialogController = {
         }
         // --- ヘッダーボタンの定義 ---
         const headerButtons = [];
-        if (archive.is_public) {
+        if (archive.is_public && !archive.closed_flg) {
             headerButtons.push({
                 label: "🔗",
                 handler: () => this.ShowShareArchive(archive, profile)
@@ -1386,6 +1393,14 @@ const DialogController = {
         editBody.value = archive.memo || "";
         editUrl.value = archive.link_url || "";
         editCurrency.value = archive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
+        // --- 文字数カウント制御 ---
+        const cTitle = $Dom.QuerySelector('#edit-mem-title-count', el);
+        const cBody  = $Dom.QuerySelector('#edit-mem-body-count', el);
+        cTitle.textContent = editTitle.value.length;
+        cBody.textContent  = editBody.value.length;
+        editTitle.addEventListener('input', () => cTitle.textContent = editTitle.value.length);
+        editBody.addEventListener('input',  () => cBody.textContent  = editBody.value.length);
+        //
         _DialogCore.open({
             title: "EDIT ARCHIVE",
             content: el,
@@ -1629,7 +1644,7 @@ const DialogController = {
         const renderList = async () => {
             root.innerHTML = "";
             if (notices.length === 0) {
-                root.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-6">通知データがありません</div>`;
+                root.innerHTML = `<div class="text-center text-[1rem] font-bold text-slate-400 py-6">通知データがありません</div>`;
                 return;
             }
             const now = new Date();
@@ -1700,6 +1715,9 @@ const DialogController = {
         const inptUrl = $Dom.QuerySelector('#edit-notice-url', el);
         const inptFrom = $Dom.QuerySelector('#edit-notice-from', el);
         const inptTo = $Dom.QuerySelector('#edit-notice-to', el);
+        // カウンター要素の取得
+        const countTitle = $Dom.QuerySelector('#edit-notice-title-count', el);
+        const countBody = $Dom.QuerySelector('#edit-notice-body-count', el);
         // 定数からセレクトボックスの選択肢を動的生成
         selKind.innerHTML = "";
         Object.values($Const.NOTICE_KIND).forEach(k => {
@@ -1715,6 +1733,13 @@ const DialogController = {
         inptUrl.value = target.link_url || "";
         inptFrom.value = $Util.FormatDate(target.disp_from, "YYYY-MM-DD");
         inptTo.value = $Util.FormatDate(target.disp_to, "YYYY-MM-DD");
+        // --- 即時反映のための初期カウント表示 ---
+        countTitle.textContent = inptTitle.value.length;
+        countBody.textContent = inptBody.value.length;
+        // --- イベントリスナーの登録 (inputイベントを使う) ---
+        inptTitle.addEventListener('input', () => {
+            countTitle.textContent = inptTitle.value.length;
+        });
         _DialogCore.open({
             title: isNew ? "NEW NOTICE" : "EDIT NOTICE",
             content: el,
@@ -1757,7 +1782,7 @@ const DialogController = {
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         root.className = "w-full text-black-3 mb-2 px-1";
         if (reportSummary.length === 0) {
-            root.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-6">通報データはありません</div>`;
+            root.innerHTML = `<div class="text-center text-[1rem] font-bold text-slate-400 py-6">通報データはありません</div>`;
         } else {
             // 通報件数の多い順にソート
             const sorted = [...reportSummary].sort((a, b) => b.report_count - a.report_count);
@@ -1796,7 +1821,6 @@ const DialogController = {
         } else {
             reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
-                $Dom.QuerySelector(".js-reporter-user", child).textContent = `From: ${rep.reporter_user_id}`;
                 $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim, "YYYY.MM.DD HH:mm");
                 $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
                 listContainer.appendChild(child);
@@ -1832,14 +1856,12 @@ const DialogController = {
         const isSuccess = await $Data.Access.GetAllFeedback({ skip, take });
         if (!isSuccess) return;
         const root = $Dom.GenerateTemplate("tpl-list-parent");
-        // root.className = "w-full text-black-3 mb-2 px-1 _h-[60vh] overflow-y-auto";
         let isLoading = false;
         let hasMore = true;
         const renderItems = (items) => {
             items.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");
                 $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim || new Date(), "YYYY.MM.DD HH:mm");
-                // $Dom.QuerySelector(".js-score", child).textContent = `Score: ${item.score || 0}`;
                 const score = item.score || 0;
                 $Dom.QuerySelector(".js-score", child).textContent = "★".repeat(score) + "☆".repeat(5 - score);
                 $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
@@ -1897,15 +1919,7 @@ const DialogController = {
             title: "FEEDBACK DETAILS",
             content: el,
             help: "",
-            buttons: [
-                [
-                    { 
-                        label: "BACK", 
-                        className: "bg-slate-200 text-slate-500 shadow-sm", 
-                        closesDialog: true 
-                    }
-                ]
-            ]
+            buttons: []
         });
     },
     // 通報投稿画面

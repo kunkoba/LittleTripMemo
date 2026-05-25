@@ -25,10 +25,13 @@ const _BottomCore = {
 					$Dialog.ShowAppMenu();
 				});
 				this.btnCreate.addEventListener('click', () => {
-					// 詳細画面開く
-                    $Marker.FocusToLocationMarker();
 					$Marker.RefreshCurrentArrow();
-					$DetailFrame.Open();
+                    // まず現在地を画面中央にする
+                    $Marker.FocusToLocationMarker();
+                    // 50ミリ秒待ってから詳細画面を開く
+                    setTimeout(() => {
+						$DetailFrame.Open();
+                    }, 50);
 				});
 				this.btnSearch.addEventListener('click', async () => {
 					// 検索範囲（緯度経度）を取得
@@ -66,9 +69,7 @@ const _BottomCore = {
 				this.btnNext.addEventListener('click',  () => { $Marker.FocusNext();  });
 				this.btnLast.addEventListener('click',  () => { $Marker.FocusLast();  });
 				this.btnOpen.addEventListener('click',  () => {
-                    // ★先に「遅延ゼロ(0)」でマーカーを画面中央に瞬間移動させる
-                    $Marker.FocusToCurrentMarker(0);
-                    // ★その直後に詳細パネルを開くことで、マーカーが中心に固定されたままスムーズにアニメーションする
+                    $Marker.FocusToCurrentMarker();
 					$DetailFrame.Open($Marker.GetDataWithCurrentIndex());
 				});
 			}

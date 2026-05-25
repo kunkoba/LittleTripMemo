@@ -33,9 +33,9 @@ window.$Const = {
     },
     // 通知種別の定数
     NOTICE_KIND: {
-        OTHER:     { id: 0, emoji: '🤔', label: 'Other' },
-        IMPORTANT: { id: 1, emoji: '🙇🏻', label: 'Important' },
-        NOTICE:    { id: 2, emoji: '📢', label: 'Notice' },
+        OTHER:     { id: 0, emoji: '💬', label: 'Other' },
+        IMPORTANT: { id: 1, emoji: '📢', label: 'Important' },
+        NOTICE:    { id: 2, emoji: '🔔', label: 'Notice' },
     },
 };
 
@@ -58,14 +58,14 @@ window.$Const.GetMockData = function(key, count = 10) {
                 list.push({
                     reporter_user_id: `reporter-guid-${i}`,
                     report_tim: new Date(now.getTime() - i * 600000).toISOString(),
-                    body: `${i}番目の通報理由：\n不適切なコンテンツが含まれています。\n規約違反の疑いがあります。\nあああああああああああああああああああああああ\nああああああああああ`
+                    body: `${i}番目の通報理由：\n不適切なコンテンツが含まれています。\n規約違反の疑いがあります。\nあああああ\nああああ\nあああ\nあああああ\nああああああ\nあああああ\nあああああ`
                 });
                 break;
             case 'FEEDBACK': // フィードバック
                 list.push({
                     create_tim: new Date(now.getTime() - i * 1800000).toISOString(),
                     score: (i % 5) + 1,
-                    body: `フィードバック #${i}: アプリのデザインがとても使いやすいです！${'あ'.repeat(i % 50)}`
+                    body: `フィードバック #${i}: \nアプリのデザインがとても使いやすいです！${'あああ\n'.repeat(i % 50)}`
                 });
                 break;
         }
