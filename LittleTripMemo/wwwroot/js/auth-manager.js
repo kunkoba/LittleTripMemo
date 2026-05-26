@@ -26,7 +26,7 @@ const AuthManager = {
         if (!user || !user.email) {
             throw new Error("ユーザー情報が取得できませんでした。");
         }
-        // 🌟 自サーバーとの通信はしない！身分証明（email）だけを返す！
+        // 自サーバーとの通信はしない！身分証明（email）だけを返す！
         return user.email;
     }
 };

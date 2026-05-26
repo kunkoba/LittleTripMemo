@@ -197,14 +197,14 @@ const _DetailContentCore = {
         // URLの表示制御
         if (detail.link_url) {
             $Dom.ToggleShow(this.displayUrlWrapper, true);
-            this.displayUrlText.textContent = detail.link_url;
-            // this.displayUrlText.href = detail.link_url;
-            this.displayUrlWrapper.onclick = () => {
-                const keyword = detail.link_url.trim();
-                // Google検索URLへエンコードして渡す
-                const searchUrl = "https://www.google.com/search?q=" + encodeURIComponent(keyword);
-                window.open(searchUrl, "_blank", "noopener,noreferrer");
-            };
+            // 共通メソッドを使用してアイコンを生成（サイズ 28px）
+            const iconHtml = $Util.GetUrlIconHtml(detail.link_url, 28);
+            // aタグ（displayUrlText）に情報を反映
+            this.displayUrlText.href = detail.link_url;
+            this.displayUrlText.innerHTML = iconHtml;
+            // ラッパーのクリックイベント（検索URLへ飛ばす処理）は、
+            // 直接リンク（aタグ）として機能させるため削除または null にリセット
+            this.displayUrlWrapper.onclick = null; 
         } else {
             $Dom.ToggleShow(this.displayUrlWrapper, false);
         }
@@ -270,8 +270,9 @@ const _DetailContentCore = {
         this.editPriceMinus.value = "";
         // 現在地マーカーから現在地を取得
         const pos = $Marker.GetLocationMarkerPos();
-        this.editLat.value = pos.lat;
-        this.editLng.value = pos.lng;
+        // this.editLat.value = pos.lat;
+        // this.editLng.value = pos.lng;
+        this.setPos(pos.lat, pos.lng);
         this.editFaceEmoji.value = '😀';
         this.editFacePreview.textContent = '😀';
         // this.editWeatherEmoji.value = 'はれ'; // 新規時は「はれ」を選択
@@ -281,6 +282,16 @@ const _DetailContentCore = {
         if (this.countTitle) this.countTitle.textContent = "0";
         if (this.countBody)  this.countBody.textContent  = "0";
         if (this.countUrl)   this.countUrl.textContent   = "0";
+    },
+    // フォームに地点を設定
+    setPos(lat, lng){
+        // 1. DOM要素がまだ取得されていない（初期化前）場合は安全にスルー（エラー回避）
+        if (!this.editLat || !this.editLng) return;
+        // 2. アプリの状態が「CREATEモード（新規作成）」以外の時は、フォームへの反映を無視する
+        if ($App.AppData.Context.ScreenMode !== $Const.SCREEN_MODE.CREATE) return;
+        // console.log("setPos:", lat, lng);
+        this.editLat.value = lat;
+        this.editLng.value = lng;
     },
     // フォーム上のデータをまとめて取得
     getFormEditData(){
@@ -355,6 +366,10 @@ const DetailContentController = {
             }
         }
         return true; // 全てOK
+    },
+    // フォームに地点を設定
+    SetPos(lat, lng){
+        _DetailContentCore.setPos(lat, lng);
     },
 };
 

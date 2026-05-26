@@ -96,10 +96,12 @@ const _MarkerCore = {
         });
     },
     // 現在地マーカーの更新
-    async refreshCurrentLocation() {
+    refreshCurrentLocation() {
         $Warn.CatchAsync(async () => {
             const pos = await $Util.GetCurrentPosition();
             const p = [pos.coords.latitude, pos.coords.longitude];
+            // 明細画面に反映（開いている時だけ）
+            $DetailContent.SetPos(pos.coords.latitude, pos.coords.longitude);
             // 現在地マーカー移動
             if (this.locationMarker) this.locationMarker.setLatLng(p);
             if ($App.AppData.Context.ScreenMode == $Const.SCREEN_MODE.CREATE) {
@@ -107,7 +109,6 @@ const _MarkerCore = {
                 this.generateArrowToCurrent();
                 this.focusToLocationMarker();
             }
-            return p;
         })();
     },
     // 矢印生成（まとめて）
@@ -339,8 +340,8 @@ const MarkerController = {
     GetCurrentMarkerPos() {
         return _MarkerCore.getCurrentMarkerPos(this._currentIndex);
     },
-    async RefreshCurrentLocation() {
-        return await _MarkerCore.refreshCurrentLocation();
+    RefreshCurrentLocation() {
+        _MarkerCore.refreshCurrentLocation();
     },
     RefreshCurrentArrow() {
         _MarkerCore.generateArrowToCurrent();

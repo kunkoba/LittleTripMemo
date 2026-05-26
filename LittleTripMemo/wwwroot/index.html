@@ -207,11 +207,10 @@
                             <!-- 隠し項目 -->
                             <span id="detail-display-weather_code" class="hidden"></span>
                             <!-- 下部：Locationカード風のURLリンク -->
-                            <div id="detail-display-url-wrapper" class="hidden w-full pt-6">
+                            <div id="detail-display-url-wrapper" class="hidden w-full">
                                 <a id="detail-display-link_url" href="" target="_blank" 
-                                    class="flex items-center bg-slate-50/50 border border-slate-100 border-l-4 border-cyan-400 rounded-[1rem] p-4 shadow-md active:scale-[0.98] transition-transform">
-                                    <span class="text-[1.2rem] mr-4">📍</span>
-                                    <span class="text-[0.8rem] font-bold text-slate-700 truncate">Location Data / Link</span>
+                                    class="shrink-0 w-12 h-12 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
+                                    <!-- ここに $Util.GetUrlIconHtml が挿入される -->
                                 </a>
                             </div>
                         </div>
@@ -295,7 +294,7 @@
                                 <div class="text-[0.6rem] text-black-2 font-bold"><span id="detail-count-body">0</span>/300</div>
                             </div>
                             <textarea name="body" id="detail-edit-body" maxlength="300" 
-                                class="leading-[2] w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+                                class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
                         </div>
                         <!-- PRICE -->
                         <div>

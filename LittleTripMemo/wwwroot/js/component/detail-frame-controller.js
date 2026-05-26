@@ -32,21 +32,10 @@ const _DetailFrameCore = {
             // イベント登録
             {
                 // 現在地移動（アプリメニューと同じ処理）
-                this.btnCurrent.addEventListener("click", async () => {
-                    $Notice.Info("現在地を取得しています...");
+                this.btnCurrent.addEventListener("click", () => {
                     // 1. 地図とマーカーの移動は既存の処理に「投げっぱなし」にする
                     $Marker.RefreshCurrentLocation();
                     $Marker.FocusToLocationMarker();
-                    // 2. それとは完全に独立して、裏で現在地を取得し、終わったらフォームに直接書き込む
-                    $Util.GetCurrentPosition().then(pos => {
-                        const latInput = document.getElementById("detail-edit-latitude");
-                        const lngInput = document.getElementById("detail-edit-longitude");
-                        if (latInput) latInput.value = pos.coords.latitude;
-                        if (lngInput) lngInput.value = pos.coords.longitude;
-                        $Notice.Info("現在地を更新しました");
-                    }).catch(err => {
-                        console.warn("フォームへの現在地反映をスキップしました", err);
-                    });
                 });
                 // Google Earth連携（追加）
                 this.btnEarth.addEventListener("click", () => {

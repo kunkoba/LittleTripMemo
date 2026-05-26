@@ -944,7 +944,7 @@ const DialogController = {
             const root = $Dom.GenerateTemplate("tpl-list-parent");
             root.className = "w-full text-black-3 mb-2 px-1";
             const archives = $Data.Store.GetArchiveList() ||[];
-            // 🌟 プライベートデータのみに絞る
+            // プライベートデータのみに絞る
             const privateList = archives.filter(item => !item.is_public);
             if (privateList.length === 0) {
                 $Notice.Warn("No ArchiveData.");
@@ -1103,7 +1103,7 @@ const DialogController = {
                         id: "btn-ms-add",
                         label: "＋ ADD",
                         className: "min-w-[40%] bg-brand-5 text-white shadow-md disabled:opacity-50 flex items-center justify-center gap-2",
-                        closesDialog: false, // 🌟 手動で制御するためfalse
+                        closesDialog: false, // 手動で制御するためfalse
                         handler: () => {
                             const seqs = Array.from(selectedSeqs);
                             // 新しく作った専用メソッドを呼び出す
@@ -1255,15 +1255,15 @@ const DialogController = {
             const displayCurrency = currentArchive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
             priceUnit.textContent = displayCurrency;
             if (totalPrice > 0) {
-                priceVal.className = "text-[1.2rem] font-black text-blue-600  italic";
+                priceVal.className = "text-[1.2rem] font-black text-blue-600 mr-2 italic";
                 // priceUnit.className = "text-[0.7rem] font-black text-blue-500 uppercase tracking-widest mb-1 block ";
                 priceVal.textContent = `+${totalPrice.toLocaleString()}`;
             } else if (totalPrice < 0) {
-                priceVal.className = "text-[1.2rem] font-black text-red-600  italic";
+                priceVal.className = "text-[1.2rem] font-black text-red-600 mr-2 italic";
                 // priceUnit.className = "text-[0.7rem] font-black text-red-500 uppercase tracking-widest mb-1 block ";
                 priceVal.textContent = `- ${Math.abs(totalPrice).toLocaleString()}`;
             } else {
-                priceVal.className = "text-[1.2rem] font-black text-black-5  italic";
+                priceVal.className = "text-[1.2rem] font-black text-black-5 mr-2 italic";
                 // priceUnit.className = "text-[0.7rem] font-black text-slate-400 uppercase tracking-widest mb-1 block ";
                 priceVal.textContent = `0`;
             }
@@ -1419,8 +1419,10 @@ const DialogController = {
                         onClose: true,
                         handler: $Warn.CatchAsync(async () => {
                             const updatedFields = {
-                                title: editTitle.value, memo: editBody.value,
-                                link_url: editUrl.value, currency_unit: editCurrency.value.trim(),
+                                title: editTitle.value,
+                                memo: editBody.value,
+                                link_url: editUrl.value,
+                                currency_unit: editCurrency.value.trim(),
                             };
                             const isSuccess = (!archive.is_public)
                                 ? await $Data.Access.UpdateArchive({ archive_id: archive.archive_id, ...updatedFields })
@@ -1429,8 +1431,8 @@ const DialogController = {
                             $Data.Store.UpdateArchive(updatedFields);
                             $TopBar.ChangeTitle(updatedFields.title);
                             $Notice.Info("Changes saved.");
-                            _DialogCore.close(); // 編集画面だけ閉じる
-                            if (onUpdate) onUpdate(); // 参照画面のDOMを最新化
+                            _DialogCore.closeAll();
+                            // if (onUpdate) onUpdate(); // 参照画面のDOMを最新化
                         })
                     }
                 ]
@@ -1644,7 +1646,7 @@ const DialogController = {
         const renderList = async () => {
             root.innerHTML = "";
             if (notices.length === 0) {
-                root.innerHTML = `<div class="text-center text-[1rem] font-bold text-slate-400 py-6">通知データがありません</div>`;
+                root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">通知データがありません</div>`;
                 return;
             }
             const now = new Date();
@@ -1782,7 +1784,7 @@ const DialogController = {
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         root.className = "w-full text-black-3 mb-2 px-1";
         if (reportSummary.length === 0) {
-            root.innerHTML = `<div class="text-center text-[1rem] font-bold text-slate-400 py-6">通報データはありません</div>`;
+            root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">通報データはありません</div>`;
         } else {
             // 通報件数の多い順にソート
             const sorted = [...reportSummary].sort((a, b) => b.report_count - a.report_count);

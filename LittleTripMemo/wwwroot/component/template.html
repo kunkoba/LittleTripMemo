@@ -150,7 +150,7 @@
 <!-- 【リスト子】タイムライン日付 -->
 <template id="tpl-timeline-date">
     <div class="flex items-center gap-3 pl-12_ pt-2 cursor-pointer opacity-80">
-        <div class="text-[1rem] font-black text-black-5 js-date-text tracking-widest"></div>
+        <div class="text-[1.5rem] font-black text-black-5 js-date-text italic"></div>
         <div class="flex-1 h-[1px] bg-slate-100"></div>
     </div>
 </template>
@@ -159,7 +159,7 @@
     <div class="relative flex items-stretch gap-2 group cursor-pointer active:scale-[0.98] transition-transform mb-2 mt-1">
         <!-- 左側：顔文字と時刻（ドットの代わり） -->
         <div class="shrink-0 w-10 flex flex-col items-center pt-2 z-10">
-            <!-- 🌟 ドットを顔文字に変更 -->
+            <!-- ドットを顔文字に変更 -->
             <div class="js-face text-[24px]  bg-brand-0 pb-1"></div>
             <!-- 時刻 -->
             <div class="text-[0.6rem] font-black text-black-5 js-time tracking-wider bg-brand-0 px-1"></div>
@@ -681,7 +681,7 @@
 <template id="tpl-view-notice">
 	<div class="relative min-h-full flex flex-col bg-white px-1">
 		<!-- 1. ヘッダー（日付とアイコンを横並びに） -->
-		<div class="flex items-center gap-4 mb-6">
+		<div class="flex items-center gap-4 mb-3">
             <div class="flex items-center gap-3 text-black font-bold text-[1rem]">
                 <span id="view-notice-icon" class="text-[1.5rem]  drop-shadow-md"></span>
                 <span id="view-notice-date" class="text-slate-400 italic"></span>
@@ -719,7 +719,7 @@
                 <label class="block text-[0.7rem] font-bold uppercase">Description / Memo</label>
                 <span class="text-[0.6rem] text-slate-300 font-bold"><span id="edit-mem-body-count">0</span>/300</span>
             </div>
-            <textarea id="edit-mem-body" maxlength="300" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none leading-[2]"></textarea>
+            <textarea id="edit-mem-body" maxlength="300" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
         <!-- リンクURL -->
         <div>
@@ -914,7 +914,7 @@
     </div>
 </template>
 <!-- 【ダイアログ子】まとめ親参照 -->
-<template id="tpl-view-archive">
+<template id="tpl-view-archive_2">
 	<div class="relative min-h-full flex flex-col bg-white">
 		<!-- 1. ユーザー情報（明細の時刻/顔文字エリアのスタイルに追従） -->
 		<div class="flex gap-4 pb-6">
@@ -947,6 +947,44 @@
                     <span id="mem-stat-count" class="text-[1.4rem] font-black text-slate-800 ">0</span>
                     <span class="text-[0.7rem] font-bold text-slate-400 uppercase ">memos</span>
                 </div>
+			</button>
+		</div>
+	</div>
+</template>
+<!-- 【ダイアログ子】まとめ親参照 -->
+<template id="tpl-view-archive">
+	<div class="relative min-h-full flex flex-col bg-white">
+        <!-- 2. 金額（左） ＋ ユーザ情報（右） の並列エリア -->
+        <div class="flex items-center justify-between gap-2 mb-6">
+            <!-- 右：ユーザ情報（プロフボタン） -->
+            <button id="btn-mem-user-profile" 
+                class="border border-slate-100 rounded-full py-1.5 pl-2 pr-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
+                <span id="view-mem-user-icon" class="text-[1.4rem] drop-shadow-md"></span>
+                <span id="view-mem-user-id" class="text-[0.8rem] font-black text-slate-600 tracking-tight line-clamp-1"></span>
+            </button>
+        </div>
+		<!-- 1. タイトル（最上部） -->
+		<div class="mb-4">
+			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 break-all leading-tight"></h1>
+		</div>
+		<!-- 3. 本文（中央） -->
+		<div id="view-mem-body" class="text-[1rem] min-h-[100px] text-slate-600 leading-[2] whitespace-pre-wrap break-all mb-2">
+		</div>
+		<!-- 4. 下部アクション（リンク ＋ メモ数） -->
+		<div class="mt-auto pb-1 flex items-end justify-between border-t border-slate-50">
+			<!-- 左下：リンク（正円ボタン・影あり） -->
+			<a id="view-mem-url" href="" target="_blank" class="shrink-0 w-12 h-12 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
+				<!-- ここにアイコンが挿入される -->
+			</a>
+            <!-- 左：金額（左アクセント線） -->
+            <div class="py-1">
+                <span id="view-mem-price-unit" class="text-[0.6rem] font-black text-slate-400 uppercase tracking-[0.2em] block mb-0.5"></span>
+                <div id="mem-stat-price" class="text-[1.2rem] font-black italic mr-2"></div>
+            </div>
+			<!-- 右下：件数（横長ボタン風） -->
+			<button id="btn-view-mem-timeline" class="h-12 shadow-md rounded-[1rem] border border-slate-100 flex items-center justify-center gap-2 bg-brand-1 active:scale-95 transition-transform px-4 outline-none">
+				<span id="mem-stat-count" class="text-[1.1rem] font-black text-slate-800">0</span>
+				<span class="text-[0.7rem] font-bold text-slate-400 uppercase tracking-wider">memos</span>
 			</button>
 		</div>
 	</div>
