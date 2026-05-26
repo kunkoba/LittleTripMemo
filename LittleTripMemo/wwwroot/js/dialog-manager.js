@@ -508,7 +508,7 @@ const DialogController = {
                 const child = $Dom.GenerateTemplate("tpl-list-child-review");
                 const score = rev.score || 0;
                 $Dom.QuerySelector(".js-stars", child).textContent = "★".repeat(score) + "☆".repeat(5 - score);
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(rev.create_tim, 'YYYY-MM-DD  HH:mm');
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(rev.create_tim, 'YYYY-MM-DD　HH:mm');
                 $Dom.QuerySelector(".js-body", child).textContent = rev.body || "（内容なし）";
                 container.appendChild(child);
             });
@@ -890,7 +890,7 @@ const DialogController = {
                 list.forEach(item => {
                     const child = $Dom.GenerateTemplate("tpl-list-child-archive");
                     $Dom.QuerySelector(".js-title", child).textContent = item.title;
-                    $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD  HH:mm');
+                    $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD　HH:mm');
                     $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
                     $Dom.QuerySelector(".js-count", child).textContent = item.cnt || "0";
                     const badge = $Dom.QuerySelector(".js-badge", child);
@@ -960,7 +960,7 @@ const DialogController = {
             privateList.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-list-child-archive");
                 $Dom.QuerySelector(".js-title", child).textContent = item.title;
-                $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD  HH:mm');
+                $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD　HH:mm');
                 $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
                 $Dom.QuerySelector(".js-count", child).textContent = item.cnt || "0";
                 // バッジの装飾（PRIVATE固定）
@@ -1558,7 +1558,7 @@ const DialogController = {
 		const el = $Dom.GenerateTemplate('tpl-view-notice');
 		const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === notice.kind) || $Const.NOTICE_KIND.NOTICE;
 		$Dom.QuerySelector('#view-notice-icon', el).textContent = kindObj.emoji;
-		$Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, 'YYYY-MM-DD  HH:mm');
+		$Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, 'YYYY-MM-DD　HH:mm');
 		$Dom.QuerySelector('#view-notice-title', el).textContent = notice.title;
 		$Dom.QuerySelector('#view-notice-body', el).textContent = notice.body;
         // リンクURLの表示制御
@@ -1582,7 +1582,7 @@ const DialogController = {
 		const el = $Dom.GenerateTemplate('tpl-view-notice');
 		const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === notice.kind) || $Const.NOTICE_KIND.NOTICE;
         $Dom.QuerySelector('#view-notice-icon', el).textContent = kindObj.emoji;
-		$Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, 'YYYY-MM-DD  HH:mm');
+		$Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, 'YYYY-MM-DD　HH:mm');
 		$Dom.QuerySelector('#view-notice-title', el).textContent = notice.title;
 		$Dom.QuerySelector('#view-notice-body', el).textContent = notice.body;
         // リンクURLの表示制御 (共通メソッドを使用)
@@ -1622,7 +1622,7 @@ const DialogController = {
 			const isNew = item.is_new;
 			const badge = $Dom.QuerySelector(".js-badge-new", child);
 			if (badge) $Dom.ToggleShow(badge, isNew);
-			$Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD  HH:mm');
+			$Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD　HH:mm');
             const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === item.kind) || $Const.NOTICE_KIND.NOTICE;
             $Dom.QuerySelector('.js-icon', child).textContent = kindObj.emoji;
 			$Dom.QuerySelector(".js-title", child).textContent = item.title;
@@ -1677,7 +1677,7 @@ const DialogController = {
             const child = $Dom.GenerateTemplate("tpl-list-child-notice");
             // スタイルの初期適用
             setNoticeStyle(child, item.is_new);
-            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD  HH:mm');
+            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD　HH:mm');
             const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === item.kind) || $Const.NOTICE_KIND.NOTICE;
             $Dom.QuerySelector('.js-icon', child).textContent = kindObj.emoji;
             $Dom.QuerySelector(".js-title", child).textContent = item.title;
@@ -1731,7 +1731,7 @@ const DialogController = {
             const sorted = [...notices].sort((a, b) => new Date(b.update_tim) - new Date(a.update_tim));
             sorted.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-notice");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD  HH:mm');
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD　HH:mm');
                 const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === item.kind) || $Const.NOTICE_KIND.NOTICE;
                 $Dom.QuerySelector(".js-title", child).textContent = `${kindObj.emoji} ${item.title}`;
                 $Dom.QuerySelector(".js-body", child).textContent = item.body;
@@ -1901,7 +1901,7 @@ const DialogController = {
         } else {
             reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
-                $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim, 'YYYY-MM-DD  HH:mm');
+                $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim, 'YYYY-MM-DD　HH:mm');
                 $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
                 listContainer.appendChild(child);
             });
@@ -1941,7 +1941,7 @@ const DialogController = {
         const renderItems = (items) => {
             items.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim || new Date(), 'YYYY-MM-DD  HH:mm');
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim || new Date(), 'YYYY-MM-DD　HH:mm');
                 const score = item.score || 0;
                 $Dom.QuerySelector(".js-score", child).textContent = "★".repeat(score) + "☆".repeat(5 - score);
                 $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
@@ -1989,7 +1989,7 @@ const DialogController = {
     // 管理者：フィードバック詳細
     ShowAdminFeedbackDetail(item) {
         const el = $Dom.GenerateTemplate("tpl-admin-feedback-detail");
-        $Dom.QuerySelector(".js-date", el).textContent = $Util.FormatDate(item.create_tim || new Date(), 'YYYY-MM-DD  HH:mm');
+        $Dom.QuerySelector(".js-date", el).textContent = $Util.FormatDate(item.create_tim || new Date(), 'YYYY-MM-DD　HH:mm');
         const score = item.score || 0;
         $Dom.QuerySelector(".js-score", el).textContent = "★".repeat(score) + "☆".repeat(5 - score);
         // ユーザーIDなどがあれば表示（APIにuser_idが含まれていれば入るようにしています）
