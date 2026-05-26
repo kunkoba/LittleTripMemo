@@ -184,7 +184,7 @@
     </div>
 </template>
 <!-- 【リスト子】通知一覧用 -->
-<template id="tpl-list-child-notice">
+<template id="tpl-list-child-notice_2">
     <div class="js-item-card flex p-4 rounded-[1rem] bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md relative border-l-4 border-brand-3 mb-6">
         <!-- 右上の固定要素（NEWバッジ ＋ アイコン） -->
         <div class="absolute top-1 right-3 flex items-start gap-2 z-10">
@@ -199,6 +199,23 @@
             <div class="text-[0.9rem] font-black text-black-5 truncate js-title mb-2"></div>
             <!-- 3行目: 本文（2行で省略表示） -->
             <div class="text-[0.7rem] text-black-4 line-clamp-2 js-body break-all"></div>
+        </div>
+    </div>
+</template>
+<!-- 【リスト子】通知一覧用 -->
+<template id="tpl-list-child-notice">
+    <!-- 枠線と影はJSで動的に付けるため、最低限のレイアウトクラスのみ残す -->
+    <div class="js-item-card flex p-4 rounded-[1rem] cursor-pointer active:scale-[0.98] transition-all overflow-hidden mb-3 relative min-h-[6rem] border-2">
+        <!-- 右上の固定アイコンエリア -->
+        <div class="absolute top-2 right-2 flex flex-col items-end gap-1 z-10">
+            <span class="js-badge-new hidden bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">NEW</span>
+            <span class="js-icon text-[1.5rem] leading-none drop-shadow-sm"></span>
+        </div>
+        <!-- テキストエリア -->
+        <div class="flex-1 min-w-0 pr-14 flex flex-col justify-center">
+            <div class="text-[0.7rem] text-slate-400 tracking-wider js-date mb-1.5 italic"></div>
+            <div class="text-[0.9rem] font-black text-black-5 truncate js-title mb-1.5"></div>
+            <div class="text-[0.7rem] text-black-4 line-clamp-2 js-body break-all leading-relaxed"></div>
         </div>
     </div>
 </template>
@@ -681,9 +698,11 @@
 <template id="tpl-view-notice">
 	<div class="relative min-h-full flex flex-col bg-white px-1">
 		<!-- 1. ヘッダー（日付とアイコンを横並びに） -->
+        <div class="absolute top-0 right-0 ">
+            <span id="view-notice-icon" class="text-[1.5rem] drop-shadow-md"></span>
+        </div>
 		<div class="flex items-center gap-4 mb-3">
             <div class="flex items-center gap-3 text-black font-bold text-[1rem]">
-                <span id="view-notice-icon" class="text-[1.5rem]  drop-shadow-md"></span>
                 <span id="view-notice-date" class="text-slate-400 italic"></span>
 			</div>
 		</div>
@@ -694,10 +713,10 @@
 		<!-- 3. 本文（ で統一） -->
 		<div id="view-notice-body" class="text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-all pt-2 h-[300px] overflow-y-auto pr-2"></div>
         <!-- 4. リンク表示エリア -->
-		<div id="view-notice-url-wrapper" class="hidden w-full pt-6 pb-2 mt-auto">
-            <a id="view-notice-url" href="" target="_blank" class="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-[1rem] p-3 shadow-sm active:scale-95 transition-transform text-blue-600">
-                <span class="text-[1.2rem] leading-none">🔗</span>
-                <span class="text-[0.75rem] font-bold truncate flex-1"></span>
+		<div id="view-notice-url-wrapper" class="hidden mt-auto flex py-1">
+            <a id="view-notice-url" href="" target="_blank" 
+                class="shrink-0 w-12 h-12 shadow-lg rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
+                <!-- ここにアイコンが挿入される -->
             </a>
         </div>
 	</div>
