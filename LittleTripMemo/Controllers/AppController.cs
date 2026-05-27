@@ -223,19 +223,6 @@ public class AppController : _BaseController
             return OkWithBase(result);
         }
 
-        ///// <summary>
-        ///// まとめ明細一覧取得（公開データ）
-        ///// </summary>
-        ///// <param name="req"></param>
-        ///// <returns></returns>
-        //[AllowAnonymous]
-        //[HttpPost("api/GetArchiveDetailsPub")]
-        //public async Task<IActionResult> GetArchiveDetailsPub([FromBody] GetArchiveDetailsPubService.GetArchiveDetailsPubReq req)
-        //{
-        //    var result = await _getArchiveDetailsPubService.ExecuteAsync(req);
-        //    return OkWithBase(result);
-        //}
-
         /// <summary>
         /// まとめ明細一覧取得（公開データ）
         /// URL例: /api/GetArchiveDetailsPub/123
@@ -265,13 +252,6 @@ public class AppController : _BaseController
         public async Task<IActionResult> UpsertReaction([FromBody] UpsertReactionService.UpsertReactionReq req)
         {
             var result = await _upsertReactionService.ExecuteAsync(req);
-            return OkWithBase(result);
-        }
-
-        [HttpPost("api/BulkSyncReactions")]
-        public async Task<IActionResult> BulkSyncReactions([FromBody] BulkSyncReactionService.BulkSyncReactionReq req)
-        {
-            var result = await _bulkSyncReactionService.ExecuteAsync(req);
             return OkWithBase(result);
         }
 
@@ -332,6 +312,18 @@ public class AppController : _BaseController
         public async Task<IActionResult> BulkSyncDetails([FromBody] BulkSyncDetailsService.BulkSyncReq req)
         {
             var result = await _bulkSyncDetailsService.ExecuteAsync(req);
+            return OkWithBase(result);
+    }
+
+        /// <summary>
+        /// リアクション登録一括処理
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [HttpPost("api/BulkSyncReactions")]
+        public async Task<IActionResult> BulkSyncReactions([FromBody] BulkSyncReactionService.BulkSyncReactionReq req)
+        {
+            var result = await _bulkSyncReactionService.ExecuteAsync(req);
             return OkWithBase(result);
         }
 

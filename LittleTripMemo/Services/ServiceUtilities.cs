@@ -116,7 +116,23 @@ public static class ServiceUtilities
     }
 
     /// <summary>
-    /// JSの $Util.EncodeId で難読化された文字列を int に戻す
+    /// 暗号化
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public static string EncodeId(int id)
+    {
+        string origin = id.ToString();
+        var bytes = System.Text.Encoding.UTF8.GetBytes(origin);
+        var base64 = Convert.ToBase64String(bytes).TrimEnd('='); // パディング削除
+
+        var chars = base64.ToCharArray();
+        Array.Reverse(chars); // 文字列反転
+        return new string(chars);
+    }
+
+    /// <summary>
+    /// 復号化
     /// </summary>
     public static int DecodeId(string? encodedId)
     {

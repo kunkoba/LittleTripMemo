@@ -225,6 +225,13 @@ window.$Data = {
         async AdminUnpublishArchive(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/AdminUnpublishArchive', params))();
         },
+        // public record Request(Guid target_user_id, string emoji, string body);
+        async SendUserNotification(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/SendUserNotification', params))();
+        },
+        async GetMyUserNotifications(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyUserNotifications', params))();
+        },
     },
     // データ操作・取得のメソッド群
     Store: {

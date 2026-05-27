@@ -189,16 +189,6 @@ public class SysController : _BaseController
     }
 
     /// <summary>
-    /// 個人宛通知の送信（管理者専用）
-    /// </summary>
-    [HttpPost("api/Sys/SendUserNotification")]
-    public async Task<IActionResult> SendUserNotification([FromBody] SendUserNotificationService.Request req)
-    {
-        var result = await _sendUserNotificationService.ExecuteAsync(req);
-        return OkWithBase(result);
-    }
-
-    /// <summary>
     /// 自分宛ての個人通知を取得（ユーザー用）
     /// </summary>
     [HttpPost("api/Sys/GetMyUserNotifications")]
@@ -212,6 +202,11 @@ public class SysController : _BaseController
 
 #region "Admin"
 
+    /// <summary>
+    /// 【管理者権限】まとめ親を強制クローズ
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
     [HttpPost("api/Sys/AdminCloseArchive")]
     public async Task<IActionResult> AdminCloseArchive([FromBody] AdminCloseArchivePubService.Request req)
     {
@@ -219,6 +214,11 @@ public class SysController : _BaseController
         return OkWithBase(result);
     }
 
+    /// <summary>
+    /// 【管理者権限】まとめ親を強制削除
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
     [HttpPost("api/Sys/AdminUnpublishArchive")]
     public async Task<IActionResult> AdminUnpublishArchive([FromBody] AdminUnpublishArchiveService.Request req)
     {
@@ -226,5 +226,17 @@ public class SysController : _BaseController
         return OkWithBase(result);
     }
 
-#endregion
+    /// <summary>
+    /// 【管理者権限】ユーザに個別送信
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("api/Sys/SendUserNotification")]
+    public async Task<IActionResult> SendUserNotification([FromBody] SendUserNotificationService.Request req)
+    {
+        var result = await _sendUserNotificationService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    #endregion
 }

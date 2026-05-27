@@ -111,4 +111,13 @@ public class SysReportRepository : _BaseRepository
         return await ExecuteAsync(sql, new { user_id = _user.UserId, archive_id = archiveId });
     }
 
+    /// <summary>
+    /// アーカイブIDに紐づく通報データをすべて物理削除
+    /// </summary>
+    public async Task<int> DeletePhysicalByArchiveIdAsync(long archiveId)
+    {
+        const string sql = "DELETE FROM t_sys_reports WHERE archive_id = @archive_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId });
+    }
+
 }

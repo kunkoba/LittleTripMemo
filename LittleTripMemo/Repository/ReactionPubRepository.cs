@@ -75,4 +75,13 @@ public class ReactionPubRepository : _BaseRepository
         return await QueryAsync<TReactionPub>(sql, new { archiveId = archiveId, user_id = _user.UserId });
     }
 
+    /// <summary>
+    /// アーカイブIDに紐づくリアクションをすべて物理削除
+    /// </summary>
+    public async Task<int> DeletePhysicalByArchiveIdAsync(int archiveId)
+    {
+        const string sql = "DELETE FROM t_reaction_pub WHERE archive_id = @archive_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId });
+    }
+
 }

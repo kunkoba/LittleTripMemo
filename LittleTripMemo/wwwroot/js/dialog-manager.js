@@ -893,24 +893,17 @@ const DialogController = {
                     $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD　HH:mm');
                     $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
                     $Dom.QuerySelector(".js-count", child).textContent = item.cnt || "0";
-                    const badge = $Dom.QuerySelector(".js-badge", child);
                     const leftBorder = $Dom.QuerySelector(".js-item-border", child);
                     if (isPublicGroup) {
                         if (item.closed_flg) {
                             // Publicデータ（CLOSE）
-                            badge.textContent = "Close";
-                            badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-slate-200 bg-white text-slate-400";
                             leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-200"; // 左線グレー
                         } else {
                             // Publicデータ（OPEN）
-                            badge.textContent = "OPEN";
-                            badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-blue-100 bg-brand-2 text-brand-5 _shadow-md";
                             leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-brand-5"; // 左線ブランドカラー
                         }
                     } else {
                         // 内部データ（PRIVATE）
-                        badge.textContent = "PRIVATE";
-                        badge.className = "js-badge text-[0.6rem] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-slate-200 bg-slate-100 text-slate-400";
                         leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800"; // 左線ブランドカラー
                     }
                     child.onclick = () => {
@@ -964,10 +957,7 @@ const DialogController = {
                 $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
                 $Dom.QuerySelector(".js-count", child).textContent = item.cnt || "0";
                 // バッジの装飾（PRIVATE固定）
-                const badge = $Dom.QuerySelector(".js-badge", child);
                 const leftBorder = $Dom.QuerySelector(".js-item-border", child);
-                badge.textContent = "PRIVATE";
-                badge.className = "js-badge text-[9px] font-black px-2 py-0.5 rounded-[1rem] uppercase italic border border-slate-200 bg-slate-100 text-slate-400 shadow-md";
                 leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800";
                 // アイテムクリック時の処理（追加確認 ＆ API実行）
                 child.onclick = async () => {
@@ -1185,6 +1175,17 @@ const DialogController = {
                 target.classList.remove('bg-white', 'text-black-5', 'border-brand-3');
                 target.classList.add('bg-brand-5', 'text-white', 'border-brand-5');
                 currentW = target.dataset.val;
+                if (currentW === "0") {
+                    // Clearが押されたら、すべてのパラメータを0にリセット
+                    rngWind.value = 0;
+                    rngDensity.value = 0;
+                    rngDarkness.value = 0;
+                } else {
+                    // Clear以外が押されたとき、もし密度が0なら1に引き上げる
+                    if (parseInt(rngDensity.value) === 0) {
+                        rngDensity.value = 1;
+                    }
+                }
                 applyEffect();
             });
         });
@@ -1347,6 +1348,7 @@ const DialogController = {
                     label: "【ADMIN】強制 Close",
                     className: "w-full bg-red-500 text-white font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform",
                     closesDialog: false,
+                    // handler: () => this._showAdminActionDialog(archive, "CLOSE", "AdminCloseArchive")
                     handler: async () => {
                         const isOk = await this.ShowConfirm({ title: "ADMIN: CLOSE", message: "【注意】\n強制的にClose状態にしますか？" });
                         if (!isOk) return;
@@ -1363,6 +1365,7 @@ const DialogController = {
                 label: "【ADMIN】強制 Privateに戻す",
                 className: "w-full bg-white text-red-600 border-2 border-red-500 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-sm active:scale-95 transition-transform",
                 closesDialog: false,
+                // handler: () => this._showAdminActionDialog(archive, "UNPUBLISH", "AdminUnpublishArchive")
                 handler: async () => {
                     const isOk = await this.ShowConfirm({ title: "ADMIN: UNPUBLISH", message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？" });
                     if (!isOk) return;
@@ -1992,8 +1995,6 @@ const DialogController = {
         $Dom.QuerySelector(".js-date", el).textContent = $Util.FormatDate(item.create_tim || new Date(), 'YYYY-MM-DD　HH:mm');
         const score = item.score || 0;
         $Dom.QuerySelector(".js-score", el).textContent = "★".repeat(score) + "☆".repeat(5 - score);
-        // ユーザーIDなどがあれば表示（APIにuser_idが含まれていれば入るようにしています）
-        $Dom.QuerySelector(".js-user-id", el).textContent = item.user_id || "Unknown User";
         $Dom.QuerySelector(".js-body", el).textContent = item.body || "（内容なし）";
         _DialogCore.open({
             title: "FEEDBACK DETAILS",
