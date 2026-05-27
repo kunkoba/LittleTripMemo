@@ -124,13 +124,12 @@ public class DetailPubRepository : _BaseRepository
     /// </summary>
     public async Task<IEnumerable<TMemoDetailPub>> GetByLocationBasicAsync(
         decimal latMin, decimal latMax, decimal lngMin, decimal lngMax,
-        string? keyword, int sortField, int limit = 50)
+        string? keyword, int sortField, Guid loginUserId, int limit = 50)
     {
         var parameters = new DynamicParameters();
-        parameters.Add("lat_min", latMin);
-        parameters.Add("lat_max", latMax);
-        parameters.Add("lng_min", lngMin);
-        parameters.Add("lng_max", lngMax);
+        parameters.Add("lat_min", latMin); parameters.Add("lat_max", latMax);
+        parameters.Add("lng_min", lngMin); parameters.Add("lng_max", lngMax);
+        parameters.Add("login_user_id", loginUserId);
         parameters.Add("limit", limit);
 
         // ソート句の決定
@@ -142,6 +141,7 @@ public class DetailPubRepository : _BaseRepository
         INNER JOIN t_memo_archive_pub a ON d.archive_id = a.archive_id
         WHERE d.latitude  BETWEEN @lat_min AND @lat_max
           AND d.longitude BETWEEN @lng_min AND @lng_max
+          AND d.user_id   <> @login_user_id
           AND d.del_flg   = false
           AND a.closed_flg = false";
 
@@ -161,11 +161,12 @@ public class DetailPubRepository : _BaseRepository
     /// </summary>
     public async Task<IEnumerable<TMemoDetailPub>> GetByLocationRankAsync(
         decimal latMin, decimal latMax, decimal lngMin, decimal lngMax,
-        string? keyword, int reactionType, int limit = 50)
+        string? keyword, int reactionType, Guid loginUserId, int limit = 50)
     {
         var parameters = new DynamicParameters();
         parameters.Add("lat_min", latMin); parameters.Add("lat_max", latMax);
         parameters.Add("lng_min", lngMin); parameters.Add("lng_max", lngMax);
+        parameters.Add("login_user_id", loginUserId);
         parameters.Add("limit", limit);
 
         // リアクション種別に応じたソートカラム
@@ -189,6 +190,7 @@ public class DetailPubRepository : _BaseRepository
         LEFT JOIN t_reaction_pub r ON d.archive_id = r.archive_id AND d.seq = r.seq
         WHERE d.latitude  BETWEEN @lat_min AND @lat_max
           AND d.longitude BETWEEN @lng_min AND @lng_max
+          AND d.user_id   <> @login_user_id
           AND d.del_flg   = false
           AND a.closed_flg = false";
 

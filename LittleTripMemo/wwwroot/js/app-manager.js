@@ -197,6 +197,7 @@ const AppManager = {
         // システム情報を取得
         if (this.AppData.Context.IsLoggedIn) {
             $Data.Access.GetSystemInfo();
+            $Data.Access.GetProfile();
         }
         // モードごとにデータ取得
         switch (this.AppData.Context.ScreenMode) {

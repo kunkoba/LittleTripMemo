@@ -48,12 +48,7 @@ const _BottomCore = {
 						limit: 50
 					};
 					// 通信処理（Public と Private でエンドポイントを分岐）
-					let isSuccess = false;
-					if (sortSetting.isPublic) {
-						isSuccess = await $Data.Access.SearchByLocationPub(params);
-					} else {
-						isSuccess = await $Data.Access.SearchByLocation(params);
-					}
+					const isSuccess = await $Data.Access.SearchByLocationPub(params);
 					if (!isSuccess) return;
 					// 検索結果のリスト表示、またはマーカーの再描画
 					$Marker.RefreshPointMarker();

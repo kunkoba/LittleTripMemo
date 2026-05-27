@@ -43,14 +43,14 @@ public class SearchByLocationPubService : _BaseService
             // リアクション順（RANK）
             details = await _detailPubRepo.GetByLocationRankAsync(
                 req.lat_min, req.lat_max, req.lng_min, req.lng_max,
-                req.keyword, req.reactionType.Value, req.limit);
+                req.keyword, req.reactionType.Value, _user.UserId, req.limit);
         }
         else
         {
             // 作成順 or 更新順（BASIC）
             details = await _detailPubRepo.GetByLocationBasicAsync(
                 req.lat_min, req.lat_max, req.lng_min, req.lng_max,
-                req.keyword, req.sortField, req.limit);
+                req.keyword, req.sortField, _user.UserId, req.limit);
         }
 
         SetAppFlags(details);

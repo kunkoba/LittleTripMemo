@@ -183,25 +183,6 @@
     </div>
 </template>
 <!-- 【リスト子】通知一覧用 -->
-<template id="tpl-list-child-notice_2">
-    <div class="js-item-card flex p-4 rounded-[1rem] bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md relative border-l-4 border-brand-3 mb-6">
-        <!-- 右上の固定要素（NEWバッジ ＋ アイコン） -->
-        <div class="absolute top-1 right-3 flex items-start gap-2 z-10">
-            <span class="js-badge-new hidden bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm mt-1">NEW</span>
-            <span class="js-icon text-[1.8rem] leading-none drop-shadow-sm"></span>
-        </div>
-        <!-- テキストエリア -->
-        <div class="flex-1 min-w-0 flex flex-col justify-center">
-            <!-- 1行目: 日時 -->
-            <div class="text-[0.7rem] text-slate-400 tracking-wider js-date mb-2 italic"></div>
-            <!-- 2行目: タイトル -->
-            <div class="text-[0.9rem] font-black text-black-5 truncate js-title mb-2"></div>
-            <!-- 3行目: 本文（2行で省略表示） -->
-            <div class="text-[0.7rem] text-black-4 line-clamp-2 js-body break-all"></div>
-        </div>
-    </div>
-</template>
-<!-- 【リスト子】通知一覧用 -->
 <template id="tpl-list-child-notice">
     <!-- 枠線と影はJSで動的に付けるため、最低限のレイアウトクラスのみ残す -->
     <div class="js-item-card flex p-4 cursor-pointer active:scale-[0.98] transition-all overflow-hidden mb-3 relative min-h-[6rem] border-2">
@@ -325,7 +306,7 @@
 <template id="tpl-menu-system">
     <div class="w-full flex flex-col bg-brand-0">
         <button id="btn-sys-user-profile" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">👤</span>
+            <span class="col-span-1 flex justify-center text-[2rem]">👤</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">User Profile</span>
         </button>
@@ -439,44 +420,6 @@
                 <div class="text-[0.6rem] font-bold text-slate-400 js-report-tim shrink-0"></div>
             </div>
             <div class="text-[0.6rem] text-black-5 break-all js-report-body line-clamp-1"></div>
-        </div>
-    </div>
-</template>
-<!-- 【ダイアログ子】管理者通知編集 -->
-<template id="tpl-admin-notice-edit_2">
-    <div class="w-full text-black-5 space-y-4 pt-2 px-2">
-        <!-- 種別 -->
-        <div>
-            <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Kind</label>
-            <select id="edit-notice-kind" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
-                <!-- JavaScript側で定数から動的に生成します -->
-            </select>
-        </div>
-        <!-- タイトル -->
-        <div>
-            <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Title</label>
-            <input id="edit-notice-title" type="text" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
-        </div>
-        <!-- 本文 -->
-        <div>
-            <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Body</label>
-            <textarea id="edit-notice-body" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
-        </div>
-        <!-- リンクURL -->
-        <div>
-            <label class="block text-[0.7rem] font-bold mb-1 uppercase text-black-3">Link URL</label>
-            <input id="edit-notice-url" type="url" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-500" placeholder="https://...">
-        </div>
-        <!-- 表示期間 -->
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label class="block text-[0.6rem] font-bold mb-1 uppercase text-black-3">Disp From</label>
-                <input id="edit-notice-from" type="date" class="w-full border-2 border-brand-3 px-2 py-1 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
-            </div>
-            <div>
-                <label class="block text-[0.6rem] font-bold mb-1 uppercase text-black-3">Disp To</label>
-                <input id="edit-notice-to" type="date" class="w-full border-2 border-brand-3 px-2 py-1 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
-            </div>
         </div>
     </div>
 </template>
@@ -927,44 +870,6 @@
     </div>
 </template>
 <!-- 【ダイアログ子】まとめ親参照 -->
-<template id="tpl-view-archive_2">
-	<div class="relative min-h-full flex flex-col bg-white">
-		<!-- 1. ユーザー情報（明細の時刻/顔文字エリアのスタイルに追従） -->
-		<div class="flex gap-4 pb-6">
-			<button id="btn-mem-user-profile" class="border rounded-full pb-1 pl-4 pr-6 shadow-md flex items-baseline gap-2 active:opacity-60 transition-opacity">
-				<span id="view-mem-user-icon" class="text-[1.5rem]  drop-shadow-md"></span>
-				<span id="view-mem-user-id" class="text-[0.8rem] font-black text-slate-400 tracking-tight line-clamp-1"></span>
-			</button>
-		</div>
-		<!-- 2. タイトル（左アクセント border-l-4） -->
-		<div class="border-l-4 border-brand-3 pl-4 mb-6">
-			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800  break-all"></h1>
-		</div>
-		<!-- 3. 本文（ で明細と統一） -->
-		<div id="view-mem-body" class="text-[1rem] text-slate-600 h-[200px] whitespace-pre-wrap break-all pb-6 leading-[2] overflow-y-auto pr-2">
-        </div>
-        <!-- 4. ボタン群 -->
-		<div class="mt-auto flex items-center justify-between pb-3 gap-4 mt-3">
-			<!-- 左：金額（枠付き） -->
-			<div class="h-14 flex-1 flex flex-col border-b-2 border-brand-3 items-center justify-center bg-white px-2">
-				<span id="view-mem-price-unit" class="text-[0.7rem] font-black uppercase tracking-widest mb-1 block "></span>
-				<div id="mem-stat-price" class="text-[1rem] font-black italic "></div>
-			</div>
-			<!-- 中：リンク（正円ボタン） -->
-			<a id="view-mem-url" href="" target="_blank" class="hidden shrink-0 w-14 h-14 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden">
-				<!-- ここにアイコンが挿入される -->
-			</a>
-			<!-- 右：件数（クリック可能なボタン） -->
-			<button id="btn-view-mem-timeline" class="h-14 flex-1 shadow-md rounded-[1rem] justify-center bg-white active:scale-95 transition-transform px-2 outline-none">
-				<div>
-                    <span id="mem-stat-count" class="text-[1.4rem] font-black text-slate-800 ">0</span>
-                    <span class="text-[0.7rem] font-bold text-slate-400 uppercase ">memos</span>
-                </div>
-			</button>
-		</div>
-	</div>
-</template>
-<!-- 【ダイアログ子】まとめ親参照 -->
 <template id="tpl-view-archive">
 	<div class="relative min-h-full flex flex-col bg-white">
         <!-- 2. 金額（左） ＋ ユーザ情報（右） の並列エリア -->
@@ -1014,11 +919,10 @@
                 <span class="text-[0.6rem] font-bold text-black-2"><span id="report-text-count">0</span>/300</span>
             </div>
             <textarea id="input-report-body" maxlength="300" placeholder="問題のある箇所や理由を具体的に記入してください" 
-                class="w-full border-2 border-brand-3 p-3 text-[1rem] h-[300px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+                class="w-full border-2 border-brand-3 p-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
     </div>
 </template>
-
 <!-- 【ダイアログ子】Atmosphere設定ダイアログ（完全高さ同調版） -->
 <template id="tpl-setting-weather">
     <div class="w-full text-black-5 space-y-4 px-1 py-1">
@@ -1076,6 +980,30 @@
         <div class="bg-brand-1 border-x-4 border-brand-2 py-3 flex items-center justify-center gap-4">
             <span class="text-[0.7rem] font-black text-slate-500 uppercase tracking-[0.3em]">Code:</span>
             <span id="atm-code-preview" class="text-[2rem] font-black text-brand-5 tracking-widest leading-none mr-8">0000</span>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】管理者：ユーザー個別通知送信 -->
+<template id="tpl-admin-send-user-notification">
+    <div class="w-full text-black-5 space-y-4 pt-2 px-2">
+        <div class="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+            <!-- 送信アイコン選択 -->
+            <button id="btn-admin-send-emoji-trigger" class="w-16 h-16 bg-white rounded-full shadow-md flex items-center justify-center text-[2.5rem] active:scale-95 transition-transform outline-none border border-slate-100">
+                <span id="admin-send-emoji-preview">✉️</span>
+                <input type="hidden" id="admin-send-emoji-val" value="✉️">
+            </button>
+            <div class="flex-1 min-w-0">
+                <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest block mb-1">To User ID</span>
+                <div id="admin-send-target-id" class="text-[0.7rem] font-bold text-slate-600 break-all leading-tight"></div>
+            </div>
+        </div>
+        <div>
+            <div class="flex justify-between items-end mb-1">
+                <label class="block text-[0.7rem] font-bold uppercase text-slate-400">Message Body</label>
+                <span class="text-[0.6rem] font-bold text-slate-300"><span id="admin-send-body-count">0</span>/300</span>
+            </div>
+            <textarea id="admin-send-body" maxlength="300" placeholder="ユーザーへのメッセージを入力してください" 
+                class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none leading-relaxed"></textarea>
         </div>
     </div>
 </template>

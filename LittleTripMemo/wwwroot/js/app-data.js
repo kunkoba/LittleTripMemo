@@ -195,10 +195,10 @@ window.$Data = {
             // return true;
         },
         async GetAllFeedback(params = {}) {
-            // return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllFeedback', params))();
-            console.warn("TEST: GetMockData(FEEDBACK) を使用します");
-            $App.AppData.Admin.feedbackList = $Const.GetMockData('FEEDBACK', 50);
-            return true;
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllFeedback', params))();
+            // console.warn("TEST: GetMockData(FEEDBACK) を使用します");
+            // $App.AppData.Admin.feedbackList = $Const.GetMockData('FEEDBACK', 50);
+            // return true;
         },
         async GetAllNotifications(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllNotifications', params))();

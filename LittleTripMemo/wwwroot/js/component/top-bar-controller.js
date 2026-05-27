@@ -9,7 +9,7 @@ const _TopCore = {
                 this.root = $Dom.GetElementById(this._elementId);
                 this.btnArchiveTitle = $Dom.GetElementById('ui-archive-title');
                 this.uiSortGroup = $Dom.GetElementById('ui-sort-group');
-                this.sortKbn = $Dom.GetElementById('sort-kbn');
+                // this.sortKbn = $Dom.GetElementById('sort-kbn');
                 this.sortField = $Dom.GetElementById('sort-field');
                 this.sortReaction = $Dom.GetElementById('sort-reaction');
                 this.sortWord = $Dom.GetElementById('sort-word');
@@ -26,48 +26,48 @@ const _TopCore = {
                     // システムメニュー
                     $Dialog.ShowSystemMenu();
                 });
-                this.sortKbn.addEventListener("click", (e) => {
-                    const btn = e.target.closest("button");
-                    if (!btn) return;
-                    // 全ボタンをリセット
-                    this.sortKbn.querySelectorAll("button").forEach((b) => {
-                        b.classList.remove("bg-brand-3");
-                        b.classList.add("bg-brand-0");
-                    });
-                    // 押されたボタンだけ強調
-                    btn.classList.remove("bg-brand-0");
-                    btn.classList.add("bg-brand-3");
-                    // Private / Public 切り替えに伴う制御
-                    const isPublic = (btn.dataset.value === '1');
-                    const btnReactionField = document.querySelector('#sort-field button[data-value="3"]');
-                    const btnWordField = document.querySelector('#sort-field button[data-value="4"]');
-                    if (isPublic) {
-                        // Public: Reactionでの並び順を解放
-                        if (btnReactionField) $Dom.ToggleShow(btnReactionField, true);
-                        if (btnWordField) $Dom.ToggleShow(btnWordField, true);
-                    } else {
-                        // Private: Reactionでの並び順を封印
-                        if (btnReactionField) $Dom.ToggleShow(btnReactionField, false);
-                        if (btnWordField) $Dom.ToggleShow(btnWordField, false);
-                        // もし「Reaction」が選択された状態でPrivateに戻された場合、強制的に「Created」に戻す
-                        if ((btnReactionField && btnReactionField.classList.contains('bg-brand-3')) ||
-                            (btnWordField && btnWordField.classList.contains('bg-brand-3'))) {
-                            const btnCreated = document.querySelector('#sort-field button[data-value="1"]');if (btnReactionField) {
-                                btnReactionField.classList.remove('bg-brand-3');
-                                btnReactionField.classList.add('bg-brand-0');
-                            }
-                            if (btnWordField) {
-                                btnWordField.classList.remove('bg-brand-3');
-                                btnWordField.classList.add('bg-brand-0');
-                            }
-                            btnCreated.classList.remove('bg-brand-0');
-                            btnCreated.classList.add('bg-brand-3');
-                        }
-                        // リアクションアイコン選択UIも強制的に隠す
-                        if (this.sortReaction) $Dom.ToggleShow(this.sortReaction, false);
-                        if (this.sortWord) $Dom.ToggleShow(this.sortWord, false);
-                    }
-                });
+                // this.sortKbn.addEventListener("click", (e) => {
+                //     const btn = e.target.closest("button");
+                //     if (!btn) return;
+                //     // 全ボタンをリセット
+                //     this.sortKbn.querySelectorAll("button").forEach((b) => {
+                //         b.classList.remove("bg-brand-3");
+                //         b.classList.add("bg-brand-0");
+                //     });
+                //     // 押されたボタンだけ強調
+                //     btn.classList.remove("bg-brand-0");
+                //     btn.classList.add("bg-brand-3");
+                //     // Private / Public 切り替えに伴う制御
+                //     const isPublic = (btn.dataset.value === '1');
+                //     const btnReactionField = document.querySelector('#sort-field button[data-value="3"]');
+                //     const btnWordField = document.querySelector('#sort-field button[data-value="4"]');
+                //     if (isPublic) {
+                //         // Public: Reactionでの並び順を解放
+                //         if (btnReactionField) $Dom.ToggleShow(btnReactionField, true);
+                //         if (btnWordField) $Dom.ToggleShow(btnWordField, true);
+                //     } else {
+                //         // Private: Reactionでの並び順を封印
+                //         if (btnReactionField) $Dom.ToggleShow(btnReactionField, false);
+                //         if (btnWordField) $Dom.ToggleShow(btnWordField, false);
+                //         // もし「Reaction」が選択された状態でPrivateに戻された場合、強制的に「Created」に戻す
+                //         if ((btnReactionField && btnReactionField.classList.contains('bg-brand-3')) ||
+                //             (btnWordField && btnWordField.classList.contains('bg-brand-3'))) {
+                //             const btnCreated = document.querySelector('#sort-field button[data-value="1"]');if (btnReactionField) {
+                //                 btnReactionField.classList.remove('bg-brand-3');
+                //                 btnReactionField.classList.add('bg-brand-0');
+                //             }
+                //             if (btnWordField) {
+                //                 btnWordField.classList.remove('bg-brand-3');
+                //                 btnWordField.classList.add('bg-brand-0');
+                //             }
+                //             btnCreated.classList.remove('bg-brand-0');
+                //             btnCreated.classList.add('bg-brand-3');
+                //         }
+                //         // リアクションアイコン選択UIも強制的に隠す
+                //         if (this.sortReaction) $Dom.ToggleShow(this.sortReaction, false);
+                //         if (this.sortWord) $Dom.ToggleShow(this.sortWord, false);
+                //     }
+                // });
                 this.sortField.addEventListener("click", (e) => {
                     const btn = e.target.closest("button");
                     if (!btn) return;
@@ -167,21 +167,20 @@ const _TopCore = {
     },
     // ▼修正：並び順取得ロジック（サーバー側のAPI仕様に合わせる）
     getSortSetting(){
-        const sortKbn = this._getSelectedValue("sort-kbn");       // 0（Private） or 1（Public）
-        const sortField = this._getSelectedValue("sort-field");   // 1（登録日時）, 2（更新日時）, 3（リアクション）
-        const isPublic = (sortKbn === '1');
+        const sortField = this._getSelectedValue("sort-field"); 
         let reactionType = null;
         let searchWord = null;
-        // Public かつ リアクション順(3) の場合のみリアクション種別を取得
-        if (isPublic && sortField === '3') {
+        // 常にPublic前提のロジック
+        if (sortField === '3') {
             reactionType = this._getSelectedValue("sort-reaction");
         }
-        if (isPublic && sortField === '4') {
+        if (sortField === '4') {
             const input = $Dom.GetElementById('input-sort-word');
             if (input) searchWord = input.value.trim();
         }
+        //
         return {
-            isPublic: isPublic,
+            isPublic: true, // 常にtrue
             sortField: parseInt(sortField || '1', 10),
             reactionType: reactionType ? parseInt(reactionType, 10) : null,
             keyword: searchWord,

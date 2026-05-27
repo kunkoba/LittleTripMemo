@@ -217,6 +217,16 @@ const DialogController = {
             auth:    $Dom.QuerySelector('#btn-sys-auth', el),
             admin:   $Dom.QuerySelector('#btn-sys-admin', el),
         };
+        // ログイン中であれば、プロフィールのアイコンを反映する
+        if (isLoggedIn) {
+            const profile = $App.AppData.Owner.Profile;
+            // console.log("profile:", profile);
+            if (profile && profile.icon) {
+                // ボタン内の最初のspan（アイコン表示用）を取得して書き換え
+                const iconSpan = $Dom.QuerySelector('span:first-child', b.profile);
+                iconSpan.textContent = profile.icon;
+            }
+        }
         // 2. まとめて表示設定（ログイン・権限状態で絞り込み）
         $Dom.ToggleShow(b.profile, isLoggedIn);
         $Dom.ToggleShow(b.notice,  isLoggedIn);
@@ -235,8 +245,13 @@ const DialogController = {
         }
         // 4. 各ボタンのイベント登録
         b.profile.onclick = async () => {
-            const isSuccess = await $Data.Access.GetProfile();
-            if (isSuccess && $App.AppData.Owner.Profile) {_DialogCore.close(); this.ShowUserProfile($App.AppData.Owner.Profile, true)};
+            // const isSuccess = await $Data.Access.GetProfile();
+            // if (isSuccess && $App.AppData.Owner.Profile) {
+            //     _DialogCore.close();
+            //     this.ShowUserProfile($App.AppData.Owner.Profile, true)
+            // };
+            _DialogCore.close();
+            this.ShowUserProfile($App.AppData.Owner.Profile, true)
         };
         b.config.onclick = () => {_DialogCore.close(); this.ShowUserSettingsMenu()};
         b.notice.onclick = () => {_DialogCore.close(); this.ShowNoticeList()};
@@ -1556,30 +1571,6 @@ const DialogController = {
             ]
         });
     },
-    // 通知詳細ダイアログ
-	ShowNoticeDetail_2(notice) {
-		const el = $Dom.GenerateTemplate('tpl-view-notice');
-		const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === notice.kind) || $Const.NOTICE_KIND.NOTICE;
-		$Dom.QuerySelector('#view-notice-icon', el).textContent = kindObj.emoji;
-		$Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, 'YYYY-MM-DD　HH:mm');
-		$Dom.QuerySelector('#view-notice-title', el).textContent = notice.title;
-		$Dom.QuerySelector('#view-notice-body', el).textContent = notice.body;
-        // リンクURLの表示制御
-        const urlWrapper = $Dom.QuerySelector('#view-notice-url-wrapper', el);
-        if (notice.link_url && notice.link_url.trim() !== "") {
-            $Dom.ToggleShow(urlWrapper, true);
-            const urlLink = $Dom.QuerySelector('#view-notice-url', el);
-            const urlText = $Dom.QuerySelector('#view-notice-url span:last-child', el);
-            urlLink.href = notice.link_url;
-            urlText.textContent = notice.link_url; // リンクの文字列を表示
-        } else {
-            $Dom.ToggleShow(urlWrapper, false);
-        }
-		_DialogCore.open({
-			title: "NOTICE DETAILS",
-			content: el
-		});
-	},
     // 通知詳細ダイアログ (修正版)
 	ShowNoticeDetail(notice) {
 		const el = $Dom.GenerateTemplate('tpl-view-notice');
@@ -1602,53 +1593,6 @@ const DialogController = {
 		_DialogCore.open({
 			title: "NOTICE DETAILS",
 			content: el
-		});
-	},
-    // 通知リスト表示
-    async ShowNoticeList_2() {
-		const notices = $App.AppData.Owner.systemInfo.notifications || [];
-		if (notices.length === 0) {
-			$Notice.Warn("データはありません");
-			return;
-		}
-		const root = $Dom.GenerateTemplate("tpl-list-parent");
-		root.className = "w-full text-black-3 mb-2 px-1";
-		notices.forEach(item => {
-			const child = $Dom.GenerateTemplate("tpl-list-child-notice");
-            // child自身に直接クラスを追加する
-			if (item.kind === 0) {
-				child.classList.add("border-l-4", "border-slate-300");
-			} else {
-				child.classList.add("border-l-4", "border-brand-3");
-			}
-			// メモリ上の未読フラグを使用
-			const isNew = item.is_new;
-			const badge = $Dom.QuerySelector(".js-badge-new", child);
-			if (badge) $Dom.ToggleShow(badge, isNew);
-			$Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD　HH:mm');
-            const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === item.kind) || $Const.NOTICE_KIND.NOTICE;
-            $Dom.QuerySelector('.js-icon', child).textContent = kindObj.emoji;
-			$Dom.QuerySelector(".js-title", child).textContent = item.title;
-			$Dom.QuerySelector(".js-body", child).textContent = item.body;
-			child.onclick = async () => {
-				// ★クリック時に IndexedDB に保存して既読化する
-                if (item.is_new) {
-                    item.is_new = false; // メモリ上も既読に
-                    await $LocalDb.Notice.Save(item.seq, item.update_tim, item.disp_to);
-                    // 未読カウントを減らしてUI(歯車アイコンの赤丸)を即時更新
-                    if ($App.AppData.Context.UnreadNoticeCount > 0) {
-                        $App.AppData.Context.UnreadNoticeCount--;
-                        $UI.UpdateNoticeBadge($App.AppData.Context.UnreadNoticeCount);
-                    }
-                }
-				if (badge) $Dom.ToggleShow(badge, false);
-				this.ShowNoticeDetail(item);
-			};
-			root.appendChild(child);
-		});
-		_DialogCore.open({
-			title: "NOTIFICATIONS",
-			content: root
 		});
 	},
     // 通知リスト表示（修正版）
@@ -1999,61 +1943,18 @@ const DialogController = {
         _DialogCore.open({
             title: "FEEDBACK DETAILS",
             content: el,
-            help: "",
-            buttons: []
-        });
-    },
-    // 通報投稿画面
-    async ShowReportPost_2(archive) {
-        // ダイアログを開く前に、自分が過去にこのアーカイブを通報したか取得
-        const reqParam = { target_user_id: archive.user_id, archive_id: archive.archive_id };
-        const isSuccess = await $Data.Access.GetMyReport(reqParam);
-        if (!isSuccess) return;
-        // 取得したデータがあれば初期値として設定
-        const myReport = $App.AppData.Owner.myReport || null;
-        let currentBody = myReport ? (myReport.body || "") : "";
-        const el = $Dom.GenerateTemplate("tpl-report-post");
-        const inputBody = $Dom.QuerySelector('#input-report-body', el);
-        const countBody = $Dom.QuerySelector('#report-text-count', el);
-        // 初期値の反映
-        inputBody.value = currentBody;
-        countBody.textContent = currentBody.length;
-        inputBody.addEventListener("input", () => {
-            countBody.textContent = inputBody.value.length;
-        });
-        _DialogCore.open({
-            // データが既にあれば編集（EDIT）、なければ新規（SUBMIT）
-            title: myReport ? "EDIT REPORT" : "REPORT SUBMIT",
-            content: el,
-            help: "",
-            buttons: [[
+            headerButtons: [
                 {
-                    label: "CANCEL",
-                    className: "bg-slate-200 text-slate-500 shadow-md",
-                    closesDialog: true
-                },
-                {
-                    label: "SUBMIT",
-                    className: "bg-red-500 text-white shadow-md",
-                    closesDialog: false,
-                    handler: async () => {
-                        const body = inputBody.value.trim();
-                        if (!body) {
-                            $Notice.Warn("通報内容を入力してください。");
-                            return;
-                        }
-                        const req = {
-                            target_user_id: archive.user_id,
-                            archive_id: archive.archive_id,
-                            body: body
-                        };
-                        const isSubmitSuccess = await $Data.Access.UpsertReport(req);
-                        if (!isSubmitSuccess) return;
-                        $Notice.Info("通報を送信しました。管理者が確認します。");
-                        _DialogCore.close(); // 通報ダイアログを閉じる
+                    label: "✉", // 送信アイコン
+                    id: "btn-admin-reply-user",
+                    handler: () => {
+                        // このユーザーに対して送信画面を開く
+                        this.ShowAdminSendUserNotification(item.user_id, `フィードバックありがとうございます！\n`);
                     }
                 }
-            ]]
+            ],
+            help: "",
+            buttons: []
         });
     },
     // 通報投稿画面
@@ -2148,6 +2049,60 @@ const DialogController = {
             content: el,
             help: "",
             buttons: [] // CLOSEボタンは右上の✖で代用し、下部はコピーボタンのみにする
+        });
+    },
+    // 【管理者機能】ユーザー個別通知送信ダイアログ
+    ShowAdminSendUserNotification(targetUserId, defaultText = "") {
+        if (!targetUserId) return $Notice.Warn("ユーザーIDが不明です");
+        const el = $Dom.GenerateTemplate("tpl-admin-send-user-notification");
+        const previewEmoji = $Dom.QuerySelector('#admin-send-emoji-preview', el);
+        const inputEmoji = $Dom.QuerySelector('#admin-send-emoji-val', el);
+        const displayUserId = $Dom.QuerySelector('#admin-send-target-id', el);
+        const inputBody = $Dom.QuerySelector('#admin-send-body', el);
+        const countBody = $Dom.QuerySelector('#admin-send-body-count', el);
+        // 初期値セット
+        displayUserId.textContent = targetUserId;
+        inputBody.value = defaultText;
+        countBody.textContent = inputBody.value.length;
+        // イベントリスナー
+        inputBody.addEventListener('input', () => countBody.textContent = inputBody.value.length);
+        $Dom.QuerySelector('#btn-admin-send-emoji-trigger', el).onclick = () => {
+            $Util.ShowEmojiPicker((emoji) => {
+                previewEmoji.textContent = emoji;
+                inputEmoji.value = emoji;
+            });
+        };
+        _DialogCore.open({
+            title: "SEND NOTIFICATION",
+            content: el,
+            help: "特定のユーザーに対して、個別の通知（DM）を送信します。",
+            buttons: [
+                [
+                    {
+                        label: "CANCEL",
+                        className: "bg-slate-200 text-slate-500 shadow-md",
+                        closesDialog: true
+                    },
+                    {
+                        label: "SEND MESSAGE",
+                        className: "bg-brand-5 text-white shadow-md",
+                        closesDialog: false,
+                        handler: async () => {
+                            const body = inputBody.value.trim();
+                            if (!body) return $Notice.Warn("本文を入力してください");
+                            const isSuccess = await $Data.Access.SendUserNotification({
+                                target_user_id: targetUserId,
+                                emoji: inputEmoji.value,
+                                body: body
+                            });
+                            if (isSuccess) {
+                                $Notice.Info("通知を送信しました。");
+                                _DialogCore.close(); // 送信画面を閉じる
+                            }
+                        }
+                    }
+                ]
+            ]
         });
     },
 };
