@@ -115,7 +115,6 @@ builder.Services.AddScoped<AddDetailsService>();
 builder.Services.AddScoped<DeleteArchiveService>();
 builder.Services.AddScoped<UpdateArchiveService>();
 builder.Services.AddScoped<PublishArchiveService>();
-builder.Services.AddScoped<SearchByLocationService>();
 builder.Services.AddScoped<GetArchiveDetailsPubService>();
 builder.Services.AddScoped<UnpublishArchiveService>();
 builder.Services.AddScoped<UpsertReactionService>();

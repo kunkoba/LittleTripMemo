@@ -245,11 +245,6 @@ const DialogController = {
         }
         // 4. 各ボタンのイベント登録
         b.profile.onclick = async () => {
-            // const isSuccess = await $Data.Access.GetProfile();
-            // if (isSuccess && $App.AppData.Owner.Profile) {
-            //     _DialogCore.close();
-            //     this.ShowUserProfile($App.AppData.Owner.Profile, true)
-            // };
             _DialogCore.close();
             this.ShowUserProfile($App.AppData.Owner.Profile, true)
         };
@@ -1459,17 +1454,17 @@ const DialogController = {
     },
     // プロフィール参照
     async ShowUserProfile(profile, isOwner) {
-        if (isOwner) {
-            const isSuccess = await $Data.Access.GetProfile();
-            if (isSuccess && $App.AppData.Owner.Profile) {
-                // 自分のプロフィールで上書き
-                profile = $App.AppData.Owner.Profile;
-            }
-        }
-        if (!profile) return $Notice.Warn("ユーザー情報がありません");
+        // if (isOwner) {
+        //     const isSuccess = await $Data.Access.GetProfile();
+        //     if (isSuccess && $App.AppData.Owner.Profile) {
+        //         // 自分のプロフィールで上書き
+        //         profile = $App.AppData.Owner.Profile;
+        //     }
+        // }
+        // if (!profile) return $Notice.Warn("ユーザー情報がありません");
         const el = $Dom.GenerateTemplate('tpl-view-profile');
         const renderView = () => {
-            const pIcon = profile.icon || "😀";
+            const pIcon = profile.icon || "👤";
             const pName = profile.nickName || "No Name";
             const pDesc  = profile.description || "";
             const pL1   = profile.link1 || "";
@@ -1518,8 +1513,8 @@ const DialogController = {
         const editLink1 = $Dom.QuerySelector('#edit-profile-link1', el);
         const editLink2 = $Dom.QuerySelector('#edit-profile-link2', el);
         const editLink3 = $Dom.QuerySelector('#edit-profile-link3', el);
-        editIconPreview.textContent = profile.icon || "😀";
-        editIconInput.value = profile.icon || "😀";
+        editIconPreview.textContent = profile.icon || "👤";
+        editIconInput.value = profile.icon || "👤";
         editNickname.value = profile.nickName || "";
         editNicknameCount.textContent = (profile.nickName || "").length;
         editDesc.value = profile.description || "";

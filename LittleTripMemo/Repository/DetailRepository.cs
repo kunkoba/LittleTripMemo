@@ -174,61 +174,19 @@ public class DetailRepository : _BaseRepository
         return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
     }
 
-    // 管理者用：対象ユーザーの TableId を指定して復元
+    /// <summary>
+    /// 管理者用：対象ユーザーの TableId を指定して復元
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <param name="targetUserId"></param>
+    /// <param name="targetTableId"></param>
+    /// <returns></returns>
     public async Task<int> AdminRestoreByKeyAsync(int archiveId, Guid targetUserId, int targetTableId)
     {
         string sql = $@"
         UPDATE t_memo_detail_{targetTableId} SET del_flg = false, update_tim = CURRENT_TIMESTAMP 
         WHERE archive_id = @archive_id AND user_id = @target_user_id";
         return await ExecuteAsync(sql, new { archive_id = archiveId, target_user_id = targetUserId });
-    }
-
-    /// <summary>
-    /// 地点検索用の明細取得。指定された緯度・経度の範囲内にある明細を取得する。
-    /// </summary>
-    /// <param name="latMin"></param>
-    /// <param name="latMax"></param>
-    /// <param name="lngMin"></param>
-    /// <param name="lngMax"></param>
-    /// <param name="limit"></param>
-    /// <returns></returns>
-    public async Task<IEnumerable<TMemoDetail>> GetByLocationAsync(
-        decimal latMin, decimal latMax,
-        decimal lngMin, decimal lngMax,
-        int sortField,
-        int limit = 50)
-    {
-        // ソート句の決定
-        string orderBy = sortField switch
-        {
-            1 => "d.create_tim DESC",
-            2 => "d.update_tim DESC",
-            _ => "d.create_tim DESC"
-        };
-
-        string sql = $@"
-            SELECT d.*,
-                a.title AS a_title
-            FROM t_memo_detail_{_user.TableId} d
-            LEFT JOIN t_memo_archive a
-                ON d.archive_id = a.archive_id
-            WHERE d.latitude  BETWEEN @lat_min AND @lat_max
-              AND d.longitude BETWEEN @lng_min AND @lng_max
-              AND d.user_id   = @user_id
-              AND d.del_flg   = false
-              AND d.archive_id > 0
-            ORDER BY {orderBy}
-              LIMIT @limit";
-
-        return await QueryAsync<TMemoDetail>(sql, new
-        {
-            lat_min = latMin,
-            lat_max = latMax,
-            lng_min = lngMin,
-            lng_max = lngMax,
-            user_id = _user.UserId,
-            limit
-        });
     }
 
 }

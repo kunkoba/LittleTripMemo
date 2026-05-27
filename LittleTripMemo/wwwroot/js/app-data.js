@@ -140,9 +140,9 @@ window.$Data = {
         async UnpublishArchive(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UnpublishArchive', params))();
         },
-        async SearchByLocation(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/SearchByLocation', params))();
-        },
+        // async SearchByLocation(params = {}) {
+        //     return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/SearchByLocation', params))();
+        // },
         async SearchByLocationPub(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/SearchByLocationPub', params))();
         },

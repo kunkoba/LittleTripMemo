@@ -543,22 +543,22 @@
 <template id="tpl-menu-user-settings">
     <div class="w-full flex flex-col bg-brand-0">
         <button id="btn-set-theme" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1rem]">🎨</span>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">🎨</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Theme Config</span>
         </button>
         <button id="btn-set-map" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1rem]">🗺️</span>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">🗺️</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Map Style Config</span>
         </button>
         <button id="btn-set-currency" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1rem]">💰</span>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">💰</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Currency Config</span>
         </button>
         <button id="btn-set-gps" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1rem]">😀</span>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">😀</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">GPS Tracking</span>
         </button>
@@ -714,7 +714,7 @@
 			<div class="shrink-0 flex flex-col items-center">
 				<!-- <label class="block text-[0.6rem] font-bold mb-1 uppercase text-slate-400">Icon</label> -->
 				<button id="btn-profile-icon-trigger" class="w-14 h-14 bg-white rounded-full shadow-md _border-2 _border-brand-3 flex items-center justify-center text-[2rem]  active:scale-95 transition-transform outline-none">
-					<span id="edit-profile-icon-preview">😀</span>
+					<span id="edit-profile-icon-preview">👤</span>
 					<input type="hidden" id="edit-profile-icon">
 				</button>
 			</div>
@@ -876,25 +876,26 @@
         <div class="flex items-center justify-between gap-2 mb-6">
             <!-- 右：ユーザ情報（プロフボタン） -->
             <button id="btn-mem-user-profile" 
-                class="border border-slate-100 rounded-full py-1.5 pl-2 pr-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
+                class="border border-slate-100 rounded-full pl-2 pr-4 h-10 w-[200px] border-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
                 <span id="view-mem-user-icon" class="text-[1.4rem] drop-shadow-md"></span>
-                <span id="view-mem-user-id" class="text-[0.8rem] font-black text-slate-600 tracking-tight line-clamp-1"></span>
+                <span id="view-mem-user-id" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1"></span>
             </button>
         </div>
 		<!-- 1. タイトル（最上部） -->
 		<div class="mb-4">
-			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 break-all leading-tight"></h1>
+			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 break-all leading-tight border-l-4 border-brand-3 pl-3"></h1>
 		</div>
 		<!-- 3. 本文（中央） -->
-		<div id="view-mem-body" class="text-[1rem] min-h-[100px] text-slate-600 leading-[2] whitespace-pre-wrap break-all mb-2">
+		<div id="view-mem-body" class="text-[1rem] min-h-[200px] overflow-y-auto pr-1 text-slate-600 leading-[2] whitespace-pre-wrap break-all mb-2">
 		</div>
 		<!-- 4. 下部アクション（リンク ＋ メモ数） -->
 		<div class="mt-auto pb-1 flex items-end justify-between border-t border-slate-50">
             <!-- 左：金額（左アクセント線） -->
-            <div class="py-1">
-                <span id="view-mem-price-unit" class="text-[0.6rem] font-black text-slate-400 uppercase tracking-[0.2em] block mb-0.5"></span>
-                <div id="mem-stat-price" class="text-[1.2rem] font-black italic mr-2"></div>
-            </div>
+            
+<div class="pl-3 flex items-baseline italic border-b-2 border-brand-3">
+    <span id="mem-stat-price" class="text-[1.2rem] font-black italic "></span>
+    <span id="view-mem-price-unit" class="text-[0.7rem] font-bold text-slate-400 ml-1.5 uppercase"></span>
+</div>
 			<!-- 左下：リンク（正円ボタン・影あり） -->
 			<a id="view-mem-url" href="" target="_blank" class="shrink-0 w-12 h-12 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
 				<!-- ここにアイコンが挿入される -->

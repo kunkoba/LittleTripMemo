@@ -22,7 +22,6 @@ public class AppController : _BaseController
     private readonly DeleteArchiveService _deleteArchiveService;
     private readonly UpdateArchiveService _updateArchiveService;
     private readonly PublishArchiveService _publishArchiveService;
-    private readonly SearchByLocationService _searchByLocationService;
     private readonly GetArchiveDetailsPubService _getArchiveDetailsPubService;
     private readonly UnpublishArchiveService _unpublishArchiveService;
     private readonly UpsertReactionService _upsertReactionService;
@@ -46,7 +45,6 @@ public class AppController : _BaseController
         DeleteArchiveService deleteArchiveService,
         UpdateArchiveService updateArchiveService,
         PublishArchiveService publishArchiveService,
-        SearchByLocationService searchByLocationService,
         GetArchiveDetailsPubService getArchiveDetailsPubService,
         UnpublishArchiveService unpublishArchiveService,
         UpsertReactionService upsertReactionService,
@@ -68,7 +66,6 @@ public class AppController : _BaseController
         _deleteArchiveService = deleteArchiveService;
         _updateArchiveService = updateArchiveService;
         _publishArchiveService = publishArchiveService;
-        _searchByLocationService = searchByLocationService;
         _getArchiveDetailsPubService = getArchiveDetailsPubService;
         _unpublishArchiveService = unpublishArchiveService;
         _upsertReactionService = upsertReactionService;
@@ -180,18 +177,6 @@ public class AppController : _BaseController
         public async Task<IActionResult> PublishArchive([FromBody] PublishArchiveService.PublishArchiveReq req)
         {
             var result = await _publishArchiveService.ExecuteAsync(req);
-            return OkWithBase(result);
-        }
-
-        /// <summary>
-        /// 地点検索（秘密データ）
-        /// </summary>
-        /// <param name="req"></param>
-        /// <returns></returns>
-        [HttpPost("api/SearchByLocation")]
-        public async Task<IActionResult> SearchByLocation([FromBody] SearchByLocationService.SearchByLocationReq req)
-        {
-            var result = await _searchByLocationService.ExecuteAsync(req);
             return OkWithBase(result);
         }
 
