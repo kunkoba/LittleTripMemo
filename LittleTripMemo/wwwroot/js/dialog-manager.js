@@ -105,7 +105,8 @@ const _DialogCore = {
                     // btn.className = btnDef.className
                     //     ? `${baseClass} ${btnDef.className}`
                     //     : `${baseClass} ${defaultColorClass}`;
-                    btn.className = `${this.FOOTER_BTN_BASE} ${sizeClass} ${btnDef.className ?? this.FOOTER_BTN_DEFAULT}`;
+                    // btn.className = `${this.FOOTER_BTN_BASE} ${sizeClass} ${btnDef.className ?? this.FOOTER_BTN_DEFAULT}`;
+                    btn.className = `${this.FOOTER_BTN_BASE} ${sizeClass} ${this.FOOTER_BTN_DEFAULT} ${btnDef.className}`;
                     btn.textContent = btnDef.label;
                     if (btnDef.id) btn.id = btnDef.id;
                     if (btnDef.isHidden) btn.classList.add("hidden");
@@ -1135,7 +1136,8 @@ const DialogController = {
                 {
                     id: "btn-ms-merge",
                     label: "⇄ MERGE",
-                    className: "bg-brand-5 text-white shadow-md disabled:opacity-50 flex items-center justify-center gap-2",
+                    // className: "bg-brand-5 text-white shadow-md disabled:opacity-50 flex items-center justify-center gap-2",
+                    className: "disabled:opacity-50 flex items-center justify-center gap-2",
                     closesDialog: false,
                     handler: async () => {
                         const seqs = Array.from(selectedSeqs);
@@ -1156,7 +1158,7 @@ const DialogController = {
                 {
                     id: "btn-ms-add",
                     label: "＋ ADD",
-                    className: "bg-brand-5 text-white shadow-md disabled:opacity-50 flex items-center justify-center gap-2",
+                    className: "disabled:opacity-50 flex items-center justify-center gap-2",
                     closesDialog: false, // 手動で制御するためfalse
                     handler: () => {
                         const seqs = Array.from(selectedSeqs);
