@@ -713,7 +713,7 @@
 		<div class="flex items-end gap-3 py-1">
 			<div class="shrink-0 flex flex-col items-center">
 				<!-- <label class="block text-[0.6rem] font-bold mb-1 uppercase text-slate-400">Icon</label> -->
-				<button id="btn-profile-icon-trigger" class="w-14 h-14 bg-white rounded-full shadow-md pb-2 border-2 border-brand-3 flex items-center justify-center text-[2rem]  active:scale-95 transition-transform outline-none">
+				<button id="btn-profile-icon-trigger" class="w-14 h-14 bg-white rounded-full shadow-md border-2 border-brand-3 flex items-center justify-center text-[2rem]  active:scale-95 transition-transform outline-none">
 					<span id="edit-profile-icon-preview">👤</span>
 					<input type="hidden" id="edit-profile-icon">
 				</button>
@@ -1005,6 +1005,22 @@
             </div>
             <textarea id="admin-send-body" maxlength="300" placeholder="ユーザーへのメッセージを入力してください" 
                 class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none leading-relaxed"></textarea>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】管理者：通報内容の全文詳細 -->
+<template id="tpl-admin-report-item-detail">
+    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden p-2 bg-white">
+        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+            <span class="text-[0.8rem] font-black text-slate-400 tracking-wider js-report-tim italic"></span>
+        </div>
+        <div class="mb-4 px-2">
+            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Reporter ID</span>
+            <div class="text-[0.75rem] font-bold text-slate-600 js-reporter-id break-all mt-1"></div>
+        </div>
+        <div class="flex-1 overflow-y-auto px-2 pb-4">
+            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Report Body</span>
+            <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all js-report-body mt-2"></div>
         </div>
     </div>
 </template>

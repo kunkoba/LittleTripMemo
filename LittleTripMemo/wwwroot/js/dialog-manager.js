@@ -98,21 +98,14 @@ const _DialogCore = {
                 if (!isArray && rowDef.rowId) rowDiv.id = rowDef.rowId;
                 if (!isArray && rowDef.isHidden) rowDiv.classList.add("hidden");
                 const sizeClass = items.length > 1 ? "flex-1" : "w-full";
-                // const baseClass = `${sizeClass} font-black text-[1rem] h-12 rounded-[1rem] uppercase active:scale-95 transition-transform`;
-                // const defaultColorClass = "bg-brand-5 text-white shadow-md";
                 items.forEach(btnDef => {
                     const btn = document.createElement("button");
-                    // btn.className = btnDef.className
-                    //     ? `${baseClass} ${btnDef.className}`
-                    //     : `${baseClass} ${defaultColorClass}`;
-                    // btn.className = `${this.FOOTER_BTN_BASE} ${sizeClass} ${btnDef.className ?? this.FOOTER_BTN_DEFAULT}`;
                     btn.className = `${this.FOOTER_BTN_BASE} ${sizeClass} ${this.FOOTER_BTN_DEFAULT} ${btnDef.className}`;
                     btn.textContent = btnDef.label;
                     if (btnDef.id) btn.id = btnDef.id;
                     if (btnDef.isHidden) btn.classList.add("hidden");
                     btn.onclick = () => {
                         if (btnDef.handler) btnDef.handler();
-                        if (btnDef.closesDialog !== false) this.close();
                     };
                     rowDiv.appendChild(btn);
                 });
@@ -410,8 +403,8 @@ const DialogController = {
                     className: "bg-slate-400 text-white shadow-md",
                     handler: () => {
                         $UI.ChangeTheme(oldTheme);
+                        _DialogCore.close();
                     },
-                    closesDialog: true
                 },
                 {
                     label: "OK",
@@ -460,8 +453,8 @@ const DialogController = {
                     className: "bg-slate-400 text-white shadow-md",
                     handler: () => {
                         $Map.SetMapStyle(oldStyle);
+                        _DialogCore.close();
                     },
-                    closesDialog: true
                 },
                 {
                     label: "OK",
@@ -491,8 +484,8 @@ const DialogController = {
                     className: "bg-slate-400 text-white shadow-md",
                     handler: () => {
                         $App.ChangeCurrency(oldUnit);
+                        _DialogCore.close();
                     },
-                    closesDialog: true
                 },
                 {
                     label: "OK",
@@ -540,8 +533,8 @@ const DialogController = {
                     className: "bg-slate-400 text-white shadow-md",
                     handler: () => {
                         $App.ChangeGpsTracking(oldIsOn);
+                        _DialogCore.close();
                     },
-                    closesDialog: true
                 },
                 {
                     label: "OK",
@@ -613,7 +606,6 @@ const DialogController = {
                 {
                     label: "Write Feedback",
                     className: "",
-                    closesDialog: false,
                     handler: async () => {
                         this.ShowReviewPost();
                     }
@@ -679,12 +671,13 @@ const DialogController = {
                 {
                     label: "CANCEL",
                     className: "bg-slate-400 text-white shadow-md",
-                    closesDialog: true,
+                    handler: () => {
+						_DialogCore.close();
+                    },
                 },
                 {
                     label: "SUBMIT",
                     className: "",
-                    closesDialog: false,
                     handler: async () => {
                         const rating = Number(inputRating.value);
                         const body = inputBody.value.trim();
@@ -740,7 +733,6 @@ const DialogController = {
             buttons: [
                 {
                     label: "GO！",
-                    closesDialog: false, // 独自で制御するため自動で閉じさせない
                     handler: $Warn.CatchAsync(async () => {
                         // IDを指定して入力要素を取得し、前後の空白を除去した値を取得
                         const val = $Dom.QuerySelector("#inputPointValue", el).value.trim();
@@ -1138,7 +1130,6 @@ const DialogController = {
                     label: "⇄ MERGE",
                     // className: "bg-brand-5 text-white shadow-md disabled:opacity-50 flex items-center justify-center gap-2",
                     className: "disabled:opacity-50 flex items-center justify-center gap-2",
-                    closesDialog: false,
                     handler: async () => {
                         const seqs = Array.from(selectedSeqs);
                         const isOk = await this.ShowConfirm({ title: "MERGE", message: `${seqs.length}件のアイテムを\n新しいまとめにしますか？` });
@@ -1159,7 +1150,6 @@ const DialogController = {
                     id: "btn-ms-add",
                     label: "＋ ADD",
                     className: "disabled:opacity-50 flex items-center justify-center gap-2",
-                    closesDialog: false, // 手動で制御するためfalse
                     handler: () => {
                         const seqs = Array.from(selectedSeqs);
                         // 新しく作った専用メソッドを呼び出す
@@ -1271,7 +1261,9 @@ const DialogController = {
                     {
                         label: "CANCEL",
                         className: "bg-slate-400 text-white shadow-md",
-                        closesDialog: true
+                        handler: () => {
+                            _DialogCore.close();
+                        },
                     },
                     {
                         label: "OK",
@@ -1371,13 +1363,11 @@ const DialogController = {
                 dialogButtons.push([{
                     label: "Private　⇒　Public",
                     className: btnMainClass,
-                    closesDialog: false,
                     handler: () => this._execStatusChange('PublishArchive', { archive_id: archive.archive_id }, "Switch to [Public]", "Do you want to make\nthis internal data [Public]？", "Set to [Public].", $Const.SCREEN_MODE.ARCHIVE_PUB)
                 }]);
                 dialogButtons.push([{
                     label: "Archive　⇒　Details",
                     className: btnReleaseClass,
-                    closesDialog: false,
                     handler: () => this._execStatusChange('DeleteArchive', { archive_id: archive.archive_id }, "Restore to Details", "Restore this group to\nindividual detail items？", "Restored to individual detail items.", $Const.SCREEN_MODE.CREATE)
                 }]);
             } else {
@@ -1385,21 +1375,18 @@ const DialogController = {
                     dialogButtons.push([{
                         label: "Close　⇒　Open",
                         className: btnMainClass,
-                        closesDialog: false,
                         handler: () => this._execStatusChange('OpenArchive', { archive_id: archive.archive_id }, "Switch to [Open]", "Do you want to switch\nthis data to [Open]？", "Switched to [Open].", null, () => $Data.Store.UpdateArchive({ closed_flg: false }))
                     }]);
                 } else {
                     dialogButtons.push([{
                         label: "Open　⇒　Close",
                         className: btnMainClass,
-                        closesDialog: false,
                         handler: () => this._execStatusChange('CloseArchive', { archive_id: archive.archive_id }, "Switch to [Close]", "Do you want to switch\nthis data to [Close]？", "Switched to [Close].", null, () => $Data.Store.UpdateArchive({ closed_flg: true }))
                     }]);
                 }
                 dialogButtons.push([{
                     label: "Public　⇒　Private",
                     className: btnReleaseClass,
-                    closesDialog: false,
                     handler: () => this._execStatusChange('UnpublishArchive', { archive_id: archive.archive_id }, "Switch to [Private]", "Do you want to revert\nthis data to Private？", "Reverted to [Private].", $Const.SCREEN_MODE.ARCHIVE)
                 }]);
             }
@@ -1411,8 +1398,6 @@ const DialogController = {
                 dialogButtons.push([{
                     label: "【ADMIN】強制 Close",
                     className: "bg-red-500 text-white shadow-md",
-                    closesDialog: false,
-                    // handler: () => this._showAdminActionDialog(archive, "CLOSE", "AdminCloseArchive")
                     handler: async () => {
                         const isOk = await this.ShowConfirm({ title: "ADMIN: CLOSE", message: "【注意】\n強制的にClose状態にしますか？" });
                         if (!isOk) return;
@@ -1428,8 +1413,6 @@ const DialogController = {
             dialogButtons.push([{
                 label: "【ADMIN】強制 Privateに戻す",
                 className: "bg-white text-red-600 border-2 border-red-500 shadow-sm",
-                closesDialog: false,
-                // handler: () => this._showAdminActionDialog(archive, "UNPUBLISH", "AdminUnpublishArchive")
                 handler: async () => {
                     const isOk = await this.ShowConfirm({ title: "ADMIN: UNPUBLISH", message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？" });
                     if (!isOk) return;
@@ -1477,12 +1460,13 @@ const DialogController = {
                     {
                         label: "CANCEL",
                         className: "bg-slate-400 text-white shadow-md",
-                        closesDialog: true
+                        handler: () => {
+                            _DialogCore.close();
+                        },
                     },
                     {
                         label: "SAVE DATA",
                         className: "",
-                        closesDialog: false,
                         onClose: true,
                         handler: $Warn.CatchAsync(async () => {
                             const updatedFields = {
@@ -1586,12 +1570,13 @@ const DialogController = {
                     {
                         label: "CANCEL",
                         className: "bg-slate-400 text-white shadow-md",
-                        closesDialog: true
+                        handler: () => {
+                            _DialogCore.close();
+                        },
                     },
                     {
                         label: "SAVE",
                         className: "bg-brand-4 text-white shadow-md",
-                        closesDialog: false,
                         handler: $Warn.CatchAsync(async () => {
                             const updatedFields = {
                                 nickName: editNickname.value.trim(),
@@ -1759,7 +1744,6 @@ const DialogController = {
                 {
                     label: "＋ CREATE NEW NOTICE",
                     className: "w-full bg-brand-5 text-white shadow-md font-black",
-                    closesDialog: false,
                     handler: () => {
                         this.ShowAdminNoticeEdit(null, () => {
                             _DialogCore.close(); // 一覧を閉じる
@@ -1819,12 +1803,13 @@ const DialogController = {
                 {
                     label: "CANCEL",
                     className: "bg-slate-400 text-white shadow-md",
-                    closesDialog: true
+                    handler: () => {
+						_DialogCore.close();
+                    },
                 },
                 {
                     label: "SAVE",
                     className: "bg-brand-5 text-white shadow-md",
-                    closesDialog: false,
                     handler: async () => {
                         const req = {
                             seq: target.seq,
@@ -1894,6 +1879,9 @@ const DialogController = {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
                 $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim, 'YYYY-MM-DD　HH:mm');
                 $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
+                // クリックで全文詳細を開く
+                child.classList.add("cursor-pointer", "active:bg-slate-50");
+                child.onclick = () => this.ShowAdminReportItemDetail(rep);
                 listContainer.appendChild(child);
             });
         }
@@ -1906,7 +1894,6 @@ const DialogController = {
                 {
                     label: "🔗 OPEN PUBLIC ARCHIVE",
                     className: "bg-red-500 text-white shadow-md",
-                    closesDialog: false,
                     handler: async () => {
                         const isOk = await this.ShowConfirm({ title: "OPEN ARCHIVE", message: "この Public まとめデータを開きますか？" });
                         if (!isOk) return;
@@ -2025,7 +2012,6 @@ const DialogController = {
         dialogButtons.push([{
             label: "SUBMIT",
             className: "bg-red-600 text-white shadow-none rounded-none",
-            closesDialog: false,
             handler: async () => {
                 const body = inputBody.value.trim();
                 if (!body) {
@@ -2048,7 +2034,6 @@ const DialogController = {
             dialogButtons.push([{
                 label: "取り消す (DELETE)",
                 className: "bg-white text-slate-800 border-2 border-slate-800 shadow-none rounded-none",
-                closesDialog: false,
                 handler: async () => {
                     const isOk = await this.ShowConfirm({ title: "DELETE REPORT", message: "通報を取り消しますか？" });
                     if (!isOk) return;
@@ -2125,12 +2110,13 @@ const DialogController = {
                     {
                         label: "CANCEL",
                         className: "bg-slate-400 text-white shadow-md",
-                        closesDialog: true
+                        handler: () => {
+                            _DialogCore.close();
+                        },
                     },
                     {
                         label: "SEND MESSAGE",
                         className: "",
-                        closesDialog: false,
                         handler: async () => {
                             const body = inputBody.value.trim();
                             if (!body) return $Notice.Warn("本文を入力してください");
@@ -2147,6 +2133,18 @@ const DialogController = {
                     }
                 ]
             ]
+        });
+    },
+    // 【管理者機能】通報1件の全文詳細を表示
+    ShowAdminReportItemDetail(rep) {
+        const el = $Dom.GenerateTemplate("tpl-admin-report-item-detail");
+        $Dom.QuerySelector(".js-report-tim", el).textContent = $Util.FormatDate(rep.report_tim, "YYYY.MM.DD HH:mm");
+        $Dom.QuerySelector(".js-reporter-id", el).textContent = rep.reporter_user_id;
+        $Dom.QuerySelector(".js-report-body", el).textContent = rep.body || "（内容なし）";
+        _DialogCore.open({
+            title: "REPORT CONTENT",
+            content: el,
+            buttons: []
         });
     },
 };
