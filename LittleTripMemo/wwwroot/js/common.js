@@ -112,7 +112,6 @@ window.$Util = {
     },
     // GPSから現在地を取得する（純粋な座標取得のみ）
     async GetCurrentPosition() {
-        console.log("GetCurrentPosition");
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) reject(new Error("GPS非対応"));
             navigator.geolocation.getCurrentPosition(resolve, reject, {

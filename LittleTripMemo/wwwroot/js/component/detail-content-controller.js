@@ -185,11 +185,9 @@ const _DetailContentCore = {
             this.displayPriceUnit.textContent = displayCurrency;
             // マイナスなら赤、プラスなら青に色分け
             if (price < 0) {
-                this.displayPrice.className = "text-[1.2rem] font-black text-red-500";
-                // this.displayPriceLabel.className = "text-[0.6rem] font-black uppercase tracking-wider text-red-500";
+                this.displayPrice.className = "text-red-500";
             } else {
-                this.displayPrice.className = "text-[1.2rem] font-black text-blue-500";
-                // this.displayPriceLabel.className = "text-[0.6rem] font-black uppercase tracking-wider text-blue-500";
+                this.displayPrice.className = "text-blue-500";
             }
         } else {
             $Dom.ToggleShow(this.displayPriceWrapper, false);

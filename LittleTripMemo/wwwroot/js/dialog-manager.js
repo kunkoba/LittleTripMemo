@@ -4,6 +4,10 @@ const _DialogCore = {
     dialogRoot: null,
     backdrop: null,
     stack:[],
+    // ★ 共通クラス定数
+    HEADER_BTN_CLASS: "w-9 h-9 bg-white rounded-full shadow-md flex items-center justify-center active:scale-95 border border-brand-2 transition-transform",
+    FOOTER_BTN_BASE:  "font-black text-[1rem] h-12 rounded-[1rem] uppercase active:scale-95 transition-transform",
+    FOOTER_BTN_DEFAULT: "bg-brand-5 text-white shadow-md",
     // 初期化
     init() {
         this.dialogRoot = $Dom.GetElementById(this.elementId);
@@ -35,7 +39,7 @@ const _DialogCore = {
         // 【追加】help 引数がある場合、ヘルプボタンを先頭に追加
         if (help) {
             const btnHelp = document.createElement("button");
-            btnHelp.className = "w-9 h-9 bg-white rounded-full shadow-md text-brand-5 flex items-center justify-center active:scale-95 text-[1rem] border border-brand-2 transition-transform font-black";
+            btnHelp.className = `${this.HEADER_BTN_CLASS} text-brand-5 font-black`;
             btnHelp.textContent = "?";
             btnHelp.onclick = () => {
                 document.getElementById('ui-help-dialog-body').textContent = help;
@@ -47,7 +51,7 @@ const _DialogCore = {
         if (headerButtons && headerButtons.length > 0) {
             headerButtons.forEach(btnDef => {
                 const btn = document.createElement("button");
-                btn.className = "w-9 h-9 bg-white rounded-full shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[1rem] border border-brand-2 transition-transform";
+                btn.className = this.HEADER_BTN_CLASS;
                 btn.innerHTML = btnDef.label;
                 if (btnDef.id) btn.id = btnDef.id;
                 btn.onclick = () => { if (btnDef.handler) btnDef.handler(); };
@@ -56,7 +60,7 @@ const _DialogCore = {
         }
         // 最後に「閉じる(✖)」ボタンを必ず追加
         const btnCloseX = document.createElement("button");
-        btnCloseX.className = "w-9 h-9 bg-white rounded-full shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[0.8rem] border border-brand-2 transition-transform";
+        btnCloseX.className = `${this.HEADER_BTN_CLASS} text-[0.8rem]`;
         btnCloseX.textContent = "✖";
         btnCloseX.onclick = () => this.close();
         headerActions.appendChild(btnCloseX);
@@ -94,13 +98,14 @@ const _DialogCore = {
                 if (!isArray && rowDef.rowId) rowDiv.id = rowDef.rowId;
                 if (!isArray && rowDef.isHidden) rowDiv.classList.add("hidden");
                 const sizeClass = items.length > 1 ? "flex-1" : "w-full";
-                const baseClass = `${sizeClass} font-black text-[0.8rem] h-12 rounded-[1rem] uppercase active:scale-95 transition-transform`;
-                const defaultColorClass = "bg-brand-5 text-white shadow-md";
+                // const baseClass = `${sizeClass} font-black text-[1rem] h-12 rounded-[1rem] uppercase active:scale-95 transition-transform`;
+                // const defaultColorClass = "bg-brand-5 text-white shadow-md";
                 items.forEach(btnDef => {
                     const btn = document.createElement("button");
-                    btn.className = btnDef.className
-                        ? `${baseClass} ${btnDef.className}`
-                        : `${baseClass} ${defaultColorClass}`;
+                    // btn.className = btnDef.className
+                    //     ? `${baseClass} ${btnDef.className}`
+                    //     : `${baseClass} ${defaultColorClass}`;
+                    btn.className = `${this.FOOTER_BTN_BASE} ${sizeClass} ${btnDef.className ?? this.FOOTER_BTN_DEFAULT}`;
                     btn.textContent = btnDef.label;
                     if (btnDef.id) btn.id = btnDef.id;
                     if (btnDef.isHidden) btn.classList.add("hidden");
@@ -356,7 +361,7 @@ const DialogController = {
             help: "アプリメ\nニュー",
         });
     },
-    // （システム）ユーザー設定メニュー（第2階層）
+    // （ユーザ設定）ユーザー設定メニュー（第2階層）
     ShowUserSettingsMenu() {
         const el = $Dom.GenerateTemplate("tpl-menu-user-settings");
         $Dom.QuerySelector('#btn-set-theme', el).onclick = () => this.ShowThemeConfig();
@@ -370,7 +375,7 @@ const DialogController = {
             help: "ユーザシステム\nメニュー",
         });
     },
-    // （システム）テーマ設定ダイアログ
+    // （ユーザ設定）テーマ設定ダイアログ
     ShowThemeConfig() {
         const oldTheme = $App.AppData.Owner.Theme;
         // プレビュー用バーを0-5までループ生成
@@ -398,7 +403,15 @@ const DialogController = {
             title: "THEME CONFIG",
             content: el,
             help: "",
-            buttons: [
+            buttons: [[
+                {
+                    label: "CANCEL",
+                    className: "bg-slate-400 text-white shadow-md",
+                    handler: () => {
+                        $UI.ChangeTheme(oldTheme);
+                    },
+                    closesDialog: true
+                },
                 {
                     label: "OK",
                     handler: () => {
@@ -406,12 +419,13 @@ const DialogController = {
                         const current = document.documentElement.getAttribute('data-theme');
                         // テーマの変更・保存処理を実行
                         $App.ChangeTheme(current);
+                        $Notice.Info("Changes saved.");
                     }
                 }
-            ]
+            ]]
         });
     },
-    // （システム）マップスタイル設定ダイアログ
+    // （ユーザ設定）マップスタイル設定ダイアログ
     ShowMapStyleConfig() {
         const oldStyle = $App.AppData.Owner.MapStyle;
         let selectedStyle = oldStyle;
@@ -439,28 +453,46 @@ const DialogController = {
             title: "MAP STYLE CONFIG",
             content: el,
             help: "",
-            buttons: [
+            buttons: [[
+                {
+                    label: "CANCEL",
+                    className: "bg-slate-400 text-white shadow-md",
+                    handler: () => {
+                        $Map.SetMapStyle(oldStyle);
+                    },
+                    closesDialog: true
+                },
                 {
                     label: "OK",
                     handler: () => {
                         // 選択されたマップスタイルを適用・保存
                         $App.ChangeMapStyle(selectedStyle);
+                        $Notice.Info("Changes saved.");
                     }
                 }
-            ]
+            ]]
         });
     },
-    // （システム）通貨単位設定ダイアログ
+    // （ユーザ設定）通貨単位設定ダイアログ
     ShowCurrencyConfig() {
         const el = $Dom.GenerateTemplate("tpl-config-currency");
         const inputCurrency = $Dom.QuerySelector('#input-currency', el);
         // 現在の値をセット
-        inputCurrency.value = $App.AppData.Owner.currency_unit || 'JPY';
+        const oldUnit = $App.AppData.Owner.currency_unit || 'JPY';
+        inputCurrency.value = oldUnit;
         _DialogCore.open({
             title: "CURRENCY CONFIG",
             content: el,
             help: "",
-            buttons: [
+            buttons: [[
+                {
+                    label: "CANCEL",
+                    className: "bg-slate-400 text-white shadow-md",
+                    handler: () => {
+                        $App.ChangeCurrency(oldUnit);
+                    },
+                    closesDialog: true
+                },
                 {
                     label: "OK",
                     handler: () => {
@@ -470,7 +502,56 @@ const DialogController = {
                         $Notice.Info("Changes saved.");
                     }
                 }
-            ]
+            ]]
+        });
+    },
+    // （ユーザ設定）GPS追従設定
+    ShowGpsFollowConfig() {
+        const oldIsOn = $App.AppData.Owner.IsGpsTracking;
+        const el = $Dom.GenerateTemplate("tpl-config-gps");
+        const btnOn = $Dom.QuerySelector('#gps-btn-on', el);
+        const btnOff = $Dom.QuerySelector('#gps-btn-off', el);
+        let isOn = oldIsOn;
+        // 現在の状態を反映
+        $Dom.QuerySelector('.js-icon', btnOn).textContent = oldIsOn ? '●' : '○';
+        $Dom.QuerySelector('.js-icon', btnOff).textContent = !oldIsOn ? '●' : '○';
+        // if (isOn) btnOn.classList.add('bg-brand-1'); else btnOff.classList.add('bg-brand-1');
+        // イベント紐付け
+        btnOn.onclick = () => {
+            // let isOn = $App.AppData.Owner.IsGpsTracking;
+            $Dom.QuerySelector('.js-icon', btnOn).textContent = isOn ? '○' : '●';
+            $Dom.QuerySelector('.js-icon', btnOff).textContent = !isOn ? '○' : '●';
+            isOn = true;
+        };
+        btnOff.onclick = () => {
+            // let isOn = $App.AppData.Owner.IsGpsTracking;
+            $Dom.QuerySelector('.js-icon', btnOn).textContent = isOn ? '○' : '●';
+            $Dom.QuerySelector('.js-icon', btnOff).textContent = !isOn ? '○' : '●';
+            isOn = false;
+        };
+        _DialogCore.open({
+            title: "GPS TRACKING",
+            content: el,
+            help: "",
+            buttons: [[
+                {
+                    label: "CANCEL",
+                    className: "bg-slate-400 text-white shadow-md",
+                    handler: () => {
+                        $App.ChangeGpsTracking(oldIsOn);
+                    },
+                    closesDialog: true
+                },
+                {
+                    label: "OK",
+                    handler: () => {
+                        console.log("isOn:", isOn);
+                        $App.AppData.Owner.IsGpsTracking = isOn;
+                        $App.ChangeGpsTracking(isOn);
+                        $Notice.Info("Changes saved.");
+                    }
+                }
+            ]]
         });
     },
     // （システム）アプリ情報
@@ -530,7 +611,7 @@ const DialogController = {
             buttons:[
                 {
                     label: "Write Feedback",
-                    className: "bg-brand-5 text-white shadow-md",
+                    className: "",
                     closesDialog: false,
                     handler: async () => {
                         this.ShowReviewPost();
@@ -564,9 +645,10 @@ const DialogController = {
             star.textContent = "★";
             // 初期値の星の着色
             if (i <= currentRating) {
-                star.className = "outline-none transition-colors active:scale-90 text-yellow-500";
+                star.className = "text-yellow-500";
             } else {
-                star.className = "outline-none transition-colors active:scale-90 text-slate-200";
+                // star.className = "outline-none transition-colors active:scale-90 text-slate-200";
+                star.className = "text-slate-200";
             }
             star.onclick = () => {
                 currentRating = i;
@@ -595,12 +677,12 @@ const DialogController = {
             buttons: [[
                 {
                     label: "CANCEL",
-                    className: "bg-slate-200 text-slate-500 shadow-md",
-                    closesDialog: true
+                    className: "bg-slate-400 text-white shadow-md",
+                    closesDialog: true,
                 },
                 {
                     label: "SUBMIT",
-                    className: "bg-brand-5 text-white shadow-md",
+                    className: "",
                     closesDialog: false,
                     handler: async () => {
                         const rating = Number(inputRating.value);
@@ -677,37 +759,6 @@ const DialogController = {
             ]
         });
     },
-    // GPS追従設定
-    ShowGpsFollowConfig() {
-        const isOn = $App.AppData.Owner.IsGpsTracking;
-        const el = $Dom.GenerateTemplate("tpl-config-gps");
-        const btnOn = $Dom.QuerySelector('#gps-btn-on', el);
-        const btnOff = $Dom.QuerySelector('#gps-btn-off', el);
-        // 現在の状態を反映
-        $Dom.QuerySelector('.js-icon', btnOn).textContent = isOn ? '●' : '○';
-        $Dom.QuerySelector('.js-icon', btnOff).textContent = !isOn ? '●' : '○';
-        // if (isOn) btnOn.classList.add('bg-brand-1'); else btnOff.classList.add('bg-brand-1');
-        // イベント紐付け
-        btnOn.onclick = () => {
-            let isOn = $App.AppData.Owner.IsGpsTracking;
-            $Dom.QuerySelector('.js-icon', btnOn).textContent = isOn ? '○' : '●';
-            $Dom.QuerySelector('.js-icon', btnOff).textContent = !isOn ? '○' : '●';
-            $App.ChangeGpsTracking(true);
-            // _DialogCore.closeAll();
-        };
-        btnOff.onclick = () => {
-            let isOn = $App.AppData.Owner.IsGpsTracking;
-            $Dom.QuerySelector('.js-icon', btnOn).textContent = isOn ? '○' : '●';
-            $Dom.QuerySelector('.js-icon', btnOff).textContent = !isOn ? '○' : '●';
-            $App.ChangeGpsTracking(false);
-            // _DialogCore.closeAll();
-        };
-        _DialogCore.open({
-            title: "GPS TRACKING",
-            content: el,
-            help: "",
-        });
-    },
     // 地点リスト（単一選択・ジャンプ機能）
     ShowDetailsTimeLine() {
         // Storeの機能を使って昇順にソート
@@ -761,10 +812,11 @@ const DialogController = {
                     if (priceUnitEl) priceUnitEl.textContent = displayCurrency;
                     if (price > 0) {
                         priceEl.textContent = `+${price.toLocaleString()}`;
-                        priceEl.className = "js-price text-[1rem] font-black italic  text-blue-500";
+                        // priceEl.className = "js-price text-[1rem] font-black italic  text-blue-500";
+                        priceEl.className += " text-blue-500";
                     } else if (price < 0) {
                         priceEl.textContent = price.toLocaleString();
-                        priceEl.className = "js-price text-[1rem] font-black italic  text-red-500";
+                        priceEl.className += " text-red-500";
                     }
                 } else {
                     // 0円の時は枠ごと隠す
@@ -792,7 +844,7 @@ const DialogController = {
             return;
         }
         const el = $Dom.GenerateTemplate("tpl-list-parent");
-        el.className = "w-full text-black-3 mb-2 px-1 space-y-4";
+        // el.className = "w-full text-black-3 mb-2 px-1 space-y-4";
         details.forEach((item, index) => {
             const child = $Dom.GenerateTemplate("tpl-list-child-simple");
             const dateStr = (item.memo_date || "").replace(/-/g, '.');
@@ -811,7 +863,6 @@ const DialogController = {
                 const price = Number(item.memo_price || 0);
                 if (price !== 0) {
                     $Dom.ToggleShow(priceWrapper, true);
-                    
                     let displayCurrency = $App.AppData.Owner.currency_unit || 'JPY';
                     if (item.archive_id > 0) {
                         const archiveList = $Data.Store.GetArchiveList() || [];
@@ -821,13 +872,13 @@ const DialogController = {
                         }
                     }
                     currencyEl.textContent = displayCurrency;
-
                     if (price > 0) {
                         priceEl.textContent = `+${price.toLocaleString()}`;
-                        priceEl.className = "js-memo-price text-[1rem] font-black italic  text-blue-500";
+                        // priceEl.className = "js-memo-price text-[1rem] font-black italic  text-blue-500";
+                        priceEl.className += " text-blue-500";
                     } else if (price < 0) {
                         priceEl.textContent = price.toLocaleString();
-                        priceEl.className = "js-memo-price text-[1rem] font-black italic  text-red-500";
+                        priceEl.className += " text-red-500";
                     }
                 } else {
                     // 0円の時はラッパーごと非表示にして隙間を詰める
@@ -864,8 +915,7 @@ const DialogController = {
             const isSuccess = await $Data.Access.GetArchiveList();
             if (!isSuccess) return;
             const root = $Dom.GenerateTemplate("tpl-list-parent");
-            // リストの上下の余白を少し調整
-            root.className = "w-full text-black-3 mb-2 px-1";
+            // root.className = "w-full text-black-3 mb-2 px-1";
             const archives = $Data.Store.GetArchiveList() ||[];
             if (archives.length == 0){
                 $Notice.Warn("データはありません");
@@ -907,14 +957,15 @@ const DialogController = {
                     if (isPublicGroup) {
                         if (item.closed_flg) {
                             // Publicデータ（CLOSE）
-                            leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-200"; // 左線グレー
+                            // leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-200";
+                            leftBorder.className += " bg-slate-200";
                         } else {
                             // Publicデータ（OPEN）
-                            leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-brand-5"; // 左線ブランドカラー
+                            leftBorder.className += " bg-brand-5";
                         }
                     } else {
                         // 内部データ（PRIVATE）
-                        leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800"; // 左線ブランドカラー
+                        leftBorder.className += " bg-slate-800";
                     }
                     child.onclick = () => {
                         _DialogCore.closeAll();
@@ -945,7 +996,7 @@ const DialogController = {
             const isSuccess = await $Data.Access.GetArchiveList();
             if (!isSuccess) return;
             const root = $Dom.GenerateTemplate("tpl-list-parent");
-            root.className = "w-full text-black-3 mb-2 px-1";
+            // root.className = "w-full text-black-3 mb-2 px-1";
             const archives = $Data.Store.GetArchiveList() ||[];
             // プライベートデータのみに絞る
             const privateList = archives.filter(item => !item.is_public);
@@ -968,7 +1019,7 @@ const DialogController = {
                 $Dom.QuerySelector(".js-count", child).textContent = item.cnt || "0";
                 // バッジの装飾（PRIVATE固定）
                 const leftBorder = $Dom.QuerySelector(".js-item-border", child);
-                leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800";
+                // leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800";
                 // アイテムクリック時の処理（追加確認 ＆ API実行）
                 child.onclick = async () => {
                     const isOk = await this.ShowConfirm({
@@ -1025,13 +1076,17 @@ const DialogController = {
                 const isSel = selectedSeqs.has(seq);
                 const checkbox = $Dom.QuerySelector(".js-checkbox", card);
                 const mark = $Dom.QuerySelector(".js-check-mark", card);
+                const cardHtml = "js-item-card flex items-center gap-3 p-3 mb-2 rounded-[1rem] border-2 cursor-pointer active:scale-[0.98] transition-all";
+                const checkHtml = "shrink-0 w-6 h-6 rounded-[1rem] border-2 flex items-center justify-center js-checkbox transition-colors";
                 if (isSel) {
-                    card.className = "js-item-card flex items-center gap-3 p-3 mb-2 rounded-[1rem] border-2 cursor-pointer active:scale-[0.98] transition-all border-brand-5 bg-white shadow-md";
-                    checkbox.className = "shrink-0 w-6 h-6 rounded-[1rem] border-2 flex items-center justify-center js-checkbox transition-colors border-brand-5 bg-brand-5";
+                    // card.className = "js-item-card flex items-center gap-3 p-3 mb-2 rounded-[1rem] border-2 cursor-pointer active:scale-[0.98] transition-all border-brand-5 bg-white shadow-md";
+                    // checkbox.className = "shrink-0 w-6 h-6 rounded-[1rem] border-2 flex items-center justify-center js-checkbox transition-colors border-brand-5 bg-brand-5";
+                    card.className = cardHtml + " border-brand-5 bg-white shadow-md";
+                    checkbox.className = checkHtml + " border-brand-5 bg-brand-5";
                     mark.classList.remove("hidden");
                 } else {
-                    card.className = "js-item-card flex items-center gap-3 p-3 mb-2 rounded-[1rem] border-2 cursor-pointer active:scale-[0.98] transition-all border-brand-1 bg-white";
-                    checkbox.className = "shrink-0 w-6 h-6 rounded-[1rem] border-2 flex items-center justify-center js-checkbox transition-colors border-brand-2 bg-transparent";
+                    card.className = cardHtml + " border-brand-1 bg-white";
+                    checkbox.className = checkHtml + " border-brand-2 bg-transparent";
                     mark.classList.add("hidden");
                 }
             });
@@ -1076,42 +1131,40 @@ const DialogController = {
             title: "SELECTION MODE",
             content: content,
             help: "",
-            buttons: [
-                [
-                    {
-                        id: "btn-ms-merge",
-                        label: "⇄ MERGE",
-                        className: "min-w-[40%] bg-brand-5 text-white shadow-md disabled:opacity-50 flex items-center justify-center gap-2",
-                        closesDialog: false,
-                        handler: async () => {
-                            const seqs = Array.from(selectedSeqs);
-                            const isOk = await this.ShowConfirm({ title: "MERGE", message: `${seqs.length}件のアイテムを\n新しいまとめにしますか？` });
-                            if (!isOk) return;
-                            const isSuccess = await $Data.Access.MergeDetails({
-                                seqs,
-                                title: "メモのまとめタイトル_" + $Util.FormatDate(new Date(), 'YYYYMMDD_HHmmss'),
-                                currency_unit: $App.AppData.Owner.currency_unit || 'JPY'
-                            });
-                            if (!isSuccess) return;
-                            $Notice.Info("作成しました");
-                            _DialogCore.closeAll();
-                            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE;
-                            await $App.RefreshScreen();
-                        }
-                    },
-                    {
-                        id: "btn-ms-add",
-                        label: "＋ ADD",
-                        className: "min-w-[40%] bg-brand-5 text-white shadow-md disabled:opacity-50 flex items-center justify-center gap-2",
-                        closesDialog: false, // 手動で制御するためfalse
-                        handler: () => {
-                            const seqs = Array.from(selectedSeqs);
-                            // 新しく作った専用メソッドを呼び出す
-                            this.SelectArchiveForAdd(seqs);
-                        }
-                    },
-                ]
-            ]
+            buttons: [[
+                {
+                    id: "btn-ms-merge",
+                    label: "⇄ MERGE",
+                    className: "bg-brand-5 text-white shadow-md disabled:opacity-50 flex items-center justify-center gap-2",
+                    closesDialog: false,
+                    handler: async () => {
+                        const seqs = Array.from(selectedSeqs);
+                        const isOk = await this.ShowConfirm({ title: "MERGE", message: `${seqs.length}件のアイテムを\n新しいまとめにしますか？` });
+                        if (!isOk) return;
+                        const isSuccess = await $Data.Access.MergeDetails({
+                            seqs,
+                            title: "メモのまとめタイトル_" + $Util.FormatDate(new Date(), 'YYYYMMDD_HHmmss'),
+                            currency_unit: $App.AppData.Owner.currency_unit || 'JPY'
+                        });
+                        if (!isSuccess) return;
+                        $Notice.Info("作成しました");
+                        _DialogCore.closeAll();
+                        $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE;
+                        await $App.RefreshScreen();
+                    }
+                },
+                {
+                    id: "btn-ms-add",
+                    label: "＋ ADD",
+                    className: "bg-brand-5 text-white shadow-md disabled:opacity-50 flex items-center justify-center gap-2",
+                    closesDialog: false, // 手動で制御するためfalse
+                    handler: () => {
+                        const seqs = Array.from(selectedSeqs);
+                        // 新しく作った専用メソッドを呼び出す
+                        this.SelectArchiveForAdd(seqs);
+                    }
+                },
+            ]]
         });
         updateSelectionUI(); // フッターボタン生成後に再度呼んで初期状態の disabled を反映
     },
@@ -1215,8 +1268,8 @@ const DialogController = {
                 [
                     {
                         label: "CANCEL",
-                        className: "bg-slate-400 text-white shadow-md"
-                        // onCloseが自動で呼ばれるのでhandlerは不要
+                        className: "bg-slate-400 text-white shadow-md",
+                        closesDialog: true
                     },
                     {
                         label: "OK",
@@ -1229,7 +1282,7 @@ const DialogController = {
             ]
         });
     },
-    // まとめ親参照（アーカイブ）
+    // まとめ親詳細参照（アーカイブ）
     ShowArchiveInfo() {
         const archive = $Data.Store.GetArchive();
         if (!archive) return $Notice.Warn("Not found.");
@@ -1266,16 +1319,14 @@ const DialogController = {
             const displayCurrency = currentArchive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
             priceUnit.textContent = displayCurrency;
             if (totalPrice > 0) {
-                priceVal.className = "text-[1.2rem] font-black text-blue-600 mr-2 italic";
-                // priceUnit.className = "text-[0.7rem] font-black text-blue-500 uppercase tracking-widest mb-1 block ";
+                // priceVal.className = "text-[1.2rem] font-black text-blue-600 mr-2 italic";
+                priceVal.className += " text-blue-600";
                 priceVal.textContent = `+${totalPrice.toLocaleString()}`;
             } else if (totalPrice < 0) {
-                priceVal.className = "text-[1.2rem] font-black text-red-600 mr-2 italic";
-                // priceUnit.className = "text-[0.7rem] font-black text-red-500 uppercase tracking-widest mb-1 block ";
+                priceVal.className += " text-red-600";
                 priceVal.textContent = `- ${Math.abs(totalPrice).toLocaleString()}`;
             } else {
-                priceVal.className = "text-[1.2rem] font-black text-black-5 mr-2 italic";
-                // priceUnit.className = "text-[0.7rem] font-black text-slate-400 uppercase tracking-widest mb-1 block ";
+                priceVal.className += " text-black-5";
                 priceVal.textContent = `0`;
             }
         };
@@ -1302,7 +1353,8 @@ const DialogController = {
                 label: "✏️",
                 handler: () => this.ShowEditArchive(archive, renderView)
             });
-        } else {
+        }
+        if (!archive.is_owner) {
             headerButtons.push({
                 label: "🚫",
                 handler: () => this.ShowReportPost(archive)
@@ -1311,8 +1363,8 @@ const DialogController = {
         // --- ボタンの定義 ---
         const dialogButtons = [];
         if (archive.is_owner) {
-            const btnMainClass = "w-full bg-brand-5 text-white font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform";
-            const btnReleaseClass = "w-full bg-white text-red-400 border border-brand-4 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform";
+        const btnMainClass    = "bg-brand-5 text-white shadow-md";
+        const btnReleaseClass = "bg-white text-red-400 border border-brand-4 shadow-md";
             if (!archive.is_public) {
                 dialogButtons.push([{
                     label: "Private　⇒　Public",
@@ -1356,7 +1408,7 @@ const DialogController = {
             if (!archive.closed_flg) {
                 dialogButtons.push([{
                     label: "【ADMIN】強制 Close",
-                    className: "w-full bg-red-500 text-white font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-md active:scale-95 transition-transform",
+                    className: "bg-red-500 text-white shadow-md",
                     closesDialog: false,
                     // handler: () => this._showAdminActionDialog(archive, "CLOSE", "AdminCloseArchive")
                     handler: async () => {
@@ -1373,7 +1425,7 @@ const DialogController = {
             // 【警告】強制Private戻し
             dialogButtons.push([{
                 label: "【ADMIN】強制 Privateに戻す",
-                className: "w-full bg-white text-red-600 border-2 border-red-500 font-bold py-3 rounded-[1rem] text-[0.8rem] shadow-sm active:scale-95 transition-transform",
+                className: "bg-white text-red-600 border-2 border-red-500 shadow-sm",
                 closesDialog: false,
                 // handler: () => this._showAdminActionDialog(archive, "UNPUBLISH", "AdminUnpublishArchive")
                 handler: async () => {
@@ -1422,12 +1474,12 @@ const DialogController = {
                 [
                     {
                         label: "CANCEL",
-                        className: "bg-slate-200 text-slate-500 shadow-md",
+                        className: "bg-slate-400 text-white shadow-md",
                         closesDialog: true
                     },
                     {
                         label: "SAVE DATA",
-                        className: "bg-brand-4 text-white shadow-md",
+                        className: "",
                         closesDialog: false,
                         onClose: true,
                         handler: $Warn.CatchAsync(async () => {
@@ -1454,14 +1506,8 @@ const DialogController = {
     },
     // プロフィール参照
     async ShowUserProfile(profile, isOwner) {
-        // if (isOwner) {
-        //     const isSuccess = await $Data.Access.GetProfile();
-        //     if (isSuccess && $App.AppData.Owner.Profile) {
-        //         // 自分のプロフィールで上書き
-        //         profile = $App.AppData.Owner.Profile;
-        //     }
-        // }
-        // if (!profile) return $Notice.Warn("ユーザー情報がありません");
+        if (isOwner) profile = $App.AppData.Owner.Profile;
+        if (!profile) return $Notice.Warn("ユーザー情報がありません");
         const el = $Dom.GenerateTemplate('tpl-view-profile');
         const renderView = () => {
             const pIcon = profile.icon || "👤";
@@ -1481,7 +1527,6 @@ const DialogController = {
 				const a = document.createElement("a");
 				a.href = l; a.target = "_blank";
 				a.className = "w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-md active:scale-90 transition-transform overflow-hidden";
-				// サイズ24pxでアイコンHTMLを取得して挿入
 				a.innerHTML = $Util.GetUrlIconHtml(l, 24);
 				a.title = l;
 				viewLinks.appendChild(a);
@@ -1538,7 +1583,7 @@ const DialogController = {
                 [
                     {
                         label: "CANCEL",
-                        className: "bg-slate-200 text-slate-500 shadow-md",
+                        className: "bg-slate-400 text-white shadow-md",
                         closesDialog: true
                     },
                     {
@@ -1598,8 +1643,7 @@ const DialogController = {
             return;
         }
         const root = $Dom.GenerateTemplate("tpl-list-parent");
-        root.className = "w-full text-black-3 mb-2 px-1";
-        // 状態によってスタイルを切り替える関数
+        // root.className = "w-full text-black-3 mb-2 px-1";
         const setNoticeStyle = (el, isNew) => {
             const badge = $Dom.QuerySelector(".js-badge-new", el);
             $Dom.ToggleShow(badge, isNew);
@@ -1662,7 +1706,7 @@ const DialogController = {
         if (!isSuccess) return;
         const notices = $App.AppData.Admin.notifications ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
-        root.className = "w-full text-black-3 mb-2 px-1";
+        // root.className = "w-full text-black-3 mb-2 px-1";
         const renderList = async () => {
             root.innerHTML = "";
             if (notices.length === 0) {
@@ -1683,13 +1727,14 @@ const DialogController = {
                 const badge = $Dom.QuerySelector(".js-badge-status", child);
                 if (isPublic) {
                     badge.textContent = "公開中";
-                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 _rounded-full uppercase tracking-wider shadow-md border border-brand-3 bg-brand-5 text-white";
+                    // badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 _rounded-full uppercase tracking-wider shadow-md border border-brand-3 bg-brand-5 text-white";
+                    badge.className += " border-brand-3 bg-brand-5 text-white";
                 } else if (now < fromDate) {
                     badge.textContent = "公開前";
-                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 _rounded-full uppercase tracking-wider shadow-md border border-slate-300 bg-slate-100 text-slate-500";
+                    badge.className += " border-slate-300 bg-slate-100 text-slate-500";
                 } else {
                     badge.textContent = "公開終了";
-                    badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 _rounded-full uppercase tracking-wider shadow-md border border-slate-300 bg-slate-500 text-white";
+                    badge.className += " border-slate-300 bg-slate-500 text-white";
                 }
                 // 編集を開き、保存成功時は一覧を閉じて開き直す
                 child.onclick = () => {
@@ -1702,24 +1747,26 @@ const DialogController = {
             });
         };
         await renderList();
-        const frame = _DialogCore.open({
+        //
+        _DialogCore.open({
             title: "NOTICE Mgmt",
             content: root,
-            help: "",
-            buttons:[]
+            help: "システム全体への通知を管理します。\n下のボタンから新規作成、一覧の項目タップで編集が可能です。",
+            // ★ 新規登録ボタンをここ（下部ボタンエリア）に配置
+            buttons: [
+                {
+                    label: "＋ CREATE NEW NOTICE",
+                    className: "w-full bg-brand-5 text-white shadow-md font-black",
+                    closesDialog: false,
+                    handler: () => {
+                        this.ShowAdminNoticeEdit(null, () => {
+                            _DialogCore.close(); // 一覧を閉じる
+                            this.ShowAdminNoticeList(); // 最新状態で一覧を出し直す
+                        });
+                    }
+                }
+            ]
         });
-        // 新規登録ボタン
-        const headerActions = $Dom.QuerySelector('#dialog-header-actions', frame);
-        if (headerActions) {
-            const addBtn = document.createElement('button');
-            addBtn.className = "w-8 h-8 bg-brand-5 rounded-[1rem] shadow-md text-white flex items-center justify-center active:scale-95 text-[1.2rem] border border-brand-5 transition-transform";
-            addBtn.innerHTML = "＋";
-            addBtn.onclick = () => this.ShowAdminNoticeEdit(null, () => {
-                _DialogCore.close();
-                this.ShowAdminNoticeList();
-            });
-            headerActions.prepend(addBtn);
-        }
     },
     // 通知の編集・新規登録（API通信化）
     ShowAdminNoticeEdit(noticeItem, onSaved) {
@@ -1769,7 +1816,7 @@ const DialogController = {
             buttons:[[
                 {
                     label: "CANCEL",
-                    className: "bg-slate-200 text-slate-500 shadow-md",
+                    className: "bg-slate-400 text-white shadow-md",
                     closesDialog: true
                 },
                 {
@@ -1802,7 +1849,7 @@ const DialogController = {
         if (!isSuccess) return;
         const reportSummary = $App.AppData.Admin.reportSummary ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
-        root.className = "w-full text-black-3 mb-2 px-1";
+        // root.className = "w-full text-black-3 mb-2 px-1";
         if (reportSummary.length === 0) {
             root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">通報データはありません</div>`;
         } else {
@@ -1975,7 +2022,7 @@ const DialogController = {
         // 1段目：送信（SUBMIT）ボタン
         dialogButtons.push([{
             label: "SUBMIT",
-            className: "w-full bg-red-600 text-white shadow-none rounded-none",
+            className: "bg-red-600 text-white shadow-none rounded-none",
             closesDialog: false,
             handler: async () => {
                 const body = inputBody.value.trim();
@@ -1998,7 +2045,7 @@ const DialogController = {
         if (myReport) {
             dialogButtons.push([{
                 label: "取り消す (DELETE)",
-                className: "w-full bg-white text-slate-800 border-2 border-slate-800 shadow-none rounded-none",
+                className: "bg-white text-slate-800 border-2 border-slate-800 shadow-none rounded-none",
                 closesDialog: false,
                 handler: async () => {
                     const isOk = await this.ShowConfirm({ title: "DELETE REPORT", message: "通報を取り消しますか？" });
@@ -2075,12 +2122,12 @@ const DialogController = {
                 [
                     {
                         label: "CANCEL",
-                        className: "bg-slate-200 text-slate-500 shadow-md",
+                        className: "bg-slate-400 text-white shadow-md",
                         closesDialog: true
                     },
                     {
                         label: "SEND MESSAGE",
-                        className: "bg-brand-5 text-white shadow-md",
+                        className: "",
                         closesDialog: false,
                         handler: async () => {
                             const body = inputBody.value.trim();

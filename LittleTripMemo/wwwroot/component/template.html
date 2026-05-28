@@ -713,7 +713,7 @@
 		<div class="flex items-end gap-3 py-1">
 			<div class="shrink-0 flex flex-col items-center">
 				<!-- <label class="block text-[0.6rem] font-bold mb-1 uppercase text-slate-400">Icon</label> -->
-				<button id="btn-profile-icon-trigger" class="w-14 h-14 bg-white rounded-full shadow-md _border-2 _border-brand-3 flex items-center justify-center text-[2rem]  active:scale-95 transition-transform outline-none">
+				<button id="btn-profile-icon-trigger" class="w-14 h-14 bg-white rounded-full shadow-md pb-2 border-2 border-brand-3 flex items-center justify-center text-[2rem]  active:scale-95 transition-transform outline-none">
 					<span id="edit-profile-icon-preview">👤</span>
 					<input type="hidden" id="edit-profile-icon">
 				</button>
@@ -726,13 +726,13 @@
 				<input id="edit-profile-nickname" type="text" maxlength="20" class="w-full border-2 border-brand-3 px-4 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
 			</div>
 		</div>
-		<!-- 2. 自己紹介（高さを h-48 から h-32 に縮小） -->
+		<!-- 2. 自己紹介 -->
 		<div>
 			<div class="flex justify-between items-end mb-1">
 				<label class="block text-[0.7rem] font-bold uppercase text-slate-400">Description</label>
 				<span class="text-[0.6rem] font-bold text-slate-300"><span id="edit-profile-description-count">0</span>/300</span>
 			</div>
-			<textarea id="edit-profile-description" maxlength="300" class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none "></textarea>
+			<textarea id="edit-profile-description" maxlength="300" class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none "></textarea>
 		</div>
 		<!-- 3. リンク（上下の間隔を詰めて配置） -->
 		<div class="space-y-2">
@@ -825,8 +825,8 @@
 <template id="tpl-share-archive">
     <div class="w-full text-black-5 flex flex-col items-center pt-6 pb-2 space-y-8">
         <!-- 1. まとめタイトル -->
-        <div class="w-full px-4">
-            <div id="share-archive-title" class="text-[1.2rem] font-black text-black-5 text-center break-all "></div>
+        <div class="w-full border-l-4 border-brand-3 pl-4">
+            <div id="share-archive-title" class="text-[1.2rem] font-black text-black-5"></div>
         </div>
         <!-- 2. QRコード -->
         <div class="bg-white p-4 rounded-[1.5rem] shadow-md border border-slate-200">
@@ -886,7 +886,7 @@
 			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 break-all leading-tight border-l-4 border-brand-3 pl-3"></h1>
 		</div>
 		<!-- 3. 本文（中央） -->
-		<div id="view-mem-body" class="text-[1rem] min-h-[200px] overflow-y-auto pr-1 text-slate-600 leading-[2] whitespace-pre-wrap break-all mb-2">
+		<div id="view-mem-body" class="text-[1rem] min-h-[200px] overflow-y-auto pr-2 text-slate-600 leading-[2] whitespace-pre-wrap break-all mb-2">
 		</div>
 		<!-- 4. 下部アクション（リンク ＋ メモ数） -->
 		<div class="mt-auto pb-1 flex items-end justify-between border-t border-slate-50">
