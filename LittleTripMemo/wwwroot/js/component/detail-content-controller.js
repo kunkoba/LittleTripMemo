@@ -47,23 +47,7 @@ const _DetailContentCore = {
                     this.btnAtmosphereTrigger = $Dom.GetElementById("btn-atmosphere-trigger");
                     this.spanAtmospherePreview = $Dom.GetElementById("span-atmosphere-preview");
                     this.editWeatherEmoji = $Dom.GetElementById("detail-edit-weather_code");
-                    if (this.btnAtmosphereTrigger) {
-                        this.btnAtmosphereTrigger.addEventListener('click', () => {
-                            const currentCode = this.editWeatherEmoji.value || "0000";
-                            $Dialog.ShowAtmospherePicker(currentCode, (code) => {
-                                this.spanAtmospherePreview.textContent = code;
-                                this.editWeatherEmoji.value = code;
-                            });
-                        });
-                    }
                     this.btnAddress = $Dom.GetElementById("btn-address-name");
-                    if (this.btnAddress) {
-                        this.btnAddress.addEventListener('click', async () => {
-                            const data = $DetailContent.GetFormEditData();
-                            const addressName = await $Util.GetAddressName(data.latitude, data.longitude, "jp");
-                            this.editTitle.value = addressName;
-                        });
-                    }
                     this.editPricePlus = $Dom.GetElementById("detail-edit-price_plus");
                     this.editPriceMinus = $Dom.GetElementById("detail-edit-price_minus");
                     this.countTitle = $Dom.GetElementById("detail-count-title");
@@ -73,6 +57,18 @@ const _DetailContentCore = {
             }
             // イベント登録
             {
+                this.btnAtmosphereTrigger.addEventListener('click', () => {
+                    const currentCode = this.editWeatherEmoji.value || "0000";
+                    $Dialog.ShowAtmospherePicker(currentCode, (code) => {
+                        this.spanAtmospherePreview.textContent = code;
+                        this.editWeatherEmoji.value = code;
+                    });
+                });
+                this.btnAddress.addEventListener('click', async () => {
+                    const data = $DetailContent.GetFormEditData();
+                    const addressName = await $Util.GetAddressName(data.latitude, data.longitude, "jp");
+                    this.editTitle.value = addressName;
+                });
                 // 絵文字アイコン選択ボタンのクリックイベント
                 this.editFaceTrigger.addEventListener('click', () => {
                     $Util.ShowEmojiPicker((emoji) => {
@@ -185,9 +181,9 @@ const _DetailContentCore = {
             this.displayPriceUnit.textContent = displayCurrency;
             // マイナスなら赤、プラスなら青に色分け
             if (price < 0) {
-                this.displayPrice.className = "text-red-500";
+                this.displayPrice.className += " text-red-500";
             } else {
-                this.displayPrice.className = "text-blue-500";
+                this.displayPrice.className += " text-blue-500";
             }
         } else {
             $Dom.ToggleShow(this.displayPriceWrapper, false);

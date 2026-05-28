@@ -168,11 +168,17 @@ const DialogController = {
                         {
                             label: "CANCEL",
                             className: "bg-slate-400 text-white shadow-md",
-                            handler: () => { isResolved = true; resolve(false); }
+                            handler: () => {
+                                isResolved = true; resolve(false);
+                                _DialogCore.close();
+                            }
                         },
                         {
                             label: label,
-                            handler: () => { isResolved = true; resolve(true); }
+                            handler: () => {
+                                isResolved = true; resolve(true);
+                                _DialogCore.close();
+                            }
                         }
                     ]
                 ]
@@ -371,6 +377,7 @@ const DialogController = {
     },
     // （ユーザ設定）テーマ設定ダイアログ
     ShowThemeConfig() {
+        let isSaved = false;
         const oldTheme = $App.AppData.Owner.Theme;
         // プレビュー用バーを0-5までループ生成
         let previewItems = '';
@@ -397,22 +404,28 @@ const DialogController = {
             title: "THEME CONFIG",
             content: el,
             help: "",
+            onClose: () => {
+                if (isSaved) return;
+                // もとに戻す
+                $UI.ChangeTheme(oldTheme);
+            },
             buttons: [[
                 {
                     label: "CANCEL",
                     className: "bg-slate-400 text-white shadow-md",
                     handler: () => {
-                        $UI.ChangeTheme(oldTheme);
                         _DialogCore.close();
                     },
                 },
                 {
                     label: "OK",
                     handler: () => {
+                        isSaved = true;
                         // 現在のテーマ属性値を取得
                         const current = document.documentElement.getAttribute('data-theme');
                         // テーマの変更・保存処理を実行
                         $App.ChangeTheme(current);
+                        _DialogCore.close();
                         $Notice.Info("Changes saved.");
                     }
                 }
@@ -421,6 +434,7 @@ const DialogController = {
     },
     // （ユーザ設定）マップスタイル設定ダイアログ
     ShowMapStyleConfig() {
+        let isSaved = false;
         const oldStyle = $App.AppData.Owner.MapStyle;
         let selectedStyle = oldStyle;
         // スタイル一覧をループ生成
@@ -447,20 +461,26 @@ const DialogController = {
             title: "MAP STYLE CONFIG",
             content: el,
             help: "",
+            onClose: () => {
+                if (isSaved) return;
+                // もとに戻す
+                $Map.SetMapStyle(oldStyle);
+            },
             buttons: [[
                 {
                     label: "CANCEL",
                     className: "bg-slate-400 text-white shadow-md",
                     handler: () => {
-                        $Map.SetMapStyle(oldStyle);
                         _DialogCore.close();
                     },
                 },
                 {
                     label: "OK",
                     handler: () => {
+                        isSaved = true;
                         // 選択されたマップスタイルを適用・保存
                         $App.ChangeMapStyle(selectedStyle);
+                        _DialogCore.close();
                         $Notice.Info("Changes saved.");
                     }
                 }
@@ -469,6 +489,7 @@ const DialogController = {
     },
     // （ユーザ設定）通貨単位設定ダイアログ
     ShowCurrencyConfig() {
+        let isSaved = false;
         const el = $Dom.GenerateTemplate("tpl-config-currency");
         const inputCurrency = $Dom.QuerySelector('#input-currency', el);
         // 現在の値をセット
@@ -478,21 +499,27 @@ const DialogController = {
             title: "CURRENCY CONFIG",
             content: el,
             help: "",
+            onClose: () => {
+                if (isSaved) return;
+                // もとに戻す
+                $App.ChangeCurrency(oldUnit);
+            },
             buttons: [[
                 {
                     label: "CANCEL",
                     className: "bg-slate-400 text-white shadow-md",
                     handler: () => {
-                        $App.ChangeCurrency(oldUnit);
                         _DialogCore.close();
                     },
                 },
                 {
                     label: "OK",
                     handler: () => {
+                        isSaved = true;
                         const val = inputCurrency.value.trim();
                         // 空の場合は JPY をデフォルトとする
                         $App.ChangeCurrency(val || 'JPY');
+                        _DialogCore.close();
                         $Notice.Info("Changes saved.");
                     }
                 }
@@ -501,6 +528,7 @@ const DialogController = {
     },
     // （ユーザ設定）GPS追従設定
     ShowGpsFollowConfig() {
+        let isSaved = false;
         const oldIsOn = $App.AppData.Owner.IsGpsTracking;
         const el = $Dom.GenerateTemplate("tpl-config-gps");
         const btnOn = $Dom.QuerySelector('#gps-btn-on', el);
@@ -527,21 +555,27 @@ const DialogController = {
             title: "GPS TRACKING",
             content: el,
             help: "",
+            onClose: () => {
+                if (isSaved) return;
+                // もとに戻す
+                $App.ChangeGpsTracking(oldIsOn);
+            },
             buttons: [[
                 {
                     label: "CANCEL",
                     className: "bg-slate-400 text-white shadow-md",
                     handler: () => {
-                        $App.ChangeGpsTracking(oldIsOn);
                         _DialogCore.close();
                     },
                 },
                 {
                     label: "OK",
                     handler: () => {
+                        isSaved = true;
                         console.log("isOn:", isOn);
                         $App.AppData.Owner.IsGpsTracking = isOn;
                         $App.ChangeGpsTracking(isOn);
+                        _DialogCore.close();
                         $Notice.Info("Changes saved.");
                     }
                 }
@@ -1216,31 +1250,37 @@ const DialogController = {
         rngDensity.addEventListener('input', applyEffect);
         rngDarkness.addEventListener('input', applyEffect);
         weatherBtns.forEach(btn => {
-            if (btn.dataset.val === currentW) {
-                btn.classList.replace('bg-white', 'bg-brand-5');
-                btn.classList.replace('text-black-5', 'text-white');
-                btn.classList.replace('border-brand-3', 'border-brand-5');
-            }
             btn.addEventListener('click', (e) => {
-                weatherBtns.forEach(b => {
-                    b.classList.remove('bg-brand-5', 'text-white', 'border-brand-5');
-                    b.classList.add('bg-white', 'text-black-5', 'border-brand-3');
-                });
-                const target = e.currentTarget;
-                target.classList.remove('bg-white', 'text-black-5', 'border-brand-3');
-                target.classList.add('bg-brand-5', 'text-white', 'border-brand-5');
-                currentW = target.dataset.val;
-                if (currentW === "0") {
-                    // Clearが押されたら、すべてのパラメータを0にリセット
+                const clickedVal = btn.dataset.val;
+                if (clickedVal === "0") {
+                    // --- 【Clearボタンの挙動】 ---
+                    // すべてのスライダーを0にリセット
                     rngWind.value = 0;
                     rngDensity.value = 0;
                     rngDarkness.value = 0;
+                    // 全ボタンの選択状態を解除（Clear自体も選択状態にしない）
+                    weatherBtns.forEach(b => {
+                        b.classList.remove('bg-brand-5', 'text-white', 'border-brand-5');
+                        b.classList.add('bg-white', 'text-brand-5', 'border-brand-3');
+                    });
+                    currentW = "0"; // 内部値は0（晴れ）にする
                 } else {
-                    // Clear以外が押されたとき、もし密度が0なら1に引き上げる
+                    // --- 【天候ボタンの挙動】 ---
+                    // 一旦すべての選択を解除
+                    weatherBtns.forEach(b => {
+                        b.classList.remove('bg-brand-5', 'text-white', 'border-brand-5');
+                        b.classList.add('bg-white', 'text-brand-5', 'border-brand-3');
+                    });
+                    // 押されたボタンを選択状態にする
+                    btn.classList.remove('bg-white', 'text-brand-5', 'border-brand-3');
+                    btn.classList.add('bg-brand-5', 'text-white', 'border-brand-5');
+                    currentW = clickedVal;
+                    // 密度が0なら1に引き上げる
                     if (parseInt(rngDensity.value) === 0) {
                         rngDensity.value = 1;
                     }
                 }
+                // 数値表示とエフェクトの更新
                 applyEffect();
             });
         });
@@ -1270,6 +1310,7 @@ const DialogController = {
                         handler: () => {
                             const finalCode = txtCode.textContent;
                             if (onOk) onOk(finalCode);
+                            _DialogCore.close();
                         }
                     }
                 ]
@@ -1363,31 +1404,68 @@ const DialogController = {
                 dialogButtons.push([{
                     label: "Private　⇒　Public",
                     className: btnMainClass,
-                    handler: () => this._execStatusChange('PublishArchive', { archive_id: archive.archive_id }, "Switch to [Public]", "Do you want to make\nthis internal data [Public]？", "Set to [Public].", $Const.SCREEN_MODE.ARCHIVE_PUB)
+                    handler: () => this._execStatusChange(
+                        'PublishArchive',
+                        { archive_id: archive.archive_id },
+                        "Switch to [Public]",
+                        "Do you want to make\nthis internal data [Public]？",
+                        "Set to [Public].",
+                        $Const.SCREEN_MODE.ARCHIVE_PUB
+                    )
                 }]);
                 dialogButtons.push([{
                     label: "Archive　⇒　Details",
                     className: btnReleaseClass,
-                    handler: () => this._execStatusChange('DeleteArchive', { archive_id: archive.archive_id }, "Restore to Details", "Restore this group to\nindividual detail items？", "Restored to individual detail items.", $Const.SCREEN_MODE.CREATE)
+                    handler: () => this._execStatusChange(
+                        'DeleteArchive',
+                        { archive_id: archive.archive_id },
+                        "Restore to Details",
+                        "Restore this group to\nindividual detail items？",
+                        "Restored to individual detail items.",
+                        $Const.SCREEN_MODE.CREATE
+                    )
                 }]);
             } else {
                 if (archive.closed_flg) {
                     dialogButtons.push([{
                         label: "Close　⇒　Open",
                         className: btnMainClass,
-                        handler: () => this._execStatusChange('OpenArchive', { archive_id: archive.archive_id }, "Switch to [Open]", "Do you want to switch\nthis data to [Open]？", "Switched to [Open].", null, () => $Data.Store.UpdateArchive({ closed_flg: false }))
+                        handler: () => this._execStatusChange(
+                            'OpenArchive',
+                            { archive_id: archive.archive_id },
+                            "Switch to [Open]",
+                            "Do you want to switch\nthis data to [Open]？",
+                            "Switched to [Open].",
+                            null,
+                            () => $Data.Store.UpdateArchive({ closed_flg: false })
+                        )
                     }]);
                 } else {
                     dialogButtons.push([{
                         label: "Open　⇒　Close",
                         className: btnMainClass,
-                        handler: () => this._execStatusChange('CloseArchive', { archive_id: archive.archive_id }, "Switch to [Close]", "Do you want to switch\nthis data to [Close]？", "Switched to [Close].", null, () => $Data.Store.UpdateArchive({ closed_flg: true }))
+                        handler: () => this._execStatusChange(
+                            'CloseArchive',
+                            { archive_id: archive.archive_id },
+                            "Switch to [Close]",
+                            "Do you want to switch\nthis data to [Close]？",
+                            "Switched to [Close].",
+                            null,
+                            () => $Data.Store.UpdateArchive({ closed_flg: true })
+                        )
                     }]);
                 }
                 dialogButtons.push([{
                     label: "Public　⇒　Private",
                     className: btnReleaseClass,
-                    handler: () => this._execStatusChange('UnpublishArchive', { archive_id: archive.archive_id }, "Switch to [Private]", "Do you want to revert\nthis data to Private？", "Reverted to [Private].", $Const.SCREEN_MODE.ARCHIVE)
+                    handler: () => this._execStatusChange(
+                        'UnpublishArchive',
+                        { archive_id: archive.archive_id },
+                        "Switch to [Private]",
+                        "Do you want to revert\nthis data to Private？",
+                        "Reverted to [Private].",
+                        $Const.SCREEN_MODE.ARCHIVE
+                    )
                 }]);
             }
         }
@@ -1467,7 +1545,6 @@ const DialogController = {
                     {
                         label: "SAVE DATA",
                         className: "",
-                        onClose: true,
                         handler: $Warn.CatchAsync(async () => {
                             const updatedFields = {
                                 title: editTitle.value,
@@ -1858,136 +1935,6 @@ const DialogController = {
             buttons:[]
         });
     },
-    // 管理者：通報詳細
-    async ShowAdminReportDetail(summaryItem) {
-        // 詳細データをAPI取得
-        const isSuccess = await $Data.Access.GetReportDetails({
-            target_user_id: summaryItem.target_user_id,
-            archive_id: summaryItem.archive_id
-        });
-        if (!isSuccess) return;
-        const reports = $App.AppData.Admin.reports || [];
-        const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
-        // データの反映
-        $Dom.QuerySelector(".js-target-user", el).textContent = summaryItem.target_user_id;
-        $Dom.QuerySelector(".js-archive-title", el).textContent = summaryItem.archive_title || "Unknown Title";
-        const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
-        if (reports.length === 0) {
-            listContainer.innerHTML = `<div class="text-[0.7rem] text-slate-400 p-2">詳細データがありません</div>`;
-        } else {
-            reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
-                const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
-                $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim, 'YYYY-MM-DD　HH:mm');
-                $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
-                // クリックで全文詳細を開く
-                child.classList.add("cursor-pointer", "active:bg-slate-50");
-                child.onclick = () => this.ShowAdminReportItemDetail(rep);
-                listContainer.appendChild(child);
-            });
-        }
-        _DialogCore.open({
-            title: "REPORT DETAILS",
-            content: el,
-            help: "",
-            // ボタン設定を修正：BACKを消し、OPENボタンを下段に配置
-            buttons: [
-                {
-                    label: "🔗 OPEN PUBLIC ARCHIVE",
-                    className: "bg-red-500 text-white shadow-md",
-                    handler: async () => {
-                        const isOk = await this.ShowConfirm({ title: "OPEN ARCHIVE", message: "この Public まとめデータを開きますか？" });
-                        if (!isOk) return;
-                        _DialogCore.closeAll();
-                        $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
-                        $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
-                        await $App.RefreshScreen();
-                    }
-                }
-            ]
-        });
-    },
-    // 管理者：フィードバックリスト（無限スクロール）
-    async ShowAdminFeedbackList() {
-        let skip = 0;
-        const take = 20;
-        // ★ 実行時に即データアクセスし、エラーの場合は開かずに終了
-        const isSuccess = await $Data.Access.GetAllFeedback({ skip, take });
-        if (!isSuccess) return;
-        const root = $Dom.GenerateTemplate("tpl-list-parent");
-        let isLoading = false;
-        let hasMore = true;
-        const renderItems = (items) => {
-            items.forEach(item => {
-                const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim || new Date(), 'YYYY-MM-DD　HH:mm');
-                const score = item.score || 0;
-                $Dom.QuerySelector(".js-score", child).textContent = "★".repeat(score) + "☆".repeat(5 - score);
-                $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
-                child.onclick = () => this.ShowAdminFeedbackDetail(item);
-                root.appendChild(child);
-            });
-        };
-        // 初回取得分の描画
-        const initialItems = $App.AppData.Admin.feedbackList ||[];
-        if (initialItems.length < take) hasMore = false;
-        renderItems(initialItems);
-        skip += take;
-        // 追加読み込み処理
-        const loadMore = async () => {
-            if (isLoading || !hasMore) return;
-            isLoading = true;
-            const isLoadSuccess = await $Data.Access.GetAllFeedback({ skip, take });
-            if (!isLoadSuccess) {
-                isLoading = false;
-                return;
-            }
-            const newItems = $App.AppData.Admin.feedbackList ||[];
-            if (newItems.length < take) hasMore = false;
-            renderItems(newItems);
-            skip += take;
-            isLoading = false;
-        };
-        // スクロール検知
-        root.addEventListener('scroll', () => {
-            // スクロール最下部付近で追加ロード
-            if (root.scrollTop + root.clientHeight >= root.scrollHeight - 50) loadMore();
-        });
-        // 1件もない場合の表示
-        if (root.children.length === 0) {
-            root.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
-        }
-        // ダイアログを開く
-        _DialogCore.open({
-            title: "FEEDBACK Mgmt",
-            content: root,
-            help: "",
-            buttons:[]
-        });
-    },
-    // 管理者：フィードバック詳細
-    ShowAdminFeedbackDetail(item) {
-        const el = $Dom.GenerateTemplate("tpl-admin-feedback-detail");
-        $Dom.QuerySelector(".js-date", el).textContent = $Util.FormatDate(item.create_tim || new Date(), 'YYYY-MM-DD　HH:mm');
-        const score = item.score || 0;
-        $Dom.QuerySelector(".js-score", el).textContent = "★".repeat(score) + "☆".repeat(5 - score);
-        $Dom.QuerySelector(".js-body", el).textContent = item.body || "（内容なし）";
-        _DialogCore.open({
-            title: "FEEDBACK DETAILS",
-            content: el,
-            headerButtons: [
-                {
-                    label: "✉", // 送信アイコン
-                    id: "btn-admin-reply-user",
-                    handler: () => {
-                        // このユーザーに対して送信画面を開く
-                        this.ShowAdminSendUserNotification(item.user_id, `フィードバックありがとうございます！\n`);
-                    }
-                }
-            ],
-            help: "",
-            buttons: []
-        });
-    },
     // 通報投稿画面
     async ShowReportPost(archive) {
         // ダイアログを開く前に、自分が過去にこのアーカイブを通報したか取得
@@ -2078,6 +2025,136 @@ const DialogController = {
             content: el,
             help: "",
             buttons: [] // CLOSEボタンは右上の✖で代用し、下部はコピーボタンのみにする
+        });
+    },
+    // 【管理者機能】通報詳細
+    async ShowAdminReportDetail(summaryItem) {
+        // 詳細データをAPI取得
+        const isSuccess = await $Data.Access.GetReportDetails({
+            target_user_id: summaryItem.target_user_id,
+            archive_id: summaryItem.archive_id
+        });
+        if (!isSuccess) return;
+        const reports = $App.AppData.Admin.reports || [];
+        const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
+        // データの反映
+        $Dom.QuerySelector(".js-target-user", el).textContent = summaryItem.target_user_id;
+        $Dom.QuerySelector(".js-archive-title", el).textContent = summaryItem.archive_title || "Unknown Title";
+        const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
+        if (reports.length === 0) {
+            listContainer.innerHTML = `<div class="text-[0.7rem] text-slate-400 p-2">詳細データがありません</div>`;
+        } else {
+            reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
+                $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim, 'YYYY-MM-DD　HH:mm');
+                $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
+                // クリックで全文詳細を開く
+                child.classList.add("cursor-pointer", "active:bg-slate-50");
+                child.onclick = () => this.ShowAdminReportItemDetail(rep);
+                listContainer.appendChild(child);
+            });
+        }
+        _DialogCore.open({
+            title: "REPORT DETAILS",
+            content: el,
+            help: "",
+            // ボタン設定を修正：BACKを消し、OPENボタンを下段に配置
+            buttons: [
+                {
+                    label: "🔗 OPEN PUBLIC ARCHIVE",
+                    className: "bg-red-500 text-white shadow-md",
+                    handler: async () => {
+                        const isOk = await this.ShowConfirm({ title: "OPEN ARCHIVE", message: "この Public まとめデータを開きますか？" });
+                        if (!isOk) return;
+                        _DialogCore.closeAll();
+                        $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+                        $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
+                        await $App.RefreshScreen();
+                    }
+                }
+            ]
+        });
+    },
+    // 【管理者機能】フィードバックリスト（無限スクロール）
+    async ShowAdminFeedbackList() {
+        let skip = 0;
+        const take = 20;
+        // ★ 実行時に即データアクセスし、エラーの場合は開かずに終了
+        const isSuccess = await $Data.Access.GetAllFeedback({ skip, take });
+        if (!isSuccess) return;
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        let isLoading = false;
+        let hasMore = true;
+        const renderItems = (items) => {
+            items.forEach(item => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim || new Date(), 'YYYY-MM-DD　HH:mm');
+                const score = item.score || 0;
+                $Dom.QuerySelector(".js-score", child).textContent = "★".repeat(score) + "☆".repeat(5 - score);
+                $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
+                child.onclick = () => this.ShowAdminFeedbackDetail(item);
+                root.appendChild(child);
+            });
+        };
+        // 初回取得分の描画
+        const initialItems = $App.AppData.Admin.feedbackList ||[];
+        if (initialItems.length < take) hasMore = false;
+        renderItems(initialItems);
+        skip += take;
+        // 追加読み込み処理
+        const loadMore = async () => {
+            if (isLoading || !hasMore) return;
+            isLoading = true;
+            const isLoadSuccess = await $Data.Access.GetAllFeedback({ skip, take });
+            if (!isLoadSuccess) {
+                isLoading = false;
+                return;
+            }
+            const newItems = $App.AppData.Admin.feedbackList ||[];
+            if (newItems.length < take) hasMore = false;
+            renderItems(newItems);
+            skip += take;
+            isLoading = false;
+        };
+        // スクロール検知
+        root.addEventListener('scroll', () => {
+            // スクロール最下部付近で追加ロード
+            if (root.scrollTop + root.clientHeight >= root.scrollHeight - 50) loadMore();
+        });
+        // 1件もない場合の表示
+        if (root.children.length === 0) {
+            root.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
+        }
+        // ダイアログを開く
+        _DialogCore.open({
+            title: "FEEDBACK Mgmt",
+            content: root,
+            help: "",
+            buttons:[]
+        });
+    },
+    // 【管理者機能】フィードバック詳細
+    ShowAdminFeedbackDetail(item) {
+        const el = $Dom.GenerateTemplate("tpl-admin-feedback-detail");
+        $Dom.QuerySelector(".js-date", el).textContent = $Util.FormatDate(item.create_tim || new Date(), 'YYYY-MM-DD　HH:mm');
+        const score = item.score || 0;
+        $Dom.QuerySelector(".js-score", el).textContent = "★".repeat(score) + "☆".repeat(5 - score);
+        $Dom.QuerySelector(".js-body", el).textContent = item.body || "（内容なし）";
+        _DialogCore.open({
+            title: "FEEDBACK DETAILS",
+            content: el,
+            headerButtons: [
+                {
+                    label: "✉", // 送信アイコン
+                    id: "btn-admin-reply-user",
+                    handler: () => {
+                        // このユーザーに対して送信画面を開く
+                        this.ShowAdminSendUserNotification(item.user_id, `フィードバックありがとうございます！\n`);
+                    }
+                }
+            ],
+            help: "",
+            buttons: []
         });
     },
     // 【管理者機能】ユーザー個別通知送信ダイアログ

@@ -1095,41 +1095,5 @@
         </div>
     </div>
 </template>
-<!-- 【テスト用】Atmosphereテストダイアログ -->
-<template id="tpl-setting-weather_2">
-    <div class="w-full text-black-5 my-3 space-y-4 px-4">
-        <!-- 天気 (0-4) -->
-        <div>
-            <label class="block font-bold text-black-3 text-[0.6rem] mb-1">WEATHER (0-4)</label>
-            <div id="atm-weather-group" class="grid grid-cols-5 gap-1">
-                <!-- <button data-val="0" class="atm-w-btn h-10 border-2 border-brand-5 bg-brand-5 text-white font-bold text-[0.6rem] rounded">None</button> -->
-                <button data-val="0" class="atm-w-btn h-10 border-2 border-brand-5 bg-brand-5 text-white font-bold text-[0.6rem] rounded">Leaf</button>
-                <button data-val="1" class="atm-w-btn h-10 border-2 border-brand-3 bg-white text-black-5 font-bold text-[0.6rem] rounded">Rain</button>
-                <button data-val="2" class="atm-w-btn h-10 border-2 border-brand-3 bg-white text-black-5 font-bold text-[0.6rem] rounded">Storm</button>
-                <button data-val="3" class="atm-w-btn h-10 border-2 border-brand-3 bg-white text-black-5 font-bold text-[0.6rem] rounded">Snow</button>
-                <button data-val="4" class="atm-w-btn h-10 border-2 border-brand-3 bg-white text-black-5 font-bold text-[0.6rem] rounded">Cherry</button>
-            </div>
-        </div>
-        <!-- 風速 (0-9) -->
-        <div>
-            <label class="block font-bold text-black-3 text-[0.6rem] mb-1">WIND (0-9): <span id="atm-wind-val" class="text-brand-5 text-[0.8rem]">0</span></label>
-            <input id="atm-wind" type="range" min="0" max="9" value="0" class="w-full">
-        </div>
-        <!-- 密度 (0-9) -->
-        <div>
-            <label class="block font-bold text-black-3 text-[0.6rem] mb-1">DENSITY (0-9): <span id="atm-density-val" class="text-brand-5 text-[0.8rem]">0</span></label>
-            <input id="atm-density" type="range" min="0" max="9" value="0" class="w-full">
-        </div>
-        <!-- 暗さ (0-9) -->
-        <div>
-            <label class="block font-bold text-black-3 text-[0.6rem] mb-1">DARKNESS (0-9): <span id="atm-darkness-val" class="text-brand-5 text-[0.8rem]">0</span></label>
-            <input id="atm-darkness" type="range" min="0" max="9" value="0" class="w-full">
-        </div>
-        <!-- 現在のコードプレビュー -->
-        <div class="mt-4 p-3 bg-brand-1 text-center font-bold text-[1.2rem] tracking-widest border border-brand-3">
-            CODE: <span id="atm-code-preview" class="text-brand-5">0000</span>
-        </div>
-    </div>
-</template>
 
 
