@@ -110,16 +110,16 @@
         <div class="flex-1 min-w-0 p-3 pl-4">
             <div class="flex justify-between items-start mb-1">
                 <div class="text-[0.8rem] font-black text-slate-400 tracking-wider js-date italic"></div>
-                <!-- ★修正：宛先表示をアイコン＋ニックネームに変更 -->
-                <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 shadow-sm">
-                    <span class="js-target-icon text-[0.7rem]"></span> <!-- ★ -->
-                    <span class="js-target-user text-[9px] font-black uppercase tracking-wider text-slate-500"></span> <!-- ★ -->
-                </div>
             </div>
-            <div class="text-[0.8rem] font-black text-black-5 truncate pr-2 mb-1">
-                <span class="js-emoji mr-2"></span><span class="js-title"></span>
+            <div class="absolute top-0 right-0 text-[1.5rem] font-black">
+                <span class="js-emoji mr-2"></span>
             </div>
-            <div class="text-[0.7rem] text-black-3 line-clamp-1 js-body"></div>
+            <!-- 宛先表示をアイコン＋ニックネームに変更 -->
+            <div class="w-[200px] flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 shadow-sm">
+                <span class="js-target-icon text-[0.8rem]"></span>
+                <span class="js-target-user text-[9px] font-black line-clamp-1 text-slate-500"></span>
+            </div>
+            <div class="text-[0.7rem] text-black-3 line-clamp-1 js-body mt-2"></div>
         </div>
     </div>
 </template>
@@ -162,26 +162,6 @@
         <div class="flex-1 overflow-y-auto px-2 pb-4">
             <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Report Body</span>
             <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all js-report-body mt-2"></div>
-        </div>
-    </div>
-</template>
-
-<!-- 管理者用ユーザーメール一覧アイテム -->
-<template id="tpl-admin-list-child-user-mail">
-    <div class="js-item-card flex items-stretch p-0 border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3 relative">
-        <div class="flex-1 min-w-0 p-3 pl-4">
-            <div class="flex justify-between items-start mb-1">
-                <div class="text-[0.8rem] font-black text-slate-400 tracking-wider js-date italic"></div>
-                <!-- ★修正：宛先表示をアイコン＋ニックネームに変更 -->
-                <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 shadow-sm">
-                    <span class="js-target-icon text-[0.7rem]"></span> <!-- ★ -->
-                    <span class="js-target-user text-[9px] font-black uppercase tracking-wider text-slate-500"></span> <!-- ★ -->
-                </div>
-            </div>
-            <div class="text-[0.8rem] font-black text-black-5 truncate pr-2 mb-1">
-                <span class="js-emoji mr-2"></span><span class="js-title"></span>
-            </div>
-            <div class="text-[0.7rem] text-black-3 line-clamp-1 js-body"></div>
         </div>
     </div>
 </template>

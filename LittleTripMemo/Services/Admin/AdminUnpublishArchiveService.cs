@@ -44,6 +44,9 @@ public class AdminUnpublishArchiveService : _BaseService
         var targetUser = await _userManager.FindByIdAsync(req.target_user_id.ToString());
         BusinessException.ThrowIf(targetUser == null, "対象ユーザーが見つかりません");
 
+        var archive = await _archivePubRepo.GetByKeyAsync(req.archive_id);
+        BusinessException.ThrowIf(archive == null || archive.user_id != req.target_user_id, "対象の公開アーカイブが見つかりません");
+
         // 2. 実行
         using var tran = _provider.BeginTransaction();
         try
@@ -65,7 +68,7 @@ public class AdminUnpublishArchiveService : _BaseService
             {
                 user_id = req.target_user_id,
                 emoji = "🚫",
-                body = "【重要】公開中のまとめが規約違反により運営側で公開停止されました。データは「非公開」へ戻され、リアクション等はリセットされました。内容を修正してください。"
+                body = $"【重要】公開中のまとめ『{archive.title}』が規約違反により運営側で公開停止されました。データは「非公開」へ戻され、評価等はリセットされました。"
             });
 
             tran.Commit();

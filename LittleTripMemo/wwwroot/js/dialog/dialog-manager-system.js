@@ -344,7 +344,6 @@ export default {
             const pL3   = profile.link3 || "";
             $Dom.QuerySelector('#view-profile-icon', el).textContent = pIcon;
             $Dom.QuerySelector('#view-profile-nickname', el).textContent = pName;
-            // $Dom.QuerySelector('#view-profile-userid', el).textContent = profile.user_id || "";
             $Dom.QuerySelector('#view-profile-description', el).textContent = pDesc;
             const viewLinks = $Dom.QuerySelector('#view-profile-links', el);
             viewLinks.innerHTML = "";
@@ -365,7 +364,6 @@ export default {
                 label: "✉️",
                 id: "btn-header-mail",
                 handler: () => {
-                    this._core.close();
                     this.ShowUserMailList();
                 }
             });

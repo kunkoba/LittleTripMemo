@@ -31,6 +31,9 @@ public class AdminCloseArchivePubService : _BaseService
         // 1. 検証
         await ValidateAsync(req);
 
+        var archive = await _archivePubRepo.GetByKeyAsync(req.archive_id);
+        if (archive == null || archive.user_id != req.target_user_id) return new Response(false);
+
         // 2. 実行（一括処理のためトランザクション開始）
         using var tran = _provider.BeginTransaction();
         try
@@ -41,13 +44,12 @@ public class AdminCloseArchivePubService : _BaseService
             // 対象が見つからない（ID間違い等）場合は通知を送らず終了
             if (affected == 0) return new Response(false);
 
-            // ② 個人通知送信（固定文言）
-            // 以前追加した link_url も活用して、該当記事へ誘導
+            // ② 個人通知送信（タイトルを含める）
             await _userNoteRepo.InsertAsync(new TSysUserNotification
             {
                 user_id = req.target_user_id,
                 emoji = "⚠️",
-                body = "【警告】公開中のまとめが規約制限により運営側で非公開（クローズ）に設定されました。内容を確認・修正してください。",
+                body = $"【警告】公開中のまとめ『{archive.title}』が規約制限により運営側で非公開に設定されました。\n内容を確認・修正してください。"
             });
 
             tran.Commit();

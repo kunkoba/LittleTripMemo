@@ -405,8 +405,6 @@ export default {
                 $Dom.QuerySelector(".js-target-icon", child).textContent = item.icon || "👤";
                 $Dom.QuerySelector(".js-target-user", child).textContent = item.nick_name || item.user_id.slice(0,8);
                 $Dom.QuerySelector(".js-emoji", child).textContent = item.emoji || "✉️";
-                const lines = (item.body || "").split('\n');
-                $Dom.QuerySelector(".js-title", child).textContent = lines[0] || "No Subject";
                 $Dom.QuerySelector(".js-body", child).textContent = item.body;
                 child.onclick = () => this.ShowAdminUserMailDetail(item);
                 root.appendChild(child);

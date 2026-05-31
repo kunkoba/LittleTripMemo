@@ -604,6 +604,7 @@ export default {
                         if (!isSuccess) return;
                         $Notice.Info("強制的にCloseしました");
                         this._core.closeAll();
+                        $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
                         await $App.RefreshScreen(); // 画面を更新して反映
                     }
                 }]);
@@ -619,6 +620,7 @@ export default {
                     if (!isSuccess) return;
                     $Notice.Info("強制的にPrivateに戻しました");
                     this._core.closeAll();
+                    $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
                     await $App.RefreshScreen(); // 画面を更新して反映
                 }
             }]);
