@@ -24,6 +24,7 @@ public class SysController : _BaseController
     private readonly GetMyUserNotificationsService _getMyUserNotificationsService;
     private readonly AdminCloseArchivePubService _adminCloseArchivePubService;
     private readonly AdminUnpublishArchiveService _adminUnpublishArchiveService;
+    private readonly GetAllUserNotificationsService _getAllUserNotificationsService;
 
     public SysController(
         UserContext user,
@@ -41,7 +42,8 @@ public class SysController : _BaseController
         SendUserNotificationService sendUserNotificationService,
         GetMyUserNotificationsService getMyUserNotificationsService,
         AdminCloseArchivePubService adminCloseArchivePubService,
-        AdminUnpublishArchiveService adminUnpublishArchiveService
+        AdminUnpublishArchiveService adminUnpublishArchiveService,
+        GetAllUserNotificationsService getAllUserNotificationsService
     ) : base(user)
     {
         _upsertFeedbackService = upsertFeedbackService;
@@ -59,6 +61,7 @@ public class SysController : _BaseController
         _getMyUserNotificationsService = getMyUserNotificationsService;
         _adminCloseArchivePubService　= adminCloseArchivePubService;
         _adminUnpublishArchiveService = adminUnpublishArchiveService;
+        _getAllUserNotificationsService = getAllUserNotificationsService;
     }
 
 #region "System"
@@ -235,6 +238,16 @@ public class SysController : _BaseController
     public async Task<IActionResult> SendUserNotification([FromBody] SendUserNotificationService.Request req)
     {
         var result = await _sendUserNotificationService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// 全ユーザー宛ての個別通知履歴を取得（管理者専用）
+    /// </summary>
+    [HttpPost("api/Sys/GetAllUserNotifications")]
+    public async Task<IActionResult> GetAllUserNotifications([FromBody] GetAllUserNotificationsService.Request req)
+    {
+        var result = await _getAllUserNotificationsService.ExecuteAsync(req);
         return OkWithBase(result);
     }
 

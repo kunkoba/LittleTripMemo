@@ -1608,7 +1608,7 @@ const DialogController = {
 		const headerButtons = [];
 		if (isOwner) {
             headerButtons.push({
-                label: "✉",
+                label: "✉️",
                 id: "btn-header-mail",
                 handler: () => {
                     _DialogCore.close();
@@ -1722,8 +1722,8 @@ const DialogController = {
             // 既読管理（後ほど既読判定ロジックを追加可能。一旦すべて未読として扱う）
             const isNew = item.is_new ?? true; 
             setMailStyle(child, isNew);
-            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim, "YYYY.MM.DD");
-            $Dom.QuerySelector(".js-icon", child).textContent = item.emoji || "✉️";
+            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
+            $Dom.QuerySelector(".js-icon", child).textContent = item.emoji || "✉️️";
             // 本文の1行目をタイトル、全体を本文としてリストに表示
             const lines = item.body.split('\n');
             $Dom.QuerySelector(".js-title", child).textContent = lines[0];
@@ -1762,9 +1762,9 @@ const DialogController = {
         const title = lines[0] || "No Subject";
         const body = lines.slice(1).join('\n');
         // 各要素への反映
-        $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️";
+        $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️️";
         $Dom.QuerySelector('#view-notice-title', el).textContent = title;
-        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY.MM.DD HH:mm");
+        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
         // 2行目以降があれば本文に、なければ全体を表示（運営からの短い連絡を考慮）
         const bodyEl = $Dom.QuerySelector('#view-notice-body', el);
         bodyEl.textContent = body.trim() !== "" ? body : item.body;
@@ -1871,6 +1871,7 @@ const DialogController = {
         $Dom.QuerySelector('#btn-admin-notice', el).onclick = () => this.ShowAdminNoticeList();
         $Dom.QuerySelector('#btn-admin-report', el).onclick = () => this.ShowAdminReportList();
         $Dom.QuerySelector('#btn-admin-feedback', el).onclick = () => this.ShowAdminFeedbackList();
+        $Dom.QuerySelector('#btn-admin-user-mail', el).onclick = () => this.ShowAdminUserMailList();
         _DialogCore.open({
             title: "ADMIN TOOLS",
             content: el,
@@ -2258,7 +2259,7 @@ const DialogController = {
             content: el,
             headerButtons: [
                 {
-                    label: "✉", // 送信アイコン
+                    label: "✉️", // 送信アイコン
                     id: "btn-admin-reply-user",
                     handler: () => {
                         // このユーザーに対して送信画面を開く
@@ -2328,13 +2329,60 @@ const DialogController = {
     // 【管理者機能】通報1件の全文詳細を表示
     ShowAdminReportItemDetail(rep) {
         const el = $Dom.GenerateTemplate("tpl-admin-report-item-detail");
-        $Dom.QuerySelector(".js-report-tim", el).textContent = $Util.FormatDate(rep.report_tim, "YYYY.MM.DD HH:mm");
+        $Dom.QuerySelector(".js-report-tim", el).textContent = $Util.FormatDate(rep.report_tim, "YYYY-MM-DD　HH:mm");
         $Dom.QuerySelector(".js-reporter-id", el).textContent = rep.reporter_user_id;
         $Dom.QuerySelector(".js-report-body", el).textContent = rep.body || "（内容なし）";
         _DialogCore.open({
             title: "REPORT CONTENT",
             content: el,
             buttons: []
+        });
+    },
+    // 【管理者機能】ユーザーメール一覧
+    async ShowAdminUserMailList() {
+        const isSuccess = await $Data.Access.AdminGetAllUserNotifications({ limit: 100 });
+        if (!isSuccess) return;
+        const mails = $App.AppData.Admin.userMailList  || []; // API側で notifications に格納される想定
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        if (mails.length === 0) {
+            root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">送信済みメッセージはありません</div>`;
+        } else {
+            mails.forEach(item => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-user-mail");
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim, 'YYYY-MM-DD　HH:mm');
+                $Dom.QuerySelector(".js-target-icon", child).textContent = item.icon || "👤";
+                $Dom.QuerySelector(".js-target-user", child).textContent = item.nick_name || item.user_id.slice(0,8);
+                $Dom.QuerySelector(".js-emoji", child).textContent = item.emoji || "✉️";
+                const lines = (item.body || "").split('\n');
+                $Dom.QuerySelector(".js-title", child).textContent = lines[0] || "No Subject";
+                $Dom.QuerySelector(".js-body", child).textContent = item.body;
+                child.onclick = () => this.ShowAdminUserMailDetail(item);
+                root.appendChild(child);
+            });
+        }
+        _DialogCore.open({
+            title: "USER MESSAGE LOG",
+            content: root
+        });
+    },
+    // 【管理者機能】ユーザーメール詳細
+    ShowAdminUserMailDetail(item) {
+        const el = $Dom.GenerateTemplate('tpl-view-notice');
+        const lines = (item.body || "").split('\n');
+        // 詳細画面のヘッダーに宛先ユーザー名を表示
+        const titleArea = $Dom.QuerySelector('#view-notice-title', el);
+        titleArea.innerHTML = `
+            <div class="text-[0.6rem] text-slate-400 uppercase tracking-widest mb-1">To: ${item.icon} ${item.nick_name}</div>
+            <div>${lines[0] || "No Subject"}</div>
+        `;
+        $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️";
+        $Dom.QuerySelector('#view-notice-title', el).textContent = lines[0] || "No Subject";
+        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
+        $Dom.QuerySelector('#view-notice-body', el).textContent = item.body;
+        _DialogCore.open({
+            title: "MESSAGE DETAILS (ADMIN)",
+            content: el,
+            headerButtons: []
         });
     },
 };

@@ -87,7 +87,8 @@ window.$Data = {
             if (data.reportSummary) $App.AppData.Admin.reportSummary = data.reportSummary;
             if (data.reports) $App.AppData.Admin.reports = data.reports;
             if (data.feedbackList) $App.AppData.Admin.feedbackList = data.feedbackList;
-            // console.log(">>$App.AppData:", $App.AppData);
+            if (data.userMailList) $App.AppData.Admin.userMailList = data.userMailList;
+            console.log(">>$App.AppData:", $App.AppData);
         },
         // --- (既存のアプリアクセスメソッド群省略なし) ---
         async LoginToServer(email) {
@@ -231,8 +232,12 @@ window.$Data = {
         async SendUserNotification(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/SendUserNotification', params))();
         },
-        async GetMyUserNotifications(params) {
+        async GetMyUserNotifications(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyUserNotifications', params))();
+        },
+        // public record Request(int limit = 100);
+        async AdminGetAllUserNotifications(params = { limit: 100 }) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllUserNotifications', params))();
         },
     },
     // データ操作・取得のメソッド群

@@ -28,4 +28,25 @@ public class SysUserNotificationRepository : _BaseRepository
             ORDER BY send_tim DESC LIMIT 20";
         return await QueryAsync<TSysUserNotification>(sql, new { user_id = _user.UserId });
     }
+
+    /// <summary>
+    /// すべてのデータ取得
+    /// </summary>
+    /// <param name="limit"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<DtoUserNotification>> GetAllAsync(int limit = 100)
+    {
+        const string sql = @"
+        SELECT 
+            n.*,
+            u.""NickName"" AS nick_name,
+            u.""Icon""     AS icon
+        FROM t_sys_user_notifications n
+        LEFT JOIN ""AspNetUsers"" u ON n.user_id = u.""Id""
+        ORDER BY n.send_tim DESC 
+        LIMIT @limit";
+
+        return await QueryAsync<DtoUserNotification>(sql, new { limit });
+    }
+
 }

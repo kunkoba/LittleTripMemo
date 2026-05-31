@@ -193,7 +193,7 @@
         </div>
         <!-- テキストエリア -->
         <div class="flex-1 min-w-0 pr-4 flex flex-col justify-center">
-            <div class="text-[0.7rem] text-slate-400 tracking-wider js-date mb-1.5 italic"></div>
+            <div class="text-[0.8rem] text-slate-400 tracking-wider js-date mb-1.5 italic"></div>
             <div class="text-[0.9rem] font-black text-black-5 truncate js-title mb-1.5"></div>
             <div class="text-[0.7rem] text-black-4 line-clamp-1 js-body break-all leading-relaxed"></div>
         </div>
@@ -215,7 +215,7 @@
     <div class="js-item-card flex items-stretch p-0 _rounded-[1rem] border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3 relative">
         <div class="flex-1 min-w-0 p-3 pl-4">
             <div class="flex justify-between items-start mb-1">
-                <div class="text-[0.6rem] font-black text-slate-400 tracking-wider js-date"></div>
+                <div class="text-[0.8rem] font-black text-slate-400 tracking-wider js-date italic"></div>
                 <span class="js-badge-status text-[9px] font-black px-2 py-0.5 _rounded-full uppercase tracking-wider shadow-md border"></span>
             </div>
             <div class="text-[0.8rem] font-black text-black-5 truncate pr-2 mb-1 js-title"></div>
@@ -341,24 +341,29 @@
 <!-- 【ダイアログ子】管理者メニュー -->
 <template id="tpl-menu-admin">
     <div class="w-full flex flex-col bg-brand-0">
+        <!-- 通知管理 -->
         <button id="btn-admin-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
             <span class="col-span-1 flex justify-center text-[1.2rem]">📢</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Notice Management</span>
         </button>
-        <!-- ▼ WIP等の無効化クラスを削除 -->
+        <!-- 通報管理 -->
         <button id="btn-admin-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
             <span class="col-span-1 flex justify-center text-[1.2rem]">🚨</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Report Mgmt</span>
         </button>
-        <!-- 【ダイアログ子】管理者メニュー の Feedback Mgmt ボタンから opacity-50 cursor-not-allowed を削除 -->
+        <!-- フィードバック -->
         <button id="btn-admin-feedback" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
             <span class="col-span-1 flex justify-center text-[1.2rem]">💡</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Feedback Mgmt</span>
+        </button>
+        <!-- ユーザあて通知 -->
+        <button id="btn-admin-user-mail" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.2rem]">✉️️</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">User Message Mgmt</span>
         </button>
     </div>
 </template>
 <!-- 【リスト子】管理者フィードバック一覧用 -->
 <template id="tpl-admin-list-child-feedback">
-    <button class="js-item-card w-full flex flex-col p-4 rounded-[1rem] border border-brand-1 bg-white mb-3 shadow-sm">
+    <button class="js-item-card w-full flex flex-col p-4 rounded-[1rem] border border-brand-1 bg-white mb-3 shadow-md">
         <div class="flex justify-between items-center mb-2">
-            <span class="text-[0.7rem] font-black text-slate-400 tracking-wider js-date italic"></span>
+            <span class="text-[0.8rem] font-black text-slate-400 tracking-wider js-date italic"></span>
             <span class="js-score text-[0.9rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
         </div>
         <div class="text-left text-[0.75rem] text-slate-700 break-all js-body line-clamp-1"></div>
@@ -368,7 +373,7 @@
 <template id="tpl-admin-feedback-detail">
     <div class="w-full text-black-5 flex flex-col h-full overflow-hidden p-2 bg-white">
         <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
-            <span class="text-[0.9rem] font-black text-slate-400 tracking-wider js-date italic"></span>
+            <span class="text-[0.8rem] font-black text-slate-400 tracking-wider js-date italic"></span>
             <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
         </div>
         <div class="flex-1 px-2 pb-4 h-[200px] overflow-y-auto">
@@ -990,8 +995,8 @@
         <div class="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
             <!-- 送信アイコン選択 -->
             <button id="btn-admin-send-emoji-trigger" class="w-16 h-16 bg-white rounded-full shadow-md flex items-center justify-center text-[2.5rem] active:scale-95 transition-transform outline-none border border-slate-100">
-                <span id="admin-send-emoji-preview">✉️</span>
-                <input type="hidden" id="admin-send-emoji-val" value="✉️">
+                <span id="admin-send-emoji-preview">✉️️</span>
+                <input type="hidden" id="admin-send-emoji-val" value="✉️️">
             </button>
             <div class="flex-1 min-w-0">
                 <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest block mb-1">To User ID</span>
@@ -1021,6 +1026,25 @@
         <div class="flex-1 overflow-y-auto px-2 pb-4">
             <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Report Body</span>
             <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all js-report-body mt-2"></div>
+        </div>
+    </div>
+</template>
+<!-- 管理者用ユーザーメール一覧アイテム -->
+<template id="tpl-admin-list-child-user-mail">
+    <div class="js-item-card flex items-stretch p-0 border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3 relative">
+        <div class="flex-1 min-w-0 p-3 pl-4">
+            <div class="flex justify-between items-start mb-1">
+                <div class="text-[0.8rem] font-black text-slate-400 tracking-wider js-date italic"></div>
+                <!-- ★修正：宛先表示をアイコン＋ニックネームに変更 -->
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 shadow-sm">
+    <span class="js-target-icon text-[0.7rem]"></span> <!-- ★ -->
+    <span class="js-target-user text-[9px] font-black uppercase tracking-wider text-slate-500"></span> <!-- ★ -->
+</div>
+            </div>
+            <div class="text-[0.8rem] font-black text-black-5 truncate pr-2 mb-1">
+                <span class="js-emoji mr-2"></span><span class="js-title"></span>
+            </div>
+            <div class="text-[0.7rem] text-black-3 line-clamp-1 js-body"></div>
         </div>
     </div>
 </template>

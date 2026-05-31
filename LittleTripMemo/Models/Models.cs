@@ -192,4 +192,21 @@ public class DtoArchive
         //public string user_link3 { get; set; } = string.Empty;
     }
 
+    /// <summary>
+    /// 孤児あて通知情報
+    /// </summary>
+    public class DtoUserNotification
+    {
+        public long seq { get; set; }
+        public Guid user_id { get; set; }
+        public string emoji { get; set; } = string.Empty;
+        public string body { get; set; } = string.Empty;
+        public string link_url { get; set; } = string.Empty;
+        public DateTime send_tim { get; set; }
+
+        // 宛先ユーザーの情報
+        public string nick_name { get; set; } = string.Empty;
+        public string icon { get; set; } = string.Empty;
+}
+
 #endregion
