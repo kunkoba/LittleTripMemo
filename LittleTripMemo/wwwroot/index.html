@@ -555,19 +555,30 @@
     window.$App = app;
     // setTimeout(() => $Notice.Info("保存しました"), 3000);
 </script>
+
 <!-- アプリ起動前処理 -->
 <script>
-    // テンプレートファイルの読み込み
+    // テンプレートファイルの複数読み込み
     (async () => {
-        const res = await fetch("./component/template.html");
-        const html = await res.text();
-        // 読み込んだ HTML を DOM に追加
-        const div = document.createElement("div");
-        div.innerHTML = html;
-        document.body.appendChild(div);
+        const templates = [
+            "./component/template-core.html",
+            "./component/template-screen.html",
+            "./component/template-list.html",
+            "./component/template-admin.html"
+        ];
+        try {
+            // 並列で一気に読み込み
+            const responses = await Promise.all(templates.map(url => fetch(url)));
+            const htmls = await Promise.all(responses.map(res => res.text()));
+            // 全て結合してDOMに追加
+            const div = document.createElement("div");
+            div.innerHTML = htmls.join("\n");
+            document.body.appendChild(div);
+        } catch (error) {
+            console.error("テンプレートの読み込みに失敗しました:", error);
+        }
     })();
 </script>
-
 
 </body>
 

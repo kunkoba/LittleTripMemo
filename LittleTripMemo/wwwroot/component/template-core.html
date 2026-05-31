@@ -1,0 +1,212 @@
+<!-- トースト用 -->
+<template id="tpl-toast">
+    <div class="flex justify-center w-full">
+        <div class="flex items-center justify-center px-4 py-2 shadow-md w-[80vw] max-w-[500px]
+            opacity-0 translate-y-2 transition-all duration-300 pointer-events-auto z-[9999]">
+            <span class="message text-[0.8rem] font-bold text-center w-full block"></span>
+        </div>
+    </div>
+</template>
+
+<!-- オフライン通知 -->
+<template id="tpl-offline">
+    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-[1rem] bg-red-600 text-white text-[0.8rem] opacity-0 pointer-events-none transition-all duration-300 opacity-100 z-[9999]">
+        オフラインです
+    </div>
+</template>
+
+<!-- 【ダイアログ親】フレーム -->
+<template id="tpl-dialog-frame">
+    <div class="absolute inset-0 z-[2000] pointer-events-none flex items-center justify-center bg-black/20">
+        <div class="pointer-events-auto w-[90%] max-w-[600px] min-h-[400px] max-h-[70vh] bg-brand-0 rounded-[1rem] shadow-2xl flex flex-col overflow-hidden border-2 border-brand-5 relative">
+            <div id="dialog-title-bar" class="h-14 flex items-center justify-between bg-brand-1 shadow-md shrink-0 px-4 relative z-[1000]">
+                <div id="dialog-title" class="flex-1 flex items-center font-black italic text-brand-5 uppercase tracking-wider truncate pr-2"></div>
+                <div id="dialog-header-actions" class="flex items-center gap-2 shrink-0">
+                    <button id="dialog-btn-close-x" class="w-9 h-9 bg-white rounded-[1rem] shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[1rem] transition-transform">✖</button>
+                </div>
+            </div>
+            <div id="dialog-content" class="flex-1 overflow-y-auto flex flex-col m-4 relative pr-2"></div>
+            <div id="dialog-button-container" class="z-[900] shrink-0 flex flex-col gap-3 p-4 bg-brand-1 border"></div>
+        </div>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】保存前確認 -->
+<template id="tpl-confirm-base">
+    <div class="p-6 text-center flex-1 flex items-center justify-center">
+        <div class="font-bold text-[1rem] js-message whitespace-pre-line"></div>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】絵文字ピッカー -->
+<template id="tpl-emoji-picker">
+    <div class="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 touch-none">
+        <div class="p-3 border-0 bg-white rounded-[1rem] shadow-2xl flex flex-col overflow-hidden animate-fade-in">
+            <div class="h-16 px-5 flex justify-between items-center shrink-0 border-b border-slate-100 bg-slate-50/50">
+                <div class="flex flex-col">
+                    <span class="text-[0.6rem] font-black text-brand-5 uppercase tracking-[0.2em]">Select Icon</span>
+                    <span class="text-[0.9rem] font-black text-slate-800 italic uppercase ">Marker Library</span>
+                </div>
+                <button class="js-close w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center font-bold active:scale-95 transition-transform border border-slate-100">✖</button>
+            </div>
+            <div id="emoji-mart-container" class="w-full bg-white"></div>
+        </div>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】地点・住所検索 -->
+<template id="tpl-point-search-google">
+    <div class="w-full text-black-5 my-3 space-y-5 px-2">
+        <div class="border-l-4 border-brand-3 pl-3">
+            <strong class="text-[1rem] tracking-wide">地点を検索して移動</strong>
+        </div>
+        <div class="text-[0.8rem] space-y-2">
+            <p>下記の入力欄に、探したい場所の情報を入力してください。</p>
+            <ul class="list-disc list-inside pl-1 text-black-3 space-y-1">
+                <li>住所（例：台東区上野）</li>
+                <li>施設名（例：東京スカイツリー）</li>
+                <li>座標（例：35.7, 139.8）</li>
+                <li>※プラスコードは不可（例：PQ7V+RX）</li>
+            </ul>
+        </div>
+        <div class="w-full">
+            <input id="inputPointValue" type="text" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] text-black-5 focus:outline-none focus:border-brand-5 bg-white" placeholder="場所、住所、または座標を入力">
+        </div>
+        <p class="text-[0.7rem] text-black-2 text-right">※Googleマップ等のURL貼り付けにも対応</p>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】ヘルプ表示用 -->
+<template id="tpl-dialog-help">
+    <div class="p-6 space-y-4">
+        <div class="flex items-center gap-3 border-b-2 border-brand-2 pb-3">
+            <span class="text-[1.5rem] drop-shadow-md">❓</span>
+            <span class="text-[0.9rem] font-black text-brand-5 uppercase tracking-[0.2em]">Guide / Help</span>
+        </div>
+        <div class="js-help-body text-[0.85rem] text-slate-600 whitespace-pre-wrap pt-2"></div>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】通報投稿 -->
+<template id="tpl-report-post">
+    <div class="w-full text-black-5 px-2 space-y-4 pt-4">
+        <div class="text-[0.9rem] text-red-500 font-bold border-l-4 border-red-500 pl-2">
+            利用規約に違反していると思われる内容を通報できます。<br>通報内容は管理者が確認します。
+        </div>
+        <div>
+            <div class="flex justify-between items-end mb-1">
+                <label class="block text-[0.7rem] font-black text-black-3 uppercase tracking-widest">Report Details</label>
+                <span class="text-[0.6rem] font-bold text-black-2"><span id="report-text-count">0</span>/300</span>
+            </div>
+            <textarea id="input-report-body" maxlength="300" placeholder="問題のある箇所や理由を具体的に記入してください" class="w-full border-2 border-brand-3 p-3 text-[1rem] h-[300px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+        </div>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】レビュー投稿 -->
+<template id="tpl-review-post">
+    <div class="w-full text-black-5 px-2 space-y-6 pt-4">
+        <div class="text-center">
+            <label class="block text-[0.7rem] font-black text-black-3 uppercase tracking-widest">Tap to Rate</label>
+            <div id="review-star-input" class="flex justify-center gap-1 text-[40px] "></div>
+            <input type="hidden" id="input-review-rating" value="5">
+        </div>
+        <div>
+            <div class="flex justify-between items-end mb-1">
+                <label class="block text-[0.7rem] font-black text-black-3 uppercase tracking-widest">Review (Optional)</label>
+                <span class="text-[0.6rem] font-bold text-black-2"><span id="review-text-count">0</span>/300</span>
+            </div>
+            <textarea id="input-review-body" maxlength="300" placeholder="アプリの感想をお聞かせください" class="w-full border-2 border-brand-3 p-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+        </div>
+    </div>
+</template>
+
+<!-- 【マップ】ポップアップ -->
+<template id="tpl-marker-popup">
+    <div class="relative w-full bg-white rounded-[1rem] shadow-md p-4 pt-5 overflow-hidden flex flex-col">
+        <div class="absolute top-1 right-1 w-10 h-10 rounded-full bg-brand-4 text-white font-black text-[1.2rem] flex items-center justify-center shadow-md border-2 border-white z-20">
+            <span class="index"></span>
+        </div>
+        <div class="text-[0.8rem] mb-1.5 tracking-widest font-black text-slate-400 italic">
+            <span class="time"></span>
+        </div>
+        <div class="text-[0.8rem] border-l-4 border-brand-3 pl-3 font-black text-black-5 mb-2 line-clamp-2 pr-8 relative z-10">
+            <span class="title"></span>
+        </div>
+        <div class="text-[0.7rem] text-black-3 line-clamp-3 leading-[2] overflow-y-auto pr-2">
+            <span class="body"></span>
+        </div>
+        <button id="btn-popup-action" class="mt-3 w-full h-10 bg-brand-2 text-brand-5 font-black text-[0.7rem] rounded-[1rem] flex items-center justify-center gap-1 uppercase shadow-md active:scale-95 transition-transform tracking-widest">
+            <span class="js-action-text px-4 truncate"></span>
+        </button>
+    </div>
+</template>
+
+<!-- ローディング用 -->
+<template id="tpl-loading">
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 z-[9998]">
+        <div class="text-[1.8rem] font-bold text-white inline-block wait-dots">Wait</div>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】Atmosphere設定ダイアログ（完全高さ同調版） -->
+<template id="tpl-setting-weather">
+    <div class="w-full text-black-5 space-y-4 px-1 py-1">
+        <!-- メインエリア（items-stretch で左右の高さを強制同期） -->
+        <div class="flex gap-4 items-stretch">
+            <!-- 左側：Weatherボタン群 -->
+            <div class="w-[110px] shrink-0 flex flex-col">
+                <label class="block font-black text-slate-400 text-[0.6rem] mb-3 uppercase tracking-widest">Weather</label>
+                <!-- gap-2 で綺麗に並べ、高さを自動追従 -->
+                <div id="atm-weather-group" class="flex flex-col gap-2 flex-1 justify-between">
+                    <button data-val="0" class="atm-w-btn h-9 border-2 border-red-200 bg-red-50 text-red-500 font-black text-[0.8rem] rounded-xl active:scale-95 transition-all">Clear</button>
+                    <button data-val="1" class="atm-w-btn h-9 border-2 border-brand-2 bg-white  text-brand-5 font-black text-[0.8rem] rounded-xl active:scale-95 transition-all">Leaf</button>
+                    <button data-val="2" class="atm-w-btn h-9 border-2 border-brand-2 bg-white  text-brand-5 font-black text-[0.8rem] rounded-xl active:scale-95 transition-all">Rain</button>
+                    <button data-val="3" class="atm-w-btn h-9 border-2 border-brand-2 bg-white  text-brand-5 font-black text-[0.8rem] rounded-xl active:scale-95 transition-all">Storm</button>
+                    <button data-val="4" class="atm-w-btn h-9 border-2 border-brand-2 bg-white  text-brand-5 font-black text-[0.8rem] rounded-xl active:scale-95 transition-all">Snow</button>
+                    <button data-val="5" class="atm-w-btn h-9 border-2 border-brand-2 bg-white  text-brand-5 font-black text-[0.8rem] rounded-xl active:scale-95 transition-all">Cherry</button>
+                </div>
+            </div>
+            <!-- 右側：Settings（カードも左と同じ高さまで引き伸ばす） -->
+            <div class="flex-1 flex flex-col">
+                <label class="block font-black text-slate-400 text-[0.6rem] mb-3 uppercase tracking-widest text-center">Settings</label>
+                <!-- flex-1 で高さを下端まで引き伸ばす -->
+                <div class="flex justify-between gap-2 flex-1">
+                    <!-- WIND -->
+                    <div class="flex-1 bg-white border border-slate-100 rounded-[1rem] p-3 flex flex-col items-center justify-between h-full shadow-sm">
+                        <span class="text-[0.5rem] font-black text-slate-300 uppercase">Wind</span>
+                        <span id="atm-wind-val" class="text-brand-5 font-black text-[1rem] my-1">0</span>
+                        <div class="flex-1 flex items-center justify-center w-full min-h-[100px]">
+                            <input id="atm-wind" type="range" min="0" max="9" value="0" step="1" orient="vertical"
+                                style="-webkit-appearance: slider-vertical; width: 8px; height: 80%; padding: 0;">
+                        </div>
+                    </div>
+                    <!-- DENSITY -->
+                    <div class="flex-1 bg-white border border-slate-100 rounded-[1rem] p-3 flex flex-col items-center justify-between h-full shadow-sm">
+                        <span class="text-[0.5rem] font-black text-slate-300 uppercase">Density</span>
+                        <span id="atm-density-val" class="text-brand-5 font-black text-[1rem] my-1">0</span>
+                        <div class="flex-1 flex items-center justify-center w-full min-h-[100px]">
+                            <input id="atm-density" type="range" min="0" max="9" value="0" step="1" orient="vertical"
+                                style="-webkit-appearance: slider-vertical; width: 8px; height: 80%; padding: 0;">
+                        </div>
+                    </div>
+                    <!-- DARK -->
+                    <div class="flex-1 bg-white border border-slate-100 rounded-[1rem] p-3 flex flex-col items-center justify-between h-full shadow-sm">
+                        <span class="text-[0.5rem] font-black text-slate-300 uppercase">Dark</span>
+                        <span id="atm-darkness-val" class="text-brand-5 font-black text-[1rem] my-1">0</span>
+                        <div class="flex-1 flex items-center justify-center w-full min-h-[100px]">
+                            <input id="atm-darkness" type="range" min="0" max="9" value="0" step="1" orient="vertical"
+                                style="-webkit-appearance: slider-vertical; width: 8px; height: 80%; padding: 0;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 下部：CODE -->
+        <div class="bg-brand-1 border-x-4 border-brand-2 py-3 flex items-center justify-center gap-4">
+            <span class="text-[0.7rem] font-black text-slate-500 uppercase tracking-[0.3em]">Code:</span>
+            <span id="atm-code-preview" class="text-[2rem] font-black text-brand-5 tracking-widest leading-none mr-8">0000</span>
+        </div>
+    </div>
+</template>
+

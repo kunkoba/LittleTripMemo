@@ -32,30 +32,6 @@
     <div class="w-full text-black-3 mb-4">
     </div>
 </template>
-<!-- 【リスト子】タイムライン（アイコン対応版） -->
-<template id="tpl-list-child-timeline">
-    <div class="flex mx-3 border-b border-brand-1 active:bg-brand-1 transition-colors">
-        <!-- 左：軸 -->
-        <div class="flex flex-col items-center mr-3 shrink-0">
-            <div class="w-6 h-6 bg-brand-5 flex items-center justify-center js-node"></div>
-            <!-- <div class="flex-1 w-[2px] bg-brand-5 js-line"></div> -->
-        </div>
-        <!-- 右側：内容 -->
-        <div class="flex-1 min-w-0 pb-4"> <!-- ① 下余白をここへ移動 -->
-            <div class="h-6 flex items-center justify-between mb-1">
-                <div class="text-[0.7rem] font-bold text-brand-5 js-time"></div>
-                <!-- アイコン表示エリア -->
-                <div class="flex items-center gap-2">
-                    <span class="js-face text-[24px] e"></span>
-                    <img src="" class="js-memo-price w-6 h-6 object-contain">
-                </div>
-            </div>
-            <div class="text-[1rem] font-bold text-black-5 truncate js-title"></div>
-            <!-- ② break-all を追加し、pb-4 を削除 -->
-            <div class="text-[0.7rem] text-black-3 line-clamp-2 js-body break-all"></div>
-        </div>
-    </div>
-</template>
 <!-- 【リスト子】シンプルリスト（検索結果・単発リスト用） -->
 <template id="tpl-list-child-simple">
     <div class="js-item-card relative flex flex-col p-3 rounded-[1rem] border border-slate-200 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3">
@@ -896,11 +872,10 @@
 		<!-- 4. 下部アクション（リンク ＋ メモ数） -->
 		<div class="mt-auto pb-1 flex items-end justify-between border-t border-slate-50">
             <!-- 左：金額（左アクセント線） -->
-            
-<div class="pl-3 flex items-baseline italic border-b-2 border-brand-3">
-    <span id="mem-stat-price" class="text-[1.2rem] font-black italic "></span>
-    <span id="view-mem-price-unit" class="text-[0.7rem] font-bold text-slate-400 ml-1.5 uppercase"></span>
-</div>
+            <div class="pl-3 flex items-baseline italic border-b-2 border-brand-3">
+                <span id="mem-stat-price" class="text-[1.2rem] font-black italic "></span>
+                <span id="view-mem-price-unit" class="text-[0.7rem] font-bold text-slate-400 ml-1.5 uppercase"></span>
+            </div>
 			<!-- 左下：リンク（正円ボタン・影あり） -->
 			<a id="view-mem-url" href="" target="_blank" class="shrink-0 w-12 h-12 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
 				<!-- ここにアイコンが挿入される -->
@@ -1010,41 +985,6 @@
             </div>
             <textarea id="admin-send-body" maxlength="300" placeholder="ユーザーへのメッセージを入力してください" 
                 class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none leading-relaxed"></textarea>
-        </div>
-    </div>
-</template>
-<!-- 【ダイアログ子】管理者：通報内容の全文詳細 -->
-<template id="tpl-admin-report-item-detail">
-    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden p-2 bg-white">
-        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
-            <span class="text-[0.8rem] font-black text-slate-400 tracking-wider js-report-tim italic"></span>
-        </div>
-        <div class="mb-4 px-2">
-            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Reporter ID</span>
-            <div class="text-[0.75rem] font-bold text-slate-600 js-reporter-id break-all mt-1"></div>
-        </div>
-        <div class="flex-1 overflow-y-auto px-2 pb-4">
-            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Report Body</span>
-            <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all js-report-body mt-2"></div>
-        </div>
-    </div>
-</template>
-<!-- 管理者用ユーザーメール一覧アイテム -->
-<template id="tpl-admin-list-child-user-mail">
-    <div class="js-item-card flex items-stretch p-0 border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3 relative">
-        <div class="flex-1 min-w-0 p-3 pl-4">
-            <div class="flex justify-between items-start mb-1">
-                <div class="text-[0.8rem] font-black text-slate-400 tracking-wider js-date italic"></div>
-                <!-- ★修正：宛先表示をアイコン＋ニックネームに変更 -->
-<div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 shadow-sm">
-    <span class="js-target-icon text-[0.7rem]"></span> <!-- ★ -->
-    <span class="js-target-user text-[9px] font-black uppercase tracking-wider text-slate-500"></span> <!-- ★ -->
-</div>
-            </div>
-            <div class="text-[0.8rem] font-black text-black-5 truncate pr-2 mb-1">
-                <span class="js-emoji mr-2"></span><span class="js-title"></span>
-            </div>
-            <div class="text-[0.7rem] text-black-3 line-clamp-1 js-body"></div>
         </div>
     </div>
 </template>
