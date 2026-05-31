@@ -224,8 +224,7 @@ const DialogController = {
         };
         // ログイン中であれば、プロフィールのアイコンを反映する
         if (isLoggedIn) {
-            const profile = $App.AppData.Owner.Profile;
-            // console.log("profile:", profile);
+            const profile = $App.AppData.Owner.systemInfo.ownerProfile;
             if (profile && profile.icon) {
                 // ボタン内の最初のspan（アイコン表示用）を取得して書き換え
                 const iconSpan = $Dom.QuerySelector('span:first-child', b.profile);
@@ -240,6 +239,7 @@ const DialogController = {
         // 3. ログイン/ログアウトボタンのラベル反映
         const authLabel = $Dom.QuerySelector('span:last-child', b.auth);
         authLabel.textContent = isLoggedIn ? "LOGOUT" : "LOGIN";
+        // 新着通知
         const unreadCount = $App.AppData.Context.UnreadNoticeCount || 0;
         if (unreadCount > 0) {
             const labelSpan = $Dom.QuerySelector('span:last-child', b.notice);
@@ -248,10 +248,19 @@ const DialogController = {
                 labelSpan.insertAdjacentHTML('beforeend', `<span class="badge-new ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full tracking-wider mt-0.5">NEW</span>`);
             }
         }
+        // 新着メール
+        const unreadMail = $App.AppData.Context.UnreadMailCount || 0;
+        if (unreadMail > 0) {
+            const labelSpan = $Dom.QuerySelector('span:last-child', b.profile);
+            labelSpan.classList.add("flex", "items-center", "gap-2");
+            if (!labelSpan.querySelector('.badge-new')) {
+                labelSpan.insertAdjacentHTML('beforeend', `<span class="badge-new ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full tracking-wider mt-0.5">NEW</span>`);
+            }
+        }
         // 4. 各ボタンのイベント登録
         b.profile.onclick = async () => {
             _DialogCore.close();
-            this.ShowUserProfile($App.AppData.Owner.Profile, true)
+            this.ShowUserProfile($App.AppData.Owner.systemInfo.ownerProfile, true)
         };
         b.config.onclick = () => {_DialogCore.close(); this.ShowUserSettingsMenu()};
         b.notice.onclick = () => {_DialogCore.close(); this.ShowNoticeList()};
@@ -1569,7 +1578,7 @@ const DialogController = {
     },
     // プロフィール参照
     async ShowUserProfile(profile, isOwner) {
-        if (isOwner) profile = $App.AppData.Owner.Profile;
+        if (isOwner) profile = $App.AppData.Owner.systemInfo.ownerProfile;
         if (!profile) return $Notice.Warn("ユーザー情報がありません");
         const el = $Dom.GenerateTemplate('tpl-view-profile');
         const renderView = () => {
@@ -1598,6 +1607,14 @@ const DialogController = {
         renderView();
 		const headerButtons = [];
 		if (isOwner) {
+            headerButtons.push({
+                label: "✉",
+                id: "btn-header-mail",
+                handler: () => {
+                    _DialogCore.close();
+                    this.ShowUserMailList();
+                }
+            });
 			headerButtons.push({
 				label: "✏️",
 				handler: () => this.ShowEditProfile(profile, renderView)
@@ -1608,6 +1625,8 @@ const DialogController = {
 			content: el,
 			headerButtons: headerButtons
 		});
+        // バッジを反映
+        setTimeout(() => this._updateProfileMailBadge(), 10);
     },
     // プロフィール編集（上にスタックされる）
     ShowEditProfile(profile, onUpdate) {
@@ -1674,6 +1693,100 @@ const DialogController = {
                 ]
             ]
         });
+    },
+    // ② ユーザあて通知一覧画面
+    async ShowUserMailList() {
+        const mails = $App.AppData.Owner.systemInfo.userNotifications || [];
+        if (mails.length === 0) {
+            $Notice.Warn("メッセージはありません");
+            return;
+        }
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        root.className = "w-full text-black-3 mb-2 px-1";
+        // システム通知と同様のスタイル制御（未読：太枠＋影 / 既読：薄枠）
+        const setMailStyle = (el, isNew) => {
+            const badge = $Dom.QuerySelector(".js-badge-new", el);
+            $Dom.ToggleShow(badge, isNew);
+            if (isNew) {
+                el.classList.add("border-brand-5", "shadow-xl", "bg-white");
+                el.classList.remove("border-slate-200", "shadow-sm", "bg-slate-50");
+            } else {
+                el.classList.remove("border-brand-5", "shadow-xl", "bg-white");
+                el.classList.add("border-slate-200", "shadow-sm", "bg-slate-50");
+                el.style.opacity = "0.8";
+            }
+        };
+        // 送信日時が新しい順にソートして描画
+        [...mails].sort((a, b) => new Date(b.send_tim) - new Date(a.send_tim)).forEach(item => {
+            const child = $Dom.GenerateTemplate("tpl-list-child-notice");
+            // 既読管理（後ほど既読判定ロジックを追加可能。一旦すべて未読として扱う）
+            const isNew = item.is_new ?? true; 
+            setMailStyle(child, isNew);
+            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim, "YYYY.MM.DD");
+            $Dom.QuerySelector(".js-icon", child).textContent = item.emoji || "✉️";
+            // 本文の1行目をタイトル、全体を本文としてリストに表示
+            const lines = item.body.split('\n');
+            $Dom.QuerySelector(".js-title", child).textContent = lines[0];
+            $Dom.QuerySelector(".js-body", child).textContent = item.body;
+            child.onclick = async () => {
+                // クリック時の既読処理（スタイル変更）
+                if (item.is_new) {
+                    item.is_new = false;
+                    await $LocalDb.Mail.Save(item.seq, item.send_tim);
+                    setMailStyle(child, false);
+                    if ($App.AppData.Context.UnreadMailCount > 0) {
+                        $App.AppData.Context.UnreadMailCount--;
+                        // プロフィール内のバッジと、システムメニューの赤丸の両方を更新
+                        this._updateProfileMailBadge();
+                        $UI.UpdateNoticeBadge(); // これを追加
+                    }
+                }
+                // ③ 詳細画面へ
+                this.ShowUserMailDetail(item);
+            };
+            root.appendChild(child);
+        });
+        _DialogCore.open({
+            title: "MESSAGES",
+            content: root
+        });
+        // バッジを反映
+        setTimeout(() => this._updateProfileMailBadge(), 10);
+    },
+    // ③ ユーザあて通知詳細画面
+    ShowUserMailDetail(item) {
+        // テンプレートはプロフィール形式に整えた tpl-view-notice を使用
+        const el = $Dom.GenerateTemplate('tpl-view-notice');
+        // 本文の1行目をタイトル、残りを本文として分割
+        const lines = (item.body || "").split('\n');
+        const title = lines[0] || "No Subject";
+        const body = lines.slice(1).join('\n');
+        // 各要素への反映
+        $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️";
+        $Dom.QuerySelector('#view-notice-title', el).textContent = title;
+        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY.MM.DD HH:mm");
+        // 2行目以降があれば本文に、なければ全体を表示（運営からの短い連絡を考慮）
+        const bodyEl = $Dom.QuerySelector('#view-notice-body', el);
+        bodyEl.textContent = body.trim() !== "" ? body : item.body;
+        _DialogCore.open({
+            title: "MESSAGE DETAILS",
+            content: el,
+            buttons: []
+        });
+    },
+    // ユーザあて通知の赤丸バッジ更新
+    _updateProfileMailBadge() {
+        const count = $App.AppData.Context.UnreadMailCount || 0;
+        const btn = document.getElementById("btn-header-mail");
+        if (!btn) return;
+        const oldBadge = btn.querySelector(".js-unread-badge");
+        if (oldBadge) oldBadge.remove();
+        if (count > 0) {
+            btn.classList.add("relative");
+            btn.insertAdjacentHTML('beforeend', 
+                `<span class="js-unread-badge absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white pointer-events-none shadow-sm"></span>`
+            );
+        }
     },
     // 通知詳細ダイアログ (修正版)
 	ShowNoticeDetail(notice) {

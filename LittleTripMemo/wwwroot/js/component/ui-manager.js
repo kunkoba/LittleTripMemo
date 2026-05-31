@@ -93,7 +93,7 @@ const UI_Manager = {
 	},
 	// 通知バッジの更新
 	UpdateNoticeBadge(count){
-		$TopBar.UpdateNoticeBadge(count);
+		$BotBar.UpdateNoticeBadge(count);
 	},
 };
 

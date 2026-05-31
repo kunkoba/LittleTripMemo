@@ -14,7 +14,6 @@ const _TopCore = {
                 this.sortReaction = $Dom.GetElementById('sort-reaction');
                 this.sortWord = $Dom.GetElementById('sort-word');
                 this.btnSysMenu = $Dom.GetElementById('btn-sys-menu');
-                this.badgeSysMenu = $Dom.GetElementById('badge-sys-menu');
             }
             // イベント登録
             {
@@ -26,48 +25,6 @@ const _TopCore = {
                     // システムメニュー
                     $Dialog.ShowSystemMenu();
                 });
-                // this.sortKbn.addEventListener("click", (e) => {
-                //     const btn = e.target.closest("button");
-                //     if (!btn) return;
-                //     // 全ボタンをリセット
-                //     this.sortKbn.querySelectorAll("button").forEach((b) => {
-                //         b.classList.remove("bg-brand-3");
-                //         b.classList.add("bg-brand-0");
-                //     });
-                //     // 押されたボタンだけ強調
-                //     btn.classList.remove("bg-brand-0");
-                //     btn.classList.add("bg-brand-3");
-                //     // Private / Public 切り替えに伴う制御
-                //     const isPublic = (btn.dataset.value === '1');
-                //     const btnReactionField = document.querySelector('#sort-field button[data-value="3"]');
-                //     const btnWordField = document.querySelector('#sort-field button[data-value="4"]');
-                //     if (isPublic) {
-                //         // Public: Reactionでの並び順を解放
-                //         if (btnReactionField) $Dom.ToggleShow(btnReactionField, true);
-                //         if (btnWordField) $Dom.ToggleShow(btnWordField, true);
-                //     } else {
-                //         // Private: Reactionでの並び順を封印
-                //         if (btnReactionField) $Dom.ToggleShow(btnReactionField, false);
-                //         if (btnWordField) $Dom.ToggleShow(btnWordField, false);
-                //         // もし「Reaction」が選択された状態でPrivateに戻された場合、強制的に「Created」に戻す
-                //         if ((btnReactionField && btnReactionField.classList.contains('bg-brand-3')) ||
-                //             (btnWordField && btnWordField.classList.contains('bg-brand-3'))) {
-                //             const btnCreated = document.querySelector('#sort-field button[data-value="1"]');if (btnReactionField) {
-                //                 btnReactionField.classList.remove('bg-brand-3');
-                //                 btnReactionField.classList.add('bg-brand-0');
-                //             }
-                //             if (btnWordField) {
-                //                 btnWordField.classList.remove('bg-brand-3');
-                //                 btnWordField.classList.add('bg-brand-0');
-                //             }
-                //             btnCreated.classList.remove('bg-brand-0');
-                //             btnCreated.classList.add('bg-brand-3');
-                //         }
-                //         // リアクションアイコン選択UIも強制的に隠す
-                //         if (this.sortReaction) $Dom.ToggleShow(this.sortReaction, false);
-                //         if (this.sortWord) $Dom.ToggleShow(this.sortWord, false);
-                //     }
-                // });
                 this.sortField.addEventListener("click", (e) => {
                     const btn = e.target.closest("button");
                     if (!btn) return;
@@ -193,13 +150,6 @@ const _TopCore = {
         const selected = $Dom.QuerySelector("button.bg-brand-3", container);
         return selected ? selected.dataset.value : null;
     },
-    // 通知の未読バッジ（赤丸）をシステムアイコンに付ける
-    updateNoticeBadge(count) {
-        if (this.badgeSysMenu) {
-            // カウントが1以上なら true(表示)、0なら false(非表示)
-            $Dom.ToggleShow(this.badgeSysMenu, count > 0);
-        }
-    },
 };
 
 // 窓口
@@ -223,10 +173,6 @@ const TopBarController = {
     // まとめ親タイトル変更
     ChangeTitle(title){
         _TopCore.changeTitle(title);
-    },
-    // トップバーコントローラー窓口の末尾に追加
-    UpdateNoticeBadge(count){
-        _TopCore.updateNoticeBadge(count);
     },
 };
 

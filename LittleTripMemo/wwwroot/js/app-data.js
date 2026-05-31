@@ -68,7 +68,6 @@ window.$Data = {
             if (data.archiveList) this._rawData.archiveList = data.archiveList;
             if (data.userProfile) this._rawData.userProfile = data.userProfile;
             // Owner
-            if (data.ownerProfile) $App.AppData.Owner.Profile = data.ownerProfile;
             if (data.token) $App.AppData.Owner.Token = data.token;
             // ユーザ用：システムデータ
             if (data.systemInfo) {
@@ -76,6 +75,9 @@ window.$Data = {
                 // 通知の未読判定とローカルDBの掃除を非同期で実行
                 $Warn.CatchAsync(async () => {
                     await $Data.LocalDb.CheckUnreadNotices();
+                    await $Data.LocalDb.CheckUnreadMails();
+                    // チェック完了後にUI側の更新を1回呼ぶ
+                    $UI.UpdateNoticeBadge();
                 })();
             }
             if (data.myFeedback) $App.AppData.Owner.myFeedback = data.myFeedback;
@@ -449,7 +451,48 @@ window.$Data = {
             $App.AppData.Context.UnreadNoticeCount = unreadCount;
             // console.log(`[Notice] 未読件数: ${unreadCount}件`);
             // メニューアイコンの赤丸を更新
-            if (window.$UI) window.$UI.UpdateNoticeBadge(unreadCount);
+            $UI.UpdateNoticeBadge(unreadCount);
+        },
+        // ユーザ当て通知
+        async CheckUnreadMails_2() {
+            const sysInfo = $App.AppData.Owner.systemInfo;
+            if (!sysInfo || !sysInfo.userNotifications) return;
+            // 1. ローカルDBから既読履歴を取得
+            const readHistory = await $LocalDb.Mail.GetAll();
+            let unreadCount = 0;
+            for (const mail of sysInfo.userNotifications) {
+                const history = readHistory.find(h => h.seq === mail.seq);
+                // 2. 履歴がない、またはサーバーの方が新しい場合は未読
+                if (!history || new Date(mail.send_tim) > new Date(history.send_tim)) {
+                    mail.is_new = true;
+                    unreadCount++;
+                } else {
+                    mail.is_new = false;
+                }
+            }
+            // 3. コンテキストに保持
+            $App.AppData.Context.UnreadMailCount = unreadCount;
+            // 4. プロフィール画面が開いていればバッジを更新
+            if (window.$Dialog) this._updateProfileMailBadge();
+        },
+        // 通知の未読判定（個別メッセージ版）
+        async CheckUnreadMails() {
+            const sysInfo = $App.AppData.Owner.systemInfo;
+            if (!sysInfo || !sysInfo.userNotifications) return;
+
+            const readHistory = await $LocalDb.Mail.GetAll();
+            let unreadCount = 0;
+
+            for (const mail of sysInfo.userNotifications) {
+                const history = readHistory.find(h => h.seq === mail.seq);
+                if (!history || new Date(mail.send_tim) > new Date(history.send_tim)) {
+                    mail.is_new = true;
+                    unreadCount++;
+                } else {
+                    mail.is_new = false;
+                }
+            }
+            $App.AppData.Context.UnreadMailCount = unreadCount;
         },
     },
 };

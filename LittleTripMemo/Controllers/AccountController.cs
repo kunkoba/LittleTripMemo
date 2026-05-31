@@ -53,17 +53,6 @@ public class AccountController : _BaseController // 基底クラスを _BaseCont
         });
     }
 
-    [CustomAuthorize]
-    [HttpPost("GetProfile")]
-    public async Task<IActionResult> GetOwnerProfile()
-    {
-        // GetUserProfileService を DI して使用
-        var result = await _getUserProfileService.ExecuteAsync(_user.UserId);
-
-        // JS側の _fetchData で ownerProfile キーで受け取れるように匿名型でラップ
-        return OkWithBase(new { ownerProfile = result });
-    }
-
     /// <summary>
     /// ユーザー情報更新
     /// </summary>

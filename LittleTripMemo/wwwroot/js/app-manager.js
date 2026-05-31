@@ -194,11 +194,11 @@ const AppManager = {
         // アーカイブID
         const archiveId = this.AppData.Context.TargetArchiveId;
         let isSuccess = false;
-        // システム情報を取得
-        if (this.AppData.Context.IsLoggedIn) {
-            $Data.Access.GetSystemInfo();
-            $Data.Access.GetProfile();
-        }
+        // // システム情報を取得
+        // if (this.AppData.Context.IsLoggedIn) {
+        //     $Data.Access.GetSystemInfo();
+        //     $Data.Access.GetProfile();
+        // }
         // モードごとにデータ取得
         switch (this.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
@@ -208,6 +208,8 @@ const AppManager = {
                         $Dialog.ShowLoginDialog();
                         return;
                     };
+                    // システム情報取得
+                    $Data.Access.GetSystemInfo();
                 }
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:

@@ -2,7 +2,7 @@
 const _LocalDbCore = {
     db: null,
     DB_NAME: "littleTripMemoDb",
-    VERSION: 1,
+    VERSION: 2,
     // トランザクションモード定義
     TRANSACTION_MODES: {
         READONLY: 'readonly',
@@ -11,9 +11,9 @@ const _LocalDbCore = {
     // ストア名称定義
     STORE_NAMES: {
         DETAIL: 'detailStore',
-        // ARCHIVE: 'archiveStore',
         REACTION: 'reactionStore',
         NOTICE: 'noticeStore',
+        MAIL: 'mailStore',
     },
     // 初期化
     async init() {
@@ -63,6 +63,10 @@ const _LocalDbCore = {
         // 通知既読履歴（seqをキーとする）
         if (!db.objectStoreNames.contains(this.STORE_NAMES.NOTICE)) {
             const store = db.createObjectStore(this.STORE_NAMES.NOTICE, { keyPath: "seq" });
+        }
+        // ユーザあて通知（seqをキーとする）
+        if (!db.objectStoreNames.contains(this.STORE_NAMES.MAIL)) {
+            db.createObjectStore(this.STORE_NAMES.MAIL, { keyPath: "seq" });
         }
     },
     // トランザクションからオブジェクトストアを取得
@@ -336,7 +340,7 @@ const LocalDbController = {
             };
         }
     },
-    // 通知の既読履歴管理
+    // システム通知の既読履歴管理
     Notice: {
         storeName: _LocalDbCore.STORE_NAMES.NOTICE,
         // 既読履歴の保存（詳細を開いた時に呼ぶ）
@@ -361,6 +365,14 @@ const LocalDbController = {
                 return now > toDate; // 現在時刻が disp_to を過ぎていれば削除対象
             });
         }
+    },
+    // ユーザ当て通知の既読履歴管理
+    Mail: {
+        storeName: _LocalDbCore.STORE_NAMES.MAIL,
+        async Save(seq, send_tim) {
+            return await _LocalDbCore.upsertData(this.storeName, { seq: Number(seq), send_tim: send_tim });
+        },
+        async GetAll() { return await _LocalDbCore.getAllData(this.storeName); }
     },
 };
 

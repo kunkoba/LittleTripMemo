@@ -17,6 +17,7 @@ const _BottomCore = {
 				this.btnOpen = $Dom.GetElementById('btn-bot-move-open');
 				this.btnNext = $Dom.GetElementById('btn-bot-move-next');
 				this.btnLast = $Dom.GetElementById('btn-bot-move-last');
+                this.badgeSysMenu = $Dom.GetElementById('badge-sys-menu');
 			}
 			// イベント登録
 			{
@@ -106,6 +107,17 @@ const _BottomCore = {
         // 元々隠れていた場合のみ開く（トグル動作）
         if (isHidden) $Dom.ToggleShow(el, true);
     },
+    // 通知の未読バッジ（赤丸）をシステムアイコンに付ける
+    updateNoticeBadge(count) {
+        if (this.badgeSysMenu) {
+			console.log("$App.AppData.Context", $App.AppData.Context);
+            // システム通知 と 個人メッセージ の未読数を合算
+            const totalUnread = ($App.AppData.Context.UnreadNoticeCount || 0) + 
+                                ($App.AppData.Context.UnreadMailCount || 0);
+            // 合計が 1 以上なら赤丸を表示
+            $Dom.ToggleShow(this.badgeSysMenu, totalUnread > 0);
+        }
+    },
 };
 
 // 窓口
@@ -121,6 +133,10 @@ const BottomBarController = {
     // 表示切替
     ToggleRoot(isOpen){
         _BottomCore.toggleRoot(isOpen);
+    },
+    // ボトムバーコントローラー窓口の末尾に追加
+    UpdateNoticeBadge(count){
+        _BottomCore.updateNoticeBadge(count);
     },
 };
 
