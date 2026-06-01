@@ -285,7 +285,7 @@
                                 <div class="text-[0.6rem] text-black-2 font-bold"><span id="detail-count-body">0</span>/300</div>
                             </div>
                             <textarea name="body" id="detail-edit-body" maxlength="300" 
-                                class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-48 rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+                                class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
                         </div>
                         <!-- PRICE -->
                         <div>
@@ -431,7 +431,12 @@
             <!-- テンプレート生成物 -->
         </div>
         <!-- ■　共通バックドロップ -->
-        <div id="ui-dialog-backdrop" class="z-[1999] absolute inset-0 hidden"></div>
+        <div id="ui-dialog-backdrop" class="z-[1999] absolute inset-0 hidden bg-black/40 flex flex-col items-center justify-end pb-10">
+            <!-- 下部に「すべて閉じる」ボタンを設置 -->
+            <button id="dialog-btn-close-all" class="bg-white/50 hover:bg-white/80 text-black text-[0.7rem] font-black tracking-widest px-8 py-3 rounded-full border border-white/40 backdrop-blur-md active:scale-95 transition-all shadow-xl">
+                ✕ CLOSE ALL
+            </button>
+        </div>
 
         <!-- ■　Toast を積み上げるコンテナ -->
         <div id="toast-container" class="absolute bottom-[100px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>

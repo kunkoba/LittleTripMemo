@@ -84,17 +84,15 @@ export default {
         }
         // 4. 各ボタンのイベント登録
         b.profile.onclick = async () => {
-            this._core.close();
             this.ShowUserProfile($App.AppData.Owner.systemInfo.ownerProfile, true)
         };
-        b.config.onclick = () => {this._core.close(); this.ShowUserSettingsMenu()};
-        b.notice.onclick = () => {this._core.close(); this.ShowNoticeList()};
-        b.version.onclick = () => {this._core.close(); this.ShowAppInfo()};
+        b.config.onclick = () => {this.ShowUserSettingsMenu()};
+        b.notice.onclick = () => {this.ShowNoticeList()};
+        b.version.onclick = () => {this.ShowAppInfo()};
         b.admin.onclick = async () => {
             // メニューを開く前に一括取得を実行
             const isSuccess = await $Data.Access.GetAdminAllInfo();
             if (isSuccess) {
-                this._core.close(); 
                 this.ShowAdminMenu();
             }
         };
@@ -370,7 +368,7 @@ export default {
         if (isOwner) {
             // 【自分のプロフ】受信箱ボタン ＋ 編集ボタン
             headerButtons.push({
-                label: "✉️",
+                label: "📬",
                 id: "btn-header-mail",
                 handler: () => this.ShowUserMailList()
             });
@@ -381,8 +379,8 @@ export default {
         } else if (isAdmin) {
             // 【自分が管理者 且つ 他人のプロフ】メッセージ送信（返信）ボタンを表示
             headerButtons.push({
-                label: "📮",
-                handler: () => this.ShowAdminSendUserNotification(profile.user_id)
+                label: "✉️",
+                handler: () => this.ShowAdminSendUserNotification(profile)
             });
         }
 		this._core.open({

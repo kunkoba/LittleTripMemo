@@ -19,8 +19,16 @@ const _DialogCore = {
     init() {
         this.dialogRoot = $Dom.GetElementById(this.elementId);
         this.backdrop = $Dom.GetElementById("ui-dialog-backdrop");
-        // 背景クリック時は最前面のダイアログを閉じる
-        this.backdrop.onclick = () => this.close();
+        // 1. 背景クリック時は「今のダイアログ」だけ閉じる（既存通り）
+        this.backdrop.onclick = (e) => {
+            if (e.target === this.backdrop) this.close();
+        };
+        // 2. 「すべて閉じる」ボタンの onclick に直接 closeAll を設置
+        const btnCloseAll = $Dom.GetElementById("dialog-btn-close-all");
+        btnCloseAll.onclick = (e) => {
+            e.stopPropagation(); // 背景の onclick (close) が動かないようにする
+            this.closeAll();
+        };
     },
     // ダイアログ開く
     open(options) {

@@ -278,7 +278,7 @@ export default {
         });
     },
     // 【管理者機能】フィードバックリスト
-    async ShowAdminFeedbackList(currentScore = 1) {
+    async ShowAdminFeedbackList(currentScore = 0) {
         const isSuccess = await $Data.Access.GetAllFeedback({ score: currentScore });
         if (!isSuccess) return;
         // 新設した「検索バー付き」テンプレートを使用
@@ -338,65 +338,56 @@ export default {
         this._core.open({
             title: "FEEDBACK DETAILS",
             content: el,
-            headerButtons: [{
-                label: "✉️",
-                handler: () => this.ShowAdminSendUserNotification(item.user_id, `フィードバックありがとうございます！\n`)
-            }]
+            headerButtons: []
         });
     },
-    // 【管理者機能】ユーザー個別通知送信ダイアログ
-    ShowAdminSendUserNotification(targetUserId, defaultText = "") {
-        if (!targetUserId) return $Notice.Warn("ユーザーIDが不明です");
+    // 【管理者機能】個別通知送信ダイアログ
+    ShowAdminSendUserNotification(profile) {
+        if (!profile) return $Notice.Warn("ユーザー情報が不明です");
         const el = $Dom.GenerateTemplate("tpl-admin-send-user-notification");
+        // --- 1. 宛先ユーザー情報の反映 ---
+        $Dom.QuerySelector('#admin-send-target-icon', el).textContent = profile.icon;
+        $Dom.QuerySelector('#admin-send-target-name', el).textContent = profile.nick_name;
+        // --- 2. メッセージ用アイコン選択 (明細入力風) ---
         const previewEmoji = $Dom.QuerySelector('#admin-send-emoji-preview', el);
         const inputEmoji = $Dom.QuerySelector('#admin-send-emoji-val', el);
-        const displayUserId = $Dom.QuerySelector('#admin-send-target-id', el);
-        const inputBody = $Dom.QuerySelector('#admin-send-body', el);
-        const countBody = $Dom.QuerySelector('#admin-send-body-count', el);
-        // 初期値セット
-        displayUserId.textContent = targetUserId;
-        inputBody.value = defaultText;
-        countBody.textContent = inputBody.value.length;
-        // イベントリスナー
-        inputBody.addEventListener('input', () => countBody.textContent = inputBody.value.length);
         $Dom.QuerySelector('#btn-admin-send-emoji-trigger', el).onclick = () => {
             $Util.ShowEmojiPicker((emoji) => {
                 previewEmoji.textContent = emoji;
                 inputEmoji.value = emoji;
             });
         };
+        // --- 3. 本文入力の設定 ---
+        const inputBody = $Dom.QuerySelector('#admin-send-body', el);
+        const countBody = $Dom.QuerySelector('#admin-send-body-count', el);
+        countBody.textContent = inputBody.value.length;
+        inputBody.addEventListener('input', () => countBody.textContent = inputBody.value.length);
         this._core.open({
             title: "SEND NOTIFICATION",
             content: el,
-            help: "特定のユーザーに対して、個別の通知（DM）を送信します。",
-            buttons: [
-                [
-                    {
-                        label: "CANCEL",
-                        className: "bg-slate-400 text-white shadow-md",
-                        handler: () => {
+            buttons: [[
+                {
+                    label: "CANCEL",
+                    className: "bg-slate-400 text-white shadow-md",
+                    handler: () => this._core.close()
+                },
+                {
+                    label: "SEND MESSAGE",
+                    handler: async () => {
+                        const body = inputBody.value.trim();
+                        if (!body) return $Notice.Warn("本文を入力してください");
+                        const isSuccess = await $Data.Access.SendUserNotification({
+                            target_user_id: profile.user_id,
+                            emoji: inputEmoji.value,
+                            body: body
+                        });
+                        if (isSuccess) {
+                            $Notice.Info("通知を送信しました。");
                             this._core.close();
-                        },
-                    },
-                    {
-                        label: "SEND MESSAGE",
-                        className: "",
-                        handler: async () => {
-                            const body = inputBody.value.trim();
-                            if (!body) return $Notice.Warn("本文を入力してください");
-                            const isSuccess = await $Data.Access.SendUserNotification({
-                                target_user_id: targetUserId,
-                                emoji: inputEmoji.value,
-                                body: body
-                            });
-                            if (isSuccess) {
-                                $Notice.Info("通知を送信しました。");
-                                this._core.close(); // 送信画面を閉じる
-                            }
                         }
                     }
-                ]
-            ]
+                }
+            ]]
         });
     },
     // 【管理者機能】ユーザーメール一覧
@@ -445,7 +436,6 @@ export default {
                 this.ShowUserProfile(profile, false);
             }
         };
-        // --- 3. その他の基本情報を反映 ---
         // 右上のメール（封筒）アイコンなど
         $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️";
         // 送信日時

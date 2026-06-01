@@ -53,16 +53,13 @@ export default {
             $App.RefreshScreen();
         };
         b.current.onclick = () => {
-            this._core.close();
             $Marker.RefreshCurrentLocation();
             $Marker.FocusToLocationMarker();
         };
         b.restore.onclick = () => {
-            this._core.close();
             $Marker.RestoreMarkers();
         };
         b.archiveInfo.onclick = () => {
-            this._core.close();
             this.ShowArchiveInfo();
         }
         b.detailList.onclick = () => {
@@ -75,11 +72,9 @@ export default {
             this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18));
         };
         b.archiveList.onclick = () => {
-            this._core.close();
             this.ShowArchiveList();
         };
         b.search.onclick = () => {
-            this._core.close();
             $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH;
             $App.RefreshScreen();
         };
