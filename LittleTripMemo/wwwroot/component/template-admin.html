@@ -67,9 +67,9 @@
             <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
         </div>
         <!-- User IDテキストを、標準ユーザーボタンに変更 -->
-        <div class="mb-4 px-2">
-            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">User Info</span>
-            <div id="view-feedback-user-wrapper" class="mt-1">
+        <div class="mb-5 px-2">
+            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest block mb-2">User Info</span>
+            <div id="view-feedback-user-wrapper">
                 <button id="btn-feedback-user-profile" 
                     class="border border-slate-100 rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
                     <span id="view-feedback-user-icon" class="text-[1.4rem] drop-shadow-md">👤</span>
@@ -194,3 +194,24 @@
         </div>
     </div>
 </template>
+
+<!-- 【追加】管理者フィードバック：検索バー付きリスト外枠 -->
+<template id="tpl-admin-feedback-list-parent">
+    <div class="flex flex-col h-full w-full">
+        <!-- 上部固定のスコアフィルタバー -->
+        <div class="sticky top-0 z-10 bg-brand-0 pb-3 flex flex-col gap-2">
+            <div class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest pl-1">Filter by Score</div>
+            <div id="feedback-score-filter" class="flex justify-between bg-white rounded-xl border border-brand-2 p-1 shadow-sm">
+                <button data-score="0" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">ALL</button>
+                <button data-score="1" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">1</button>
+                <button data-score="2" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">2</button>
+                <button data-score="3" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">3</button>
+                <button data-score="4" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">4</button>
+                <button data-score="5" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">5</button>
+            </div>
+        </div>
+        <!-- リスト本体の挿入先 -->
+        <div id="feedback-list-container" class="flex-1"></div>
+    </div>
+</template>
+

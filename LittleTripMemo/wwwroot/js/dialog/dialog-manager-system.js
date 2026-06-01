@@ -366,19 +366,25 @@ export default {
         };
         renderView();
 		const headerButtons = [];
-		if (isOwner) {
+        const isAdmin = $App.AppData.Owner.plan === "Admin"; // 管理者判定
+        if (isOwner) {
+            // 【自分のプロフ】受信箱ボタン ＋ 編集ボタン
             headerButtons.push({
                 label: "✉️",
                 id: "btn-header-mail",
-                handler: () => {
-                    this.ShowUserMailList();
-                }
+                handler: () => this.ShowUserMailList()
             });
-			headerButtons.push({
-				label: "✏️",
-				handler: () => this.ShowEditProfile(profile, renderView)
-			});
-		}
+            headerButtons.push({
+                label: "✏️",
+                handler: () => this.ShowEditProfile(profile, renderView)
+            });
+        } else if (isAdmin) {
+            // 【自分が管理者 且つ 他人のプロフ】メッセージ送信（返信）ボタンを表示
+            headerButtons.push({
+                label: "📮",
+                handler: () => this.ShowAdminSendUserNotification(profile.user_id)
+            });
+        }
 		this._core.open({
 			title: "USER PROFILE",
 			content: el,

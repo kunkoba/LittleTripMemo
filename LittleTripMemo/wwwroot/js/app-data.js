@@ -225,6 +225,10 @@ window.$Data = {
         async GetMyUserNotifications(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyUserNotifications', params))();
         },
+        // public record GetAllFeedbackReq(int score = 0);
+        async GetAllFeedback(params = {}) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllFeedback', params))();
+        },
         async GetAdminAllInfo(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAdminAllInfo', params))();
         },

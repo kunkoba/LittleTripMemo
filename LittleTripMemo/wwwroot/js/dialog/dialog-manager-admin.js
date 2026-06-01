@@ -277,86 +277,71 @@ export default {
             buttons: []
         });
     },
-    // 【管理者機能】フィードバックリスト（無限スクロール）
-    async ShowAdminFeedbackList() {
-        let skip = 0;
-        const take = 20;
-        // ★ 実行時に即データアクセスし、エラーの場合は開かずに終了
-        // const isSuccess = await $Data.Access.GetAllFeedback({ skip, take });
-        // if (!isSuccess) return;
-        const root = $Dom.GenerateTemplate("tpl-list-parent");
-        let isLoading = false;
-        let hasMore = true;
-        const renderItems = (items) => {
-            items.forEach(item => {
+    // 【管理者機能】フィードバックリスト
+    async ShowAdminFeedbackList(currentScore = 1) {
+        const isSuccess = await $Data.Access.GetAllFeedback({ score: currentScore });
+        if (!isSuccess) return;
+        // 新設した「検索バー付き」テンプレートを使用
+        const frame = $Dom.GenerateTemplate("tpl-admin-feedback-list-parent");
+        const listContainer = $Dom.QuerySelector("#feedback-list-container", frame);
+        const scoreButtons = $Dom.QuerySelectorAll(".js-score-btn", frame);
+        // 1. ボタンの状態（色）を現在のスコアに合わせて設定
+        scoreButtons.forEach(btn => {
+            const score = parseInt(btn.dataset.score);
+            if (score === currentScore) {
+                btn.classList.add("bg-brand-5", "text-white", "shadow-md");
+            } else {
+                btn.classList.add("text-slate-400");
+                // クリック時にスコアを指定して再検索
+                btn.onclick = async () => {
+                    this._core.close(); // 現在の一覧を閉じる
+                    this.ShowAdminFeedbackList(score); // 指定スコアで開き直す
+                };
+            }
+        });
+        // 2. リストの描画
+        const feedbackList = $App.AppData.Admin.feedbackList || [];
+        if (feedbackList.length === 0) {
+            listContainer.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-10">No matching data.</div>`;
+        } else {
+            feedbackList.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim || new Date(), 'YYYY-MM-DD　HH:mm');
-                const score = item.score || 0;
-                $Dom.QuerySelector(".js-score", child).textContent = "★".repeat(score) + "☆".repeat(5 - score);
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim, 'YYYY-MM-DD　HH:mm');
+                $Dom.QuerySelector(".js-score", child).textContent = "★".repeat(item.score) + "☆".repeat(5 - item.score);
                 $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
                 child.onclick = () => this.ShowAdminFeedbackDetail(item);
-                root.appendChild(child);
+                listContainer.appendChild(child);
             });
-        };
-        // 初回取得分の描画
-        const initialItems = $App.AppData.Admin.feedbackList ||[];
-        if (initialItems.length < take) hasMore = false;
-        renderItems(initialItems);
-        skip += take;
-        // 追加読み込み処理
-        const loadMore = async () => {
-            if (isLoading || !hasMore) return;
-            isLoading = true;
-            const isLoadSuccess = await $Data.Access.GetAllFeedback({ skip, take });
-            if (!isLoadSuccess) {
-                isLoading = false;
-                return;
-            }
-            const newItems = $App.AppData.Admin.feedbackList ||[];
-            if (newItems.length < take) hasMore = false;
-            renderItems(newItems);
-            skip += take;
-            isLoading = false;
-        };
-        // スクロール検知
-        root.addEventListener('scroll', () => {
-            // スクロール最下部付近で追加ロード
-            if (root.scrollTop + root.clientHeight >= root.scrollHeight - 50) loadMore();
-        });
-        // 1件もない場合の表示
-        if (root.children.length === 0) {
-            root.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
         }
-        // ダイアログを開く
-        this._core.open({
-            title: "FEEDBACK Mgmt",
-            content: root,
-            help: "",
-            buttons:[]
-        });
+        this._core.open({ title: "FEEDBACK Mgmt", content: frame });
     },
     // 【管理者機能】フィードバック詳細
     ShowAdminFeedbackDetail(item) {
         const el = $Dom.GenerateTemplate("tpl-admin-feedback-detail");
-        $Dom.QuerySelector(".js-date", el).textContent = $Util.FormatDate(item.create_tim || new Date(), 'YYYY-MM-DD　HH:mm');
-        const score = item.score || 0;
-        $Dom.QuerySelector(".js-score", el).textContent = "★".repeat(score) + "☆".repeat(5 - score);
+        $Dom.QuerySelector(".js-date", el).textContent = $Util.FormatDate(item.create_tim, 'YYYY-MM-DD　HH:mm');
+        $Dom.QuerySelector(".js-score", el).textContent = "★".repeat(item.score) + "☆".repeat(5 - item.score);
         $Dom.QuerySelector(".js-body", el).textContent = item.body || "（内容なし）";
+        // --- ユーザーボタンへの反映 ---
+        const userIcon = $Dom.QuerySelector("#view-feedback-user-icon", el);
+        const userName = $Dom.QuerySelector("#view-feedback-user-name", el);
+        const btnUser = $Dom.QuerySelector("#btn-feedback-user-profile", el);
+        userIcon.textContent = item.icon || "👤";
+        userName.textContent = item.nick_name || "Unknown User";
+        btnUser.onclick = async () => {
+            const isSuccess = await $Data.Access.GetUserProfile({ userId: item.user_id });
+            if (isSuccess) {
+                const profile = $Data.resData;
+                // $Data.resData から取得したプロフィールを表示
+                this.ShowUserProfile(profile, false);
+            }
+        };
         this._core.open({
             title: "FEEDBACK DETAILS",
             content: el,
-            headerButtons: [
-                {
-                    label: "✉️", // 送信アイコン
-                    id: "btn-admin-reply-user",
-                    handler: () => {
-                        // このユーザーに対して送信画面を開く
-                        this.ShowAdminSendUserNotification(item.user_id, `フィードバックありがとうございます！\n`);
-                    }
-                }
-            ],
-            help: "",
-            buttons: []
+            headerButtons: [{
+                label: "✉️",
+                handler: () => this.ShowAdminSendUserNotification(item.user_id, `フィードバックありがとうございます！\n`)
+            }]
         });
     },
     // 【管理者機能】ユーザー個別通知送信ダイアログ

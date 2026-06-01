@@ -54,7 +54,7 @@ public class GetAdminAllInfoService : _BaseService
 
         // 2. 並列(WhenAll)ではなく、1つずつ順番に実行する
         // PostgreSQLは1つの接続で同時に複数のコマンドを実行できません
-        var resNotes = await _notificationsService.ExecuteAsync(new GetAllNotificationsService.GetAllNotificationsReq(100));
+        var resNotes = await _notificationsService.ExecuteAsync(new GetAllNotificationsService.GetAllNotificationsReq());
         var resReports = await _reportSummaryService.ExecuteAsync(new GetReportSummaryService.GetReportSummaryReq());
         var resFeedbacks = await _feedbackService.ExecuteAsync(new GetAllFeedbackService.GetAllFeedbackReq(0));
         var resUserNotes = await _userNotificationsService.ExecuteAsync(new GetAllUserNotificationsService.Request(100));

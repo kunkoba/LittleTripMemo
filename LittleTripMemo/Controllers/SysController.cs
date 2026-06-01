@@ -22,7 +22,7 @@ public class SysController : _BaseController
     private readonly AdminUnpublishArchiveService _adminUnpublishArchiveService;
     private readonly GetAdminAllInfoService _getAdminAllInfoService;
     private readonly UpsertNotificationService _upsertNotificationService;
-    private readonly GetAllFeedbackService _feedbackService;
+    private readonly GetAllFeedbackService _getAllFeedbackService;
 
     public SysController(
         UserContext user,
@@ -55,6 +55,7 @@ public class SysController : _BaseController
         _adminUnpublishArchiveService = adminUnpublishArchiveService;
         _upsertNotificationService = upsertNotificationService;
         _getAdminAllInfoService = getAdminAllInfoService;
+        _getAllFeedbackService = getAllFeedbackService;
     }
 
 #region "System"
@@ -193,7 +194,7 @@ public class SysController : _BaseController
     [HttpPost("api/Sys/GetAllFeedback")]
     public async Task<IActionResult> GetAllFeedback([FromBody] GetAllFeedbackService.GetAllFeedbackReq req)
     {
-        var result = await _feedbackService.ExecuteAsync(req);
+        var result = await _getAllFeedbackService.ExecuteAsync(req);
         return OkWithBase(result);
     }
 
