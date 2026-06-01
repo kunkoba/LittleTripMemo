@@ -75,6 +75,7 @@ export default {
             this.ShowArchiveList();
         };
         b.search.onclick = () => {
+            this._core.close();
             $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH;
             $App.RefreshScreen();
         };

@@ -361,9 +361,9 @@ export default {
     ShowUserMailDetail(item) {
         // テンプレートはプロフィール形式に整えた tpl-view-notice を使用
         const el = $Dom.GenerateTemplate('tpl-view-notice');
-        // 本文の1行目をタイトル、残りを本文として分割
-        const lines = (item.body || "").split('\n');
-        const title = lines[0] || "No Subject";
+        // // 本文の1行目をタイトル、残りを本文として分割
+        // const lines = (item.body || "").split('\n');
+        // const title = lines[0] || "No Subject";
         const body = lines.slice(1).join('\n');
         // 各要素への反映
         $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️️";

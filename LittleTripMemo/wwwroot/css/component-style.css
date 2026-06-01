@@ -36,11 +36,20 @@
 /* ズームボタンを左中央へ */
 .leaflet-control-zoom {
     position: absolute !important;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+    right: 16px; /* 右端からの距離 */
+    top: 50% !important;
+    transform: translateY(-50%) !important;
     z-index: 1000;
     pointer-events: auto;
+    margin: 0 !important; /* Leaflet既定のマージンをリセット */
+    /* ボタンの順序を反転（標準は In, Out の順なので reverse で Out, In にする） */
+    display: flex !important;
+    flex-direction: column-reverse; 
+    gap: 2px; /* ボタン間の隙間（任意） */
+    border: none !important;
+    /* shadow-brand */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) !important;
 }
 /* 著作権表記は非表示 */
 .leaflet-control-attribution {
@@ -82,4 +91,25 @@
 .list-item {
     border: 1px solid transparent;
     background-color: white;
+}
+
+/* 縦型レンジ入力の標準対応 */
+#ui-map-zoom-slider[orient="vertical"] {
+    appearance: slider-vertical; /* Firefox / Safari / Chrome用 */
+    width: 6px;
+    height: 100%;
+    transform: rotate(180deg);
+    cursor: pointer;
+}
+/* スライダーのつまみを少し大きく調整（モバイル配慮） */
+#ui-map-zoom-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    /* background: var(--brand-lvl5); */
+    background-color: white;
+    border: 2px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }

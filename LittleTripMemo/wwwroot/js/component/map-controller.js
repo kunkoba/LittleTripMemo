@@ -16,16 +16,35 @@ const _MapCore = {
             $Err.Catch(() => {
                 // Leafletの生成
                 this._generateMap();
+                // スライダーの初期化
+                this._initZoomSlider();
             })();
             $Marker.Init(this._map);
         }
+    },
+    // ズームスライダーの同期処理
+    _initZoomSlider() {
+        const slider = $Dom.GetElementById('ui-map-zoom-slider');
+        if (!slider) return;
+        // 1. スライダー操作時に地図へ反映 (inputイベントでリアルタイム反映)
+        slider.addEventListener('input', (e) => {
+            const zoomLevel = parseInt(e.target.value);
+            this._map.setZoom(zoomLevel);
+        });
+        // 2. 地図のズーム変化時（ボタンやスクロール）にスライダーへ反映
+        this._map.on('zoomend', () => {
+            const currentZoom = Math.round(this._map.getZoom());
+            slider.value = currentZoom;
+        });
+        // 初期値を地図に合わせる
+        slider.value = this._map.getZoom();
     },
     // Leafletの具体的な構築処理
     _generateMap(){
         this._map = L.map(this.root, {
             zoomControl: true,
             attributionControl: false
-        }).setView(this.currentPoint, 18);
+        }).setView(this.currentPoint, 12);
         this.setMapStyle($App.AppData.Owner.MapStyle);
     },
     // 地図機能の物理的なロック処理
