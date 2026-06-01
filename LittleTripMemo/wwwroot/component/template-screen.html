@@ -223,10 +223,14 @@
                 <span id="view-notice-date" class="text-slate-400 italic"></span>
 			</div>
 		</div>
-		<!-- 2. タイトル（左アクセント border-l-4） -->
-		<div class="border-l-4 border-brand-3 pl-3 py-0.5 mb-3">
-			<h1 id="view-notice-title" class="text-[1.2rem] font-black text-slate-800  break-all"></h1>
-		</div>
+        <!-- ★追加：ユーザー情報ボタン（初期は hidden） -->
+        <div id="view-notice-user-wrapper" class="hidden mb-6">
+            <button id="btn-notice-user-profile" 
+                class="border border-slate-100 rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
+                <span id="view-notice-user-icon" class="text-[1.4rem] drop-shadow-md"></span>
+                <span id="view-notice-user-id" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
+            </button>
+        </div>
 		<!-- 3. 本文（ で統一） -->
 		<div id="view-notice-body" class="text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-all pt-2 h-[200px] overflow-y-auto pr-2"></div>
         <!-- 4. リンク表示エリア -->

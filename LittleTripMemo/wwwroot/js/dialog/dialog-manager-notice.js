@@ -330,7 +330,7 @@ export default {
             $Dom.QuerySelector(".js-icon", child).textContent = item.emoji || "✉️️";
             // 本文の1行目をタイトル、全体を本文としてリストに表示
             const lines = item.body.split('\n');
-            $Dom.QuerySelector(".js-title", child).textContent = lines[0];
+            // $Dom.QuerySelector(".js-title", child).textContent = lines[0];
             $Dom.QuerySelector(".js-body", child).textContent = item.body;
             child.onclick = async () => {
                 // クリック時の既読処理（スタイル変更）
@@ -367,7 +367,7 @@ export default {
         const body = lines.slice(1).join('\n');
         // 各要素への反映
         $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️️";
-        $Dom.QuerySelector('#view-notice-title', el).textContent = title;
+        // $Dom.QuerySelector('#view-notice-title', el).textContent = title;
         $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
         // 2行目以降があれば本文に、なければ全体を表示（運営からの短い連絡を考慮）
         const bodyEl = $Dom.QuerySelector('#view-notice-body', el);

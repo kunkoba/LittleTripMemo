@@ -19,7 +19,6 @@ const AppManager = {
         Admin: {
             notifications:[],
             reportSummary: [],
-            reports:[],
             feedbackList:[],
             userMailList: [],
         }

@@ -110,7 +110,6 @@ const _BottomCore = {
     // 通知の未読バッジ（赤丸）をシステムアイコンに付ける
     updateNoticeBadge(count) {
         if (this.badgeSysMenu) {
-			console.log("$App.AppData.Context", $App.AppData.Context);
             // システム通知 と 個人メッセージ の未読数を合算
             const totalUnread = ($App.AppData.Context.UnreadNoticeCount || 0) + 
                                 ($App.AppData.Context.UnreadMailCount || 0);

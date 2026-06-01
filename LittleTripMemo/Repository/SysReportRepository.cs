@@ -74,15 +74,30 @@ public class SysReportRepository : _BaseRepository
     /// <param name="targetUserId"></param>
     /// <param name="archiveId"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<TSysReport>> GetReportsByTargetAsync(Guid targetUserId, long archiveId)
+    public async Task<IEnumerable<DtoReportDetail>> GetReportsByTargetAsync(Guid targetUserId, long archiveId)
     {
+        // Identity(EF Core)の標準テーブルはカラム名が大文字・小文字を区別するためダブルクォートで囲みます
         const string sql = @"
-        SELECT * FROM t_sys_reports 
-        WHERE target_user_id = @target_user_id 
-          AND archive_id = @archive_id 
-        ORDER BY report_tim DESC";
+        SELECT 
+            r.reporter_user_id,
+            r.target_user_id,
+            r.archive_id,
+            r.body,
+            r.report_tim,
+            u.""Icon""        AS icon,
+            u.""NickName""    AS nick_name
+        FROM t_sys_reports r
+        LEFT JOIN ""AspNetUsers"" u 
+            ON r.reporter_user_id = u.""Id""
+        WHERE r.target_user_id = @target_user_id 
+          AND r.archive_id     = @archive_id 
+        ORDER BY r.report_tim DESC";
 
-        return await QueryAsync<TSysReport>(sql, new { target_user_id = targetUserId, archive_id = archiveId });
+        return await QueryAsync<DtoReportDetail>(sql, new
+        {
+            target_user_id = targetUserId,
+            archive_id = archiveId
+        });
     }
 
     /// <summary>

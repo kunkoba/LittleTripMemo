@@ -10,12 +10,8 @@ using static GetAllFeedbackService;
 public class SysController : _BaseController
 {
     private readonly UpsertFeedbackService _upsertFeedbackService;
-    private readonly GetAllFeedbackService _getFeedbackService;
     private readonly UpsertReportService _upsertReportService;
     private readonly GetSystemInfoService _getSystemInfoService;
-    private readonly UpsertNotificationService _upsertNotificationService;
-    private readonly GetReportSummaryService _getReportSummaryService;
-    private readonly GetAllNotificationsService _getAllNotificationsService;
     private readonly GetReportDetailsService _getReportDetailsService;
     private readonly GetMyFeedbackService _getMyFeedbackService;
     private readonly GetMyReportService _getMyReportService;
@@ -25,6 +21,7 @@ public class SysController : _BaseController
     private readonly AdminCloseArchivePubService _adminCloseArchivePubService;
     private readonly AdminUnpublishArchiveService _adminUnpublishArchiveService;
     private readonly GetAllUserNotificationsService _getAllUserNotificationsService;
+    private readonly GetAdminAllInfoService _getAdminAllInfoService;
 
     public SysController(
         UserContext user,
@@ -43,16 +40,13 @@ public class SysController : _BaseController
         GetMyUserNotificationsService getMyUserNotificationsService,
         AdminCloseArchivePubService adminCloseArchivePubService,
         AdminUnpublishArchiveService adminUnpublishArchiveService,
-        GetAllUserNotificationsService getAllUserNotificationsService
+        GetAllUserNotificationsService getAllUserNotificationsService,
+        GetAdminAllInfoService getAdminAllInfoService
     ) : base(user)
     {
         _upsertFeedbackService = upsertFeedbackService;
-        _getFeedbackService = getAllFeedbackService;
         _upsertReportService = upsertReportService;
         _getSystemInfoService = getSystemInfoService;
-        _upsertNotificationService = upsertNotificationService;
-        _getReportSummaryService = getReportSummaryService;
-        _getAllNotificationsService = getAllNotificationsService;
         _getReportDetailsService = getReportDetailsService;
         _getMyFeedbackService = getMyFeedbackService;
         _getMyReportService = getMyReportService;
@@ -62,6 +56,7 @@ public class SysController : _BaseController
         _adminCloseArchivePubService　= adminCloseArchivePubService;
         _adminUnpublishArchiveService = adminUnpublishArchiveService;
         _getAllUserNotificationsService = getAllUserNotificationsService;
+        _getAdminAllInfoService = getAdminAllInfoService;
     }
 
 #region "System"
@@ -98,63 +93,6 @@ public class SysController : _BaseController
     public async Task<IActionResult> GetSystemInfo()
     {
         var result = await _getSystemInfoService.ExecuteAsync();
-        return OkWithBase(result);
-    }
-
-    /// <summary>
-    /// 通知情報登録更新（管理者）
-    /// </summary>
-    /// <param name="req"></param>
-    /// <returns></returns>
-    [HttpPost("api/Sys/UpsertNotification")]
-    public async Task<IActionResult> UpsertNotification([FromBody] UpsertNotificationService.UpsertNotificationReq req)
-    {
-        var result = await _upsertNotificationService.ExecuteAsync(req);
-        return OkWithBase(result);
-    }
-
-    /// <summary>
-    /// 通常集計情報取得（管理者）
-    /// </summary>
-    /// <param name="req"></param>
-    /// <returns></returns>
-    [HttpPost("api/Sys/GetReportSummary")]
-    public async Task<IActionResult> GetReportSummary([FromBody] GetReportSummaryService.GetReportSummaryReq req)
-    {
-        var result = await _getReportSummaryService.ExecuteAsync(req);
-        return OkWithBase(result);
-    }
-
-    /// <summary>
-    /// フィードバック取得（管理者）
-    /// </summary>
-    /// <returns></returns>
-    [HttpPost("api/Sys/GetAllFeedback")]
-    public async Task<IActionResult> GetAllFeedback([FromBody] GetAllFeedbackService.GetAllFeedbackReq req)
-    {
-        var result = await _getFeedbackService.ExecuteAsync(req);
-        return OkWithBase(result);
-    }
-
-    /// <summary>
-    /// 通知取得（管理者）
-    /// </summary>
-    /// <param name="req"></param>
-    /// <returns></returns>
-    [HttpPost("api/Sys/GetAllNotifications")]
-    public async Task<IActionResult> GetAllNotifications([FromBody] GetAllNotificationsService.GetAllNotificationsReq req)
-    {
-        var result = await _getAllNotificationsService.ExecuteAsync(req);
-        return OkWithBase(result);
-    }
-
-    /// <summary>
-    /// 通報詳細の取得（管理者用）
-    /// </summary>
-    [HttpPost("api/Sys/GetReportDetails")]
-    public async Task<IActionResult> GetReportDetails([FromBody] GetReportDetailsService.GetReportDetailsReq req)
-    {
-        var result = await _getReportDetailsService.ExecuteAsync(req);
         return OkWithBase(result);
     }
 
@@ -242,12 +180,22 @@ public class SysController : _BaseController
     }
 
     /// <summary>
-    /// 全ユーザー宛ての個別通知履歴を取得（管理者専用）
+    /// 通報詳細の取得（管理者用）
     /// </summary>
-    [HttpPost("api/Sys/GetAllUserNotifications")]
-    public async Task<IActionResult> GetAllUserNotifications([FromBody] GetAllUserNotificationsService.Request req)
+    [HttpPost("api/Sys/GetReportDetails")]
+    public async Task<IActionResult> GetReportDetails([FromBody] GetReportDetailsService.GetReportDetailsReq req)
     {
-        var result = await _getAllUserNotificationsService.ExecuteAsync(req);
+        var result = await _getReportDetailsService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// 【管理者権限】管理画面に必要な情報を一括取得する
+    /// </summary>
+    [HttpPost("api/Sys/GetAdminAllInfo")]
+    public async Task<IActionResult> GetAdminAllInfo([FromBody] GetAdminAllInfoService.Request req)
+    {
+        var result = await _getAdminAllInfoService.ExecuteAsync(req);
         return OkWithBase(result);
     }
 

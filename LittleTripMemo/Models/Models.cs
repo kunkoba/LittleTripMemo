@@ -182,31 +182,41 @@ public class DtoArchive
         public long archive_id { get; set; }
         public string archive_title { get; set; } = string.Empty; // 追加
         public long report_count { get; set; }
+    }
 
-        //// ★ 追加：通報されているユーザーの情報
-        //public string user_icon { get; set; } = string.Empty;
-        //public string user_nick_name { get; set; } = string.Empty;
-        //public string user_description { get; set; } = string.Empty;
-        //public string user_link1 { get; set; } = string.Empty;
-        //public string user_link2 { get; set; } = string.Empty;
-        //public string user_link3 { get; set; } = string.Empty;
+    /// <summary>
+    /// 通報の詳細（通報文＋通報した人のプロフィール）
+    /// </summary>
+    public class DtoReportDetail
+    {
+        // --- 通報データ (t_sys_reports) ---
+        public Guid reporter_user_id { get; set; }
+        public Guid target_user_id { get; set; }
+        public long archive_id { get; set; }
+        public string? body { get; set; }
+        public DateTime report_tim { get; set; }
+
+        // --- 通報した人（Reporter）の情報 (AspNetUsers) ---
+        // 管理者が「誰が通報してきたか」を判別するために使用
+        public string icon { get; set; } = string.Empty;
+        public string nick_name { get; set; } = string.Empty;
     }
 
     /// <summary>
     /// 孤児あて通知情報
     /// </summary>
     public class DtoUserNotification
-    {
-        public long seq { get; set; }
-        public Guid user_id { get; set; }
-        public string emoji { get; set; } = string.Empty;
-        public string body { get; set; } = string.Empty;
-        public string link_url { get; set; } = string.Empty;
-        public DateTime send_tim { get; set; }
+        {
+            public long seq { get; set; }
+            public Guid user_id { get; set; }
+            public string emoji { get; set; } = string.Empty;
+            public string body { get; set; } = string.Empty;
+            public string link_url { get; set; } = string.Empty;
+            public DateTime send_tim { get; set; }
 
-        // 宛先ユーザーの情報
-        public string nick_name { get; set; } = string.Empty;
-        public string icon { get; set; } = string.Empty;
-}
+            // 宛先ユーザーの情報
+            public string nick_name { get; set; } = string.Empty;
+            public string icon { get; set; } = string.Empty;
+    }
 
 #endregion

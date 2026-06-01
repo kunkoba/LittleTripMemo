@@ -10,10 +10,12 @@ public class GetUserProfileService : _BaseService
 {
     private readonly UserManager<MyAppUser> _userManager;
 
+    public record GetUserProfileReq(Guid userId);
+
     public record Response(
         Guid user_id, 
         string? icon, 
-        string? nickName,
+        string? nick_name,
         string? description, 
         string? link1, string? link2, string? link3,
         bool is_owner

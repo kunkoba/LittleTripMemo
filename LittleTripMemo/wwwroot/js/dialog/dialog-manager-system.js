@@ -90,7 +90,14 @@ export default {
         b.config.onclick = () => {this._core.close(); this.ShowUserSettingsMenu()};
         b.notice.onclick = () => {this._core.close(); this.ShowNoticeList()};
         b.version.onclick = () => {this._core.close(); this.ShowAppInfo()};
-        b.admin.onclick = () => {this._core.close(); this.ShowAdminMenu()};
+        b.admin.onclick = async () => {
+            // メニューを開く前に一括取得を実行
+            const isSuccess = await $Data.Access.GetAdminAllInfo();
+            if (isSuccess) {
+                this._core.close(); 
+                this.ShowAdminMenu();
+            }
+        };
         b.auth.onclick = async () => {
             if (isLoggedIn) {
                 if (await this.ShowConfirm({ title: "LOGOUT", message: "ログアウトしますか？" })) {
@@ -337,7 +344,7 @@ export default {
         const el = $Dom.GenerateTemplate('tpl-view-profile');
         const renderView = () => {
             const pIcon = profile.icon || "👤";
-            const pName = profile.nickName || "No Name";
+            const pName = profile.nick_name || "No Name";
             const pDesc  = profile.description || "";
             const pL1   = profile.link1 || "";
             const pL2   = profile.link2 || "";
@@ -394,8 +401,8 @@ export default {
         const editLink3 = $Dom.QuerySelector('#edit-profile-link3', el);
         editIconPreview.textContent = profile.icon || "👤";
         editIconInput.value = profile.icon || "👤";
-        editNickname.value = profile.nickName || "";
-        editNicknameCount.textContent = (profile.nickName || "").length;
+        editNickname.value = profile.nick_name || "";
+        editNicknameCount.textContent = (profile.nick_name || "").length;
         editDesc.value = profile.description || "";
         editDescCount.textContent = (profile.description || "").length;
         editLink1.value = profile.link1 || "";
@@ -427,7 +434,7 @@ export default {
                         className: "bg-brand-4 text-white shadow-md",
                         handler: $Warn.CatchAsync(async () => {
                             const updatedFields = {
-                                nickName: editNickname.value.trim(),
+                                nick_name: editNickname.value.trim(),
                                 icon: editIconInput.value,
                                 description: editDesc.value.trim(),
                                 link1: editLink1.value.trim(),

@@ -62,9 +62,13 @@
 <!-- 【ダイアログ子】管理者フィードバック詳細 -->
 <template id="tpl-admin-feedback-detail">
     <div class="w-full text-black-5 flex flex-col h-full overflow-hidden p-2 bg-white">
-        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3"><span class="text-[0.9rem] font-black text-slate-400 tracking-wider js-date italic"></span><span class="js-score text-[1.2rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span></div>
-        <div class="mb-4 px-2"><span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">User ID</span><div class="text-[0.75rem] font-bold text-slate-600 js-user-id break-all mt-1"></div></div>
-        <div class="flex-1 overflow-y-auto px-2 pb-4"><span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Feedback Detail</span><div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all js-body mt-2 h-48 overflow-y-auto pr-2"></div></div>
+        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+            <span class="text-[0.9rem] font-black text-slate-400 tracking-wider js-date italic"></span>
+            <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
+        </div>
+        <div class="flex-1 overflow-y-auto px-2 pb-4">
+            <div class="text-[1rem] text-slate-700 leading-[2] whitespace-pre-wrap break-all js-body mt-2 h-48 overflow-y-auto pr-2"></div>
+        </div>
     </div>
 </template>
 
@@ -77,17 +81,23 @@
     </div>
 </template>
 
-<!-- 【ダイアログ子】管理者通報詳細 -->
+<!-- 【ダイアログ子】管理者通報詳細 (修正) -->
 <template id="tpl-admin-report-detail">
     <div class="w-full text-black-5 flex flex-col h-full overflow-hidden">
-        <div class="shrink-0 p-4 border-b border-brand-2 bg-slate-50 relative">
-            <div class="text-[0.6rem] font-black text-slate-400 mb-1 uppercase tracking-widest">Target User</div>
-            <div class="text-[0.8rem] font-black text-black-5 mb-3 js-target-user break-all"></div>
-            <div class="text-[0.6rem] font-black text-slate-400 mb-1 uppercase tracking-widest">Target Archive</div>
-            <div class="text-[0.8rem] font-black text-black-5 mb-4 js-archive-title break-all"></div>
+        <div class="shrink-0 p-4 border-b border-brand-2 bg-slate-50 relative mb-3 gap-2">
+            <!-- ターゲットユーザー情報（ボタン化） -->
+            <div class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-1">Target Archive</div>
+            <div class="text-[0.8rem] font-black text-black-5 js-archive-title break-all mb-3"></div>
+            <div class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-1">Target User</div>
+            <div id="view-report-target-user-wrapper" class="">
+                <button id="btn-report-target-profile" 
+                    class="border border-slate-100 rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
+                    <span id="view-report-target-icon" class="text-[1.4rem] drop-shadow-md">👤</span>
+                    <span id="view-report-target-name" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
+                </button>
+            </div>
         </div>
         <div class="flex-1 overflow-y-auto p-2 bg-brand-0">
-            <div class="text-[0.6rem] font-black text-slate-400 px-2 pt-2 pb-2 uppercase tracking-widest">Report Details</div>
             <div id="admin-report-detail-list" class="space-y-2 pb-4 px-1"></div>
         </div>
     </div>
@@ -98,7 +108,9 @@
     <div class="bg-white p-3 border border-slate-200 shadow-md relative overflow-hidden">
         <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-400"></div>
         <div class="pl-2">
-            <div class="flex justify-between items-center mb-1"><div class="text-[0.6rem] font-bold text-slate-400 js-report-tim shrink-0"></div></div>
+            <div class="flex justify-between items-center mb-1">
+                <div class="text-[0.6rem] font-black text-slate-400 js-report-tim shrink-0 italic"></div>
+            </div>
             <div class="text-[0.6rem] text-black-5 break-all js-report-body line-clamp-1"></div>
         </div>
     </div>
@@ -152,17 +164,21 @@
 <!-- 【ダイアログ子】管理者：通報内容の全文詳細 -->
 <template id="tpl-admin-report-item-detail">
     <div class="w-full text-black-5 flex flex-col h-full overflow-hidden p-2 bg-white">
-        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
-            <span class="text-[0.8rem] font-black text-slate-400 tracking-wider js-report-tim italic"></span>
+        <div class="flex justify-between items-center pb-3">
+            <span class="text-[1rem] font-black text-slate-400 tracking-wider js-report-tim italic"></span>
         </div>
         <div class="mb-4 px-2">
-            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Reporter ID</span>
-            <div class="text-[0.75rem] font-bold text-slate-600 js-reporter-id break-all mt-1"></div>
+            <!-- ID表示から、標準の「アイコン＋ニックネーム」ボタンに変更 -->
+            <div id="view-report-user-wrapper" class="mt-1">
+                <button id="btn-report-reporter-profile" 
+                    class="border border-slate-100 rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
+                    <span id="view-report-user-icon" class="text-[1.4rem] drop-shadow-md">👤</span>
+                    <span id="view-report-user-name" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
+                </button>
+            </div>
         </div>
         <div class="flex-1 overflow-y-auto px-2 pb-4">
-            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Report Body</span>
-            <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all js-report-body mt-2"></div>
+            <div class="text-[1rem] text-slate-700 leading-[2] whitespace-pre-wrap break-all js-report-body mt-2"></div>
         </div>
     </div>
 </template>
-

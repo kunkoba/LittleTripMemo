@@ -24,8 +24,8 @@ export default {
     },
     // 通知管理リスト（API通信化）
     async ShowAdminNoticeList() {
-        const isSuccess = await $Data.Access.GetAllNotifications({});
-        if (!isSuccess) return;
+        // const isSuccess = await $Data.Access.GetAllNotifications({});
+        // if (!isSuccess) return;
         const notices = $App.AppData.Admin.notifications ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         // root.className = "w-full text-black-3 mb-2 px-1";
@@ -167,8 +167,8 @@ export default {
     },
     // 通報集計一覧（API通信化）
     async ShowAdminReportList() {
-        const isSuccess = await $Data.Access.GetReportSummary({ min_count: 0 });
-        if (!isSuccess) return;
+        // const isSuccess = await $Data.Access.GetReportSummary({ min_count: 0 });
+        // if (!isSuccess) return;
         const reportSummary = $App.AppData.Admin.reportSummary ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         // root.className = "w-full text-black-3 mb-2 px-1";
@@ -201,11 +201,24 @@ export default {
             archive_id: summaryItem.archive_id
         });
         if (!isSuccess) return;
-        const reports = $App.AppData.Admin.reports || [];
+        const reports = $Data.resData.reports || [];
         const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
-        // データの反映
-        $Dom.QuerySelector(".js-target-user", el).textContent = summaryItem.target_user_id;
+        // --- ターゲットユーザーボタンの設定 ---
+        const targetIcon = $Dom.QuerySelector("#view-report-target-icon", el);
+        const targetName = $Dom.QuerySelector("#view-report-target-name", el);
+        const btnTarget = $Dom.QuerySelector("#btn-report-target-profile", el);
+        const profile = $Data.resData.target_userProfile;
+        if (profile) {
+            targetIcon.textContent = profile.icon || "👤";
+            targetName.textContent = profile.nick_name || "Unknown User";
+            // ボタンクリックでターゲットユーザーのプロフィールを表示
+            btnTarget.onclick = async () => {
+                this.ShowUserProfile(profile, false);
+            };
+        }
+        // アーカイブタイトルの反映
         $Dom.QuerySelector(".js-archive-title", el).textContent = summaryItem.archive_title || "Unknown Title";
+        // 下部の通報理由リスト描画
         const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
         if (reports.length === 0) {
             listContainer.innerHTML = `<div class="text-[0.7rem] text-slate-400 p-2">詳細データがありません</div>`;
@@ -214,7 +227,6 @@ export default {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
                 $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim, 'YYYY-MM-DD　HH:mm');
                 $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
-                // クリックで全文詳細を開く
                 child.classList.add("cursor-pointer", "active:bg-slate-50");
                 child.onclick = () => this.ShowAdminReportItemDetail(rep);
                 listContainer.appendChild(child);
@@ -223,8 +235,6 @@ export default {
         this._core.open({
             title: "REPORT DETAILS",
             content: el,
-            help: "",
-            // ボタン設定を修正：BACKを消し、OPENボタンを下段に配置
             buttons: [
                 {
                     label: "🔗 OPEN PUBLIC ARCHIVE",
@@ -241,13 +251,43 @@ export default {
             ]
         });
     },
+    // 【管理者機能】通報1件の全文詳細を表示
+    async ShowAdminReportItemDetail(rep) {
+        const el = $Dom.GenerateTemplate("tpl-admin-report-item-detail");
+        // 1. 日時と本文の反映
+        $Dom.QuerySelector(".js-report-tim", el).textContent = $Util.FormatDate(rep.report_tim, "YYYY-MM-DD　HH:mm");
+        $Dom.QuerySelector(".js-report-body", el).textContent = rep.body || "（内容なし）";
+        // 2. ユーザーボタンの反映（アイコン＋ニックネーム）
+        const userIcon = $Dom.QuerySelector("#view-report-user-icon", el);
+        const userName = $Dom.QuerySelector("#view-report-user-name", el);
+        const btnUser = $Dom.QuerySelector("#btn-report-reporter-profile", el);
+        // サーバーから渡されている通報者の情報を反映
+        userIcon.textContent = rep.icon || "👤";
+        userName.textContent = rep.nick_name || "Unknown User";
+        // ボタンクリック時のアクション
+        btnUser.onclick = async () => {
+            // APIで対象ユーザーのフルプロフィールを取得
+            const isSuccess = await $Data.Access.GetUserProfile({ userId: rep.reporter_user_id });
+            if (isSuccess) {
+                // $Data.resData (最新レスポンス) から、先ほど取得したプロフィールを抽出
+                const profile = $Data.resData;
+                // 標準のプロフィール画面を表示 (編集不可モード)
+                this.ShowUserProfile(profile, false);
+            }
+        };
+        this._core.open({
+            title: "REPORT CONTENT",
+            content: el,
+            buttons: []
+        });
+    },
     // 【管理者機能】フィードバックリスト（無限スクロール）
     async ShowAdminFeedbackList() {
         let skip = 0;
         const take = 20;
         // ★ 実行時に即データアクセスし、エラーの場合は開かずに終了
-        const isSuccess = await $Data.Access.GetAllFeedback({ skip, take });
-        if (!isSuccess) return;
+        // const isSuccess = await $Data.Access.GetAllFeedback({ skip, take });
+        // if (!isSuccess) return;
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         let isLoading = false;
         let hasMore = true;
@@ -378,22 +418,10 @@ export default {
             ]
         });
     },
-    // 【管理者機能】通報1件の全文詳細を表示
-    ShowAdminReportItemDetail(rep) {
-        const el = $Dom.GenerateTemplate("tpl-admin-report-item-detail");
-        $Dom.QuerySelector(".js-report-tim", el).textContent = $Util.FormatDate(rep.report_tim, "YYYY-MM-DD　HH:mm");
-        $Dom.QuerySelector(".js-reporter-id", el).textContent = rep.reporter_user_id;
-        $Dom.QuerySelector(".js-report-body", el).textContent = rep.body || "（内容なし）";
-        this._core.open({
-            title: "REPORT CONTENT",
-            content: el,
-            buttons: []
-        });
-    },
     // 【管理者機能】ユーザーメール一覧
     async ShowAdminUserMailList() {
-        const isSuccess = await $Data.Access.AdminGetAllUserNotifications({ limit: 100 });
-        if (!isSuccess) return;
+        // const isSuccess = await $Data.Access.AdminGetAllUserNotifications({ limit: 100 });
+        // if (!isSuccess) return;
         const mails = $App.AppData.Admin.userMailList  || []; // API側で notifications に格納される想定
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         if (mails.length === 0) {
@@ -416,7 +444,7 @@ export default {
         });
     },
     // 【管理者機能】ユーザーメール詳細
-    ShowAdminUserMailDetail(item) {
+    ShowAdminUserMailDetail_2(item) {
         const el = $Dom.GenerateTemplate('tpl-view-notice');
         const lines = (item.body || "").split('\n');
         // 詳細画面のヘッダーに宛先ユーザー名を表示
@@ -426,8 +454,43 @@ export default {
             <div>${lines[0] || "No Subject"}</div>
         `;
         $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️";
-        $Dom.QuerySelector('#view-notice-title', el).textContent = lines[0] || "No Subject";
+        // $Dom.QuerySelector('#view-notice-title', el).textContent = lines[0] || "No Subject";
         $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
+        $Dom.QuerySelector('#view-notice-body', el).textContent = item.body;
+        this._core.open({
+            title: "MESSAGE DETAILS (ADMIN)",
+            content: el,
+            headerButtons: []
+        });
+    },
+    // 【管理者機能】ユーザーメール詳細
+    ShowAdminUserMailDetail(item) {
+        const el = $Dom.GenerateTemplate('tpl-view-notice');
+        // --- 2. ユーザー情報ボタンを表示・設定する ---
+        const userWrapper = $Dom.QuerySelector('#view-notice-user-wrapper', el);
+        const userIcon = $Dom.QuerySelector('#view-notice-user-icon', el);
+        const userId = $Dom.QuerySelector('#view-notice-user-id', el);
+        const btnUser = $Dom.QuerySelector('#btn-notice-user-profile', el);
+        $Dom.ToggleShow(userWrapper, true);
+        userIcon.textContent = item.icon || "👤";
+        userId.textContent = item.nick_name || item.user_id.slice(0, 8);
+        // ボタンクリックでユーザー詳細を表示
+        btnUser.onclick = async () => {
+            // API経由で対象ユーザーのフルプロフィールを取得
+            const isSuccess = await $Data.Access.GetUserProfile({ userId: item.user_id });
+            if (isSuccess) {
+                // 最新のプロフィールデータを$Data.resDataから取得
+                const profile = $Data.resData;
+                // 第2引数 isOwner を false にして編集不可モードで開く
+                this.ShowUserProfile(profile, false);
+            }
+        };
+        // --- 3. その他の基本情報を反映 ---
+        // 右上のメール（封筒）アイコンなど
+        $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️";
+        // 送信日時
+        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
+        // 本文（全文表示）
         $Dom.QuerySelector('#view-notice-body', el).textContent = item.body;
         this._core.open({
             title: "MESSAGE DETAILS (ADMIN)",

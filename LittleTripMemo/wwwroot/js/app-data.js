@@ -1,5 +1,7 @@
 // データ管理（通信・保持）を統合したオブジェクト
 window.$Data = {
+    // 取得したデータを保持する（常に上書き）
+    resData: null,
     // データの完全初期化
     Clear() {
         this.Access._rawData.archives =[];
@@ -60,6 +62,8 @@ window.$Data = {
         },
         // 取得データを内部に保持
         _setData(data) {
+            $Data.resData = data;
+            console.log(">>$Data.resData:", $Data.resData);
             if (data.archiveId) $App.AppData.Context.TargetArchiveId = data.archiveId;
             // アプリ基幹のデータ
             if (data.archive) this._rawData.archive = data.archive;
@@ -85,7 +89,6 @@ window.$Data = {
             // 管理者用：各取得APIのレスポンスを Admin に格納
             if (data.notifications) $App.AppData.Admin.notifications = data.notifications;
             if (data.reportSummary) $App.AppData.Admin.reportSummary = data.reportSummary;
-            if (data.reports) $App.AppData.Admin.reports = data.reports;
             if (data.feedbackList) $App.AppData.Admin.feedbackList = data.feedbackList;
             if (data.userMailList) $App.AppData.Admin.userMailList = data.userMailList;
             console.log(">>$App.AppData:", $App.AppData);
@@ -143,9 +146,6 @@ window.$Data = {
         async UnpublishArchive(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UnpublishArchive', params))();
         },
-        // async SearchByLocation(params = {}) {
-        //     return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/SearchByLocation', params))();
-        // },
         async SearchByLocationPub(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/SearchByLocationPub', params))();
         },
@@ -170,6 +170,10 @@ window.$Data = {
         async BulkSyncReactions(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/BulkSyncReactions', params))();
         },
+        // Guid userId
+        async GetUserProfile(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/GetUserProfile', params))();
+        },
 
 
         // public record UpsertFeedbackReq(string? body, int score);
@@ -184,27 +188,13 @@ window.$Data = {
         async UpsertNotification(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertNotification', params))();
         },
-        async GetReportSummary(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportSummary', params))();
-            // console.warn("TEST: GetMockData(REPORT_SUMMARY) を使用します");
-            // $App.AppData.Admin.reportSummary = $Const.GetMockData('REPORT_SUMMARY', 50);
-            // return true;
-        },
         // public record GetReportDetailsReq(Guid target_user_id, long archive_id);
         async GetReportDetails(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportDetails', params))();
             // console.warn("TEST: GetMockData(REPORT_DETAIL) を使用します");
-            // $App.AppData.Admin.reports = $Const.GetMockData('REPORT_DETAIL', 50);
+            // $Data.resData.reports = $Const.GetMockData('REPORT_DETAIL', 50);
+            // $Data.resData.target_userProfile = null;
             // return true;
-        },
-        async GetAllFeedback(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllFeedback', params))();
-            // console.warn("TEST: GetMockData(FEEDBACK) を使用します");
-            // $App.AppData.Admin.feedbackList = $Const.GetMockData('FEEDBACK', 50);
-            // return true;
-        },
-        async GetAllNotifications(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllNotifications', params))();
         },
         async GetMyFeedback(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyFeedback', params))();
@@ -235,9 +225,8 @@ window.$Data = {
         async GetMyUserNotifications(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyUserNotifications', params))();
         },
-        // public record Request(int limit = 100);
-        async AdminGetAllUserNotifications(params = { limit: 100 }) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllUserNotifications', params))();
+        async GetAdminAllInfo(params = {}) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAdminAllInfo', params))();
         },
     },
     // データ操作・取得のメソッド群

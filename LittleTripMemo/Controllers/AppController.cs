@@ -32,6 +32,7 @@ public class AppController : _BaseController
     private readonly SearchByLocationPubService _searchByLocationPubService;
     private readonly BulkSyncReactionService _bulkSyncReactionService;
     private readonly BulkSyncDetailsService _bulkSyncDetailsService;
+    private readonly GetUserProfileService _getUserProfileService;
 
     // コンストラクタに追加
     public AppController(
@@ -54,7 +55,8 @@ public class AppController : _BaseController
         UpdateDetailPubService updateDetailPubService,
         SearchByLocationPubService searchByLocationPubService,
         BulkSyncReactionService ulkSyncReactionService,
-        BulkSyncDetailsService bulkSyncDetailsService
+        BulkSyncDetailsService bulkSyncDetailsService,
+        GetUserProfileService getUserProfileService
     ) : base(userContext)
     {
         _getUnMergeDetailsService = getUnMergeDetailsService;
@@ -76,6 +78,7 @@ public class AppController : _BaseController
         _searchByLocationPubService = searchByLocationPubService;
         _bulkSyncDetailsService = bulkSyncDetailsService;
         _bulkSyncReactionService = ulkSyncReactionService;
+        _getUserProfileService = getUserProfileService;
     }
 
     #region "Private"
@@ -309,6 +312,17 @@ public class AppController : _BaseController
         public async Task<IActionResult> BulkSyncReactions([FromBody] BulkSyncReactionService.BulkSyncReactionReq req)
         {
             var result = await _bulkSyncReactionService.ExecuteAsync(req);
+            return OkWithBase(result);
+        }
+
+        /// <summary>
+        /// 指定されたユーザーの公開プロフィールを取得する
+        /// </summary>
+        [HttpPost("api/GetUserProfile")]
+    public async Task<IActionResult> GetUserProfile([FromBody] GetUserProfileService.GetUserProfileReq req)
+    {
+            // 既存のサービスをそのまま利用
+            var result = await _getUserProfileService.ExecuteAsync(req.userId);
             return OkWithBase(result);
         }
 

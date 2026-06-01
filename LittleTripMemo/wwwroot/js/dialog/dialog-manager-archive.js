@@ -491,7 +491,7 @@ export default {
         const profile = $Data.Store.GetUserProfile();
         if (profile) {
             $Dom.QuerySelector('#view-mem-user-icon', el).textContent = profile.icon || "😀";
-            $Dom.QuerySelector('#view-mem-user-id', el).textContent = profile.nickName;
+            $Dom.QuerySelector('#view-mem-user-id', el).textContent = profile.nick_name;
             btnUserProfile.onclick = () => this.ShowUserProfile(profile, archive.is_owner);
         } else {
             $Dom.ToggleShow(btnUserProfile, false);
