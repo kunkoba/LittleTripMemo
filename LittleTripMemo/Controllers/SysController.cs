@@ -20,18 +20,15 @@ public class SysController : _BaseController
     private readonly GetMyUserNotificationsService _getMyUserNotificationsService;
     private readonly AdminCloseArchivePubService _adminCloseArchivePubService;
     private readonly AdminUnpublishArchiveService _adminUnpublishArchiveService;
-    private readonly GetAllUserNotificationsService _getAllUserNotificationsService;
     private readonly GetAdminAllInfoService _getAdminAllInfoService;
+    private readonly UpsertNotificationService _upsertNotificationService;
+    private readonly GetAllFeedbackService _feedbackService;
 
     public SysController(
         UserContext user,
         UpsertFeedbackService upsertFeedbackService,
-        GetAllFeedbackService getAllFeedbackService,
         UpsertReportService upsertReportService,
         GetSystemInfoService getSystemInfoService,
-        UpsertNotificationService upsertNotificationService,
-        GetReportSummaryService getReportSummaryService,
-        GetAllNotificationsService getAllNotificationsService,
         GetReportDetailsService getReportDetailsService,
         GetMyFeedbackService getMyFeedbackService,
         GetMyReportService getMyReportService,
@@ -40,8 +37,9 @@ public class SysController : _BaseController
         GetMyUserNotificationsService getMyUserNotificationsService,
         AdminCloseArchivePubService adminCloseArchivePubService,
         AdminUnpublishArchiveService adminUnpublishArchiveService,
-        GetAllUserNotificationsService getAllUserNotificationsService,
-        GetAdminAllInfoService getAdminAllInfoService
+        GetAdminAllInfoService getAdminAllInfoService,
+        UpsertNotificationService upsertNotificationService,
+        GetAllFeedbackService getAllFeedbackService
     ) : base(user)
     {
         _upsertFeedbackService = upsertFeedbackService;
@@ -55,7 +53,7 @@ public class SysController : _BaseController
         _getMyUserNotificationsService = getMyUserNotificationsService;
         _adminCloseArchivePubService　= adminCloseArchivePubService;
         _adminUnpublishArchiveService = adminUnpublishArchiveService;
-        _getAllUserNotificationsService = getAllUserNotificationsService;
+        _upsertNotificationService = upsertNotificationService;
         _getAdminAllInfoService = getAdminAllInfoService;
     }
 
@@ -190,6 +188,26 @@ public class SysController : _BaseController
     }
 
     /// <summary>
+    /// 【管理者権限】フィードバック一覧を取得（スコア指定、最新100件固定）
+    /// </summary>
+    [HttpPost("api/Sys/GetAllFeedback")]
+    public async Task<IActionResult> GetAllFeedback([FromBody] GetAllFeedbackService.GetAllFeedbackReq req)
+    {
+        var result = await _feedbackService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
+    /// 【管理者権限】通知情報登録更新
+    /// </summary>
+    [HttpPost("api/Sys/UpsertNotification")]
+    public async Task<IActionResult> UpsertNotification([FromBody] UpsertNotificationService.UpsertNotificationReq req)
+    {
+        var result = await _upsertNotificationService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
+    /// <summary>
     /// 【管理者権限】管理画面に必要な情報を一括取得する
     /// </summary>
     [HttpPost("api/Sys/GetAdminAllInfo")]
@@ -199,5 +217,6 @@ public class SysController : _BaseController
         return OkWithBase(result);
     }
 
-    #endregion
+#endregion
+
 }

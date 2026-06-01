@@ -41,19 +41,6 @@ public class SysFeedbackRepository : _BaseRepository
     }
 
     /// <summary>
-    /// フィードバックを範囲指定で取得（更新日時降順）
-    /// </summary>
-    public async Task<IEnumerable<TSysFeedback>> GetAllFeedbacksAsync(int offset = 0, int limit = 50)
-    {
-        const string sql = @"
-            SELECT * FROM t_sys_feedbacks 
-            ORDER BY update_tim DESC 
-            LIMIT @limit OFFSET @offset";
-
-        return await QueryAsync<TSysFeedback>(sql, new { limit, offset });
-    }
-
-    /// <summary>
     /// 自分のフィードバックをリスト形式で取得
     /// </summary>
     public async Task<TSysFeedback?> GetMyFeedbacksAsync()
@@ -74,4 +61,29 @@ public class SysFeedbackRepository : _BaseRepository
 
         return await ExecuteScalarAsync<double>(sql);
     }
+
+    /// <summary>
+    /// フィードバックを条件指定で取得（ユーザー情報結合、スコア検索、最新100件固定）
+    /// </summary>
+    public async Task<IEnumerable<DtoFeedbackDetail>> GetAllFeedbacksAsync(int score)
+    {
+        // 1. 絞り込み条件
+        var whereClause = score > 0 ? "WHERE f.score = @score" : "";
+
+        // 2. SQL（最新100件固定）
+        var sql = $@"
+        SELECT 
+            f.*,
+            u.""Icon""     AS icon,
+            u.""NickName"" AS nick_name
+        FROM t_sys_feedbacks f
+        LEFT JOIN ""AspNetUsers"" u ON f.user_id = u.""Id""
+        {whereClause}
+        ORDER BY f.update_tim DESC 
+        LIMIT 100";
+
+        // 取得系ラッパーを使用。戻り値は単一のリスト。
+        return await QueryAsync<DtoFeedbackDetail>(sql, new { score });
+    }
+
 }

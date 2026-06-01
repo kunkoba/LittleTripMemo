@@ -7,7 +7,7 @@ using LittleTripMemo.Services;
 public class GetReportSummaryService : _BaseService
 {
     private readonly SysReportRepository _repo;
-    public record GetReportSummaryReq(int min_count);
+    public record GetReportSummaryReq();
     public record Response(IEnumerable<DtoReportSummary> reportSummary);
 
     public GetReportSummaryService(UserContext user, SysReportRepository repo) : base(user) => _repo = repo;
@@ -15,7 +15,7 @@ public class GetReportSummaryService : _BaseService
     public async Task<Response> ExecuteAsync(GetReportSummaryReq req)
     {
         await ValidateAsync();
-        var result = await _repo.GetReportSummaryAsync(req.min_count);
+        var result = await _repo.GetReportSummaryAsync();
         return new Response(result);
     }
 

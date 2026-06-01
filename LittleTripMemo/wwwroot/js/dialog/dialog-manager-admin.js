@@ -24,8 +24,6 @@ export default {
     },
     // 通知管理リスト（API通信化）
     async ShowAdminNoticeList() {
-        // const isSuccess = await $Data.Access.GetAllNotifications({});
-        // if (!isSuccess) return;
         const notices = $App.AppData.Admin.notifications ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         // root.className = "w-full text-black-3 mb-2 px-1";
@@ -167,8 +165,6 @@ export default {
     },
     // 通報集計一覧（API通信化）
     async ShowAdminReportList() {
-        // const isSuccess = await $Data.Access.GetReportSummary({ min_count: 0 });
-        // if (!isSuccess) return;
         const reportSummary = $App.AppData.Admin.reportSummary ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         // root.className = "w-full text-black-3 mb-2 px-1";
@@ -420,8 +416,6 @@ export default {
     },
     // 【管理者機能】ユーザーメール一覧
     async ShowAdminUserMailList() {
-        // const isSuccess = await $Data.Access.AdminGetAllUserNotifications({ limit: 100 });
-        // if (!isSuccess) return;
         const mails = $App.AppData.Admin.userMailList  || []; // API側で notifications に格納される想定
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         if (mails.length === 0) {
@@ -444,26 +438,6 @@ export default {
         });
     },
     // 【管理者機能】ユーザーメール詳細
-    ShowAdminUserMailDetail_2(item) {
-        const el = $Dom.GenerateTemplate('tpl-view-notice');
-        const lines = (item.body || "").split('\n');
-        // 詳細画面のヘッダーに宛先ユーザー名を表示
-        const titleArea = $Dom.QuerySelector('#view-notice-title', el);
-        titleArea.innerHTML = `
-            <div class="text-[0.6rem] text-slate-400 uppercase tracking-widest mb-1">To: ${item.icon} ${item.nick_name}</div>
-            <div>${lines[0] || "No Subject"}</div>
-        `;
-        $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️";
-        // $Dom.QuerySelector('#view-notice-title', el).textContent = lines[0] || "No Subject";
-        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
-        $Dom.QuerySelector('#view-notice-body', el).textContent = item.body;
-        this._core.open({
-            title: "MESSAGE DETAILS (ADMIN)",
-            content: el,
-            headerButtons: []
-        });
-    },
-    // 【管理者機能】ユーザーメール詳細
     ShowAdminUserMailDetail(item) {
         const el = $Dom.GenerateTemplate('tpl-view-notice');
         // --- 2. ユーザー情報ボタンを表示・設定する ---
@@ -472,6 +446,7 @@ export default {
         const userId = $Dom.QuerySelector('#view-notice-user-id', el);
         const btnUser = $Dom.QuerySelector('#btn-notice-user-profile', el);
         $Dom.ToggleShow(userWrapper, true);
+        $Dom.ToggleShow($Dom.QuerySelector('#view-notice-title-area', el), false);
         userIcon.textContent = item.icon || "👤";
         userId.textContent = item.nick_name || item.user_id.slice(0, 8);
         // ボタンクリックでユーザー詳細を表示

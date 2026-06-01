@@ -1,5 +1,6 @@
-﻿using LittleTripMemo.Models;
-using LittleTripMemo.Common;
+﻿using LittleTripMemo.Common;
+using LittleTripMemo.Models;
+using System.Collections.Generic;
 
 namespace LittleTripMemo.Repository;
 
@@ -19,10 +20,11 @@ public class SysNotificationRepository : _BaseRepository
     public async Task<IEnumerable<TSysNotification>> GetActiveNotificationsAsync()
     {
         const string sql = @"
-        SELECT * FROM t_sys_notifications 
-        WHERE disp_from <= @now 
-          AND disp_to   >= @now 
-        ORDER BY update_tim DESC";
+            SELECT * FROM t_sys_notifications 
+            WHERE disp_from <= @now 
+              AND disp_to   >= @now 
+            ORDER BY update_tim DESC
+            LIMIT 100";
 
         return await QueryAsync<TSysNotification>(sql, new { now = DateTime.Now });
     }
@@ -68,13 +70,14 @@ public class SysNotificationRepository : _BaseRepository
     /// <summary>
     /// 全ての通知を取得（管理者用：期間外や非公開も含む）
     /// </summary>
-    public async Task<IEnumerable<TSysNotification>> GetAllNotificationsAsync()
+    public async Task<IEnumerable<TSysNotification>> GetAllNotificationsAsync(int limit = 100)
     {
         const string sql = @"
             SELECT * FROM t_sys_notifications 
-            ORDER BY update_tim DESC";
+            ORDER BY update_tim DESC
+            LIMIT @limit";
 
-        return await QueryAsync<TSysNotification>(sql);
+        return await QueryAsync<TSysNotification>(sql, new { limit });
     }
 
 }

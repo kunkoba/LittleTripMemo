@@ -367,7 +367,6 @@ export default {
         const body = lines.slice(1).join('\n');
         // 各要素への反映
         $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️️";
-        // $Dom.QuerySelector('#view-notice-title', el).textContent = title;
         $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
         // 2行目以降があれば本文に、なければ全体を表示（運営からの短い連絡を考慮）
         const bodyEl = $Dom.QuerySelector('#view-notice-body', el);

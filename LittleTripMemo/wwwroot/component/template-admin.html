@@ -66,8 +66,20 @@
             <span class="text-[0.9rem] font-black text-slate-400 tracking-wider js-date italic"></span>
             <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
         </div>
+        <!-- User IDテキストを、標準ユーザーボタンに変更 -->
+        <div class="mb-4 px-2">
+            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">User Info</span>
+            <div id="view-feedback-user-wrapper" class="mt-1">
+                <button id="btn-feedback-user-profile" 
+                    class="border border-slate-100 rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
+                    <span id="view-feedback-user-icon" class="text-[1.4rem] drop-shadow-md">👤</span>
+                    <span id="view-feedback-user-name" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
+                </button>
+            </div>
+        </div>
         <div class="flex-1 overflow-y-auto px-2 pb-4">
-            <div class="text-[1rem] text-slate-700 leading-[2] whitespace-pre-wrap break-all js-body mt-2 h-48 overflow-y-auto pr-2"></div>
+            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Feedback Detail</span>
+            <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all js-body mt-2 h-48 overflow-y-auto pr-2"></div>
         </div>
     </div>
 </template>

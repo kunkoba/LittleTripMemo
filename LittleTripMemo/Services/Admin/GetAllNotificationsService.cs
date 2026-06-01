@@ -8,7 +8,7 @@ namespace LittleTripMemo.Services.Admin;
 public class GetAllNotificationsService : _BaseService
 {
     private readonly SysNotificationRepository _repo;
-    public record GetAllNotificationsReq();
+    public record GetAllNotificationsReq(int limit = 100);
     public record Response(IEnumerable<TSysNotification> notifications);
 
     public GetAllNotificationsService(UserContext user, SysNotificationRepository repo) : base(user)
@@ -19,7 +19,7 @@ public class GetAllNotificationsService : _BaseService
     public async Task<Response> ExecuteAsync(GetAllNotificationsReq req)
     {
         await ValidateAsync();
-        var result = await _repo.GetAllNotificationsAsync();
+        var result = await _repo.GetAllNotificationsAsync(req.limit);
         return new Response(result);
     }
 

@@ -39,7 +39,6 @@ const _BottomCore = {
 					const range = $Map.GetSearchRange(0.8);
 					// TopBar から新しい構造のソート設定を取得
 					const sortSetting = $TopBar.GetSortSetting();
-					console.log(">>sortSetting", sortSetting);
 					// ▼ 修正: C# 側の引数名に合わせて searchWord をパラメータに追加
 					const params = {
 						...range,

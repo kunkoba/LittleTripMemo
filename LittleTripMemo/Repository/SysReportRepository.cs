@@ -1,5 +1,6 @@
-﻿using LittleTripMemo.Models;
-using LittleTripMemo.Common;
+﻿using LittleTripMemo.Common;
+using LittleTripMemo.Models;
+using System.Collections.Generic;
 
 namespace LittleTripMemo.Repository;
 
@@ -47,7 +48,7 @@ public class SysReportRepository : _BaseRepository
     /// 通報件数が多い順にアーカイブを集計して取得
     /// </summary>
     /// <param name="minCount">抽出対象とする最小通報件数</param>
-    public async Task<IEnumerable<DtoReportSummary>> GetReportSummaryAsync(int minCount = 10)
+    public async Task<IEnumerable<DtoReportSummary>> GetReportSummaryAsync()
     {
         const string sql = @"
         SELECT 
@@ -62,10 +63,10 @@ public class SysReportRepository : _BaseRepository
             r.target_user_id, 
             r.archive_id, 
             a.title
-        HAVING COUNT(*) >= @min_count
-        ORDER BY report_count DESC";
+        ORDER BY report_count DESC
+        LIMIT 100";
 
-        return await QueryAsync<DtoReportSummary>(sql, new { min_count = minCount });
+        return await QueryAsync<DtoReportSummary>(sql);
     }
 
     /// <summary>

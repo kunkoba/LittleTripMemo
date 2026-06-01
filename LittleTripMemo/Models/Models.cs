@@ -219,4 +219,19 @@ public class DtoArchive
             public string icon { get; set; } = string.Empty;
     }
 
+    /// <summary>
+    /// フィードバック詳細情報
+    /// </summary>
+    public class DtoFeedbackDetail
+    {
+        public Guid user_id { get; set; }
+        public string? body { get; set; }
+        public int score { get; set; }
+        public DateTime update_tim { get; set; }
+
+        // 追加するユーザー情報
+        public string icon { get; set; } = string.Empty;
+        public string nick_name { get; set; } = string.Empty;
+    }
+
 #endregion
