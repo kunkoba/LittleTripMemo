@@ -44,7 +44,8 @@ export default {
         let currentDate = ""; // 現在描画中の日付を保持
         // すでにソート済みなので、上から順にループするだけでOK！
         details.forEach((item, index) => {
-            const dateStr = (item.memo_date || "").replace(/-/g, '.');
+            // const dateStr = (item.memo_date || "");
+            const dateStr = (item.memo_date || "");
             // 日付が変わったタイミングでだけヘッダーを差し込む
             if (currentDate !== dateStr) {
                 const header = $Dom.GenerateTemplate("tpl-timeline-date");
@@ -118,7 +119,7 @@ export default {
         // el.className = "w-full text-black-3 mb-2 px-1 space-y-4";
         details.forEach((item, index) => {
             const child = $Dom.GenerateTemplate("tpl-list-child-simple");
-            const dateStr = (item.memo_date || "").replace(/-/g, '.');
+            const dateStr = (item.memo_date || "");
             $Dom.QuerySelector(".js-date", child).textContent = dateStr;
             $Dom.QuerySelector(".js-time", child).textContent = item.memo_time || "";
             $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
@@ -364,7 +365,7 @@ export default {
         };
         const groups = {};
         details.forEach(item => {
-            const dateStr = item.memo_date.replace(/-/g, '.');
+            const dateStr = item.memo_date;
             if (!groups[dateStr]) groups[dateStr] = [];
             groups[dateStr].push(item);
         });

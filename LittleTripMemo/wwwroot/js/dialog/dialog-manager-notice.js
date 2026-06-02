@@ -328,10 +328,8 @@ export default {
             setMailStyle(child, isNew);
             $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
             $Dom.QuerySelector(".js-icon", child).textContent = item.emoji || "✉️️";
-            // 本文の1行目をタイトル、全体を本文としてリストに表示
-            const lines = item.body.split('\n');
-            // $Dom.QuerySelector(".js-title", child).textContent = lines[0];
             $Dom.QuerySelector(".js-body", child).textContent = item.body;
+            $Dom.ToggleShow($Dom.QuerySelector(".js-title", child), false);
             child.onclick = async () => {
                 // クリック時の既読処理（スタイル変更）
                 if (item.is_new) {
@@ -361,13 +359,11 @@ export default {
     ShowUserMailDetail(item) {
         // テンプレートはプロフィール形式に整えた tpl-view-notice を使用
         const el = $Dom.GenerateTemplate('tpl-view-notice');
-        // // 本文の1行目をタイトル、残りを本文として分割
-        // const lines = (item.body || "").split('\n');
-        // const title = lines[0] || "No Subject";
-        const body = lines.slice(1).join('\n');
+        const body = item.body;
         // 各要素への反映
         $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️️";
         $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
+        $Dom.ToggleShow($Dom.QuerySelector("#view-notice-title-area", el), false);
         // 2行目以降があれば本文に、なければ全体を表示（運営からの短い連絡を考慮）
         const bodyEl = $Dom.QuerySelector('#view-notice-body', el);
         bodyEl.textContent = body.trim() !== "" ? body : item.body;

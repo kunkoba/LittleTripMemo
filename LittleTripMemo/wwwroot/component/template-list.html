@@ -49,12 +49,15 @@
 <!-- 【リスト子】シンプルリスト（検索結果・単発リスト用） -->
 <template id="tpl-list-child-simple">
     <div class="js-item-card relative flex flex-col p-3 rounded-[1rem] border border-slate-200 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3">
+        <div class="absolute top-0 right-0 text-[1.8rem] drop-shadow-md js-face"></div>
         <div class="flex justify-between items-start mb-1">
             <div class="flex flex-col gap-1">
-                <div class="flex items-center gap-2"><span class="js-date text-[0.6rem] font-black text-slate-400 tracking-widest"></span><span class="js-time text-[0.6rem] font-black text-slate-500 tracking-widest"></span></div>
+                <div class="flex items-center gap-2 text-slate-400 text-[0.8rem] font-black italic">
+                    <span class="js-date"></span>
+                    <span class="js-time"></span>
+                </div>
                 <div class="js-price-wrapper hidden flex items-baseline gap-1 mt-0.5"><span class="js-memo-price text-[1rem] font-black italic "></span><span class="js-memo-currency text-[0.6rem] font-bold text-slate-400 ml-0.5"></span></div>
             </div>
-            <div class="shrink-0 text-[1.8rem] drop-shadow-md js-face ml-2"></div>
         </div>
         <div class="js-title text-[0.9rem] font-black text-slate-800 truncate mb-0.5 mt-1"></div>
         <div class="js-body text-[0.7rem] text-slate-500 truncate"></div>
@@ -98,7 +101,7 @@
 <!-- 【リスト子】通知一覧用 -->
 <template id="tpl-list-child-notice">
     <!-- 枠線と影はJSで動的に付けるため、最低限のレイアウトクラスのみ残す -->
-    <div class="js-item-card flex p-4 cursor-pointer active:scale-[0.98] transition-all overflow-hidden mb-3 relative min-h-[6rem] border-2">
+    <div class="js-item-card flex p-4 cursor-pointer active:scale-[0.98] transition-all overflow-hidden mb-3 relative border-2">
         <!-- 右上の固定アイコンエリア -->
         <div class="absolute top-2 right-2 flex flex-col items-end gap-1 z-10">
             <span class="js-badge-new hidden bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">NEW</span>

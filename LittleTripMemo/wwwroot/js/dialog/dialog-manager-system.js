@@ -368,7 +368,7 @@ export default {
         if (isOwner) {
             // 【自分のプロフ】受信箱ボタン ＋ 編集ボタン
             headerButtons.push({
-                label: "📬",
+                label: "📥",
                 id: "btn-header-mail",
                 handler: () => this.ShowUserMailList()
             });
