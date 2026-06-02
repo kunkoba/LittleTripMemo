@@ -1,10 +1,20 @@
+★Dockerコンポーズ
+? LittleTripMemo (ソリューションルート)
+ ├── ? docker-compose.yml
+ │
+ └── ? LittleTripMemo (プロジェクトフォルダ)
+       ├── ? Dockerfile
+       ├── ? .dockerignore
+       ├── ? Program.cs  (★ココ！完璧です)
+       ├── ? LittleTripMemo.csproj
+       └── ? wwwroot
+
 ★改修案
 ・画面のフィルタ
 ・地図画面上に現在地ボタン配置
 ・地図画面上にユーザ情報ボタン
 ・ユーザ情報アイコンを標準CSS化
-・ユーザ設定ーメモの規定値
-・ユーザ設定ーフォントの指定
+・ユーザ設定ーメモの規定値・ユーザ設定ーフォントの指定
 ・ユーザ設定ーフォントサイズ変更
 ・リンクボタンで即時ジャンプしないようにする
 

@@ -1,0 +1,48 @@
+# 3つの部屋（DB、API、フロント）を一括管理する設定
+services:
+
+    # 1. データベースの部屋 (PostgreSQL)
+    postgres_db:
+        # PostgreSQL16の公式イメージを使用
+        image: postgres:16
+        # コンテナ名を指定
+        container_name: trip_memo_db
+        # データベース接続用の環境変数
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: littletripmemo_db
+        # ポート番号の設定（既存の5433番との衝突を避けるため、パソコン側は5434番で待ち受けます）
+        ports:
+            - "5434:5432"
+        # データを自分のパソコンに安全に保存するためのボリューム設定
+        volumes:
+            - ./postgres_data:/var/lib/postgresql/data
+
+    # 2. バックエンドAPIの部屋 (ASP.NET Core)
+    api_server:
+        # 下記で作成するDockerfileを元にビルドする
+        build:
+            context: ./LittleTripMemo
+            dockerfile: Dockerfile
+        # コンテナ名を指定
+        container_name: trip_memo_api
+        # ポート番号の設定（ローカルマシンの5000番をコンテナの8080番に接続）
+        ports:
+            - "5000:8080"
+        # データベースの部屋が立ち上がってから起動するよう制御
+        depends_on:
+            - postgres_db
+
+    # 3. フロントエンド画面の部屋 (Nginx)
+    frontend_server:
+        # 軽量なウェブサーバーであるNginxの公式イメージを使用
+        image: nginx:alpine
+        # コンテナ名を指定
+        container_name: trip_memo_frontend
+        # ポート番号の設定（ローカルマシンの8080番をコンテナの80番に接続）
+        ports:
+            - "8080:80"
+        # wwwrootの中身だけをNginxの公開フォルダに直接覗かせる設定
+        volumes:
+            - ./LittleTripMemo/wwwroot:/usr/share/nginx/html
