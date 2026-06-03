@@ -222,7 +222,7 @@ export default {
                 list.forEach(item => {
                     const child = $Dom.GenerateTemplate("tpl-list-child-archive");
                     $Dom.QuerySelector(".js-title", child).textContent = item.title;
-                    $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD　HH:mm');
+                    $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
                     $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
                     $Dom.QuerySelector(".js-count", child).textContent = item.cnt || "0";
                     const leftBorder = $Dom.QuerySelector(".js-item-border", child);
@@ -286,7 +286,7 @@ export default {
             privateList.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-list-child-archive");
                 $Dom.QuerySelector(".js-title", child).textContent = item.title;
-                $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD　HH:mm');
+                $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
                 $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
                 $Dom.QuerySelector(".js-count", child).textContent = item.cnt || "0";
                 // バッジの装飾（PRIVATE固定）

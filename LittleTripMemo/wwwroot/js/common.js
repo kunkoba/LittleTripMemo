@@ -93,7 +93,7 @@ window.$Dom = {
 // 汎用処理
 window.$Util = {
     // 日付オブジェクトを文字列に変換（デフォルトをハイフン区切りに変更）
-    FormatDate(dateObj = new Date(), format = 'YYYY-MM-DD') {
+    FormatDate(dateObj = new Date(), format = 'YYYY-MM-DD　HH:mm') {
         dateObj = new Date(dateObj);
         // 置換用パーツの作成
         const parts = {

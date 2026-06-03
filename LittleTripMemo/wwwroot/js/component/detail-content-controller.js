@@ -251,7 +251,7 @@ const _DetailContentCore = {
         this.editRoot.reset();
         // 現在の日付と時刻を取得してセット
         const now = new Date();
-        const dateStr = $Util.FormatDate();
+        const dateStr = $Util.FormatDate(now, 'YYYY-MM-DD');
         const timeStr = now.toTimeString().slice(0, 5);  // hh:mm
         this.editDate.value = dateStr;
         this.editTime.value = timeStr;

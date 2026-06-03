@@ -44,6 +44,7 @@ export default {
             config:  $Dom.QuerySelector('#btn-sys-user-config', el),
             notice:  $Dom.QuerySelector('#btn-sys-notice', el),
             version: $Dom.QuerySelector('#btn-sys-version', el),
+            reports: $Dom.QuerySelector('#btn-sys-my-report', el),
             auth:    $Dom.QuerySelector('#btn-sys-auth', el),
             admin:   $Dom.QuerySelector('#btn-sys-admin', el),
         };
@@ -89,13 +90,7 @@ export default {
         b.config.onclick = () => {this.ShowUserSettingsMenu()};
         b.notice.onclick = () => {this.ShowNoticeList()};
         b.version.onclick = () => {this.ShowAppInfo()};
-        b.admin.onclick = async () => {
-            // メニューを開く前に一括取得を実行
-            const isSuccess = await $Data.Access.GetAdminAllInfo();
-            if (isSuccess) {
-                this.ShowAdminMenu();
-            }
-        };
+        b.reports.onclick = async () => {this.ShowMyReportList();};
         b.auth.onclick = async () => {
             if (isLoggedIn) {
                 if (await this.ShowConfirm({ title: "LOGOUT", message: "ログアウトしますか？" })) {
@@ -106,6 +101,13 @@ export default {
                 }
             } else {
                 this.ShowLoginDialog();
+            }
+        };
+        b.admin.onclick = async () => {
+            // メニューを開く前に一括取得を実行
+            const isSuccess = await $Data.Access.GetAdminAllInfo();
+            if (isSuccess) {
+                this.ShowAdminMenu();
             }
         };
         this._core.open({
@@ -456,5 +458,75 @@ export default {
                 ]
             ]
         });
+    },
+    // 通報履歴リスト表示
+    ShowMyReportList() {
+        const reports = $App.AppData.Owner.systemInfo.myReports || [];
+        if (reports.length === 0) {
+            $Notice.Warn("通報履歴はありません");
+            return;
+        }
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        // 日時が新しい順にソート
+        [...reports].sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(item => {
+            const child = $Dom.GenerateTemplate("tpl-list-child-my-report");
+            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.report_tim);
+            $Dom.QuerySelector(".js-target", child).textContent = `${item.target_icon} ${item.target_nick_name}`;
+            $Dom.QuerySelector(".js-body", child).textContent = item.body;
+            // ステータスバッジの表示
+            if (item.is_deleted) {
+                $Dom.ToggleShow($Dom.QuerySelector(".js-badge-deleted", child), true);
+            } else {
+                if (item.is_closed)  $Dom.ToggleShow($Dom.QuerySelector(".js-badge-closed", child), true);
+            }
+            child.onclick = () => this.ShowMyReportDetail(item);
+            root.appendChild(child);
+        });
+        this._core.open({ title: "MY REPORTS", content: root });
+    },
+    // 通報詳細表示
+    ShowMyReportDetail(report) {
+        const el = $Dom.GenerateTemplate("tpl-my-report-detail");
+        // --- 1. アーカイブタイトルの表示制御 ---
+        const titleEl = $Dom.QuerySelector("#view-report-archive-title", el);
+        if (report.is_deleted) {
+            titleEl.textContent = "削除済みです。";
+            titleEl.classList.add("text-slate-400"); // 無効な感じの色
+        } else if (report.is_closed) {
+            titleEl.textContent = "close中です";
+            titleEl.classList.add("text-red-400");   // 警告・停止中の色
+        } else {
+            titleEl.textContent = report.archive_title || "(No Title)";
+            titleEl.classList.add("text-brand-5");   // 通常のブランドカラー
+        }
+        // 基本反映
+        $Dom.QuerySelector(".js-report-tim", el).textContent = $Util.FormatDate(report.report_tim);
+        $Dom.QuerySelector("#view-report-body", el).textContent = report.body;
+        // $Dom.QuerySelector("#view-report-archive-title", el).textContent = report.archive_title || "(No Title)";
+        // ターゲットユーザーボタン
+        const userIcon = $Dom.QuerySelector("#view-report-target-icon", el);
+        const userName = $Dom.QuerySelector("#view-report-target-name", el);
+        userIcon.textContent = report.target_icon || "👤";
+        userName.textContent = report.target_nick_name || "Unknown";
+        $Dom.QuerySelector("#btn-report-target-profile", el).onclick = async () => {
+            const isSuccess = await $Data.Access.GetUserProfile({ userId: report.target_user_id });
+            if (isSuccess) this.ShowUserProfile($Data.resData, false);
+        };
+        // アーカイブジャンプボタン
+        const btnJump = $Dom.QuerySelector("#btn-report-jump-archive", el);
+        if (report.is_deleted) {
+            btnJump.classList.add("opacity-50", "grayscale");
+            btnJump.onclick = () => $Notice.Warn("このまとめは既に削除されています");
+        } else {
+            btnJump.onclick = async () => {
+                const isOk = await this.ShowConfirm({ title: "JUMP", message: "このアーカイブに移動しますか？" });
+                if (!isOk) return;
+                this._core.closeAll();
+                $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+                $App.AppData.Context.TargetArchiveId = report.archive_id;
+                await $App.RefreshScreen();
+            };
+        }
+        this._core.open({ title: "REPORT DETAIL", content: el });
     },
 };

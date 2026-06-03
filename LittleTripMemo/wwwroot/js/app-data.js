@@ -10,7 +10,9 @@ window.$Data = {
     },
     // 通信関連のメソッド群
     Access: {
-        baseUrl: "https://localhost:7292",
+        // baseUrl_2: "https://localhost:7292",
+        // Docker環境のapi_server（5000番ポート）に向けた接続先URL
+        baseUrl: "http://localhost:5000",
         _rawData: {
             archive: null,
             details: [],

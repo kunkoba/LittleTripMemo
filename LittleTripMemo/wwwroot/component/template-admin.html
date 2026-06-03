@@ -55,7 +55,7 @@
 <template id="tpl-admin-list-child-feedback">
     <button class="js-item-card w-full flex flex-col p-4 rounded-[1rem] border border-brand-1 bg-white mb-3 shadow-sm">
         <div class="flex justify-between items-center mb-2"><span class="text-[0.7rem] font-black text-slate-400 tracking-wider js-date italic"></span><span class="js-score text-[0.9rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span></div>
-        <div class="text-left text-[0.75rem] text-slate-700 break-all js-body line-clamp-1"></div>
+        <div class="text-left text-[0.75rem] text-slate-700 break-words js-body line-clamp-1"></div>
     </button>
 </template>
 
@@ -79,7 +79,7 @@
         </div>
         <div class="flex-1 overflow-y-auto px-2 pb-4">
             <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Feedback Detail</span>
-            <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-all js-body mt-2 h-[200px] overflow-y-auto pr-2"></div>
+            <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-words js-body mt-2 h-[200px] overflow-y-auto pr-2"></div>
         </div>
     </div>
 </template>
@@ -99,7 +99,7 @@
         <div class="shrink-0 p-4 border-b border-brand-2 bg-slate-50 relative mb-3 gap-2">
             <!-- ターゲットユーザー情報（ボタン化） -->
             <div class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-1">Target Archive</div>
-            <div class="text-[0.8rem] font-black text-black-5 js-archive-title break-all mb-3"></div>
+            <div class="text-[0.8rem] font-black text-black-5 js-archive-title break-words mb-3"></div>
             <div class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-1">Target User</div>
             <div id="view-report-target-user-wrapper" class="">
                 <button id="btn-report-target-profile" 
@@ -123,7 +123,7 @@
             <div class="flex justify-between items-center mb-1">
                 <div class="text-[0.6rem] font-black text-slate-400 js-report-tim shrink-0 italic"></div>
             </div>
-            <div class="text-[0.6rem] text-black-5 break-all js-report-body line-clamp-1"></div>
+            <div class="text-[0.6rem] text-black-5 break-words js-report-body line-clamp-1"></div>
         </div>
     </div>
 </template>
@@ -201,7 +201,7 @@
             </div>
         </div>
         <div class="flex-1 overflow-y-auto px-2 pb-4">
-            <div class="text-[1rem] text-slate-700 leading-[2] whitespace-pre-wrap break-all js-report-body mt-2"></div>
+            <div class="text-[1rem] text-slate-700 leading-[2] whitespace-pre-wrap break-words js-report-body mt-2"></div>
         </div>
     </div>
 </template>
@@ -226,3 +226,22 @@
     </div>
 </template>
 
+<!-- 【リスト子】自分の通報履歴アイテム -->
+<template id="tpl-list-child-my-report">
+    <div class="js-item-card bg-white border border-brand-1 p-3 mb-3 shadow-sm rounded-[1rem] cursor-pointer active:scale-[0.98] transition-transform">
+        <div class="flex justify-between items-center mb-1">
+            <span class="js-date text-[0.7rem] font-black text-slate-400 italic"></span>
+            <div class="flex gap-1">
+                <span class="js-badge-deleted hidden bg-slate-500 text-white text-[8px] px-2 py-0.5 rounded-full">DELETED</span>
+                <span class="js-badge-closed hidden bg-red-400 text-white text-[8px] px-2 py-0.5 rounded-full">CLOSED</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 mb-1">
+            <span class="text-[0.6rem] text-slate-400 uppercase font-black">Target:</span>
+            <span class="js-target text-[0.8rem] font-bold text-black-5 truncate"></span>
+        </div>
+        <div class="text-[0.7rem] text-slate-500 line-clamp-1 bg-slate-50 p-1.5 rounded-md border border-slate-100">
+            <span class="js-body"></span>
+        </div>
+    </div>
+</template>

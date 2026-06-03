@@ -234,4 +234,25 @@ public class DtoArchive
         public string nick_name { get; set; } = string.Empty;
     }
 
+    /// <summary>
+    /// ユーザの通報情報
+        /// </summary>
+    public class DtoMyReportDetail
+    {
+        // --- 通報データ (t_sys_reports) ---
+        public Guid target_user_id { get; set; }
+        public long archive_id { get; set; }
+        public string? body { get; set; }
+        public DateTime report_tim { get; set; }
+
+        // --- ターゲットユーザー情報 (AspNetUsers) ---
+        public string target_icon { get; set; } = string.Empty;
+        public string target_nick_name { get; set; } = string.Empty;
+
+        // --- アーカイブの状態 (t_memo_archive_pub) ---
+        public string archive_title { get; set; } = string.Empty;
+        public bool is_closed { get; set; } // closed_flg
+        public bool is_deleted { get; set; } // del_flg
+    }
+
 #endregion

@@ -136,4 +136,31 @@ public class SysReportRepository : _BaseRepository
         return await ExecuteAsync(sql, new { archive_id = archiveId });
     }
 
+    /// <summary>
+    /// ユーザの通報情報
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IEnumerable<DtoMyReportDetail>> GetMyReportsWithDetailsAsync()
+    {
+        const string sql = @"
+            SELECT 
+                r.target_user_id,
+                r.archive_id,
+                r.body,
+                r.report_tim,
+                u.""Icon""        AS target_icon,
+                u.""NickName""    AS target_nick_name,
+                a.title           AS archive_title,
+                COALESCE(a.closed_flg, true)  AS is_closed,
+                COALESCE(a.del_flg, true)     AS is_deleted
+            FROM t_sys_reports r
+            LEFT JOIN ""AspNetUsers"" u ON r.target_user_id = u.""Id""
+            LEFT JOIN t_memo_archive_pub a ON r.archive_id = a.archive_id
+            WHERE r.reporter_user_id = @user_id
+            ORDER BY r.report_tim DESC
+            LIMIT 100"; // 直近20件程度
+
+        return await QueryAsync<DtoMyReportDetail>(sql, new { user_id = _user.UserId });
+    }
+
 }

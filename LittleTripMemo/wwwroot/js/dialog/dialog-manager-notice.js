@@ -51,7 +51,7 @@ export default {
                 const child = $Dom.GenerateTemplate("tpl-list-child-review");
                 const score = rev.score || 0;
                 $Dom.QuerySelector(".js-stars", child).textContent = "★".repeat(score) + "☆".repeat(5 - score);
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(rev.create_tim, 'YYYY-MM-DD　HH:mm');
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(rev.create_tim);
                 $Dom.QuerySelector(".js-body", child).textContent = rev.body || "（内容なし）";
                 container.appendChild(child);
             });
@@ -161,7 +161,7 @@ export default {
 		const el = $Dom.GenerateTemplate('tpl-view-notice');
 		const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === notice.kind) || $Const.NOTICE_KIND.NOTICE;
         $Dom.QuerySelector('#view-notice-icon', el).textContent = kindObj.emoji;
-		$Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim, 'YYYY-MM-DD　HH:mm');
+		$Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(notice.update_tim);
 		$Dom.QuerySelector('#view-notice-title', el).textContent = notice.title;
 		$Dom.QuerySelector('#view-notice-body', el).textContent = notice.body;
         // リンクURLの表示制御 (共通メソッドを使用)
@@ -208,7 +208,7 @@ export default {
             const child = $Dom.GenerateTemplate("tpl-list-child-notice");
             // スタイルの初期適用
             setNoticeStyle(child, item.is_new);
-            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD　HH:mm');
+            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim);
             const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === item.kind) || $Const.NOTICE_KIND.NOTICE;
             $Dom.QuerySelector('.js-icon', child).textContent = kindObj.emoji;
             $Dom.QuerySelector(".js-title", child).textContent = item.title;

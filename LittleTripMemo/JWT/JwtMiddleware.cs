@@ -21,6 +21,13 @@ public class JwtMiddleware
     // JwtMiddleware.cs 内の Invoke メソッド
     public async Task Invoke(HttpContext context)
     {
+        // ✅ これを追加：OPTIONSリクエストなら何もしないで次へ渡す
+        if (context.Request.Method == "OPTIONS")
+        {
+            await _next(context);
+            return;
+        }
+
         var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
         if (!string.IsNullOrEmpty(token))

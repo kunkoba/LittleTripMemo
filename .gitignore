@@ -336,7 +336,7 @@ __pycache__/
 _Del/
 Migrations/
 LittleTripMemo/wwwroot copy*/
-
+postgres_data/
 
 
 # OpenCover UI analysis results

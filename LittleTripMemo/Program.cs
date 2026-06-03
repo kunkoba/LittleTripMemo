@@ -229,6 +229,10 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "https://2cd8-112-71-71-140.ngrok-free.app",
+                "http://localhost:8080",
+                "http://127.0.0.1:8080", // これも追加
+                "http://localhost:5000",
+                "http://127.0.0.1:5000", // これも念のため
                 "http://localhost:5500",
                 "http://127.0.0.1:5500",
                 "http://localhost:5501",
@@ -300,12 +304,20 @@ builder.Services
 var app = builder.Build();
 
 
-// ======================================================================
-// ■ ミドルウェアパイプライン（実行順が重要）
-// ======================================================================
+//// HTTPS 強制（ngrok 使用時は問題になる場合あり）
+//app.UseHttpsRedirection();
+
+// CORS 設定を有効化（フロントエンドからの別オリジン通信を許可）
+app.UseCors();
 
 // 全体例外を JSON レスポンスに変換
 app.UseMiddleware<ExceptionHandling>();
+
+
+
+// ======================================================================
+// ■ ミドルウェアパイプライン（実行順が重要）
+// ======================================================================
 
 
 //// Swagger UI（開発時のみ）
@@ -328,13 +340,6 @@ app.UseMiddleware<ExceptionHandling>();
 //// 静的ファイル配信
 //app.UseStaticFiles();
 
-
-
-// HTTPS 強制（ngrok 使用時は問題になる場合あり）
-app.UseHttpsRedirection();
-
-// CORS 設定を有効化（フロントエンドからの別オリジン通信を許可）
-app.UseCors();
 
 // JWTミドルウェア実行
 app.UseMiddleware<JwtMiddleware>();

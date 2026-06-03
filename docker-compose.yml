@@ -7,11 +7,14 @@ services:
         image: postgres:16
         # コンテナ名を指定
         container_name: trip_memo_db
+        # パソコン起動時やDocker再起動時にこのコンテナを自動起動する設定
+        restart: always
         # データベース接続用の環境変数
         environment:
             POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: password
-            POSTGRES_DB: littletripmemo_db
+            POSTGRES_PASSWORD: basiko8855
+            POSTGRES_DB: db_little_trip_memo
+            TZ: Asia/Tokyo # 🌟 タイムゾーンを日本に設定
         # ポート番号の設定（既存の5433番との衝突を避けるため、パソコン側は5434番で待ち受けます）
         ports:
             - "5434:5432"
@@ -27,10 +30,14 @@ services:
             dockerfile: Dockerfile
         # コンテナ名を指定
         container_name: trip_memo_api
+        # パソコン起動時やDocker再起動時にこのコンテナを自動起動する設定
+        restart: always
         # ポート番号の設定（ローカルマシンの5000番をコンテナの8080番に接続）
         ports:
             - "5000:8080"
-        # データベースの部屋が立ち上がってから起動するよう制御
+        environment:
+            TZ: Asia/Tokyo
+            ConnectionStrings__DefaultConnection: "Host=trip_memo_db;Port=5432;Database=db_little_trip_memo;Username=postgres;Password=basiko8855"
         depends_on:
             - postgres_db
 
@@ -40,6 +47,8 @@ services:
         image: nginx:alpine
         # コンテナ名を指定
         container_name: trip_memo_frontend
+        # パソコン起動時やDocker再起動時にこのコンテナを自動起動する設定
+        restart: always
         # ポート番号の設定（ローカルマシンの8080番をコンテナの80番に接続）
         ports:
             - "8080:80"

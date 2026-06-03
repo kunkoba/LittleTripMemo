@@ -37,7 +37,7 @@ export default {
             const sorted = [...notices].sort((a, b) => new Date(b.update_tim) - new Date(a.update_tim));
             sorted.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-notice");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY-MM-DD　HH:mm');
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim);
                 const kindObj = Object.values($Const.NOTICE_KIND).find(k => k.id === item.kind) || $Const.NOTICE_KIND.NOTICE;
                 $Dom.QuerySelector(".js-title", child).textContent = `${kindObj.emoji} ${item.title}`;
                 $Dom.QuerySelector(".js-body", child).textContent = item.body;
@@ -221,7 +221,7 @@ export default {
         } else {
             reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
-                $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim, 'YYYY-MM-DD　HH:mm');
+                $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim);
                 $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
                 child.classList.add("cursor-pointer", "active:bg-slate-50");
                 child.onclick = () => this.ShowAdminReportItemDetail(rep);
@@ -251,7 +251,7 @@ export default {
     async ShowAdminReportItemDetail(rep) {
         const el = $Dom.GenerateTemplate("tpl-admin-report-item-detail");
         // 1. 日時と本文の反映
-        $Dom.QuerySelector(".js-report-tim", el).textContent = $Util.FormatDate(rep.report_tim, "YYYY-MM-DD　HH:mm");
+        $Dom.QuerySelector(".js-report-tim", el).textContent = $Util.FormatDate(rep.report_tim);
         $Dom.QuerySelector(".js-report-body", el).textContent = rep.body || "（内容なし）";
         // 2. ユーザーボタンの反映（アイコン＋ニックネーム）
         const userIcon = $Dom.QuerySelector("#view-report-user-icon", el);
@@ -306,7 +306,7 @@ export default {
         } else {
             feedbackList.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim, 'YYYY-MM-DD　HH:mm');
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim);
                 $Dom.QuerySelector(".js-score", child).textContent = "★".repeat(item.score) + "☆".repeat(5 - item.score);
                 $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
                 child.onclick = () => this.ShowAdminFeedbackDetail(item);
@@ -318,7 +318,7 @@ export default {
     // 【管理者機能】フィードバック詳細
     ShowAdminFeedbackDetail(item) {
         const el = $Dom.GenerateTemplate("tpl-admin-feedback-detail");
-        $Dom.QuerySelector(".js-date", el).textContent = $Util.FormatDate(item.create_tim, 'YYYY-MM-DD　HH:mm');
+        $Dom.QuerySelector(".js-date", el).textContent = $Util.FormatDate(item.create_tim);
         $Dom.QuerySelector(".js-score", el).textContent = "★".repeat(item.score) + "☆".repeat(5 - item.score);
         $Dom.QuerySelector(".js-body", el).textContent = item.body || "（内容なし）";
         // --- ユーザーボタンへの反映 ---
@@ -399,7 +399,7 @@ export default {
         } else {
             mails.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-user-mail");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim, 'YYYY-MM-DD　HH:mm');
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim);
                 $Dom.QuerySelector(".js-target-icon", child).textContent = item.icon || "👤";
                 $Dom.QuerySelector(".js-target-user", child).textContent = item.nick_name || item.user_id.slice(0,8);
                 $Dom.QuerySelector(".js-emoji", child).textContent = item.emoji || "✉️";
