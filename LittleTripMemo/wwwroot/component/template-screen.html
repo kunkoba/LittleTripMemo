@@ -121,8 +121,8 @@
 			<div id="view-profile-icon" class="text-[4rem] drop-shadow-md shrink-0"></div>
 			<div class="flex flex-col flex-1 min-w-0"><h1 id="view-profile-nickname" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight"></h1></div>
 		</div>
-		<div id="view-profile-description" class="text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words min-h-[200px] overflow-y-auto pr-2"></div>
-		<div id="view-profile-links" class="gap-3 flex my-3"></div>
+		<div id="view-profile-description" class="flex-1 bg-brand-1 rounded-lg p-2 text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words min-h-[200px] overflow-y-auto pr-2"></div>
+		<div id="view-profile-links" class="gap-3 flex my-1"></div>
 	</div>
 </template>
 
@@ -155,8 +155,8 @@
         <!-- 2. 金額（左） ＋ ユーザ情報（右） の並列エリア -->
         <div class="flex items-center justify-between gap-2 mb-6">
             <!-- 右：ユーザ情報（プロフボタン） -->
-            <button id="btn-mem-user-profile" 
-                class="border border-slate-100 rounded-full pl-2 pr-4 h-10 min-w-[100px] border-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
+            <button id="btn-mem-user-profile"
+                class="rounded-full pl-2 pr-4 h-10 min-w-[100px] border-4 shadow-md flex items-center gap-2">
                 <span id="view-mem-user-icon" class="text-[1.4rem] drop-shadow-md"></span>
                 <span id="view-mem-user-id" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
             </button>
@@ -166,7 +166,7 @@
 			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight border-l-4 border-brand-3 pl-3"></h1>
 		</div>
 		<!-- 3. 本文（中央） -->
-		<div id="view-mem-body" class="text-[1rem] min-h-[200px] overflow-y-auto pr-2 text-slate-600 leading-[2] whitespace-pre-wrap break-words mb-2">
+		<div id="view-mem-body" class="flex-1 bg-brand-1 rounded-lg p-2 text-[1rem] min-h-[200px] overflow-y-auto pr-2 text-slate-600 leading-[2] whitespace-pre-wrap break-words mb-2">
 		</div>
 		<!-- 4. 下部アクション（リンク ＋ メモ数） -->
 		<div class="mt-auto pb-1 flex items-end justify-between border-t border-slate-50">
@@ -180,7 +180,7 @@
 				<!-- ここにアイコンが挿入される -->
 			</a>
 			<!-- 右下：件数（横長ボタン風） -->
-			<button id="btn-view-mem-timeline" class="h-12 shadow-md rounded-[1rem] border border-slate-100 flex items-center justify-center gap-2 bg-brand-1 active:scale-95 transition-transform px-4 outline-none">
+			<button id="btn-view-mem-timeline" class="h-12 shadow-md rounded-[1rem] flex items-center justify-center gap-2 active:scale-95 transition-transform px-4 outline-none">
 				<span id="mem-stat-count" class="text-[1.1rem] font-black text-slate-800">0</span>
 				<span class="text-[0.7rem] font-bold text-slate-400 uppercase tracking-wider">memos</span>
 			</button>
@@ -241,7 +241,7 @@
             <h1 id="view-notice-title" class="text-[1.2rem] font-black text-slate-800 break-words"></h1>
         </div>
 		<!-- 3. 本文（ で統一） -->
-		<div id="view-notice-body" class="text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words pt-2 min-h-[200px] overflow-y-auto pr-2"></div>
+		<div id="view-notice-body" class="flex-1 bg-brand-1 rounded-lg p-2 text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words pt-2 min-h-[200px] overflow-y-auto pr-2"></div>
         <!-- 4. リンク表示エリア -->
 		<div id="view-notice-url-wrapper" class="hidden mt-auto flex py-1">
             <a id="view-notice-url" href="" target="_blank" 
@@ -281,7 +281,6 @@
         <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2 px-1">
             <span class="js-report-tim text-[0.85rem] font-black text-slate-400 italic"></span>
         </div>
-        
         <!-- ターゲットユーザー情報 -->
         <div class="mb-5 px-1">
             <label class="block font-black text-slate-400 text-[0.6rem] mb-2 uppercase tracking-widest">Reported User</label>
@@ -291,7 +290,6 @@
                 <span id="view-report-target-name" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
             </button>
         </div>
-
         <!-- ターゲットアーカイブ情報（ジャンプボタン） -->
         <div class="mb-5 px-1">
             <label class="block font-black text-slate-400 text-[0.6rem] mb-2 uppercase tracking-widest">Target Archive</label>
@@ -303,7 +301,6 @@
                 <span class="text-[1.2rem] ml-2">🗺️</span>
             </button>
         </div>
-
         <!-- 通報内容 -->
         <div class="flex-1 overflow-y-auto px-1 pb-4">
             <label class="block font-black text-slate-400 text-[0.6rem] mb-2 uppercase tracking-widest">Your Report Body</label>

@@ -165,8 +165,9 @@
         <!-- 2. メッセージアイコン入力 (明細画面の MARKER レイアウト) -->
         <div class="px-1 w-[50%]">
             <label class="block font-black text-black-3 text-[0.6rem] mb-1 uppercase tracking-wider">Message Icon</label>
-            <div class="flex items-center justify-between border-b-2 border-brand-3 pb-1">
-                <button id="btn-admin-send-emoji-trigger" type="button" class="h-[36px] w-full text-left text-[1.8rem] outline-none active:scale-95">
+            <div class="flex items-center justify-between pb-1">
+                <button id="btn-admin-send-emoji-trigger" type="button" 
+                    class="h-[36px] w-full text-left text-[1.8rem] outline-none active:scale-95">
                     <span id="admin-send-emoji-preview">✉️️</span>
                     <input type="hidden" id="admin-send-emoji-val" value="✉️️">
                 </button>
@@ -228,19 +229,19 @@
 
 <!-- 【リスト子】自分の通報履歴アイテム -->
 <template id="tpl-list-child-my-report">
-    <div class="js-item-card bg-white border border-brand-1 p-3 mb-3 shadow-sm rounded-[1rem] cursor-pointer active:scale-[0.98] transition-transform">
+    <div class="js-item-card bg-white border border-brand-1 p-3 mb-3 shadow-md cursor-pointer active:scale-[0.98] transition-transform">
         <div class="flex justify-between items-center mb-1">
-            <span class="js-date text-[0.7rem] font-black text-slate-400 italic"></span>
+            <span class="js-date text-[0.8rem] font-black text-slate-400 italic"></span>
             <div class="flex gap-1">
-                <span class="js-badge-deleted hidden bg-slate-500 text-white text-[8px] px-2 py-0.5 rounded-full">DELETED</span>
-                <span class="js-badge-closed hidden bg-red-400 text-white text-[8px] px-2 py-0.5 rounded-full">CLOSED</span>
+                <span class="hidden bg-slate-500 text-white text-[10px] px-2 py-0.5 rounded-full js-badge-deleted">DELETED</span>
+                <span class="hidden bg-red-400   text-white text-[10px] px-2 py-0.5 rounded-full js-badge-closed ">CLOSED</span>
             </div>
         </div>
-        <div class="flex items-center gap-2 mb-1">
-            <span class="text-[0.6rem] text-slate-400 uppercase font-black">Target:</span>
-            <span class="js-target text-[0.8rem] font-bold text-black-5 truncate"></span>
+        <!-- 宛先表示をアイコン＋ニックネームに変更 -->
+        <div class="w-[200px] flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 shadow-sm">
+            <span class="flex js-target text-[0.8rem] font-bold text-black-5 truncate"></span>
         </div>
-        <div class="text-[0.7rem] text-slate-500 line-clamp-1 bg-slate-50 p-1.5 rounded-md border border-slate-100">
+        <div class="text-[0.7rem] text-slate-500 line-clamp-1 mt-2">
             <span class="js-body"></span>
         </div>
     </div>

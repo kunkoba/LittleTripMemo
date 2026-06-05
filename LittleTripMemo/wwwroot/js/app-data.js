@@ -394,7 +394,7 @@ window.$Data = {
             await $Warn.CatchAsync(async () => {
                 await $LocalDb.Reaction.ParseAndSaveMyReactions(archiveId, rawReactions, details);
                 // 通知
-                $Notice.Info(`SyncReactions: Archive ${archiveId} の同期完了`);
+                console.log(`SyncReactions: Archive ${archiveId} の同期完了`);
             })();
         },
         // バックグラウンドでリアクションを一括送信

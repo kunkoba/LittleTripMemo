@@ -13,7 +13,7 @@ public class UpdateUserProfileService : _BaseService
 
     public record UpdateUserReq(
         string icon,
-        string nickName,
+        string nick_name,
         string description,
         string link1,
         string link2,
@@ -40,7 +40,7 @@ public class UpdateUserProfileService : _BaseService
 
         // 更新
         user.Icon = req.icon;
-        user.NickName = req.nickName;
+        user.NickName = req.nick_name;
         user.Description = req.description;
         user.Link1 = req.link1;
         user.Link2 = req.link2;
@@ -61,8 +61,8 @@ public class UpdateUserProfileService : _BaseService
         BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(_user.TableId == 0, "テーブルIDが無効です");
 
-        BusinessException.ThrowIf(string.IsNullOrWhiteSpace(req.nickName), "ニックネームは必須です");
-        BusinessException.ThrowIf(req.nickName.Length > 50, "ニックネームが長すぎます");
+        BusinessException.ThrowIf(string.IsNullOrWhiteSpace(req.nick_name), "ニックネームは必須です");
+        BusinessException.ThrowIf(req.nick_name.Length > 50, "ニックネームが長すぎます");
         BusinessException.ThrowIf(req.description?.Length > 500, "説明文が長すぎます");
 
         await Task.CompletedTask;
