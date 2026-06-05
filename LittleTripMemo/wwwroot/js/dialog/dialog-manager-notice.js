@@ -73,7 +73,7 @@ export default {
     },
     // レビュー（フィードバック）投稿画面
     async ShowReviewPost() {
-        // ★ ダイアログを開く前に自分の過去の投稿データを取得
+        // ダイアログを開く前に自分の過去の投稿データを取得
         const isSuccess = await $Data.Access.GetMyFeedback();
         if (!isSuccess) return;
         // 取得したデータがあれば初期値として設定

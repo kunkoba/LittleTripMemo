@@ -18,9 +18,10 @@ public class MergeDetailsService : _BaseService
     private readonly DetailRepository _detailRepo;
 
     public record MergeDetailsReq(
+        [Required] Guid login_user_id, // ★ 追加
         [Required(ErrorMessage = "seqリストは必須です")] int[] seqs,
         [Required(ErrorMessage = "タイトルは必須です")][StringLength(100)] string title
-    );
+    ) : ILoginUserRequest; // ★ インターフェースを実装
 
     public record Response(int archiveId, int updatedCount);
 

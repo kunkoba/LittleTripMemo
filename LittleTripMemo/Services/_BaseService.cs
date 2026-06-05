@@ -8,7 +8,8 @@ public abstract class _BaseService
     // 継承先のサービスから自由に参照可能
     protected readonly UserContext _user;
 
-    protected _BaseService(UserContext userContext)
+    protected _BaseService(
+        UserContext userContext)
     {
         _user = userContext;
     }
@@ -34,5 +35,6 @@ public abstract class _BaseService
             entity.is_owner = (entity.user_id == _user.UserId);
         }
     }
+
 }
 

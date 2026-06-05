@@ -1,16 +1,8 @@
-// 現在のログインユーザーIDを取得（未ログイン時は 'anonymous'）
-const getUserId = () => {
-    if ($App.AppData.Owner.systemInfo) {
-        return $App.AppData.Owner.systemInfo.login_user_id;
-    }
-    return '';
-};
-
 // IndexedDBの低レイヤー操作を担当する現場作業員（Core）
 const _LocalDbCore = {
     db: null,
     DB_NAME: "littleTripMemoDb",
-    VERSION: 3, // スキーマ変更のためバージョンを3に引き上げ
+    VERSION: 2,
     // トランザクションモード定義
     TRANSACTION_MODES: {
         READONLY: 'readonly',
@@ -31,7 +23,7 @@ const _LocalDbCore = {
             // 構造変更時のテーブル作成
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
-                this._createStores(db, event.oldVersion);
+                this._createStores(db);
             };
             request.onsuccess = (event) => {
                 this.db = event.target.result;
@@ -47,7 +39,7 @@ const _LocalDbCore = {
     // ※※※※ データベースを削除する関数 ※※※※
     __deleteAllDatabases() {
         console.log("◆__deleteAllDatabases");
-        const request = indexedDB.deleteDatabase(this.DB_NAME);
+        const request = indexedDB.deleteDatabase(this.DB_NAME);    // dbNameは削除したいデータベース名
         request.onsuccess = () => {
             console.log(`deleteAllDatabases >> データベース ${this.DB_NAME} は削除されました`);
         };
@@ -59,30 +51,22 @@ const _LocalDbCore = {
         };
     },
     // 各ストア（テーブル）の作成とインデックス設定
-    _createStores(db, oldVersion) {
-        // バージョン3未満の古いストアが存在すれば削除してスキーマを更新する
-        if (oldVersion < 3) {
-            if (db.objectStoreNames.contains(this.STORE_NAMES.DETAIL)) db.deleteObjectStore(this.STORE_NAMES.DETAIL);
-            if (db.objectStoreNames.contains(this.STORE_NAMES.REACTION)) db.deleteObjectStore(this.STORE_NAMES.REACTION);
-            if (db.objectStoreNames.contains(this.STORE_NAMES.NOTICE)) db.deleteObjectStore(this.STORE_NAMES.NOTICE);
-            if (db.objectStoreNames.contains(this.STORE_NAMES.MAIL)) db.deleteObjectStore(this.STORE_NAMES.MAIL);
-        }
-
-        // 詳細データ（主キーはdbidだが、データ内に user_id を持つ）
+    _createStores(db) {
+        // 詳細データ
         if (!db.objectStoreNames.contains(this.STORE_NAMES.DETAIL)) {
-            db.createObjectStore(this.STORE_NAMES.DETAIL, { keyPath: "dbid", autoIncrement: true });
+            const store = db.createObjectStore(this.STORE_NAMES.DETAIL, { keyPath: "dbid", autoIncrement: true });
         }
-        // リアクション（ユーザーごとの分離のため user_id も複合キーに含める）
+        // リアクション（archive_id と seq の複合キー）
         if (!db.objectStoreNames.contains(this.STORE_NAMES.REACTION)) {
-            db.createObjectStore(this.STORE_NAMES.REACTION, { keyPath: ["user_id", "archive_id", "seq"] });
+            const store = db.createObjectStore(this.STORE_NAMES.REACTION, { keyPath: ["archive_id", "seq"] });
         }
-        // 通知既読履歴（ユーザーごとに既読を管理）
+        // 通知既読履歴（seqをキーとする）
         if (!db.objectStoreNames.contains(this.STORE_NAMES.NOTICE)) {
-            db.createObjectStore(this.STORE_NAMES.NOTICE, { keyPath: ["user_id", "seq"] });
+            const store = db.createObjectStore(this.STORE_NAMES.NOTICE, { keyPath: "seq" });
         }
-        // ユーザあて通知（ユーザーごとに既読を管理）
+        // ユーザあて通知（seqをキーとする）
         if (!db.objectStoreNames.contains(this.STORE_NAMES.MAIL)) {
-            db.createObjectStore(this.STORE_NAMES.MAIL, { keyPath: ["user_id", "seq"] });
+            db.createObjectStore(this.STORE_NAMES.MAIL, { keyPath: "seq" });
         }
     },
     // トランザクションからオブジェクトストアを取得
@@ -170,8 +154,10 @@ const _LocalDbCore = {
         return new Promise((resolve, reject) => {
             try {
                 const store = this._getStore(storeName, this.TRANSACTION_MODES.READWRITE);
+                // IndexedDBのクリア命令を発行
                 const request = store.clear();
                 request.onsuccess = () => {
+                    // 削除成功
                     resolve(true);
                 };
                 request.onerror = (e) => {
@@ -206,6 +192,32 @@ const _LocalDbCore = {
             request.onsuccess = () => resolve(request.result);
             request.onerror = (e) => reject(e.target.error);
         });
+    },
+    // 指定件数を超えた古いデータを削除
+    async trimStoreSize(storeName, maxCount, sortKey, sortOrder = "asc") {
+        try {
+            const count = await this.getCount(storeName);
+            if (count <= maxCount) return;
+            const store = this._getStore(storeName, this.TRANSACTION_MODES.READWRITE);
+            const direction = sortOrder === "desc" ? "prev" : "next";
+            let cursorRequest;
+            if (store.indexNames.contains(sortKey)) {
+                cursorRequest = store.index(sortKey).openCursor(null, direction);
+            } else {
+                cursorRequest = store.openCursor(null, direction);
+            }
+            let deleteCount = count - maxCount;
+            cursorRequest.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor && deleteCount > 0) {
+                    cursor.delete(); 
+                    deleteCount--;
+                    cursor.continue();
+                }
+            };
+        } catch (error) {
+            console.error("Core Trim Error:", error);
+        }
     }
 };
 
@@ -229,48 +241,33 @@ const LocalDbController = {
         // データ保存（成否が返却、「dbid」が付与される）
         async Save(detail) {
             detail.send_flag = 0;
-            detail.user_id = getUserId();
             return await _LocalDbCore.upsertData(this.storeName, detail);
         },
-        // 現在のユーザーの全データを送信対象（フラグ1）に更新
+        // 全データを送信対象（フラグ1）に更新
         async SetSendFlg() {
-            const uid = getUserId();
             return await _LocalDbCore.updateAll(this.storeName, (item) => {
-                if (item.user_id === uid) item.send_flag = 1;
+                item.send_flag = 1;
                 return item;
             });
         },
         // 送信完了済みデータ（フラグ1）のみ一括削除
         async DeleteSentAll() {
-            const uid = getUserId();
-            return await _LocalDbCore.deleteByFilter(this.storeName, (item) => item.user_id === uid && item.send_flag === 1);
+            return await _LocalDbCore.deleteByFilter(this.storeName, (item) => item.send_flag === 1);
         },
-        // ログイン中のユーザーのデータを全件削除
-        async DeleteAll() { 
-            const uid = getUserId();
-            return await _LocalDbCore.deleteByFilter(this.storeName, (item) => item.user_id === uid);
-        },
+        // 全件削除
+        async DeleteAll() { return await _LocalDbCore.deleteAllData(this.storeName); },
         // １件削除
         async DeleteById(dbid) { 
             return await _LocalDbCore.deleteByKey(this.storeName, dbid); 
         },
-        // ログイン中のユーザーの件数取得
-        async GetCount() { 
-            const uid = getUserId();
-            const all = await _LocalDbCore.getAllData(this.storeName);
-            return all.filter(item => item.user_id === uid).length;
-        },
-        // ログイン中のユーザーの全件取得
-        async GetAll() { 
-            const uid = getUserId();
-            const all = await _LocalDbCore.getAllData(this.storeName);
-            return all.filter(item => item.user_id === uid);
-        },
+        // 件数取得
+        async GetCount() { return await _LocalDbCore.getCount(this.storeName); },
+        // 全件取得
+        async GetAll() { return await _LocalDbCore.getAllData(this.storeName); },
         // 保存処理失敗時
         async RevertSendFlg() {
-            const uid = getUserId();
             return await _LocalDbCore.updateAll(this.storeName, (item) => {
-                if (item.user_id === uid && item.send_flag === 1) item.send_flag = 0;
+                if (item.send_flag === 1) item.send_flag = 0;
                 return item;
             });
         },
@@ -280,25 +277,23 @@ const LocalDbController = {
         storeName: _LocalDbCore.STORE_NAMES.REACTION,
         // 保存（1seq=1レコード形式をUpsert）
         async Save(reactionData) {
+            // send_flag が未設定の場合は 0 (未送信) とする
             if (reactionData.send_flag === undefined) reactionData.send_flag = 0;
-            reactionData.user_id = getUserId();
             return await _LocalDbCore.upsertData(this.storeName, reactionData);
         },
         // 特定の明細のリアクションを取得
         async Get(archiveId, seq) {
-            return await _LocalDbCore.getDataByKey(this.storeName, [getUserId(), Number(archiveId), Number(seq)]);
+            return await _LocalDbCore.getDataByKey(this.storeName, [Number(archiveId), Number(seq)]);
         },
         // 未送信(send_flag = 0)のものを全取得
         async GetUnsentAll() {
-            const uid = getUserId();
             const all = await _LocalDbCore.getAllData(this.storeName);
-            return all.filter(item => item.user_id === uid && item.send_flag === 0);
+            return all.filter(item => item.send_flag === 0);
         },
         // サーバーからの生データ（1リアクション＝1レコード）を受け取り、ローカルDBに同期する
         async ParseAndSaveMyReactions(archiveId, rawReactions, allDetails = []) {
             if (!archiveId) return;
             const targetArchiveId = Number(archiveId);
-            const uid = getUserId();
             // 1. ローカルの未送信(send_flag === 0)を保護（既存ロジック）
             const unsentList = await this.GetUnsentAll();
             const unsentSeqs = unsentList
@@ -335,7 +330,6 @@ const LocalDbController = {
         // ヘルパー：空のリアクションオブジェクト生成
         _createEmptyReaction(archiveId, seq, sendFlag = 0) {
             return {
-                user_id: getUserId(),
                 archive_id: archiveId,
                 seq: seq,
                 is_funny: false,
@@ -352,7 +346,6 @@ const LocalDbController = {
         // 既読履歴の保存（詳細を開いた時に呼ぶ）
         async Save(seq, update_tim, disp_to) {
             const data = {
-                user_id: getUserId(),
                 seq: Number(seq),
                 update_tim: update_tim,
                 disp_to: disp_to
@@ -361,16 +354,12 @@ const LocalDbController = {
         },
         // 全件取得（一覧を開いた時の突合用）
         async GetAll() {
-            const uid = getUserId();
-            const all = await _LocalDbCore.getAllData(this.storeName);
-            return all.filter(item => item.user_id === uid);
+            return await _LocalDbCore.getAllData(this.storeName);
         },
         // 期限切れデータのクリーンアップ（一覧を開いた時などに呼ぶ）
         async Cleanup() {
             const now = new Date();
-            const uid = getUserId();
             return await _LocalDbCore.deleteByFilter(this.storeName, (item) => {
-                if (item.user_id !== uid) return false;
                 if (!item.disp_to) return false;
                 const toDate = new Date(item.disp_to);
                 return now > toDate; // 現在時刻が disp_to を過ぎていれば削除対象
@@ -381,19 +370,14 @@ const LocalDbController = {
     Mail: {
         storeName: _LocalDbCore.STORE_NAMES.MAIL,
         async Save(seq, send_tim) {
-            return await _LocalDbCore.upsertData(this.storeName, { 
-                user_id: getUserId(), 
-                seq: Number(seq), 
-                send_tim: send_tim 
-            });
+            return await _LocalDbCore.upsertData(this.storeName, { seq: Number(seq), send_tim: send_tim });
         },
-        async GetAll() { 
-            const uid = getUserId();
-            const all = await _LocalDbCore.getAllData(this.storeName); 
-            return all.filter(item => item.user_id === uid);
-        }
+        async GetAll() { return await _LocalDbCore.getAllData(this.storeName); }
     },
 };
 
+// LocalDbController.RemoveDB();
+
 // Public
 export default LocalDbController;
+

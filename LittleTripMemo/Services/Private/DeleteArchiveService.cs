@@ -17,8 +17,9 @@ public class DeleteArchiveService : _BaseService
     private readonly DetailRepository _detailRepo;
 
     public record DeleteArchiveReq(
+        [Required] Guid login_user_id, // ★ 追加
         [Required(ErrorMessage = "アーカイブIDは必須です")] int archive_id
-    );
+    ) : ILoginUserRequest; // ★ インターフェースを実装
 
     public record Response(bool is_success, string message);
 

@@ -3,11 +3,14 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Services;
+using System.ComponentModel.DataAnnotations;
 
 public class UpsertNotificationService : _BaseService
 {
     private readonly SysNotificationRepository _repo;
+
     public record UpsertNotificationReq(
+        [Required] Guid login_user_id, // ★ 追加
         long seq,
         string title,
         string body,
@@ -15,7 +18,8 @@ public class UpsertNotificationService : _BaseService
         short kind,
         DateTime disp_from,
         DateTime disp_to
-    );
+    ) : ILoginUserRequest; // ★ インターフェースを実装
+
     public record Response(bool is_success);
 
     public UpsertNotificationService(UserContext user, SysNotificationRepository repo) : base(user) => _repo = repo;

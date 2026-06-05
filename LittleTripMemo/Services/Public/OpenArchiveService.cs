@@ -1,6 +1,7 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Repository;
+using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services;
 
@@ -8,7 +9,11 @@ public class OpenArchiveService : _BaseService
 {
     private readonly ArchivePubRepository _archivePubRepo;
 
-    public record OpenArchiveReq(int archive_id);
+    public record OpenArchiveReq(
+        [Required] Guid login_user_id, // ★ 追加
+        int archive_id
+    ) : ILoginUserRequest; // ★ インターフェースを実装
+
     public record Response(int archiveId);
 
     public OpenArchiveService(

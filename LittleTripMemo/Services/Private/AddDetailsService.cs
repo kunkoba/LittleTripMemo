@@ -18,9 +18,10 @@ public class AddDetailsService : _BaseService
     private readonly DetailRepository _detailRepo;
 
     public record AddDetailsReq(
+        [Required] Guid login_user_id, // ★ 追加
         [Required(ErrorMessage = "seqリストは必須です")] int[] seqs,
         [Required(ErrorMessage = "archiveIdは必須です")] int archive_id
-    );
+    ) : ILoginUserRequest; // ★ インターフェースを実装
 
     public record Response(int archiveId, int updatedCount);
 

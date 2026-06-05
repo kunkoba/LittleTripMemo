@@ -72,7 +72,7 @@ export default {
             title: "NOTICE Mgmt",
             content: root,
             help: "システム全体への通知を管理します。\n下のボタンから新規作成、一覧の項目タップで編集が可能です。",
-            // ★ 新規登録ボタンをここ（下部ボタンエリア）に配置
+            // 新規登録ボタンをここ（下部ボタンエリア）に配置
             buttons: [
                 {
                     label: "＋ CREATE NEW NOTICE",

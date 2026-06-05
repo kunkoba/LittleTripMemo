@@ -272,6 +272,12 @@ const _DetailFrameCore = {
     },
     // リアクションボタンクリック
     async _onReactionClick(propName, unusedType) {
+        // 未ログイン時はダイアログを出して処理を中断
+        if (!$App.AppData.Context.IsLoggedIn) {
+            $Notice.Warn("ログインが必要です。");
+            // $Dialog.ShowLoginDialog();
+            return;
+        }
         const detail = $DetailContent.GetFormEditData();
         if (!detail || !detail.archive_id) return;
         // 1. 自分のまとめの場合は何もしない

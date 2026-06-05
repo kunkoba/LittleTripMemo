@@ -3,11 +3,19 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Services;
+using System.ComponentModel.DataAnnotations;
 
 public class UpsertReportService : _BaseService
 {
     private readonly SysReportRepository _repo;
-    public record UpsertReportReq(Guid target_user_id, long archive_id, string? body);
+
+    public record UpsertReportReq(
+        [Required] Guid login_user_id, // ★ 追加
+        Guid target_user_id, 
+        long archive_id, 
+        string? body
+    ) : ILoginUserRequest; // ★ インターフェースを実装
+
     public record Response(bool is_success);
 
     public UpsertReportService(UserContext user, SysReportRepository repo) : base(user) => _repo = repo;

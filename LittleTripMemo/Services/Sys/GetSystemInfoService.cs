@@ -15,7 +15,7 @@ public class GetSystemInfoService : _BaseService
 
     // 統合されたレスポンス構造
     public record SystemInfoData(
-        // --- システム全体（全ユーザー共通） ---
+        Guid login_user_id, // ★追加
         double score_avg,
         IEnumerable<DtoFeedbackDetail> feedbacks,
         IEnumerable<TSysNotification> notifications,
@@ -69,7 +69,7 @@ public class GetSystemInfoService : _BaseService
         }
 
         return new Response(new SystemInfoData(
-            avg, feeds, notes, profile, userNotes, myReports
+            _user.UserId, avg, feeds, notes, profile, userNotes, myReports
         ));
     }
 

@@ -13,13 +13,14 @@ public class UpsertReactionService : _BaseService
 
     // リクエスト：1レコードで各リアクションをフラグ(bool)で表現
     public record UpsertReactionReq(
+        [Required] Guid login_user_id, // ★ 追加
         [Required] int archive_id,
         [Required] int seq,
         bool is_funny,    // type: 1
         bool is_love,     // type: 2
         bool is_surprise, // type: 3
         bool is_sad       // type: 4
-    );
+    ) : ILoginUserRequest; // ★ インターフェースを実装
 
     // レスポンス：DBの生データ形式（通常のデータ）をそのまま配列で返す
     public record Response(IEnumerable<TReactionPub> reactions);

@@ -24,8 +24,9 @@ public class BulkSyncReactionService : _BaseService
     );
 
     public record BulkSyncReactionReq(
+        [Required] Guid login_user_id, // ★ 追加
         [Required] IEnumerable<ReactionSyncItem> items
-    );
+    ) : ILoginUserRequest; // ★ インターフェースを実装
 
     public record Response(bool is_success, int updatedCount);
 

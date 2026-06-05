@@ -10,9 +10,8 @@ window.$Data = {
     },
     // 通信関連のメソッド群
     Access: {
-        // baseUrl_2: "https://localhost:7292",
-        // Docker環境のapi_server（5000番ポート）に向けた接続先URL
-        baseUrl: "http://localhost:5000",
+        baseUrl: "https://localhost:7292",
+        // baseUrl: "http://localhost:5000",   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
         _rawData: {
             archive: null,
             details: [],
@@ -22,8 +21,8 @@ window.$Data = {
         },
         // サーバー通信の基礎
         async _fetchData(method, url, params, isDebug = false) {
-            // メイン処理
             console.log("▼ Access:", this.baseUrl + url, params);
+            // メイン処理
             const token = $App.AppData.Owner.Token;
             const options = {
                 method: method.toUpperCase(),
@@ -32,7 +31,14 @@ window.$Data = {
                     "Authorization": token ? `Bearer ${token}` : ""
                 }
             };
-            if (options.method !== "GET" && params) options.body = JSON.stringify(params);
+            // if (options.method !== "GET" && params) options.body = JSON.stringify(params);
+            if (options.method !== "GET" && params) {
+                // paramsにプロパティがあるときだけ、全リクエストに login_user_id を自動で混ぜる
+                if (params && Object.keys(params).length > 0 && $App.AppData.Owner.systemInfo) {
+                    params.login_user_id = $App.AppData.Owner.systemInfo.login_user_id;
+                }
+                options.body = JSON.stringify(params);
+            }
             // 接続
             const response = await fetch(this.baseUrl + url, options);
             // 結果
@@ -313,13 +319,13 @@ window.$Data = {
             if (!this._archive) return;
             // メモリ上のデータ更新
             Object.assign(this._archive, updatedFields);
-            // ★追加：大元の生データも更新する
+            // 生データも更新する
             if ($Data.Access._rawData.archive) Object.assign($Data.Access._rawData.archive, updatedFields);
             if (this._archiveList) {
                 const target = this._archiveList.find(a => a.archive_id === this._archive.archive_id);
                 if (target) Object.assign(target, updatedFields);
             }
-            // ★追加：大元の生リストデータも更新する
+            // 生リストデータも更新する
             if ($Data.Access._rawData.archiveList) {
                 const rawTarget = $Data.Access._rawData.archiveList.find(a => a.archive_id === this._archive.archive_id);
                 if (rawTarget) Object.assign(rawTarget, updatedFields);

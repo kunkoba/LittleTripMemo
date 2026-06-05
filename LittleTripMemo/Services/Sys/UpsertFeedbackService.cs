@@ -3,11 +3,18 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Services;
+using System.ComponentModel.DataAnnotations;
 
 public class UpsertFeedbackService : _BaseService
 {
     private readonly SysFeedbackRepository _repo;
-    public record UpsertFeedbackReq(string? body, int score);
+
+    public record UpsertFeedbackReq(
+        [Required] Guid login_user_id, // ★ 追加
+        string? body, 
+        int score
+    ) : ILoginUserRequest; // ★ インターフェースを実装
+
     public record Response(bool is_success);
 
     public UpsertFeedbackService(UserContext user, SysFeedbackRepository repo) : base(user) => _repo = repo;

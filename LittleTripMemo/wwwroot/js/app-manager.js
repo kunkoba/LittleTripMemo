@@ -65,7 +65,7 @@ const AppManager = {
     // 定期タスクの定義と開始
     _initPollingTasks() {
         $Polling.Init();
-        // オンライン監視（秒）
+        // オフライン監視
         $Polling.Add($Polling.TASKS.OFFLINE_CHECK, () => {
             const isOn = navigator.onLine;
             $App.AppData.Context.IsOnline = isOn;    // オフライン状態を保持
@@ -82,7 +82,9 @@ const AppManager = {
                 console.log("-- offline --");
             }
         }, 30);
+        // オンライン監視
         if ($App.AppData.Context.IsOnline) {
+            // GPSトラッキング
             if ($App.AppData.Owner.IsGpsTracking) {
                 // 現在地追従（秒）
                 $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
@@ -92,6 +94,7 @@ const AppManager = {
             }
             // データ送信処理（秒）
             $Polling.Add($Polling.TASKS.DATA_DETAIL, async () => {
+                if (!$App.AppData.Context.IsLoggedIn) return;
                 if (await $LocalDb.Detail.GetCount() === 0) return;
                 await $Warn.CatchAsync(async () => {
                     // 全て $Data.LocalDb に任せる
@@ -102,7 +105,7 @@ const AppManager = {
             }, 60);
             // リアクションデータ送信処理（秒）
             $Polling.Add($Polling.TASKS.DATA_REACTION, async () => {
-                // 未送信リアクションの件数をチェック
+                if (!$App.AppData.Context.IsLoggedIn) return;
                 const unsent = await $LocalDb.Reaction.GetUnsentAll();
                 if (!unsent || unsent.length === 0) return;
                 await $Warn.CatchAsync(async () => {
@@ -132,10 +135,19 @@ const AppManager = {
     },
     // アプリ起動時フロー
     async Init() {
-        // ★修正：最初に設定をロードし、トークンがあればログイン状態にしておく
         this._loadSettings();
+        await $LocalDb.Init();
+        // 最初に設定をロードし、トークンがあればログイン状態にしておく
         if (this.AppData.Owner.Token) {
             this.AppData.Context.IsLoggedIn = true;
+            // システム情報取得
+            if (!$App.AppData.Owner.systemInfo) {
+                let isSuccess = await $Data.Access.GetSystemInfo();
+                if (!isSuccess) {
+                    $Dialog.ShowLoginDialog();
+                    return;
+                };
+            }
         }
         // リクエストパラメータ取得
         const params = new URLSearchParams(location.search);
@@ -145,10 +157,12 @@ const AppManager = {
         this.AppData.Context.TargetArchiveId = targetArchiveId;
         if (urlMode) {
             this.AppData.Context.ScreenMode = urlMode;
-        } else if (this.AppData.Context.TargetArchiveId) {
-            this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
         } else {
-            this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+            if (this.AppData.Context.TargetArchiveId) {
+                this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+            } else {
+                this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+            }
         }
         // 処理前チェック：TargetArchiveIdが無く、未ログインならダイアログ表示（初期画面としてのCREATE用）
         if (!this.AppData.Context.TargetArchiveId && !this.AppData.Context.IsLoggedIn) {
@@ -157,36 +171,11 @@ const AppManager = {
         // メイン処理
         console.log("★App.Init", this.AppData, params);
         this._initViewport();
-        await $LocalDb.Init();
         $UI.Init();
         this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
         this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD);
         await this.RefreshScreen();
         this._initPollingTasks();
-    },
-    // カラーテーマ変更
-    ChangeTheme(theme){
-        this.AppData.Owner.Theme = theme;
-        $UI.ChangeTheme(theme);
-        this._saveSettings(); // 保存実行
-    },
-    // カラーテーマ変更
-    ChangeMapStyle(style){
-        this.AppData.Owner.MapStyle = style;
-        this._saveSettings(); // 保存実行
-        $Map.SetMapStyle(style);
-    },
-    // 追従設定の変更メソッド
-    ChangeGpsTracking(isOn) {
-        this.AppData.Owner.IsGpsTracking = isOn;
-        if (isOn && this.AppData.Context.IsOnline) $Polling.Start($Polling.TASKS.GPS_FOLLOW);
-        else $Polling.Stop($Polling.TASKS.GPS_FOLLOW);
-        this._saveSettings();
-    },
-    // 通貨単位の変更メソッド
-    ChangeCurrency(unit) {
-        this.AppData.Owner.currency_unit = unit;
-        this._saveSettings();
     },
     // 画面モード変更
     async RefreshScreen() {
@@ -198,13 +187,18 @@ const AppManager = {
         switch (this.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
                 if (this.AppData.Context.IsLoggedIn) {
+                    // // システム情報取得
+                    // isSuccess = await $Data.Access.GetSystemInfo();
+                    // if (!isSuccess) {
+                    //     $Dialog.ShowLoginDialog();
+                    //     return;
+                    // };
+                    // 地点データ取得
                     isSuccess = await $Data.Access.GetUnMergeDetails({});
                     if (!isSuccess) {
                         $Dialog.ShowLoginDialog();
                         return;
                     };
-                    // システム情報取得
-                    $Data.Access.GetSystemInfo();
                 }
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
@@ -278,6 +272,30 @@ const AppManager = {
         this._saveSettings();
         // 3. 必要であればIndexedDBのキャッシュ等も消すが、基本は上記2つで次回の自動ログインは防げます。
         console.log("Token destroyed and logged out.");
+    },
+    // カラーテーマ変更
+    ChangeTheme(theme){
+        this.AppData.Owner.Theme = theme;
+        $UI.ChangeTheme(theme);
+        this._saveSettings(); // 保存実行
+    },
+    // カラーテーマ変更
+    ChangeMapStyle(style){
+        this.AppData.Owner.MapStyle = style;
+        this._saveSettings(); // 保存実行
+        $Map.SetMapStyle(style);
+    },
+    // 追従設定の変更メソッド
+    ChangeGpsTracking(isOn) {
+        this.AppData.Owner.IsGpsTracking = isOn;
+        if (isOn && this.AppData.Context.IsOnline) $Polling.Start($Polling.TASKS.GPS_FOLLOW);
+        else $Polling.Stop($Polling.TASKS.GPS_FOLLOW);
+        this._saveSettings();
+    },
+    // 通貨単位の変更メソッド
+    ChangeCurrency(unit) {
+        this.AppData.Owner.currency_unit = unit;
+        this._saveSettings();
     },
 };
 

@@ -30,8 +30,9 @@ public class BulkSyncDetailsService : _BaseService
     );
 
     public record BulkSyncReq(
+        [Required] Guid login_user_id, // ★ 追加
         [Required(ErrorMessage = "同期データリストは必須です")] IEnumerable<BulkSyncItem> items
-    );
+    ) : ILoginUserRequest; // ★ インターフェースを実装
 
     public record Response(int updatedCount);
 

@@ -1,6 +1,7 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Repository;
+using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Sys;
 
@@ -8,7 +9,11 @@ public class DeleteMyReportService : _BaseService
 {
     private readonly SysReportRepository _repo;
 
-    public record DeleteMyReportReq(long archive_id);
+    public record DeleteMyReportReq(
+        [Required] Guid login_user_id, // ★ 追加
+        long archive_id
+    ) : ILoginUserRequest; // ★ インターフェースを実装
+
     public record Response(bool is_success);
 
     public DeleteMyReportService(UserContext user, SysReportRepository repo) : base(user)

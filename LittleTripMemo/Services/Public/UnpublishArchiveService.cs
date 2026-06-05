@@ -2,6 +2,7 @@
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Services;
+using System.ComponentModel.DataAnnotations;
 
 public class UnpublishArchiveService : _BaseService
 {
@@ -13,7 +14,11 @@ public class UnpublishArchiveService : _BaseService
     private readonly ArchiveRepository _archiveRepo;
     private readonly DetailRepository _detailRepo;
 
-    public record UnpublishArchiveReq(int archive_id);
+    public record UnpublishArchiveReq(
+        [Required] Guid login_user_id, // ★ 追加
+        int archive_id
+    ) : ILoginUserRequest; // ★ インターフェースを実装
+
     public record Response(int archiveId);
 
     public UnpublishArchiveService(

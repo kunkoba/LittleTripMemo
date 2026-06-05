@@ -453,7 +453,7 @@ export default {
             // ② タイトルと本文の反映
             $Dom.QuerySelector('#view-mem-title', el).textContent = currentArchive.title || "";
             $Dom.QuerySelector('#view-mem-body', el).textContent = currentArchive.memo || "";
-            // ③ ★リンクの反映（すべて currentArchive を参照するように統一）
+            // ③ リンクの反映（すべて currentArchive を参照するように統一）
             const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
             if (currentArchive.link_url) {
                 const iconHtml = $Util.GetUrlIconHtml(currentArchive.link_url, 28);

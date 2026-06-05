@@ -2,6 +2,7 @@
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
+using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Sys;
 
@@ -12,7 +13,12 @@ public class AdminCloseArchivePubService : _BaseService
     private readonly SysUserNotificationRepository _userNoteRepo; // 追加
 
     // 安全のため target_user_id を必須に
-    public record Request(int archive_id, Guid target_user_id);
+    public record Request(
+        [Required] Guid login_user_id, // ★ 追加
+        int archive_id, 
+        Guid target_user_id
+    ) : ILoginUserRequest; // ★ インターフェースを実装
+
     public record Response(bool is_success);
 
     public AdminCloseArchivePubService(

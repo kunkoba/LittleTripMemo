@@ -281,8 +281,6 @@ public class AppController : _BaseController
 
         /// <summary>
         /// 明細の登録・更新。
-        /// seq=0 で INSERT、seq>0 で UPDATE。
-        /// バリデーションはサービス内の Request record の定義に基づき自動実行されます。
         /// </summary>
         [HttpPost("api/UpdateDetailPub")]
         public async Task<IActionResult> UpdateDetailPub([FromBody] UpdateDetailPubService.UpdateDetailPubReq req)
@@ -319,12 +317,12 @@ public class AppController : _BaseController
         /// 指定されたユーザーの公開プロフィールを取得する
         /// </summary>
         [HttpPost("api/GetUserProfile")]
-    public async Task<IActionResult> GetUserProfile([FromBody] GetUserProfileService.GetUserProfileReq req)
-    {
-            // 既存のサービスをそのまま利用
-            var result = await _getUserProfileService.ExecuteAsync(req.userId);
-            return OkWithBase(result);
-        }
+        public async Task<IActionResult> GetUserProfile([FromBody] GetUserProfileService.GetUserProfileReq req)
+        {
+                // 既存のサービスをそのまま利用
+                var result = await _getUserProfileService.ExecuteAsync(req.userId);
+                return OkWithBase(result);
+            }
 
     #endregion
 

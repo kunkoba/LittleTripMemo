@@ -16,7 +16,7 @@ const AuthManager = {
         if (!firebase.apps.length) firebase.initializeApp(FirebaseConfig); 
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
-    // ★これを追加：Googleのアカウント選択画面を必ず出すようにする
+    // Googleのアカウント選択画面を必ず出すようにする
     provider.setCustomParameters({
         prompt: 'select_account'
     });

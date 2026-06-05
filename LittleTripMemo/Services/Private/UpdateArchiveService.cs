@@ -2,6 +2,7 @@
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
+using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services;
 
@@ -10,12 +11,14 @@ public class UpdateArchiveService : _BaseService
     private readonly ArchiveRepository _archiveRepo;
 
     public record UpdateArchiveReq(
+        [Required] Guid login_user_id, // ★ 追加
         int archive_id,
         string title,
         string memo,
         string? link_url,
         string currency_unit
-    );
+    ) : ILoginUserRequest; // ★ インターフェースを実装
+
     public record Response(int archiveId);
 
     public UpdateArchiveService(

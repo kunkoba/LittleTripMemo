@@ -17,6 +17,7 @@ public class UpsertDetailService : _BaseService
 
     // --- 専用DTO：全項目必須のアノテーション ---
     public record UpsertDetailReq(
+        [Required] Guid login_user_id, // ★ 追加
         [Required(ErrorMessage = "seqは必須です")][Range(0, int.MaxValue)] int seq,
         [Required(ErrorMessage = "旅の記録IDは必須です")] int archive_id,
         [Required(ErrorMessage = "緯度は必須です")] decimal latitude,
@@ -29,7 +30,7 @@ public class UpsertDetailService : _BaseService
         [Required(ErrorMessage = "天気IDは必須です")] string weather_code,
         string? link_url,
         [Required(ErrorMessage = "金額は必須です")] int memo_price
-    );
+    ) : ILoginUserRequest; // ★ インターフェースを実装
 
     public record Response(int seq);
 

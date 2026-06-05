@@ -150,29 +150,33 @@ builder.Services.AddScoped<GetAdminAllInfoService>();
 // ======================================================================
 
 // Controller 有効化 + JSON の既定ルール設定
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
+builder.Services.AddControllers(options =>
+{
+    // ★ これを追加：すべてのAPIで UserValidationFilter が自動的に実行される
+    options.Filters.Add<UserValidationFilter>();
+})
+.AddJsonOptions(options =>
+{
+    // JSON プロパティ名を camelCase に統一
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+})
+.ConfigureApiBehaviorOptions(options =>
+{
+    // モデルバリデーションエラーを共通フォーマットで返す
+    options.InvalidModelStateResponseFactory = context =>
     {
-        // JSON プロパティ名を camelCase に統一
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-    })
-    .ConfigureApiBehaviorOptions(options =>
-    {
-        // モデルバリデーションエラーを共通フォーマットで返す
-        options.InvalidModelStateResponseFactory = context =>
-        {
-            var msg = string.Join(" / ",
-                context.ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage));
+        var msg = string.Join(" / ",
+            context.ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage));
 
-            return new BadRequestObjectResult(new ErrorResponse
-            {
-                Message = msg,
-                ErrorCode = "VALIDATION_ERROR"
-            });
-        };
-    });
+        return new BadRequestObjectResult(new ErrorResponse
+        {
+            Message = msg,
+            ErrorCode = "VALIDATION_ERROR"
+        });
+    };
+});
 
 
 //// ======================================================================

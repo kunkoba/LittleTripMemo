@@ -189,7 +189,7 @@ public class SysController : _BaseController
     }
 
     /// <summary>
-    /// 【管理者権限】フィードバック一覧を取得（スコア指定、最新100件固定）
+    /// 【管理者権限】フィードバック一覧を取得
     /// </summary>
     [HttpPost("api/Sys/GetAllFeedback")]
     public async Task<IActionResult> GetAllFeedback([FromBody] GetAllFeedbackService.GetAllFeedbackReq req)

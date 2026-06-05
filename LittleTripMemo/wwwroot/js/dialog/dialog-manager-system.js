@@ -24,7 +24,7 @@ export default {
             }
             // 表示されているすべてのダイアログを破棄
             this._core.closeAll();
-            // ★修正3: Init()で全初期化するのではなく、現在の画面モードを維持して再描画する
+            // Init()で全初期化するのではなく、現在の画面モードを維持して再描画する
             await $App.RefreshScreen();
         });
         this._core.open({
@@ -61,6 +61,7 @@ export default {
         $Dom.ToggleShow(b.profile, isLoggedIn);
         $Dom.ToggleShow(b.notice,  isLoggedIn);
         $Dom.ToggleShow(b.version, isLoggedIn);
+        $Dom.ToggleShow(b.reports, isLoggedIn);
         $Dom.ToggleShow(b.admin, isAdmin);
         // 3. ログイン/ログアウトボタンのラベル反映
         const authLabel = $Dom.QuerySelector('span:last-child', b.auth);
@@ -95,7 +96,7 @@ export default {
             if (isLoggedIn) {
                 if (await this.ShowConfirm({ title: "LOGOUT", message: "ログアウトしますか？" })) {
                     this._core.closeAll();
-                    // ★ここを修正：AppManagerのログアウトを呼ぶ
+                    // AppManagerのログアウトを呼ぶ
                     $App.Logout();
                     setTimeout(() => location.reload(), 500);
                 }

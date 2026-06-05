@@ -11,7 +11,7 @@ const _DialogCore = {
     dialogRoot: null,
     backdrop: null,
     stack:[],
-    // ★ 共通クラス定数
+    // 共通クラス定数
     HEADER_BTN_CLASS: "w-9 h-9 bg-white rounded-full shadow-md flex items-center justify-center active:scale-95 border border-brand-2 transition-transform",
     FOOTER_BTN_BASE:  "font-black text-[1rem] h-12 rounded-[1rem] uppercase active:scale-95 transition-transform",
     FOOTER_BTN_DEFAULT: "bg-brand-5 text-white shadow-md",
@@ -172,7 +172,6 @@ const DialogController = {
             const el = $Dom.GenerateTemplate('tpl-confirm-base');
             $Dom.QuerySelector('.js-message', el).textContent = message;
             let isResolved = false;
-            // ★変更点: this._core.open → this._core.open
             this._core.open({
                 title: title,
                 content: el,

@@ -3,6 +3,7 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Sys;
 
@@ -18,7 +19,12 @@ public class AdminUnpublishArchiveService : _BaseService
     private readonly SysUserNotificationRepository _userNoteRepo;
     private readonly UserManager<MyAppUser> _userManager;
 
-    public record Request(int archive_id, Guid target_user_id);
+    public record Request(
+        [Required] Guid login_user_id, // ★ 追加  
+        int archive_id, 
+        Guid target_user_id
+    ) : ILoginUserRequest; // ★ インターフェースを実装
+
     public record Response(bool is_success);
 
     public AdminUnpublishArchiveService(
