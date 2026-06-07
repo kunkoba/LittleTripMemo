@@ -51,16 +51,50 @@
         <button id="btn-set-theme" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">🎨</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Theme Config</span></button>
         <button id="btn-set-map" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">🗺️</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Map Style Config</span></button>
         <button id="btn-set-currency" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">💰</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Currency Config</span></button>
-        <button id="btn-set-gps" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">😀</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">GPS Tracking</span></button>
+        <button id="btn-set-gps" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">📍</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">GPS Tracking</span></button>
+        <button id="btn-set-font" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1rem]">Aa</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Font Size Config</span>
+        </button>
     </div>
 </template>
 
 <!-- 【ダイアログ子】設定系画面 -->
-<template id="tpl-config-gps">
+<template id="tpl-config-gps_2">
     <div class="w-full flex flex-col bg-brand-0">
         <button id="gps-btn-on" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 active:bg-brand-2 text-black-5"><span class="col-span-1 flex justify-center text-[1rem] js-icon"></span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Tracking On (10s)</span></button>
         <button id="gps-btn-off" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 active:bg-brand-2 text-black-5"><span class="col-span-1 flex justify-center text-[1rem] js-icon"></span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Tracking Off</span></button>
         <div class="p-4 text-[0.7rem] text-black-3 ">※ONにすると10秒おきに現在地を更新します。バッテリーの消費にご注意ください。</div>
+    </div>
+</template>
+<template id="tpl-config-gps">
+    <div class="w-full text-black-5 space-y-6 px-6 py-8 bg-brand-0">
+        <div class="flex flex-col items-center gap-4">
+            <label class="block font-black text-slate-400 text-[0.6rem] uppercase tracking-widest">Update Interval</label>
+            
+            <!-- 秒数表示エリア -->
+            <div class="flex items-baseline gap-1">
+                <span id="gps-val-display" class="text-[3.5rem] font-black text-brand-5 leading-none">0</span>
+                <span id="gps-unit-display" class="text-[0.8rem] font-bold text-slate-400 uppercase">sec</span>
+            </div>
+
+            <!-- 水平スライダー -->
+            <div class="w-full px-2">
+                <input id="gps-range-slider" type="range" min="0" max="120" step="10" value="0"
+                    class="w-full h-2 bg-brand-2 rounded-lg appearance-none cursor-pointer accent-brand-5 shadow-inner">
+            </div>
+
+            <!-- 目盛りラベル -->
+            <div class="w-full flex justify-between px-1 text-[0.6rem] font-bold text-slate-300 uppercase">
+                <span>Off</span>
+                <span>60s</span>
+                <span>120s</span>
+            </div>
+        </div>
+
+        <div class="p-4 bg-white/50 rounded-xl border border-brand-2 text-[0.7rem] text-slate-500 leading-relaxed italic">
+            ※ 0s (OFF) に設定すると自動更新を停止します。<br>
+            ※ 更新間隔が短いほど、バッテリーの消費が早くなります。
+        </div>
     </div>
 </template>
 
@@ -117,7 +151,7 @@
 
 <template id="tpl-view-profile">
 	<div class="relative min-h-full flex flex-col bg-white px-1">
-		<div class="flex items-center gap-4 mb-6">
+		<div class="flex items-center gap-4 mb-3">
 			<div id="view-profile-icon" class="text-[4rem] drop-shadow-md shrink-0"></div>
 			<div class="flex flex-col flex-1 min-w-0"><h1 id="view-profile-nickname" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight"></h1></div>
 		</div>
@@ -153,10 +187,10 @@
 <template id="tpl-view-archive">
 	<div class="relative min-h-full flex flex-col bg-white">
         <!-- 2. 金額（左） ＋ ユーザ情報（右） の並列エリア -->
-        <div class="flex items-center justify-between gap-2 mb-6">
+        <div class="flex items-center justify-between gap-2 mb-3">
             <!-- 右：ユーザ情報（プロフボタン） -->
             <button id="btn-mem-user-profile"
-                class="rounded-full pl-2 pr-4 h-10 min-w-[100px] border-4 shadow-md flex items-center gap-2">
+                class="rounded-full pl-2 pr-4 h-10 max-w-[200px] min-w-[100px] border-4 shadow-md flex items-center gap-2">
                 <span id="view-mem-user-icon" class="text-[1.4rem] drop-shadow-md"></span>
                 <span id="view-mem-user-id" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
             </button>
@@ -277,34 +311,31 @@
 
 <!-- 【ダイアログ子】自分の通報詳細 -->
 <template id="tpl-my-report-detail">
-    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden p-2">
-        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2 px-1">
-            <span class="js-report-tim text-[0.85rem] font-black text-slate-400 italic"></span>
+    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden">
+        <div class="flex justify-between items-center pb-2 px-1">
+            <span class="js-report-tim text-[1rem] font-black text-slate-400 italic"></span>
         </div>
         <!-- ターゲットユーザー情報 -->
-        <div class="mb-5 px-1">
-            <label class="block font-black text-slate-400 text-[0.6rem] mb-2 uppercase tracking-widest">Reported User</label>
+        <div class="px-1">
             <button id="btn-report-target-profile" 
-                class="border border-slate-100 rounded-full pl-2 pr-4 h-10 w-fit max-w-full border-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
+                class="border-4 border-slate-100 rounded-full pl-2 pr-4 h-10 max-w-[200px] min-w-[100px] shadow-md flex items-center gap-2">
                 <span id="view-report-target-icon" class="text-[1.4rem] drop-shadow-md"></span>
                 <span id="view-report-target-name" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
             </button>
         </div>
         <!-- ターゲットアーカイブ情報（ジャンプボタン） -->
-        <div class="mb-5 px-1">
-            <label class="block font-black text-slate-400 text-[0.6rem] mb-2 uppercase tracking-widest">Target Archive</label>
+        <div class="px-1 my-4">
             <button id="btn-report-jump-archive" 
                 class="w-full flex items-center justify-between p-3 bg-brand-1 rounded-[1rem] border-2 border-brand-2 active:scale-95 transition-transform text-left">
                 <div class="flex-1 min-w-0">
-                    <div id="view-report-archive-title" class="text-[0.9rem] font-black text-brand-5 truncate"></div>
+                    <div id="view-report-archive-title" class="text-[0.9rem] text-brand-5 truncate"></div>
                 </div>
                 <span class="text-[1.2rem] ml-2">🗺️</span>
             </button>
         </div>
         <!-- 通報内容 -->
-        <div class="flex-1 overflow-y-auto px-1 pb-4">
-            <label class="block font-black text-slate-400 text-[0.6rem] mb-2 uppercase tracking-widest">Your Report Body</label>
-            <div id="view-report-body" class="text-[0.95rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-words bg-slate-50 p-4 rounded-[1rem] border border-slate-200"></div>
+        <div class="h-[300px] bg-brand-1 rounded-lg p-2 overflow-y-auto">
+            <div id="view-report-body" class="text-[1rem] text-slate-700 leading-[2] whitespace-pre-wrap break-words"></div>
         </div>
     </div>
 </template>

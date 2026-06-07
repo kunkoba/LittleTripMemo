@@ -15,6 +15,7 @@ const AppManager = {
             Token: null,
             currency_unit: 'JPY',
             systemInfo: null,
+            fontSize: 'standard',
         },
         Admin: {
             notifications:[],
@@ -31,6 +32,7 @@ const AppManager = {
             isGpsTracking: this.AppData.Owner.IsGpsTracking,
             token: this.AppData.Owner.Token,
             currency_unit: this.AppData.Owner.currency_unit,
+            fontSize: this.AppData.Owner.FontSize,
         }));
     },
     // 設定を読込
@@ -41,6 +43,8 @@ const AppManager = {
         if (saved.isGpsTracking !== undefined) this.AppData.Owner.IsGpsTracking = saved.isGpsTracking;
         if (saved.token) this.AppData.Owner.Token = saved.token;
         if (saved.currency_unit) this.AppData.Owner.currency_unit = saved.currency_unit;
+        if (saved.fontSize) this.AppData.Owner.FontSize = saved.fontSize;
+        $UI.ChangeFontSize(this.AppData.Owner.FontSize);
     },
     // iPhoneのキーボード対策（入力中を考慮）
     _initViewport() {
@@ -141,13 +145,11 @@ const AppManager = {
         if (this.AppData.Owner.Token) {
             this.AppData.Context.IsLoggedIn = true;
             // システム情報取得
-            if (!$App.AppData.Owner.systemInfo) {
-                let isSuccess = await $Data.Access.GetSystemInfo();
-                if (!isSuccess) {
-                    $Dialog.ShowLoginDialog();
-                    return;
-                };
-            }
+            let isSuccess = await $Data.Access.GetSystemInfo();
+            if (!isSuccess) {
+                $Dialog.ShowLoginDialog();
+                return;
+            };
         }
         // リクエストパラメータ取得
         const params = new URLSearchParams(location.search);
@@ -296,6 +298,10 @@ const AppManager = {
     ChangeCurrency(unit) {
         this.AppData.Owner.currency_unit = unit;
         this._saveSettings();
+    },
+    // フォントサイズの変更メソッド
+    ChangeFontSize(size) {
+        $UI.ChangeFontSize(size);
     },
 };
 

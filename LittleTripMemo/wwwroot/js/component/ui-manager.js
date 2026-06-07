@@ -95,6 +95,12 @@ const UI_Manager = {
 	UpdateNoticeBadge(count){
 		$BotBar.UpdateNoticeBadge(count);
 	},
+	// フォントサイズの変更
+	ChangeFontSize(size){
+        // const sizes = { small: '14px', standard: '16px', large: '18px' };
+        // document.documentElement.style.fontSize = sizes[size] || sizes.standard;
+		document.documentElement.setAttribute('data-font-size', size || 'standard');
+	},
 };
 
 // Public

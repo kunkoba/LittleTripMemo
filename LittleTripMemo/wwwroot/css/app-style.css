@@ -49,15 +49,17 @@
 .text-black-4 {color: #4d4e4e}
 .text-black-5 {color: #383838}
 
-/* closeボタン用：ホバー時の連動設定 */
-.bg-brand-close {
-    background-color: #a0aab8;
-    color: #ffffff;
-    transition: background-color 0.2s;
+/* フォントサイズ定義（モバイル基準 / 768px以上でPC基準） */
+html[data-font-size='small']    { font-size: 12px; }
+html[data-font-size='standard'] { font-size: 14px; }
+html[data-font-size='large']    { font-size: 16px; }
+
+@media (min-width: 768px) {
+    html[data-font-size='small']    { font-size: 14px; }
+    html[data-font-size='standard'] { font-size: 16px; }
+    html[data-font-size='large']    { font-size: 18px; }
 }
-.bg-brand-close:active {
-    filter: brightness(1.2);
-}
+
 /* 基本設定 */
 body {
     /* font-family: 'Noto Sans JP', sans-serif; */

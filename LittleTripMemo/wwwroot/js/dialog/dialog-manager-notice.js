@@ -268,6 +268,8 @@ export default {
                     archive_id: archive.archive_id,
                     body: body
                 };
+                const isOk = await this.ShowConfirm({ title: "SUBMIT", message: "通報を送信しますか？" });
+                if (!isOk) return;
                 const isSubmitSuccess = await $Data.Access.UpsertReport(req);
                 if (!isSubmitSuccess) return;
                 $Notice.Info("通報を送信しました。管理者が確認します。");
@@ -278,7 +280,7 @@ export default {
         if (myReport) {
             dialogButtons.push([{
                 label: "取り消す (DELETE)",
-                className: "bg-white text-slate-800 border-2 border-slate-800 shadow-none rounded-none",
+                className: "bg-white !text-slate-800 border-2 border-slate-800 shadow-none rounded-none",
                 handler: async () => {
                     const isOk = await this.ShowConfirm({ title: "DELETE REPORT", message: "通報を取り消しますか？" });
                     if (!isOk) return;

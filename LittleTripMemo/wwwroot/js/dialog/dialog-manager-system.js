@@ -25,7 +25,8 @@ export default {
             // 表示されているすべてのダイアログを破棄
             this._core.closeAll();
             // Init()で全初期化するのではなく、現在の画面モードを維持して再描画する
-            await $App.RefreshScreen();
+            // await $App.RefreshScreen();
+            await $App.Init();
         });
         this._core.open({
             title: "LOGIN",
@@ -48,15 +49,15 @@ export default {
             auth:    $Dom.QuerySelector('#btn-sys-auth', el),
             admin:   $Dom.QuerySelector('#btn-sys-admin', el),
         };
-        // ログイン中であれば、プロフィールのアイコンを反映する
-        if (isLoggedIn) {
-            const profile = $App.AppData.Owner.systemInfo.ownerProfile;
-            if (profile && profile.icon) {
-                // ボタン内の最初のspan（アイコン表示用）を取得して書き換え
-                const iconSpan = $Dom.QuerySelector('span:first-child', b.profile);
-                iconSpan.textContent = profile.icon;
-            }
-        }
+        // // ログイン中であれば、プロフィールのアイコンを反映する
+        // if (isLoggedIn) {
+        //     const profile = $App.AppData.Owner.systemInfo.ownerProfile;
+        //     if (profile && profile.icon) {
+        //         // ボタン内の最初のspan（アイコン表示用）を取得して書き換え
+        //         const iconSpan = $Dom.QuerySelector('span:first-child', b.profile);
+        //         iconSpan.textContent = profile.icon;
+        //     }
+        // }
         // 2. まとめて表示設定（ログイン・権限状態で絞り込み）
         $Dom.ToggleShow(b.profile, isLoggedIn);
         $Dom.ToggleShow(b.notice,  isLoggedIn);
@@ -122,8 +123,9 @@ export default {
         const el = $Dom.GenerateTemplate("tpl-menu-user-settings");
         $Dom.QuerySelector('#btn-set-theme', el).onclick = () => this.ShowThemeConfig();
         $Dom.QuerySelector('#btn-set-map', el).onclick = () => this.ShowMapStyleConfig();
-        $Dom.QuerySelector('#btn-set-gps', el).onclick = () => this.ShowGpsFollowConfig();
         $Dom.QuerySelector('#btn-set-currency', el).onclick = () => this.ShowCurrencyConfig();
+        $Dom.QuerySelector('#btn-set-gps', el).onclick = () => this.ShowGpsFollowConfig();
+        $Dom.QuerySelector('#btn-set-font', el).onclick = () => this.ShowFontSizeConfig();
         //
         this._core.open({
             title: "USER SETTINGS",
@@ -328,9 +330,64 @@ export default {
                     label: "OK",
                     handler: () => {
                         isSaved = true;
-                        console.log("isOn:", isOn);
                         $App.AppData.Owner.IsGpsTracking = isOn;
                         $App.ChangeGpsTracking(isOn);
+                        this._core.close();
+                        $Notice.Info("Changes saved.");
+                    }
+                }
+            ]]
+        });
+    },
+    // （ユーザ設定）フォントサイズ設定
+    ShowFontSizeConfig() {
+        let isSaved = false;
+        const oldSize = $App.AppData.Owner.FontSize || 'standard';
+        let selectedSize = oldSize;
+        const el = document.createElement('div');
+        el.className = "w-full bg-brand-0";
+        const options = [
+            { key: 'small',    label: 'SMALL' },
+            { key: 'standard', label: 'STANDARD' },
+            { key: 'large',    label: 'LARGE' }
+        ];
+        // リスト描画（現在の設定に基づきラジオボタン風に表示）
+        const renderList = (current) => {
+            el.innerHTML = options.map(opt => `
+                <button data-key="${opt.key}" class="js-font-btn w-full h-14 flex items-center justify-between px-6 border-b border-brand-2 active:bg-brand-1">
+                    <span class="font-bold text-[1rem]">${opt.label}</span>
+                    <span class="js-check text-brand-5 font-black text-[1.2rem]">${current === opt.key ? '●' : '○'}</span>
+                </button>
+            `).join('');
+            // ボタンクリックで「一時適用」
+            $Dom.QuerySelectorAll('.js-font-btn', el).forEach(btn => {
+                btn.onclick = () => {
+                    selectedSize = btn.dataset.key;
+                    $UI.ChangeFontSize(selectedSize); // UIだけ一時的に変える
+                    renderList(selectedSize); // チェックマークの表示を更新
+                };
+            });
+        };
+        renderList(selectedSize);
+        this._core.open({
+            title: "FONT SIZE CONFIG",
+            content: el,
+            help: "アプリ全体の文字サイズを調整します。\nデバイスごとの適切なサイズ差は維持されます。",
+            onClose: () => {
+                if (isSaved) return;
+                $UI.ChangeFontSize(oldSize); // 保存されずに閉じたら元に戻す
+            },
+            buttons: [[
+                {
+                    label: "CANCEL",
+                    className: "bg-slate-400 text-white shadow-md",
+                    handler: () => this._core.close(),
+                },
+                {
+                    label: "OK",
+                    handler: () => {
+                        isSaved = true;
+                        $App.ChangeFontSize(selectedSize); // ここで初めてAppData更新・保存
                         this._core.close();
                         $Notice.Info("Changes saved.");
                     }
@@ -491,10 +548,10 @@ export default {
         // --- 1. アーカイブタイトルの表示制御 ---
         const titleEl = $Dom.QuerySelector("#view-report-archive-title", el);
         if (report.is_deleted) {
-            titleEl.textContent = "削除済みです。";
+            titleEl.textContent = "このまとめは既に削除されています";
             titleEl.classList.add("text-slate-400"); // 無効な感じの色
         } else if (report.is_closed) {
-            titleEl.textContent = "close中です";
+            titleEl.textContent = "このまとめは現在「CLOSE」中です";
             titleEl.classList.add("text-red-400");   // 警告・停止中の色
         } else {
             titleEl.textContent = report.archive_title || "(No Title)";
@@ -515,9 +572,8 @@ export default {
         };
         // アーカイブジャンプボタン
         const btnJump = $Dom.QuerySelector("#btn-report-jump-archive", el);
-        if (report.is_deleted) {
-            btnJump.classList.add("opacity-50", "grayscale");
-            btnJump.onclick = () => $Notice.Warn("このまとめは既に削除されています");
+        if (report.is_deleted || report.is_closed) {
+            btnJump.classList.add("grayscale");
         } else {
             btnJump.onclick = async () => {
                 const isOk = await this.ShowConfirm({ title: "JUMP", message: "このアーカイブに移動しますか？" });

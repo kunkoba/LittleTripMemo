@@ -53,10 +53,12 @@ export default {
             $App.RefreshScreen();
         };
         b.current.onclick = () => {
+            this._core.close();
             $Marker.RefreshCurrentLocation();
             $Marker.FocusToLocationMarker();
         };
         b.restore.onclick = () => {
+            this._core.close();
             $Marker.RestoreMarkers();
         };
         b.archiveInfo.onclick = () => {

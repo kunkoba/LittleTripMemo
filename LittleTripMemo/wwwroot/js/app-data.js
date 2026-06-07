@@ -39,6 +39,7 @@ window.$Data = {
                 }
                 options.body = JSON.stringify(params);
             }
+            console.log("params:", params);
             // 接続
             const response = await fetch(this.baseUrl + url, options);
             // 結果

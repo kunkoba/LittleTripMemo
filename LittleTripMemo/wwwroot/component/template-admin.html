@@ -53,7 +53,7 @@
 
 <!-- 【リスト子】管理者フィードバック一覧用 -->
 <template id="tpl-admin-list-child-feedback">
-    <button class="js-item-card w-full flex flex-col p-4 rounded-[1rem] border border-brand-1 bg-white mb-3 shadow-sm">
+    <button class="js-item-card w-full flex flex-col p-4 rounded-[1rem] border border-brand-1 bg-white mb-3 shadow-md">
         <div class="flex justify-between items-center mb-2"><span class="text-[0.7rem] font-black text-slate-400 tracking-wider js-date italic"></span><span class="js-score text-[0.9rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span></div>
         <div class="text-left text-[0.75rem] text-slate-700 break-words js-body line-clamp-1"></div>
     </button>
@@ -61,24 +61,22 @@
 
 <!-- 【ダイアログ子】管理者フィードバック詳細 -->
 <template id="tpl-admin-feedback-detail">
-    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden p-2 bg-white">
-        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
-            <span class="text-[0.9rem] font-black text-slate-400 tracking-wider js-date italic"></span>
+    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <span class="text-[1rem] font-black text-slate-400 tracking-wider js-date italic"></span>
             <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
         </div>
         <!-- User IDテキストを、標準ユーザーボタンに変更 -->
-        <div class="mb-5 px-2">
-            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest block mb-2">User Info</span>
+        <div class="mb-4">
             <div id="view-feedback-user-wrapper">
                 <button id="btn-feedback-user-profile" 
-                    class="border border-slate-100 rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
+                    class="rounded-full pl-2 pr-4 h-10 max-w-[200px] min-w-[100px] border-4 border-slate-100 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
                     <span id="view-feedback-user-icon" class="text-[1.4rem] drop-shadow-md">👤</span>
                     <span id="view-feedback-user-name" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
                 </button>
             </div>
         </div>
-        <div class="flex-1 overflow-y-auto px-2 pb-4">
-            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Feedback Detail</span>
+        <div class="_flex-1 bg-brand-1 rounded-lg p-2 h-[300px] overflow-y-auto">
             <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-words js-body mt-2 h-[200px] overflow-y-auto pr-2"></div>
         </div>
     </div>
@@ -187,8 +185,8 @@
 
 <!-- 【ダイアログ子】管理者：通報内容の全文詳細 -->
 <template id="tpl-admin-report-item-detail">
-    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden p-2 bg-white">
-        <div class="flex justify-between items-center pb-3">
+    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden bg-white">
+        <div class="flex justify-between items-center pb-2">
             <span class="text-[1rem] font-black text-slate-400 tracking-wider js-report-tim italic"></span>
         </div>
         <div class="mb-4 px-2">
@@ -201,7 +199,7 @@
                 </button>
             </div>
         </div>
-        <div class="flex-1 overflow-y-auto px-2 pb-4">
+        <div class="flex-1 bg-brand-1 rounded-lg p-2 h-[300px] overflow-y-auto">
             <div class="text-[1rem] text-slate-700 leading-[2] whitespace-pre-wrap break-words js-report-body mt-2"></div>
         </div>
     </div>
@@ -209,11 +207,11 @@
 
 <!-- 【追加】管理者フィードバック：検索バー付きリスト外枠 -->
 <template id="tpl-admin-feedback-list-parent">
-    <div class="flex flex-col h-full w-full">
+    <div class="flex flex-col h-full w-full min-h-[300px]">
         <!-- 上部固定のスコアフィルタバー -->
         <div class="sticky top-0 z-10 bg-brand-0 pb-3 flex flex-col gap-2">
             <div class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest pl-1">Filter by Score</div>
-            <div id="feedback-score-filter" class="flex justify-between bg-white rounded-xl border border-brand-2 p-1 shadow-sm">
+            <div id="feedback-score-filter" class="flex justify-between bg-white">
                 <button data-score="0" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">ALL</button>
                 <button data-score="1" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">1</button>
                 <button data-score="2" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">2</button>
@@ -233,8 +231,8 @@
         <div class="flex justify-between items-center mb-1">
             <span class="js-date text-[0.8rem] font-black text-slate-400 italic"></span>
             <div class="flex gap-1">
-                <span class="hidden bg-slate-500 text-white text-[10px] px-2 py-0.5 rounded-full js-badge-deleted">DELETED</span>
-                <span class="hidden bg-red-400   text-white text-[10px] px-2 py-0.5 rounded-full js-badge-closed ">CLOSED</span>
+                <span class="hidden bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded-full js-badge-deleted">DELETED</span>
+                <span class="hidden bg-slate-300 text-white text-[10px] px-2 py-0.5 rounded-full js-badge-closed ">CLOSED</span>
             </div>
         </div>
         <!-- 宛先表示をアイコン＋ニックネームに変更 -->

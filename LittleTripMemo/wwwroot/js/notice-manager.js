@@ -4,13 +4,14 @@ const Notice = {
         const root = $Dom.GenerateTemplate("tpl-toast", "toast-container");
         const el = $Dom.QuerySelector("div", root);
         const config = {
-            info:  { bg: "rgb(54, 202, 51)" }, // 緑
-            warn:  { bg: "rgb(255, 179, 38)" }, // オレンジ
-            error: { bg: "rgb(255, 78, 78)" }, // 赤
+            info:  { bg: "rgb(165, 243, 163)" }, // 緑
+            warn:  { bg: "rgb(255, 220, 156)" }, // オレンジ
+            error: { bg: "rgb(255, 174, 174)" }, // 赤
         };
         const c = config[type] || config.info;
         el.style.background = c.bg;
-        el.style.color = "#fff";
+        // el.style.color = "#fff";
+        el.style.color = "#000";
         $Dom.QuerySelector(".message", el).textContent = message;
         setTimeout(() => {
             el.classList.remove("opacity-0", "-translate-y-2");
