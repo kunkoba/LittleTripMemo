@@ -9,9 +9,9 @@ firebase login
 firebase deploy
 
 
-https://littletripmemomock-31477.web.app
+【HTML】
+https://littletripmemomock-31477.web.app/
 
-https://github.com/kunkoba/SlotDataTool-release/releases
-
-
+【asp/API】
+https://29a8-112-71-71-140.ngrok-free.app
 

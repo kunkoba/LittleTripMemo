@@ -1,18 +1,12 @@
 export default {
-    // 以下のメソッドを移動してきてください。
-    // - ShowDetailsTimeLine()
-    // - ShowDetailsSimpleList()
-    // - ShowArchiveList()
-    // - SelectArchiveForAdd()
-    // - ShowMultiSelectTimeline()
-    // - _execStatusChange()
-    // - ShowArchiveInfo()
-    // - ShowEditArchive()
-    // - ShowShareArchive()
     // 状態変更の定型処理ヘルパー
     async _execStatusChange(methodName, params, confirmTitle, confirmMsg, successMsg, nextScreenMode = null, onUpdateStore = null) {
         // Promiseで結果を待つ
-        const isOk = await this.ShowConfirm({ title: confirmTitle, message: confirmMsg });
+        const isOk = await this.ShowConfirm({
+            title: confirmTitle,
+            help: "",
+            message: confirmMsg
+        });
         if (!isOk) return; // キャンセルならここで終了
         // OKだった場合のAPI実行処理
         await $Warn.CatchAsync(async () => {
@@ -256,7 +250,7 @@ export default {
             this._core.open({
                 title: "ARCHIVE LIST",
                 content: root,
-            help: "",
+                help: "",
                 buttons: []
             });
         })();
@@ -296,6 +290,7 @@ export default {
                 child.onclick = async () => {
                     const isOk = await this.ShowConfirm({
                         title: "ADD",
+                        help: "",
                         message: `${seqs.length}件のアイテムを「${item.title}」に追加しますか？`
                     });
                     if (!isOk) return;
@@ -411,7 +406,11 @@ export default {
                     className: "disabled:opacity-50 flex items-center justify-center gap-2",
                     handler: async () => {
                         const seqs = Array.from(selectedSeqs);
-                        const isOk = await this.ShowConfirm({ title: "MERGE", message: `${seqs.length}件のアイテムを\n新しいまとめにしますか？` });
+                        const isOk = await this.ShowConfirm({
+                            title: "MERGE",
+                            help: "",
+                            message: `${seqs.length}件のアイテムを\n新しいまとめにしますか？`
+                        });
                         if (!isOk) return;
                         const isSuccess = await $Data.Access.MergeDetails({
                             seqs,
@@ -598,7 +597,11 @@ export default {
                     label: "【ADMIN】強制 Close",
                     className: "bg-red-500 text-white shadow-md",
                     handler: async () => {
-                        const isOk = await this.ShowConfirm({ title: "ADMIN: CLOSE", message: "【注意】\n強制的にClose状態にしますか？" });
+                        const isOk = await this.ShowConfirm({
+                            title: "ADMIN: CLOSE",
+                            help: "",
+                            message: "【注意】\n強制的にClose状態にしますか？"
+                        });
                         if (!isOk) return;
                         const isSuccess = await $Data.Access.AdminCloseArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
                         if (!isSuccess) return;
@@ -614,7 +617,11 @@ export default {
                 label: "【ADMIN】強制 Privateに戻す",
                 className: "bg-white text-red-600 border-2 border-red-500 shadow-sm",
                 handler: async () => {
-                    const isOk = await this.ShowConfirm({ title: "ADMIN: UNPUBLISH", message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？" });
+                    const isOk = await this.ShowConfirm({
+                        title: "ADMIN: UNPUBLISH",
+                        help: "",
+                        message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？"
+                    });
                     if (!isOk) return;
                     const isSuccess = await $Data.Access.AdminUnpublishArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
                     if (!isSuccess) return;

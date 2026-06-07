@@ -232,7 +232,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy.WithOrigins(
-                "https://2cd8-112-71-71-140.ngrok-free.app",
+                "https://littletripmemomock-31477.web.app",    // firebase hosting でのホスト名
                 "http://localhost:8080",
                 "http://127.0.0.1:8080", // これも追加
                 "http://localhost:5000",

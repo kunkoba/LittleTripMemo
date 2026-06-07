@@ -221,12 +221,17 @@ export default {
         this._core.open({
             title: "REPORT DETAILS",
             content: el,
+            help: "",
             buttons: [
                 {
                     label: "🔗 OPEN PUBLIC ARCHIVE",
                     className: "bg-red-500 text-white shadow-md",
                     handler: async () => {
-                        const isOk = await this.ShowConfirm({ title: "OPEN ARCHIVE", message: "この Public まとめデータを開きますか？" });
+                        const isOk = await this.ShowConfirm({
+                            title: "OPEN ARCHIVE",
+                            help: "",
+                            message: "この Public まとめデータを開きますか？"
+                        });
                         if (!isOk) return;
                         this._core.closeAll();
                         $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
@@ -264,6 +269,7 @@ export default {
         this._core.open({
             title: "REPORT CONTENT",
             content: el,
+            help: "",
             buttons: []
         });
     },
@@ -303,7 +309,11 @@ export default {
                 listContainer.appendChild(child);
             });
         }
-        this._core.open({ title: "FEEDBACK Mgmt", content: frame });
+        this._core.open({
+            title: "FEEDBACK Mgmt",
+            content: frame,
+            help: "",
+        });
     },
     // 【管理者機能】フィードバック詳細
     ShowAdminFeedbackDetail(item) {
@@ -328,6 +338,7 @@ export default {
         this._core.open({
             title: "FEEDBACK DETAILS",
             content: el,
+            help: "",
             headerButtons: []
         });
     },
@@ -355,6 +366,7 @@ export default {
         this._core.open({
             title: "SEND NOTIFICATION",
             content: el,
+            help: "",
             buttons: [[
                 {
                     label: "CANCEL",
@@ -400,7 +412,8 @@ export default {
         }
         this._core.open({
             title: "USER MESSAGE LOG",
-            content: root
+            content: root,
+            help: "",
         });
     },
     // 【管理者機能】ユーザーメール詳細
@@ -435,6 +448,7 @@ export default {
         this._core.open({
             title: "MESSAGE DETAILS (ADMIN)",
             content: el,
+            help: "",
             headerButtons: []
         });
     },

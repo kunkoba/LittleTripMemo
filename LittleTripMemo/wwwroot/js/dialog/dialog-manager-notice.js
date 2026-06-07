@@ -170,7 +170,8 @@ export default {
         }
 		this._core.open({
 			title: "NOTICE DETAILS",
-			content: el
+			content: el,
+            help: "",
 		});
 	},
     // 通知リスト表示（修正版）
@@ -223,7 +224,8 @@ export default {
         });
         this._core.open({
             title: "NOTIFICATIONS",
-            content: root
+            content: root,
+            help: "",
         });
     },
     // 通報投稿画面
@@ -261,7 +263,11 @@ export default {
                     archive_id: archive.archive_id,
                     body: body
                 };
-                const isOk = await this.ShowConfirm({ title: "SUBMIT", message: "通報を送信しますか？" });
+                const isOk = await this.ShowConfirm({
+                    title: "SUBMIT",
+                    help: "",
+                    message: "通報を送信しますか？"
+                });
                 if (!isOk) return;
                 const isSubmitSuccess = await $Data.Access.UpsertReport(req);
                 if (!isSubmitSuccess) return;
@@ -275,7 +281,11 @@ export default {
                 label: "取り消す (DELETE)",
                 className: "bg-white !text-slate-800 border-2 border-slate-800 shadow-none rounded-none",
                 handler: async () => {
-                    const isOk = await this.ShowConfirm({ title: "DELETE REPORT", message: "通報を取り消しますか？" });
+                    const isOk = await this.ShowConfirm({
+                        title: "DELETE REPORT",
+                        help: "",
+                        message: "通報を取り消しますか？"
+                    });
                     if (!isOk) return;
                     const isDelSuccess = await $Data.Access.DeleteMyReport({ archive_id: archive.archive_id });
                     if (!isDelSuccess) return;
@@ -345,7 +355,8 @@ export default {
         });
         this._core.open({
             title: "MESSAGES",
-            content: root
+            content: root,
+            help: "",
         });
         // バッジを反映
         setTimeout(() => this._updateProfileMailBadge(), 10);
@@ -365,6 +376,7 @@ export default {
         this._core.open({
             title: "MESSAGE DETAILS",
             content: el,
+            help: "",
             buttons: []
         });
     },

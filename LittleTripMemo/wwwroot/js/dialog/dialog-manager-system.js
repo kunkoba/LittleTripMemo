@@ -87,15 +87,32 @@ export default {
         }
         // 4. 各ボタンのイベント登録
         b.profile.onclick = async () => {
+            this._core.close();
             this.ShowUserProfile($App.AppData.Owner.SystemInfo.ownerProfile, true)
         };
-        b.config.onclick = () => {this.ShowUserSettingsMenu()};
-        b.notice.onclick = () => {this.ShowNoticeList()};
-        b.version.onclick = () => {this.ShowAppInfo()};
-        b.reports.onclick = async () => {this.ShowMyReportList();};
+        b.config.onclick = () => {
+            // this._core.close();
+            this.ShowUserSettingsMenu()
+        };
+        b.notice.onclick = () => {
+            this._core.close();
+            this.ShowNoticeList()
+        };
+        b.version.onclick = () => {
+            // this._core.close();
+            this.ShowAppInfo()
+        };
+        b.reports.onclick = async () => {
+            // this._core.close();
+            this.ShowMyReportList();
+        };
         b.auth.onclick = async () => {
             if (isLoggedIn) {
-                if (await this.ShowConfirm({ title: "LOGOUT", message: "ログアウトしますか？" })) {
+                if (await this.ShowConfirm({
+                    title: "LOGOUT",
+                    help: "",
+                    message: "ログアウトしますか？"
+                })) {
                     this._core.closeAll();
                     // AppManagerのログアウトを呼ぶ
                     $App.Logout();
@@ -109,6 +126,7 @@ export default {
             // メニューを開く前に一括取得を実行
             const isSuccess = await $Data.Access.GetAdminAllInfo();
             if (isSuccess) {
+                // this._core.close();
                 this.ShowAdminMenu();
             }
         };
@@ -435,6 +453,7 @@ export default {
 		this._core.open({
 			title: "USER PROFILE",
 			content: el,
+            help: "",
 			headerButtons: headerButtons
 		});
         // バッジを反映
@@ -529,7 +548,11 @@ export default {
             child.onclick = () => this.ShowMyReportDetail(item);
             root.appendChild(child);
         });
-        this._core.open({ title: "MY REPORTS", content: root });
+        this._core.open({
+            title: "MY REPORTS",
+            content: root,
+            help: "",
+        });
     },
     // 通報詳細表示
     ShowMyReportDetail(report) {
@@ -565,7 +588,11 @@ export default {
             btnJump.classList.add("grayscale");
         } else {
             btnJump.onclick = async () => {
-                const isOk = await this.ShowConfirm({ title: "JUMP", message: "このアーカイブに移動しますか？" });
+                const isOk = await this.ShowConfirm({
+                    title: "JUMP",
+                    help: "",
+                    message: "このアーカイブに移動しますか？"
+                });
                 if (!isOk) return;
                 this._core.closeAll();
                 $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
@@ -573,6 +600,9 @@ export default {
                 await $App.RefreshScreen();
             };
         }
-        this._core.open({ title: "REPORT DETAIL", content: el });
+        this._core.open({
+            title: "REPORT DETAIL",
+            content: el,
+        });
     },
 };

@@ -98,6 +98,7 @@ const _DetailFrameCore = {
                     const isOk = await $Dialog.ShowConfirm({
                         title: "保存前確認",
                         message: "保存してもよろしいですか？",
+                        help: "",
                         label: "OK"
                     });
                     if (!isOk) return;

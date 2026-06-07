@@ -155,10 +155,6 @@ const _DialogCore = {
         }
         this.backdrop.classList.add("hidden");
     },
-    // (以降はそのまま)
-    _renderTimelineChild(child, item, hasLine = true) {
-        // ...
-    },
 };
 
 const DialogController = {
@@ -166,8 +162,7 @@ const DialogController = {
     _core: _DialogCore,
 
     // 【共通】汎用的な確認ダイアログ
-    // ※ どこからでも this.ShowConfirm(...) で呼べるよう、ここはマネージャーに残す
-    async ShowConfirm({ title = "", message = "", label = "OK" }) {
+    async ShowConfirm({ title = "", message = "", label = "OK", help = ""}) {
         return new Promise((resolve) => {
             const el = $Dom.GenerateTemplate('tpl-confirm-base');
             $Dom.QuerySelector('.js-message', el).textContent = message;
@@ -175,7 +170,7 @@ const DialogController = {
             this._core.open({
                 title: title,
                 content: el,
-                help: "",
+                help: help,
                 onClose: () => { if (!isResolved) resolve(false); },
                 buttons: [[
                     { label: "CANCEL", className: "bg-slate-400 text-white shadow-md", handler: () => { isResolved = true; resolve(false); this._core.close(); } },
