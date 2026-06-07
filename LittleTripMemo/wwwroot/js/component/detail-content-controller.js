@@ -169,7 +169,7 @@ const _DetailContentCore = {
             $Dom.ToggleShow(this.displayPriceWrapper, true);
             this.displayPrice.textContent = price.toLocaleString();
             // 通貨単位の決定ロジック
-            let displayCurrency = $App.AppData.Owner.currency_unit || 'JPY';
+            let displayCurrency = $App.AppData.Owner.Currency_unit || 'JPY';
             if (detail.archive_id > 0) {
                 // 親アーカイブの情報をStoreから探す（一覧または現在開いているアーカイブ）
                 const archiveList = $Data.Store.GetArchiveList() ||[];

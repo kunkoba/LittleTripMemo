@@ -1,14 +1,4 @@
 export default {
-    // 以下のメソッドを移動してきてください。
-    // - ShowAdminMenu()
-    // - ShowAdminNoticeList()
-    // - ShowAdminNoticeEdit()
-    // - ShowAdminReportList()
-    // - ShowAdminReportDetail()
-    // - ShowAdminFeedbackList()
-    // - ShowAdminFeedbackDetail()
-    // - ShowAdminSendUserNotification()
-    // - ShowAdminReportItemDetail()
     // 【管理者機能】管理者メニュー
     ShowAdminMenu() {
         const el = $Dom.GenerateTemplate('tpl-menu-admin');

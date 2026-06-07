@@ -1,11 +1,4 @@
 export default {
-    // 以下のメソッドを移動してきてください。
-    // - ShowAppInfo()
-    // - ShowReviewList()
-    // - ShowReviewPost()
-    // - ShowNoticeDetail()
-    // - ShowNoticeList()
-    // - ShowReportPost()
     // （システム）アプリ情報
     ShowAppInfo() {
         const el = $Dom.GenerateTemplate("tpl-app-info");
@@ -20,7 +13,7 @@ export default {
             $Dom.ToggleShow(linkOfficial, false);
         }
         // systemInfo からスコア平均を取得して反映
-        const sysInfo = $App.AppData.Owner.systemInfo || {};
+        const sysInfo = $App.AppData.Owner.SystemInfo || {};
         console.log(">sysInfo:", sysInfo);
         const scoreAvg = sysInfo.score_avg || 0;
         $Dom.QuerySelector('.js-app-score', el).textContent = `★ ${scoreAvg.toFixed(1)}`;
@@ -38,7 +31,7 @@ export default {
         const el = $Dom.GenerateTemplate("tpl-review-list");
         const container = $Dom.QuerySelector(".js-review-container", el);
         // systemInfo からフィードバック情報を取得
-        const sysInfo = $App.AppData.Owner.systemInfo || {};
+        const sysInfo = $App.AppData.Owner.SystemInfo || {};
         console.log(">sysInfo:", sysInfo);
         const feedbackList = sysInfo.feedbacks ||[];
         const scoreAvg = sysInfo.score_avg || 0;
@@ -182,7 +175,7 @@ export default {
 	},
     // 通知リスト表示（修正版）
     async ShowNoticeList() {
-        const notices = $App.AppData.Owner.systemInfo.notifications || [];
+        const notices = $App.AppData.Owner.SystemInfo.notifications || [];
         if (notices.length === 0) {
             $Notice.Warn("データはありません");
             return;
@@ -302,7 +295,7 @@ export default {
     },
     // ② ユーザあて通知一覧画面
     async ShowUserMailList() {
-        const mails = $App.AppData.Owner.systemInfo.userNotifications || [];
+        const mails = $App.AppData.Owner.SystemInfo.userNotifications || [];
         if (mails.length === 0) {
             $Notice.Warn("メッセージはありません");
             return;

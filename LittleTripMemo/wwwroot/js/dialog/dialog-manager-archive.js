@@ -73,7 +73,7 @@ export default {
                     // 金額がある場合は表示
                     $Dom.ToggleShow(priceWrapper, true);
                     // 通貨単位の取得（親アーカイブの設定、またはユーザー設定）
-                    let displayCurrency = $App.AppData.Owner.currency_unit || 'JPY';
+                    let displayCurrency = $App.AppData.Owner.Currency_unit || 'JPY';
                     if (item.archive_id > 0) {
                         const archiveList = $Data.Store.GetArchiveList() || [];
                         const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
@@ -135,7 +135,7 @@ export default {
                 const price = Number(item.memo_price || 0);
                 if (price !== 0) {
                     $Dom.ToggleShow(priceWrapper, true);
-                    let displayCurrency = $App.AppData.Owner.currency_unit || 'JPY';
+                    let displayCurrency = $App.AppData.Owner.Currency_unit || 'JPY';
                     if (item.archive_id > 0) {
                         const archiveList = $Data.Store.GetArchiveList() || [];
                         const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
@@ -416,7 +416,7 @@ export default {
                         const isSuccess = await $Data.Access.MergeDetails({
                             seqs,
                             title: "メモのまとめタイトル_" + $Util.FormatDate(new Date(), 'YYYYMMDD_HHmmss'),
-                            currency_unit: $App.AppData.Owner.currency_unit || 'JPY'
+                            currency_unit: $App.AppData.Owner.Currency_unit || 'JPY'
                         });
                         if (!isSuccess) return;
                         $Notice.Info("作成しました");
@@ -473,7 +473,7 @@ export default {
             const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
             const priceVal = $Dom.QuerySelector('#mem-stat-price', el);
             const priceUnit = $Dom.QuerySelector('#view-mem-price-unit', el);
-            const displayCurrency = currentArchive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
+            const displayCurrency = currentArchive.currency_unit || $App.AppData.Owner.Currency_unit || 'JPY';
             priceUnit.textContent = displayCurrency;
             if (totalPrice > 0) {
                 // priceVal.className = "text-[1.2rem] font-black text-blue-600 mr-2 italic";
@@ -644,7 +644,7 @@ export default {
         editTitle.value = archive.title || "";
         editBody.value = archive.memo || "";
         editUrl.value = archive.link_url || "";
-        editCurrency.value = archive.currency_unit || $App.AppData.Owner.currency_unit || 'JPY';
+        editCurrency.value = archive.currency_unit || $App.AppData.Owner.Currency_unit || 'JPY';
         // --- 文字数カウント制御 ---
         const cTitle = $Dom.QuerySelector('#edit-mem-title-count', el);
         const cBody  = $Dom.QuerySelector('#edit-mem-body-count', el);

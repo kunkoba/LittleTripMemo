@@ -34,8 +34,8 @@ window.$Data = {
             // if (options.method !== "GET" && params) options.body = JSON.stringify(params);
             if (options.method !== "GET" && params) {
                 // paramsにプロパティがあるときだけ、全リクエストに login_user_id を自動で混ぜる
-                if (params && Object.keys(params).length > 0 && $App.AppData.Owner.systemInfo) {
-                    params.login_user_id = $App.AppData.Owner.systemInfo.login_user_id;
+                if (params && Object.keys(params).length > 0 && $App.AppData.Owner.SystemInfo) {
+                    params.login_user_id = $App.AppData.Owner.SystemInfo.login_user_id;
                 }
                 options.body = JSON.stringify(params);
             }
@@ -84,7 +84,7 @@ window.$Data = {
             if (data.token) $App.AppData.Owner.Token = data.token;
             // ユーザ用：システムデータ
             if (data.systemInfo) {
-                $App.AppData.Owner.systemInfo = data.systemInfo;
+                $App.AppData.Owner.SystemInfo = data.systemInfo;
                 // 通知の未読判定とローカルDBの掃除を非同期で実行
                 $Warn.CatchAsync(async () => {
                     await $Data.LocalDb.CheckUnreadNotices();
@@ -435,7 +435,7 @@ window.$Data = {
         },
         // 通知の未読判定とクリーンアップ
         async CheckUnreadNotices() {
-            const sysInfo = $App.AppData.Owner.systemInfo;
+            const sysInfo = $App.AppData.Owner.SystemInfo;
             if (!sysInfo || !sysInfo.notifications) return;
             // 1. 期限切れの既読履歴をローカルDBから掃除
             await $LocalDb.Notice.Cleanup();
@@ -462,7 +462,7 @@ window.$Data = {
         },
         // ユーザ当て通知
         async CheckUnreadMails_2() {
-            const sysInfo = $App.AppData.Owner.systemInfo;
+            const sysInfo = $App.AppData.Owner.SystemInfo;
             if (!sysInfo || !sysInfo.userNotifications) return;
             // 1. ローカルDBから既読履歴を取得
             const readHistory = await $LocalDb.Mail.GetAll();
@@ -484,7 +484,7 @@ window.$Data = {
         },
         // 通知の未読判定（個別メッセージ版）
         async CheckUnreadMails() {
-            const sysInfo = $App.AppData.Owner.systemInfo;
+            const sysInfo = $App.AppData.Owner.SystemInfo;
             if (!sysInfo || !sysInfo.userNotifications) return;
 
             const readHistory = await $LocalDb.Mail.GetAll();

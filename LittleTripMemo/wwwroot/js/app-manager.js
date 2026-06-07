@@ -11,11 +11,11 @@ const AppManager = {
         Owner: {
             Theme: null,
             MapStyle: null,
-            IsGpsTracking: false,
+            GpsTrackingSec: 0,
             Token: null,
-            currency_unit: 'JPY',
-            systemInfo: null,
-            fontSize: 'standard',
+            Currency_unit: 'JPY',
+            SystemInfo: null,
+            FontSize: 'standard',
         },
         Admin: {
             notifications:[],
@@ -29,22 +29,23 @@ const AppManager = {
         localStorage.setItem(this.AppSettingKey, JSON.stringify({
             theme: this.AppData.Owner.Theme,
             mapStyleKey: this.AppData.Owner.MapStyle?.key,
-            isGpsTracking: this.AppData.Owner.IsGpsTracking,
+            gpsTrackingSec: this.AppData.Owner.GpsTrackingSec,
             token: this.AppData.Owner.Token,
-            currency_unit: this.AppData.Owner.currency_unit,
+            currency_unit: this.AppData.Owner.Currency_unit,
             fontSize: this.AppData.Owner.FontSize,
         }));
+        // console.log("_saveSettings:", this.AppData.Owner);
     },
     // 設定を読込
     _loadSettings() {
         const saved = JSON.parse(localStorage.getItem(this.AppSettingKey) || '{}');
         if (saved.theme) this.AppData.Owner.Theme = saved.theme;
         if (saved.mapStyleKey) this.AppData.Owner.MapStyle = $Map.MAP_STYLE[saved.mapStyleKey];
-        if (saved.isGpsTracking !== undefined) this.AppData.Owner.IsGpsTracking = saved.isGpsTracking;
+        if (saved.gpsTrackingSec !== undefined) this.AppData.Owner.GpsTrackingSec = saved.gpsTrackingSec;
         if (saved.token) this.AppData.Owner.Token = saved.token;
-        if (saved.currency_unit) this.AppData.Owner.currency_unit = saved.currency_unit;
+        if (saved.currency_unit) this.AppData.Owner.Currency_unit = saved.currency_unit;
         if (saved.fontSize) this.AppData.Owner.FontSize = saved.fontSize;
-        $UI.ChangeFontSize(this.AppData.Owner.FontSize);
+        // console.log("_loadSettings:", this.AppData.Owner);
     },
     // iPhoneのキーボード対策（入力中を考慮）
     _initViewport() {
@@ -89,12 +90,14 @@ const AppManager = {
         // オンライン監視
         if ($App.AppData.Context.IsOnline) {
             // GPSトラッキング
-            if ($App.AppData.Owner.IsGpsTracking) {
-                // 現在地追従（秒）
+            const sec = $App.AppData.Owner.GpsTrackingSec; // ★変更
+            if (sec > 0) {
+                // 現在地追従（保存された秒数で登録）
                 $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
-                    // 追従モードかつオンラインなら現在地を更新（フォーカスはしない）
                     $Marker.RefreshCurrentLocation();
-                }, 10);
+                    $Notice.Info("$Polling.TASKS.GPS_FOLLOW");
+                }, sec);
+                $Polling.Start($Polling.TASKS.GPS_FOLLOW);
             }
             // データ送信処理（秒）
             $Polling.Add($Polling.TASKS.DATA_DETAIL, async () => {
@@ -173,11 +176,16 @@ const AppManager = {
         // メイン処理
         console.log("★App.Init", this.AppData, params);
         this._initViewport();
+        this._initPollingTasks();
+        // ユーザ設定反映
         $UI.Init();
         this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
         this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD);
+        this.ChangeGpsTracking(this.AppData.Owner.GpsTrackingSec || 0)
+        this.ChangeCurrency(this.AppData.Owner.Currency_unit || 'JPY')
+        this.ChangeFontSize(this.AppData.Owner.FontSize || '');
+        // UI関連
         await this.RefreshScreen();
-        this._initPollingTasks();
     },
     // 画面モード変更
     async RefreshScreen() {
@@ -278,8 +286,8 @@ const AppManager = {
     // カラーテーマ変更
     ChangeTheme(theme){
         this.AppData.Owner.Theme = theme;
-        $UI.ChangeTheme(theme);
         this._saveSettings(); // 保存実行
+        $UI.ChangeTheme(theme);
     },
     // カラーテーマ変更
     ChangeMapStyle(style){
@@ -288,19 +296,30 @@ const AppManager = {
         $Map.SetMapStyle(style);
     },
     // 追従設定の変更メソッド
-    ChangeGpsTracking(isOn) {
-        this.AppData.Owner.IsGpsTracking = isOn;
-        if (isOn && this.AppData.Context.IsOnline) $Polling.Start($Polling.TASKS.GPS_FOLLOW);
-        else $Polling.Stop($Polling.TASKS.GPS_FOLLOW);
-        this._saveSettings();
+    ChangeGpsTracking(sec) {
+        const targetSec = parseInt(sec || 0);
+        this.AppData.Owner.GpsTrackingSec = targetSec;
+        // 一旦既存のタスクを停止
+        $Polling.Stop($Polling.TASKS.GPS_FOLLOW);
+        // 秒数が1以上かつオンラインなら新しくタスクを開始
+        if (targetSec > 0 && this.AppData.Context.IsOnline) {
+            $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
+                $Marker.RefreshCurrentLocation();
+                console.log("GPS Follow logic executed.", this.AppData.Owner.GpsTrackingSec);
+            }, targetSec);
+            $Polling.Start($Polling.TASKS.GPS_FOLLOW);
+        }
+        this._saveSettings(); // ローカルストレージに永続化
     },
     // 通貨単位の変更メソッド
     ChangeCurrency(unit) {
-        this.AppData.Owner.currency_unit = unit;
-        this._saveSettings();
+        this.AppData.Owner.Currency_unit = unit;
+        this._saveSettings(); // 保存実行
     },
     // フォントサイズの変更メソッド
     ChangeFontSize(size) {
+        this.AppData.Owner.FontSize = size;
+        this._saveSettings(); // 保存実行
         $UI.ChangeFontSize(size);
     },
 };

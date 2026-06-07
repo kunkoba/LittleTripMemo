@@ -1,7 +1,7 @@
 // 現在のログインユーザーIDを取得（未ログイン時は 'anonymous'）
 const getUserId = () => {
-    if ($App.AppData.Owner.systemInfo) {
-        return $App.AppData.Owner.systemInfo.login_user_id;
+    if ($App.AppData.Owner.SystemInfo) {
+        return $App.AppData.Owner.SystemInfo.login_user_id;
     }
     return '';
 };

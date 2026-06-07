@@ -59,30 +59,20 @@
 </template>
 
 <!-- 【ダイアログ子】設定系画面 -->
-<template id="tpl-config-gps_2">
-    <div class="w-full flex flex-col bg-brand-0">
-        <button id="gps-btn-on" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 active:bg-brand-2 text-black-5"><span class="col-span-1 flex justify-center text-[1rem] js-icon"></span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Tracking On (10s)</span></button>
-        <button id="gps-btn-off" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 active:bg-brand-2 text-black-5"><span class="col-span-1 flex justify-center text-[1rem] js-icon"></span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Tracking Off</span></button>
-        <div class="p-4 text-[0.7rem] text-black-3 ">※ONにすると10秒おきに現在地を更新します。バッテリーの消費にご注意ください。</div>
-    </div>
-</template>
 <template id="tpl-config-gps">
     <div class="w-full text-black-5 space-y-6 px-6 py-8 bg-brand-0">
         <div class="flex flex-col items-center gap-4">
             <label class="block font-black text-slate-400 text-[0.6rem] uppercase tracking-widest">Update Interval</label>
-            
             <!-- 秒数表示エリア -->
-            <div class="flex items-baseline gap-1">
+            <div class="flex items-baseline gap-1 h-24">
                 <span id="gps-val-display" class="text-[3.5rem] font-black text-brand-5 leading-none">0</span>
                 <span id="gps-unit-display" class="text-[0.8rem] font-bold text-slate-400 uppercase">sec</span>
             </div>
-
             <!-- 水平スライダー -->
             <div class="w-full px-2">
                 <input id="gps-range-slider" type="range" min="0" max="120" step="10" value="0"
                     class="w-full h-2 bg-brand-2 rounded-lg appearance-none cursor-pointer accent-brand-5 shadow-inner">
             </div>
-
             <!-- 目盛りラベル -->
             <div class="w-full flex justify-between px-1 text-[0.6rem] font-bold text-slate-300 uppercase">
                 <span>Off</span>
@@ -90,7 +80,6 @@
                 <span>120s</span>
             </div>
         </div>
-
         <div class="p-4 bg-white/50 rounded-xl border border-brand-2 text-[0.7rem] text-slate-500 leading-relaxed italic">
             ※ 0s (OFF) に設定すると自動更新を停止します。<br>
             ※ 更新間隔が短いほど、バッテリーの消費が早くなります。
@@ -334,7 +323,7 @@
             </button>
         </div>
         <!-- 通報内容 -->
-        <div class="h-[300px] bg-brand-1 rounded-lg p-2 overflow-y-auto">
+        <div class="h-[200px] bg-brand-1 rounded-lg p-2 overflow-y-auto">
             <div id="view-report-body" class="text-[1rem] text-slate-700 leading-[2] whitespace-pre-wrap break-words"></div>
         </div>
     </div>

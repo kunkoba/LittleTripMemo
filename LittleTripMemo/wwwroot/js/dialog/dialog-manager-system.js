@@ -51,7 +51,7 @@ export default {
         };
         // // ログイン中であれば、プロフィールのアイコンを反映する
         // if (isLoggedIn) {
-        //     const profile = $App.AppData.Owner.systemInfo.ownerProfile;
+        //     const profile = $App.AppData.Owner.SystemInfo.ownerProfile;
         //     if (profile && profile.icon) {
         //         // ボタン内の最初のspan（アイコン表示用）を取得して書き換え
         //         const iconSpan = $Dom.QuerySelector('span:first-child', b.profile);
@@ -87,7 +87,7 @@ export default {
         }
         // 4. 各ボタンのイベント登録
         b.profile.onclick = async () => {
-            this.ShowUserProfile($App.AppData.Owner.systemInfo.ownerProfile, true)
+            this.ShowUserProfile($App.AppData.Owner.SystemInfo.ownerProfile, true)
         };
         b.config.onclick = () => {this.ShowUserSettingsMenu()};
         b.notice.onclick = () => {this.ShowNoticeList()};
@@ -251,7 +251,7 @@ export default {
         const el = $Dom.GenerateTemplate("tpl-config-currency");
         const inputCurrency = $Dom.QuerySelector('#input-currency', el);
         // 現在の値をセット
-        const oldUnit = $App.AppData.Owner.currency_unit || 'JPY';
+        const oldUnit = $App.AppData.Owner.Currency_unit || 'JPY';
         inputCurrency.value = oldUnit;
         this._core.open({
             title: "CURRENCY CONFIG",
@@ -285,7 +285,7 @@ export default {
         });
     },
     // （ユーザ設定）GPS追従設定
-    ShowGpsFollowConfig() {
+    ShowGpsFollowConfig_2() {
         let isSaved = false;
         const oldIsOn = $App.AppData.Owner.IsGpsTracking;
         const el = $Dom.GenerateTemplate("tpl-config-gps");
@@ -332,6 +332,50 @@ export default {
                         isSaved = true;
                         $App.AppData.Owner.IsGpsTracking = isOn;
                         $App.ChangeGpsTracking(isOn);
+                        this._core.close();
+                        $Notice.Info("Changes saved.");
+                    }
+                }
+            ]]
+        });
+    },
+    // （ユーザ設定）GPS追従設定
+    ShowGpsFollowConfig() {
+        let isSaved = false;
+        const oldSec = $App.AppData.Owner.GpsTrackingSec || 0; // 現在の値を保持
+        let tempSec = oldSec; // 操作用の一時変数
+        const el = $Dom.GenerateTemplate("tpl-config-gps");
+        const slider = $Dom.QuerySelector('#gps-range-slider', el);
+        const display = $Dom.QuerySelector('#gps-val-display', el);
+        const unit = $Dom.QuerySelector('#gps-unit-display', el);
+        // 初期表示の設定
+        slider.value = oldSec;
+        display.textContent = oldSec === 0 ? "OFF" : oldSec;
+        $Dom.ToggleShow(unit, oldSec !== 0);
+        // スライダー操作：画面表示だけをリアルタイム更新（Appマネージャにはまだ書かない）
+        slider.oninput = (e) => {
+            tempSec = parseInt(e.target.value);
+            display.textContent = tempSec === 0 ? "OFF" : tempSec;
+            $Dom.ToggleShow(unit, tempSec !== 0);
+        };
+        this._core.open({
+            title: "GPS TRACKING",
+            content: el,
+            help: "GPSの更新間隔を設定します。0sにすると停止します。",
+            onClose: () => {
+                // 保存せずに閉じた場合は何もしない（値は oldSec のまま維持される）
+            },
+            buttons: [[
+                {
+                    label: "CANCEL",
+                    className: "bg-slate-400 text-white shadow-md",
+                    handler: () => this._core.close()
+                },
+                {
+                    label: "OK",
+                    handler: () => {
+                        isSaved = true;
+                        $App.ChangeGpsTracking(tempSec); // OK時のみ確定して保存
                         this._core.close();
                         $Notice.Info("Changes saved.");
                     }
@@ -397,7 +441,7 @@ export default {
     },
     // プロフィール参照
     async ShowUserProfile(profile, isOwner) {
-        if (isOwner) profile = $App.AppData.Owner.systemInfo.ownerProfile;
+        if (isOwner) profile = $App.AppData.Owner.SystemInfo.ownerProfile;
         if (!profile) return $Notice.Warn("ユーザー情報がありません");
         const el = $Dom.GenerateTemplate('tpl-view-profile');
         const renderView = () => {
@@ -519,7 +563,7 @@ export default {
     },
     // 通報履歴リスト表示
     ShowMyReportList() {
-        const reports = $App.AppData.Owner.systemInfo.myReports || [];
+        const reports = $App.AppData.Owner.SystemInfo.myReports || [];
         if (reports.length === 0) {
             $Notice.Warn("通報履歴はありません");
             return;

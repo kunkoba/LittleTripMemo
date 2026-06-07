@@ -1,10 +1,15 @@
 <!-- 【ダイアログ子】管理者メニュー -->
 <template id="tpl-menu-admin">
     <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-admin-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1.2rem]">📢</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Notice Management</span></button>
-        <button id="btn-admin-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1.2rem]">🚨</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Report Mgmt</span></button>
-        <button id="btn-admin-feedback" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1.2rem]">💡</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Feedback Mgmt</span></button>
-        <!-- ユーザあて通知 -->
+        <button id="btn-admin-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.2rem]">📢</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Notice Management</span>
+        </button>
+        <button id="btn-admin-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.2rem]">🚫</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Report Mgmt</span>
+        </button>
+        <button id="btn-admin-feedback" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.2rem]">💡</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Feedback Mgmt</span>
+        </button>
         <button id="btn-admin-user-mail" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
             <span class="col-span-1 flex justify-center text-[1.2rem]">✉️️</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">User Message Mgmt</span>
         </button>
@@ -16,7 +21,7 @@
     <div class="js-item-card flex items-stretch p-0 border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3 relative">
         <div class="flex-1 min-w-0 p-3 pl-4">
             <div class="flex justify-between items-start mb-1">
-                <div class="text-[0.6rem] font-black text-slate-400 tracking-wider js-date"></div>
+                <div class="text-[0.8rem] font-black text-slate-400 tracking-wider js-date italic"></div>
                 <span class="js-badge-status text-[9px] font-black px-2 py-0.5 uppercase tracking-wider shadow-md border"></span>
             </div>
             <div class="text-[0.8rem] font-black text-black-5 truncate pr-2 mb-1 js-title"></div>
@@ -76,7 +81,7 @@
                 </button>
             </div>
         </div>
-        <div class="_flex-1 bg-brand-1 rounded-lg p-2 h-[300px] overflow-y-auto">
+        <div class="_flex-1 bg-brand-1 rounded-lg p-2 h-[200px] overflow-y-auto">
             <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-words js-body mt-2 h-[200px] overflow-y-auto pr-2"></div>
         </div>
     </div>
@@ -199,7 +204,7 @@
                 </button>
             </div>
         </div>
-        <div class="flex-1 bg-brand-1 rounded-lg p-2 h-[300px] overflow-y-auto">
+        <div class="flex-1 bg-brand-1 rounded-lg p-2 h-[200px] overflow-y-auto">
             <div class="text-[1rem] text-slate-700 leading-[2] whitespace-pre-wrap break-words js-report-body mt-2"></div>
         </div>
     </div>
@@ -207,7 +212,7 @@
 
 <!-- 【追加】管理者フィードバック：検索バー付きリスト外枠 -->
 <template id="tpl-admin-feedback-list-parent">
-    <div class="flex flex-col h-full w-full min-h-[300px]">
+    <div class="flex flex-col h-full w-full min-h-[200px]">
         <!-- 上部固定のスコアフィルタバー -->
         <div class="sticky top-0 z-10 bg-brand-0 pb-3 flex flex-col gap-2">
             <div class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest pl-1">Filter by Score</div>
