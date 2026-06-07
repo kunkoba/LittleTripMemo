@@ -335,16 +335,16 @@ const DetailContentController = {
     Validate(detail) {
         // 1. タイトル必須チェック
         if (!detail.title || detail.title.trim().length === 0) {
-            $Notice.Warn("TITLE is required.");
+            $Notice.Warn("タイトルを入力してください。");
             return false;
         }
         if (!detail.body || detail.body.trim().length === 0) {
-            $Notice.Warn("BODY is required.");
+            $Notice.Warn("本文を入力してください。");
             return false;
         }
         // 3. 日付・時刻チェック（HTML5のinputで制限されていますが、JSでも念のため）
         if (!detail.memo_date || !detail.memo_time) {
-            $Notice.Warn("DATE and TIME are required.");
+            $Notice.Warn("日付と時刻を入力してください。");
             return false;
         }
         // 5. URL形式チェック（入力されている場合のみ）
@@ -355,7 +355,7 @@ const DetailContentController = {
                     throw new Error();
                 }
             } catch (e) {
-                $Notice.Warn("Please enter a valid URL (starting with http/https).");
+                $Notice.Warn("有効なURLを入力してください。");
                 return false;
             }
         }

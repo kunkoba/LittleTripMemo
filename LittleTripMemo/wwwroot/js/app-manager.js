@@ -95,7 +95,6 @@ const AppManager = {
                 // 現在地追従（保存された秒数で登録）
                 $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
                     $Marker.RefreshCurrentLocation();
-                    $Notice.Info("$Polling.TASKS.GPS_FOLLOW");
                 }, sec);
                 $Polling.Start($Polling.TASKS.GPS_FOLLOW);
             }
@@ -107,7 +106,7 @@ const AppManager = {
                     // 全て $Data.LocalDb に任せる
                     await $Data.LocalDb.BulkSendDetails();
                     // 通知
-                    $Notice.Info("Details saved successfully.");
+                    $Notice.Info("バックグラウンド同期は成功しました。");
                 })();
             }, 60);
             // リアクションデータ送信処理（秒）
@@ -118,7 +117,7 @@ const AppManager = {
                 await $Warn.CatchAsync(async () => {
                     await $Data.LocalDb.BulkSendReactions();
                     // 通知が必要な場合は以下をコメントイン
-                    $Notice.Info("Reactions saved successfully.");
+                    $Notice.Info("バックグラウンド同期は成功しました。");
                 })();
             }, 60); // 60秒おきに実行
         }
@@ -128,13 +127,13 @@ const AppManager = {
     // ログインフロー内に追加
     async ExecuteLoginFlow() {
         return await $Warn.CatchAsync(async () => {
-            $Notice.Info("Logging in...");
+            $Notice.Info("ログイン中...");
             const email = await $Auth.GetVerifiedEmailByGoogle();
             const ret = await $Data.Access.LoginToServer(email);
             if (ret) {
                 this.AppData.Context.IsLoggedIn = true;
                 this._saveSettings();
-                $Notice.Info("Login successful！");
+                $Notice.Info("ログインに成功しました！");
                 return true;
             }
             return false;

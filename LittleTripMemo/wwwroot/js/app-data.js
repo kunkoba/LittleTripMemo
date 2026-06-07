@@ -460,28 +460,6 @@ window.$Data = {
             // メニューアイコンの赤丸を更新
             $UI.UpdateNoticeBadge(unreadCount);
         },
-        // ユーザ当て通知
-        async CheckUnreadMails_2() {
-            const sysInfo = $App.AppData.Owner.SystemInfo;
-            if (!sysInfo || !sysInfo.userNotifications) return;
-            // 1. ローカルDBから既読履歴を取得
-            const readHistory = await $LocalDb.Mail.GetAll();
-            let unreadCount = 0;
-            for (const mail of sysInfo.userNotifications) {
-                const history = readHistory.find(h => h.seq === mail.seq);
-                // 2. 履歴がない、またはサーバーの方が新しい場合は未読
-                if (!history || new Date(mail.send_tim) > new Date(history.send_tim)) {
-                    mail.is_new = true;
-                    unreadCount++;
-                } else {
-                    mail.is_new = false;
-                }
-            }
-            // 3. コンテキストに保持
-            $App.AppData.Context.UnreadMailCount = unreadCount;
-            // 4. プロフィール画面が開いていればバッジを更新
-            if (window.$Dialog) this._updateProfileMailBadge();
-        },
         // 通知の未読判定（個別メッセージ版）
         async CheckUnreadMails() {
             const sysInfo = $App.AppData.Owner.SystemInfo;

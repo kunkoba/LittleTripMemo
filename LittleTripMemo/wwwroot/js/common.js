@@ -6,7 +6,7 @@ window.$Err = {
 		console.error(err);
         // DebugInfoがあれば出力
         if (err.debugInfo) console.error("DebugInfo:", err.debugInfo);
-        $Notice.Warn(err.message || "Operation failed.");
+        $Notice.Warn(err.message || "問題が発生しました。");
         if (mode === this._errMode) {
 			console.log("エラーページへジャンプ！");
 			// window.location.href = "component/fatal-error.html";
@@ -149,7 +149,7 @@ window.$Util = {
         }
         // 引数のバリデーション
         if (!lat || !lng || typeof lat === 'undefined' || typeof lng === 'undefined') {
-            return "Invalid coordinates";
+            return "無効な座標です。";
         }
         try {
             // 逆ジオコーディングAPIの実行
@@ -161,7 +161,7 @@ window.$Util = {
             // レスポンスの解析
             const data = await response.json();
             if (!data.display_name) {
-                return "Address not found";
+                return "住所が見つかりませんでした。";
             }
             // 住所文字列の分割処理
             const parts = data.display_name.split(',').map(p => p.trim());
@@ -175,7 +175,7 @@ window.$Util = {
             if (typeof errorProc === 'function') {
                 errorProc("fetchAddress", error);
             }
-            return "Error fetching address";
+            return "住所の取得中にエラーが発生しました。";
         }
     },
     // 絵文字ピッカー

@@ -36,7 +36,7 @@ export default {
         // $Data.Store.GetDetailsWithSort("date", "asc");
         const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) {
-            $Notice.Warn("No data.");
+            $Notice.Warn("データはありません。");
             return;
         }
         const el = $Dom.GenerateTemplate("tpl-timeline-container");
@@ -112,7 +112,7 @@ export default {
     ShowDetailsSimpleList() {
         const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) {
-            $Notice.Warn("No data.");
+            $Notice.Warn("データはありません。");
             return;
         }
         const el = $Dom.GenerateTemplate("tpl-list-parent");
@@ -273,7 +273,7 @@ export default {
             // プライベートデータのみに絞る
             const privateList = archives.filter(item => !item.is_public);
             if (privateList.length === 0) {
-                $Notice.Warn("No ArchiveData.");
+                $Notice.Warn("追加できるまとめデータがありません。");
                 return;
             }
             // ヘッダーの生成
@@ -302,7 +302,7 @@ export default {
                     const params = { seqs: seqs, archive_id: item.archive_id };
                     const isAddSuccess = await $Data.Access.AddDetails(params);
                     if (!isAddSuccess) return;
-                    $Notice.Info("Added successfully.");
+                    $Notice.Info("追加しました。");
                     this._core.closeAll();
                     // ARCHIVEモードに切り替えて対象のまとめを開く
                     $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE;
@@ -324,7 +324,7 @@ export default {
     ShowMultiSelectTimeline() {
         const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) {
-            $Notice.Warn("No data.");
+            $Notice.Warn("データはありません。");
             return;
         }
         const content = $Dom.GenerateTemplate("tpl-multi-select-content");
@@ -442,7 +442,6 @@ export default {
     // まとめ親詳細参照（アーカイブ）
     ShowArchiveInfo() {
         const archive = $Data.Store.GetArchive();
-        if (!archive) return $Notice.Warn("Not found.");
         // 管理者かどうかの判定
         const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.plan === "Admin";
         //
@@ -530,8 +529,8 @@ export default {
                         'PublishArchive',
                         { archive_id: archive.archive_id },
                         "Switch to [Public]",
-                        "Do you want to make\nthis internal data [Public]？",
-                        "Set to [Public].",
+                        "このまとめを[Public]に設定しますか？",
+                        "[Public]に設定しました。",
                         $Const.SCREEN_MODE.ARCHIVE_PUB
                     )
                 }]);
@@ -542,8 +541,8 @@ export default {
                         'DeleteArchive',
                         { archive_id: archive.archive_id },
                         "Restore to Details",
-                        "Restore this group to\nindividual detail items？",
-                        "Restored to individual detail items.",
+                        "このまとめを[Private]に戻しますか？",
+                        "単体のメモに戻しました。",
                         $Const.SCREEN_MODE.CREATE
                     )
                 }]);
@@ -556,8 +555,8 @@ export default {
                             'OpenArchive',
                             { archive_id: archive.archive_id },
                             "Switch to [Open]",
-                            "Do you want to switch\nthis data to [Open]？",
-                            "Switched to [Open].",
+                            "このまとめを[Open]に切り替えますか？",
+                            "[Open]に切り替えました。",
                             null,
                             () => $Data.Store.UpdateArchive({ closed_flg: false })
                         )
@@ -570,8 +569,8 @@ export default {
                             'CloseArchive',
                             { archive_id: archive.archive_id },
                             "Switch to [Close]",
-                            "Do you want to switch\nthis data to [Close]？",
-                            "Switched to [Close].",
+                            "このまとめを[Close]に切り替えますか？",
+                            "[Close]に切り替えました。",
                             null,
                             () => $Data.Store.UpdateArchive({ closed_flg: true })
                         )
@@ -584,8 +583,8 @@ export default {
                         'UnpublishArchive',
                         { archive_id: archive.archive_id },
                         "Switch to [Private]",
-                        "Do you want to revert\nthis data to Private？",
-                        "Reverted to [Private].",
+                        "このまとめを[Private]に戻しますか？",
+                        "[Private]に戻しました。",
                         $Const.SCREEN_MODE.ARCHIVE
                     )
                 }]);
@@ -682,7 +681,7 @@ export default {
                             if (!isSuccess) return;
                             $Data.Store.UpdateArchive(updatedFields);
                             $TopBar.ChangeTitle(updatedFields.title);
-                            $Notice.Info("Changes saved.");
+                            $Notice.Info("保存しました。");
                             this._core.closeAll();
                             // if (onUpdate) onUpdate(); // 参照画面のDOMを最新化
                         })
@@ -706,7 +705,7 @@ export default {
         // 4. コピー処理 (ボタンをクリックでコピー)
         $Dom.QuerySelector('#btn-share-copy', el).onclick = () => {
             navigator.clipboard.writeText(shareUrl).then(() => {
-                $Notice.Info("URL copied to clipboard!");
+                $Notice.Info("URLをクリップボードにコピーしました！");
             }).catch(err => {
                 $Notice.Error("コピーに失敗しました");
             });

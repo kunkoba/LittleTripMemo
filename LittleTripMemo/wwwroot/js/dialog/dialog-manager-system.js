@@ -184,7 +184,7 @@ export default {
                         // テーマの変更・保存処理を実行
                         $App.ChangeTheme(current);
                         this._core.close();
-                        $Notice.Info("Changes saved.");
+                        $Notice.Info("保存しました。");
                     }
                 }
             ]]
@@ -239,7 +239,7 @@ export default {
                         // 選択されたマップスタイルを適用・保存
                         $App.ChangeMapStyle(selectedStyle);
                         this._core.close();
-                        $Notice.Info("Changes saved.");
+                        $Notice.Info("保存しました。");
                     }
                 }
             ]]
@@ -278,62 +278,7 @@ export default {
                         // 空の場合は JPY をデフォルトとする
                         $App.ChangeCurrency(val || 'JPY');
                         this._core.close();
-                        $Notice.Info("Changes saved.");
-                    }
-                }
-            ]]
-        });
-    },
-    // （ユーザ設定）GPS追従設定
-    ShowGpsFollowConfig_2() {
-        let isSaved = false;
-        const oldIsOn = $App.AppData.Owner.IsGpsTracking;
-        const el = $Dom.GenerateTemplate("tpl-config-gps");
-        const btnOn = $Dom.QuerySelector('#gps-btn-on', el);
-        const btnOff = $Dom.QuerySelector('#gps-btn-off', el);
-        let isOn = oldIsOn;
-        // 現在の状態を反映
-        $Dom.QuerySelector('.js-icon', btnOn).textContent = oldIsOn ? '●' : '○';
-        $Dom.QuerySelector('.js-icon', btnOff).textContent = !oldIsOn ? '●' : '○';
-        // if (isOn) btnOn.classList.add('bg-brand-1'); else btnOff.classList.add('bg-brand-1');
-        // イベント紐付け
-        btnOn.onclick = () => {
-            // let isOn = $App.AppData.Owner.IsGpsTracking;
-            $Dom.QuerySelector('.js-icon', btnOn).textContent = isOn ? '○' : '●';
-            $Dom.QuerySelector('.js-icon', btnOff).textContent = !isOn ? '○' : '●';
-            isOn = true;
-        };
-        btnOff.onclick = () => {
-            // let isOn = $App.AppData.Owner.IsGpsTracking;
-            $Dom.QuerySelector('.js-icon', btnOn).textContent = isOn ? '○' : '●';
-            $Dom.QuerySelector('.js-icon', btnOff).textContent = !isOn ? '○' : '●';
-            isOn = false;
-        };
-        this._core.open({
-            title: "GPS TRACKING",
-            content: el,
-            help: "",
-            onClose: () => {
-                if (isSaved) return;
-                // もとに戻す
-                $App.ChangeGpsTracking(oldIsOn);
-            },
-            buttons: [[
-                {
-                    label: "CANCEL",
-                    className: "bg-slate-400 text-white shadow-md",
-                    handler: () => {
-                        this._core.close();
-                    },
-                },
-                {
-                    label: "OK",
-                    handler: () => {
-                        isSaved = true;
-                        $App.AppData.Owner.IsGpsTracking = isOn;
-                        $App.ChangeGpsTracking(isOn);
-                        this._core.close();
-                        $Notice.Info("Changes saved.");
+                        $Notice.Info("保存しました。");
                     }
                 }
             ]]
@@ -377,7 +322,7 @@ export default {
                         isSaved = true;
                         $App.ChangeGpsTracking(tempSec); // OK時のみ確定して保存
                         this._core.close();
-                        $Notice.Info("Changes saved.");
+                        $Notice.Info("保存しました。");
                     }
                 }
             ]]
@@ -433,7 +378,7 @@ export default {
                         isSaved = true;
                         $App.ChangeFontSize(selectedSize); // ここで初めてAppData更新・保存
                         this._core.close();
-                        $Notice.Info("Changes saved.");
+                        $Notice.Info("保存しました。");
                     }
                 }
             ]]

@@ -126,7 +126,7 @@ export default {
                     handler: $Warn.CatchAsync(async () => {
                         // IDを指定して入力要素を取得し、前後の空白を除去した値を取得
                         const val = $Dom.QuerySelector("#inputPointValue", el).value.trim();
-                        if (!val) { $Notice.Warn("No input provided."); return; }
+                        if (!val) { $Notice.Warn("ワードが入力されていません。"); return; }
                         let pos = $Util.ParseLatLng(val);
                         if (!pos) {
                             pos = await $Util.SearchAddressByWord(val);
@@ -135,7 +135,7 @@ export default {
                             onOk(pos);
                             this._core.closeAll(); // 見つかった時だけ手動で閉じる
                         } else {
-                            $Notice.Warn("Not found.");
+                            $Notice.Warn("見つかりませんでした。");
                         }
                     })
                 }

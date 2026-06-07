@@ -55,7 +55,7 @@ const _BottomCore = {
 					// 検索結果が0件だった場合の通知（任意）
 					const details = $Data.Store.GetDetails();
 					if (details.length === 0) {
-						$Notice.Info("No matching location found.");
+						$Notice.Info("条件に一致するメモが見つかりませんでした。");
 					}
 				});
 				// 移動ボタン

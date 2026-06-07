@@ -145,7 +145,7 @@ export default {
                         };
                         const isSuccess = await $Data.Access.UpsertNotification(req);
                         if (!isSuccess) return;
-                        $Notice.Info("Saved successfully.");
+                        $Notice.Info("保存しました。");
                         this._core.close(); // 編集ダイアログを閉じる
                         if (onSaved) onSaved(); // 親画面の再描画コールバック
                     }
@@ -292,7 +292,7 @@ export default {
         // 2. リストの描画
         const feedbackList = $App.AppData.Admin.feedbackList || [];
         if (feedbackList.length === 0) {
-            listContainer.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-10">No matching data.</div>`;
+            listContainer.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-10">データはありません。</div>`;
         } else {
             feedbackList.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");

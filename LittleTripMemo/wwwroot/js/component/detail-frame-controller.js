@@ -43,8 +43,6 @@ const _DetailFrameCore = {
                     if (data.latitude && data.longitude) {
                         const url = `https://earth.google.com/web/search/${data.latitude},${data.longitude}`;
                         window.open(url, '_blank');
-                    } else {
-                        $Notice.Warn("No location data.");
                     }
                 });
                 // googleMap連携
@@ -54,8 +52,6 @@ const _DetailFrameCore = {
                     if (data.latitude && data.longitude) {
                         const url = `https://www.google.com/maps/search/?api=1&query=${data.latitude},${data.longitude}`;
                         window.open(url, '_blank');
-                    } else {
-                        $Notice.Warn("No location data.");
                     }
                 });
                 // 通報ボタンクリック時の処理
@@ -117,7 +113,7 @@ const _DetailFrameCore = {
                         // パネルを閉じる
                         this.toggleDetailPanel(false);
                         // 通知
-                        $Notice.Info("Saved successfully.");
+                        $Notice.Info("保存しました。");
                     })();
                 });
                 this.btnClose.addEventListener("click", () => this.handleCloseOrCancel());
@@ -281,10 +277,7 @@ const _DetailFrameCore = {
         const detail = $DetailContent.GetFormEditData();
         if (!detail || !detail.archive_id) return;
         // 1. 自分のまとめの場合は何もしない
-        if (detail.is_owner) {
-            $Notice.Warn("You cannot react to your own memories.");
-            return;
-        }
+        if (detail.is_owner) return;
         // 2. 現在のローカル状態を取得
         let myLocal = await $LocalDb.Reaction.Get(detail.archive_id, detail.seq);
         if (!myLocal) {
