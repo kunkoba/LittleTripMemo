@@ -10,9 +10,9 @@ window.$Data = {
     },
     // 通信関連のメソッド群
     Access: {
-        // baseUrl: "https://localhost:7292",
+        baseUrl: "https://localhost:7292",
+        // baseUrl: "https://eminently-meet-terrapin.ngrok-free.app",  // 固定ドメイン（ngrok）
         // baseUrl: "http://localhost:5000",   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
-        baseUrl: "https://29a8-112-71-71-140.ngrok-free.app",
         _rawData: {
             archive: null,
             details: [],
@@ -28,19 +28,22 @@ window.$Data = {
             const options = {
                 method: method.toUpperCase(),
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": token ? `Bearer ${token}` : ""
+                    // "ngrok-skip-browser-warning": "true", // ngrok対応
+                    "ngrok-skip-browser-warning": "69420", // ngrok対応
                 }
             };
-            // if (options.method !== "GET" && params) options.body = JSON.stringify(params);
+            // トークンがある場合のみヘッダーに追加（空文字を送らない）
+            if (token) {
+                options.headers["Authorization"] = `Bearer ${token}`;
+            }
             if (options.method !== "GET" && params) {
+                options.headers["Content-Type"] = "application/json";
                 // paramsにプロパティがあるときだけ、全リクエストに login_user_id を自動で混ぜる
                 if (params && Object.keys(params).length > 0 && $App.AppData.Owner.SystemInfo) {
                     params.login_user_id = $App.AppData.Owner.SystemInfo.login_user_id;
                 }
                 options.body = JSON.stringify(params);
             }
-            console.log("params:", params);
             // 接続
             const response = await fetch(this.baseUrl + url, options);
             // 結果
@@ -105,6 +108,7 @@ window.$Data = {
         },
         // --- (既存のアプリアクセスメソッド群省略なし) ---
         async LoginToServer(email) {
+            $Notice.Info("LoginToServer: " + email);
             const url = '/api/Account/LoginFirebase';
             const params = { Email: email };
             return await $Warn.CatchAsync(async () => {

@@ -179,68 +179,30 @@ builder.Services.AddControllers(options =>
 });
 
 
-//// ======================================================================
-//// ■ API メタデータ（Swagger 用・本体非依存）
-//// ======================================================================
-//// Controller / Minimal API の定義を収集し、
-//// OpenAPI 仕様生成の材料を提供する
-//builder.Services.AddEndpointsApiExplorer();
-
-
-//// ======================================================================
-//// ■ Swagger（開発・デバッグ用）
-//// ======================================================================
-//// API 仕様確認用。本番では UI を出さない
-//builder.Services.AddSwaggerGen(c =>
-//{
-//    c.SwaggerDoc("v1",
-//        new OpenApiInfo { Title = "LittleTripMemo", Version = "v1" });
-//    // JWT 認証用ヘッダ定義
-//    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-//    {
-//        Name = "Authorization",
-//        Type = SecuritySchemeType.Http,
-//        Scheme = "Bearer",
-//        BearerFormat = "JWT",
-//        In = ParameterLocation.Header,
-//        Description = "JWTトークンを入力"
-//    });
-//    // 全APIで JWT を必須にする
-//    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-//    {
-//        {
-//            new OpenApiSecurityScheme
-//            {
-//                Reference = new OpenApiReference
-//                {
-//                    Type = ReferenceType.SecurityScheme,
-//                    Id = "Bearer"
-//                }
-//            },
-//            Array.Empty<string>()
-//        }
-//    });
-//});
-
-
 // ======================================================================
-// ■ CORS（フロントエンド連携用・開発向け）
+// ■ CORS（フロントエンド連携用）
 // ======================================================================
 
 builder.Services.AddCors(options =>
 {
+    //options.AddDefaultPolicy(policy =>
+    //{
+    //    policy.WithOrigins(
+    //            "https://littletripmemomock-31477.web.app",    // firebase hosting でのホスト名
+    //            "http://localhost:8080",
+    //            "http://127.0.0.1:8080", // これも追加
+    //            "http://localhost:5000",
+    //            "http://127.0.0.1:5000", // これも念のため
+    //            "http://localhost:5500",
+    //            "http://127.0.0.1:5500",
+    //            "http://localhost:5501",
+    //            "http://127.0.0.1:5501")
+    //          .AllowAnyHeader()
+    //          .AllowAnyMethod();
+    //});
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins(
-                "https://littletripmemomock-31477.web.app",    // firebase hosting でのホスト名
-                "http://localhost:8080",
-                "http://127.0.0.1:8080", // これも追加
-                "http://localhost:5000",
-                "http://127.0.0.1:5000", // これも念のため
-                "http://localhost:5500",
-                "http://127.0.0.1:5500",
-                "http://localhost:5501",
-                "http://127.0.0.1:5501")
+        policy.AllowAnyOrigin()   // すべてのドメインを許可(ngrok使用時だけの特例）
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -269,6 +231,7 @@ JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 var jwt = builder.Configuration
     .GetSection(JwtSettings.SectionName)
     .Get<JwtSettings>()!;
+
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -312,6 +275,7 @@ var app = builder.Build();
 //app.UseHttpsRedirection();
 
 // CORS 設定を有効化（フロントエンドからの別オリジン通信を許可）
+app.UseRouting(); // これを明示的に追加
 app.UseCors();
 
 // 全体例外を JSON レスポンスに変換
@@ -319,38 +283,9 @@ app.UseMiddleware<ExceptionHandling>();
 
 
 
-// ======================================================================
-// ■ ミドルウェアパイプライン（実行順が重要）
-// ======================================================================
-
-
-//// Swagger UI（開発時のみ）
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
-
-
-// ======================================================================
-// ■ SPA エントリーポイント設定
-// ======================================================================
-
-//// ルートアクセス時に index.html を返す（SPA の起点）
-//app.UseDefaultFiles(new DefaultFilesOptions
-//{
-//    DefaultFileNames = { "index.html" }
-//});
-//// 静的ファイル配信
-//app.UseStaticFiles();
-
 
 // JWTミドルウェア実行
 app.UseMiddleware<JwtMiddleware>();
-
-//// 認証ミドルウェア
-//// リクエストに含まれる JWT を検証し、ユーザー情報を HttpContext.User に設定
-//app.UseAuthentication();
 
 // 認可ミドルウェア
 // [Authorize] 属性などを基に、アクセス可否を判定

@@ -13,5 +13,6 @@ firebase deploy
 https://littletripmemomock-31477.web.app/
 
 【asp/API】
-https://29a8-112-71-71-140.ngrok-free.app
+https://eminently-meet-terrapin.ngrok-free.app
+
 
