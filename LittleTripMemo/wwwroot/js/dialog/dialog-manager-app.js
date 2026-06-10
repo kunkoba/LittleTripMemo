@@ -65,7 +65,7 @@ export default {
             this.ShowArchiveInfo();
         }
         b.detailList.onclick = () => {
-            mode === $Const.SCREEN_MODE.SEARCH ? this.ShowDetailsSimpleList() : this.ShowDetailsTimeLine();
+            mode === $Const.SCREEN_MODE.SEARCH ? this.ShowDetailsSearchResult() : this.ShowDetailsTimeLine();
         }
         b.batch.onclick = () => {
             this.ShowMultiSelectTimeline({ onOk: (l) => console.log(l) });
@@ -103,6 +103,7 @@ export default {
             previewPosition: 'none', // 下部のプレビューエリアを隠す
             skinTonePosition: 'none', // スキントーン選択を隠す
         });
+        picker.style.setProperty('--emoji-size', '2rem');
         // コンテナにピッカーを注入
         container.appendChild(picker);
         // ダイアログを表示

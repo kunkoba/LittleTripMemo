@@ -24,11 +24,10 @@ export default {
             }
         })();
     },
-    // 地点リスト（単一選択・ジャンプ機能）
+    // タイムライン用リスト
     ShowDetailsTimeLine() {
-        // Storeの機能を使って昇順にソート
-        // $Data.Store.GetDetailsWithSort("date", "asc");
-        const details = $Data.Store.GetDetails();
+        // ソートする
+        const details = $Data.Store.GetDetailsSort();
         if (!details || details.length === 0) {
             $Notice.Warn("データはありません。");
             return;
@@ -102,15 +101,16 @@ export default {
             buttons: []
         });
     },
-    // 地図用のシンプルリスト表示
-    ShowDetailsSimpleList() {
+    // 検索結果用リスト
+    ShowDetailsSearchResult() {
+        // ソートしない
         const details = $Data.Store.GetDetails();
+        console.log("ShowDetailsSearchResult:", details);
         if (!details || details.length === 0) {
             $Notice.Warn("データはありません。");
             return;
         }
         const el = $Dom.GenerateTemplate("tpl-list-parent");
-        // el.className = "w-full text-black-3 mb-2 px-1 space-y-4";
         details.forEach((item, index) => {
             const child = $Dom.GenerateTemplate("tpl-list-child-simple");
             const dateStr = (item.memo_date || "");
@@ -163,17 +163,6 @@ export default {
             help: "",
             buttons: []
         });
-        setTimeout(() => {
-            const activeFrame = this._core.stack[this._core.stack.length - 1];
-            if (activeFrame) {
-                const titleText = $Dom.QuerySelector('#dialog-title', activeFrame);
-                if (titleText) {
-                    titleText.classList.remove('truncate');
-                    titleText.classList.add('flex', 'flex-col', 'justify-center');
-                    titleText.innerHTML = `SEARCH RESULTS <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1 not-italic">INDEPENDENT MEMOS</span>`;
-                }
-            }
-        }, 10);
     },
     // まとめ親一覧選択
     ShowArchiveList() {
@@ -317,7 +306,7 @@ export default {
     },
     // メモをまとめる（複数選択モード）
     ShowMultiSelectTimeline() {
-        const details = $Data.Store.GetDetails();
+        const details = $Data.Store.GetDetailsSort();
         if (!details || details.length === 0) {
             $Notice.Warn("データはありません。");
             return;
@@ -414,7 +403,7 @@ export default {
                         if (!isOk) return;
                         const isSuccess = await $Data.Access.MergeDetails({
                             seqs,
-                            title: "メモのまとめタイトル_" + $Util.FormatDate(new Date(), 'YYYYMMDD_HHmmss'),
+                            title: "title-" + $Util.FormatDate(new Date(), 'YYYYMMDD_HHmmss'),
                             currency_unit: $App.AppData.Owner.Currency_unit || 'JPY'
                         });
                         if (!isSuccess) return;
@@ -462,7 +451,7 @@ export default {
                 $Dom.ToggleShow(viewUrl, false); // 隠す
             }
             // ④ 件数の反映
-            const details = $Data.Store.GetDetails() || [];
+            const details = $Data.Store.GetDetailsSort() || [];
             $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
             $Dom.QuerySelector('#btn-view-mem-timeline', el).onclick = () => {
                 this.ShowDetailsTimeLine();
@@ -663,6 +652,7 @@ export default {
             title: "EDIT ARCHIVE",
             content: el,
             help: "",
+            isFooterFixed: false,   // 編集用
             buttons: [
                 [
                     {
@@ -673,7 +663,7 @@ export default {
                         },
                     },
                     {
-                        label: "SAVE DATA",
+                        label: "SAVE",
                         className: "",
                         handler: $Warn.CatchAsync(async () => {
                             const updatedFields = {

@@ -80,10 +80,6 @@
                 <span>120s</span>
             </div>
         </div>
-        <div class="p-4 bg-white/50 rounded-xl border border-brand-2 text-[0.7rem] text-slate-500 leading-relaxed italic">
-            ※ 0s (OFF) に設定すると自動更新を停止します。<br>
-            ※ 更新間隔が短いほど、バッテリーの消費が早くなります。
-        </div>
     </div>
 </template>
 
@@ -117,7 +113,7 @@
         <div class="px-4 w-full">
             <div class="bg-white rounded-[1rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                 <div class="flex justify-between items-center p-4 border-b border-slate-100"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">👤</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Developer</span></div><span class="text-[0.8rem] font-black text-slate-800 js-app-developer"></span></div>
-                <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">⭐</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Feedback & Rating</span></div><div class="flex items-center gap-1.5"><span class="text-[0.9rem] font-black text-yellow-500 leading-none js-app-score">★ 0.0</span><span class="text-slate-300 text-[1.2rem] font-normal leading-none -mt-0.5">›</span></div></button>
+                <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">⭐</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Feedback</span></div><div class="flex items-center gap-1.5"><span class="text-[0.9rem] font-black text-yellow-500 leading-none js-app-score">★ 0.0</span><span class="text-slate-300 text-[1.2rem] font-normal leading-none -mt-0.5">›</span></div></button>
                 <a id="link-info-official" href="" target="_blank" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">🌍</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Official Site</span></div><div class="flex items-center gap-1 bg-blue-50 text-blue-500 px-3 py-1 rounded-full border border-blue-100"><span class="text-[0.65rem] font-black uppercase tracking-wider mt-px">Open</span><span class="text-[0.7rem] leading-none">↗</span></div></a>
                 <button id="btn-info-license" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">📜</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">License</span></div><span class="text-slate-300 text-[1.2rem] font-normal leading-none -mt-0.5">›</span></button>
             </div>
@@ -145,14 +141,14 @@
 			<div class="flex flex-col flex-1 min-w-0"><h1 id="view-profile-nickname" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight"></h1></div>
 		</div>
 		<div id="view-profile-description"
-            class="flex-1 bg-brand-1 rounded-lg p-2 text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words _min-h-[200px] _overflow-y-auto _pr-2">
+            class="flex-1 bg-brand-1 rounded-lg p-2 text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words min-h-[200px] overflow-y-auto">
         </div>
 		<div id="view-profile-links" class="gap-3 flex py-2"></div>
 	</div>
 </template>
 
 <template id="tpl-edit-profile">
-	<div class="w-full text-black-5 space-y-3 px-1 pb-1">
+	<div class="w-full text-black-5 space-y-3 px-1 pb-4">
 		<div class="flex items-end gap-3 py-1">
 			<div class="shrink-0 flex flex-col items-center">
 				<button id="btn-profile-icon-trigger" class="w-14 h-14 bg-white rounded-full shadow-md flex items-center justify-center text-[2rem] active:scale-95 transition-transform outline-none"><span id="edit-profile-icon-preview">😀</span><input type="hidden" id="edit-profile-icon"></button>
@@ -177,7 +173,6 @@
 
 <template id="tpl-view-archive">
 	<div class="relative min-h-full flex flex-col bg-white">
-        <!-- 2. 金額（左） ＋ ユーザ情報（右） の並列エリア -->
         <div class="flex items-center justify-between gap-2 mb-3">
             <!-- 右：ユーザ情報（プロフボタン） -->
             <button id="btn-mem-user-profile"
@@ -185,13 +180,18 @@
                 <span id="view-mem-user-icon" class="text-[1.4rem] drop-shadow-md"></span>
                 <span id="view-mem-user-id" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
             </button>
+			<!-- 右下：件数（横長ボタン風） -->
+			<button id="btn-view-mem-timeline" class="h-10 shadow-md rounded-[1rem] flex items-center justify-center gap-2 active:scale-95 transition-transform px-4 outline-none">
+				<span id="mem-stat-count" class="text-[1.1rem] font-black text-slate-800">0</span>
+				<span class="text-[0.7rem] font-bold text-slate-400 uppercase tracking-wider">memos</span>
+			</button>
         </div>
 		<!-- 1. タイトル（最上部） -->
 		<div class="mb-4">
 			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight border-l-4 border-brand-3 pl-3"></h1>
 		</div>
 		<!-- 3. 本文（中央） -->
-		<div id="view-mem-body" class="flex-1 bg-brand-1 rounded-lg p-2 text-[1rem] min-h-[200px] overflow-y-auto pr-2 text-slate-600 leading-[2] whitespace-pre-wrap break-words mb-2">
+		<div id="view-mem-body" class="flex-1 bg-brand-1 rounded-lg p-2 text-[1rem] _min-h-[200px] overflow-y-auto pr-2 text-slate-600 leading-[2] whitespace-pre-wrap break-words mb-2">
 		</div>
 		<!-- 4. 下部アクション（リンク ＋ メモ数） -->
 		<div class="mt-auto pb-1 flex items-end justify-between border-t border-slate-50">
@@ -204,17 +204,12 @@
 			<a id="view-mem-url" href="" target="_blank" class="shrink-0 w-12 h-12 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
 				<!-- ここにアイコンが挿入される -->
 			</a>
-			<!-- 右下：件数（横長ボタン風） -->
-			<button id="btn-view-mem-timeline" class="h-12 shadow-md rounded-[1rem] flex items-center justify-center gap-2 active:scale-95 transition-transform px-4 outline-none">
-				<span id="mem-stat-count" class="text-[1.1rem] font-black text-slate-800">0</span>
-				<span class="text-[0.7rem] font-bold text-slate-400 uppercase tracking-wider">memos</span>
-			</button>
 		</div>
 	</div>
 </template>
 
 <template id="tpl-edit-archive">
-    <div class="w-full text-black-5 space-y-4">
+    <div class="w-full text-black-5 space-y-4 mb-4">
         <div>
             <div class="flex justify-between items-end mb-1"><label class="block text-[0.7rem] font-bold uppercase">Trip Title</label><span class="text-[0.6rem] text-slate-300 font-bold"><span id="edit-mem-title-count">0</span>/30</span></div>
             <input id="edit-mem-title" type="text" maxlength="30" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
@@ -235,10 +230,13 @@
 </template>
 
 <template id="tpl-share-archive">
-    <div class="w-full text-black-5 flex flex-col items-center pt-6 pb-2 space-y-8">
-        <div class="w-full px-4"><div id="share-archive-title" class="text-[1.2rem] font-black text-black-5 text-center break-words "></div></div>
-        <div class="bg-white p-4 rounded-[1.5rem] shadow-md border border-slate-200"><img id="share-qr-image" src="" alt="QR Code" class="w-48 h-[200px] object-contain"></div>
-        <div class="w-full"><button id="btn-share-copy" class="w-full h-14 bg-brand-5 text-white font-black rounded-[1rem] shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 text-[0.9rem] uppercase tracking-widest"><span class="text-[1.2rem] ">📋</span> COPY SHARE URL</button></div>
+    <div class="w-full text-black-5 flex flex-col items-center">
+        <div class="w-full px-4 mt-2"><div id="share-archive-title" class="text-[1.2rem] font-black text-black-5 text-center break-words "></div></div>
+        <div class="w-full flex justify-center my-6">
+            <button id="btn-share-copy" class="shadow-brand w-48 h-48 p-3 bg-brand-0 text-white font-black rounded-[1rem] shadow-md active:scale-95 transition-transform flex items-center justify-center">
+                <img id="share-qr-image" src="" alt="QR Code" class="w-48 h-[200px] object-contain">
+            </button>
+        </div>
     </div>
 </template>
 
@@ -246,7 +244,7 @@
 <template id="tpl-view-notice">
 	<div class="relative min-h-full flex flex-col bg-white px-1">
 		<!-- 1. ヘッダー（日付とアイコンを横並びに） -->
-        <div class="absolute -top-3 right-0 ">
+        <div class="absolute top-0 right-2 ">
             <span id="view-notice-icon" class="text-[2rem] drop-shadow-md"></span>
         </div>
 		<div class="flex items-center gap-4 my-4">

@@ -54,7 +54,7 @@ public class AdminCloseArchivePubService : _BaseService
             await _userNoteRepo.InsertAsync(new TSysUserNotification
             {
                 user_id = req.target_user_id,
-                emoji = "⚠️",
+                kind = (short)UserNotificationKind.Caution, // 8
                 body = $"【警告】公開中のまとめ『{archive.title}』が規約制限により運営側で非公開に設定されました。\n内容を確認・修正してください。"
             });
 

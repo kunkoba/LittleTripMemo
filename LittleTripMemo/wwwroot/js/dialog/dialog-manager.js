@@ -41,8 +41,8 @@ const _DialogCore = {
         return frame;
     },
     // 1. _DialogCore の create メソッド修正
-    // 修正後：create メソッド（help機能追加版）
-    create({ title = "", content = "", buttons = [], headerButtons = [], help = null, onClose = null, theme = null }) {
+    create({ title = "", content = "", buttons = [], headerButtons = [], 
+                help = null, onClose = null, theme = null, isFooterFixed = true }) {
         const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
         const titleEl = $Dom.QuerySelector("#dialog-title", frame);
         const contentEl = $Dom.QuerySelector("#dialog-content", frame);
@@ -103,13 +103,15 @@ const _DialogCore = {
             btnContainer.classList.remove("bg-brand-1");
             btnContainer.classList.add("bg-white", "border-t", "border-slate-300");
         }
-        // 
+        // フッター
         if (buttons && buttons.length > 0) {
+            // isFooterFixed が false の場合は、スクロール領域(contentEl)の末尾にボタンを置く
+            const targetContainer = (isFooterFixed === false) ? contentEl : btnContainer;
             buttons.forEach(rowDef => {
                 const isArray = Array.isArray(rowDef);
                 const items = isArray ? rowDef : (rowDef.items || [rowDef]);
                 const rowDiv = document.createElement("div");
-                rowDiv.className = "w-full flex gap-3";
+                rowDiv.className = "w-full flex gap-3 py-2";
                 if (!isArray && rowDef.rowId) rowDiv.id = rowDef.rowId;
                 if (!isArray && rowDef.isHidden) rowDiv.classList.add("hidden");
                 const sizeClass = items.length > 1 ? "flex-1" : "w-full";
@@ -124,9 +126,13 @@ const _DialogCore = {
                     };
                     rowDiv.appendChild(btn);
                 });
-                btnContainer.appendChild(rowDiv);
+                // btnContainer.appendChild(rowDiv);
+                targetContainer.appendChild(rowDiv);
             });
-            btnContainer.classList.remove("hidden");
+            // btnContainer.classList.remove("hidden");
+            if (isFooterFixed !== false) {
+                btnContainer.classList.remove("hidden");
+            }
         }
         frame._onClose = onClose;
         return frame;
@@ -177,6 +183,22 @@ const DialogController = {
                     { label: label, handler: () => { isResolved = true; resolve(true); this._core.close(); } }
                 ]]
             });
+        });
+    },
+    // 【共通】エラーダイアログを表示
+    ShowError(message = "問題が発生しました。\nしばらくお待ちください。") {
+        const el = $Dom.GenerateTemplate('tpl-confirm-base');
+        const msgEl = $Dom.QuerySelector('.js-message', el);
+        msgEl.innerText = message; // \n を改行として扱うため innerText を使用
+        msgEl.classList.add("text-red-500"); // エラー色を付与
+        this._core.open({
+            title: "SYSTEM ERROR",
+            content: el,
+            buttons: [{
+                label: "OK",
+                className: "bg-slate-600 text-white",
+                handler: () => this._core.close()
+            }]
         });
     },
 

@@ -14,6 +14,7 @@ const _DetailFrameCore = {
                 this.btnReport = $Dom.GetElementById("detail-btn-report");
                 this.btnClose = $Dom.GetElementById("detail-btn-close");
                 this.btnCancel = $Dom.GetElementById("detail-btn-cancel");
+                this.btnCancel2 = $Dom.GetElementById("detail-btn-cancel2");
                 this.btnSave = $Dom.GetElementById("detail-btn-save");
                 // 下部ボタン
                 this.groupMove = $Dom.GetElementById("detail-group-move");
@@ -38,7 +39,13 @@ const _DetailFrameCore = {
                     $Marker.FocusToLocationMarker();
                 });
                 // Google Earth連携（追加）
-                this.btnEarth.addEventListener("click", () => {
+                this.btnEarth.addEventListener("click", async () => {
+                    const isOk = await $Dialog.ShowConfirm({
+                        title: "google Earth",
+                        help: "",
+                        message: `「google Earth」を開きますか？`
+                    });
+                    if (!isOk) return;
                     const data = $DetailContent.GetFormEditData();
                     if (data.latitude && data.longitude) {
                         const url = `https://earth.google.com/web/search/${data.latitude},${data.longitude}`;
@@ -46,7 +53,13 @@ const _DetailFrameCore = {
                     }
                 });
                 // googleMap連携
-                this.btnMap.addEventListener("click", () => {
+                this.btnMap.addEventListener("click", async () => {
+                    const isOk = await $Dialog.ShowConfirm({
+                        title: "google Map",
+                        help: "",
+                        message: `「google Map」を開きますか？`
+                    });
+                    if (!isOk) return;
                     // 画面上の緯度経度を取得（getFormEditDataを利用）
                     const data = $DetailContent.GetFormEditData();
                     if (data.latitude && data.longitude) {
@@ -77,7 +90,8 @@ const _DetailFrameCore = {
                 // 編集切替ボタン
                 this.btnEdit.addEventListener("click", () => {
                     const data = $DetailContent.GetFormEditData();
-                    const currentData = $Data.Store.GetDetailByKey(data.archive_id, data.seq);
+                    console.log("btnEdit:", data);
+                    const currentData = $Data.Store.GetDetailByKey(data.archive_id, data.seq, data.dbid);
                     if (currentData && currentData.is_owner) {
                         $DetailContent.RenderDetail(currentData, true); // 編集モード
                         $Dom.ToggleShow(this.btnEdit, false); // 編集ボタン隠す
@@ -119,6 +133,7 @@ const _DetailFrameCore = {
                 });
                 this.btnClose.addEventListener("click", () => this.handleCloseOrCancel());
                 this.btnCancel.addEventListener("click", () => this.handleCloseOrCancel());
+                this.btnCancel2.addEventListener("click", () => this.handleCloseOrCancel());
                 // 移動ボタン
                 this.btnMoveFirst.addEventListener("click", () => this._moveAndRender(() => $Marker.FocusFirst()));
                 this.btnMovePrev.addEventListener("click",  () => this._moveAndRender(() => $Marker.FocusPrev()));
@@ -149,12 +164,14 @@ const _DetailFrameCore = {
     },
     // 画面モード変更時
     changeScreenMode(){
+        $Dom.ToggleShow(this.btnCancel, false);
         $Dom.ToggleShow(this.btnSave, false);
         $Dom.ToggleShow(this.groupMove, false);
         $Dom.ToggleShow(this.groupReaction, false);
         switch ($App.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
                 // 新規登録
+                $Dom.ToggleShow(this.btnCancel, true);
                 $Dom.ToggleShow(this.btnSave, true);
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
@@ -271,8 +288,7 @@ const _DetailFrameCore = {
     async _onReactionClick(propName, unusedType) {
         // 未ログイン時はダイアログを出して処理を中断
         if (!$App.AppData.Context.IsLoggedIn) {
-            $Notice.Warn("ログインが必要です。");
-            // $Dialog.ShowLoginDialog();
+            $Dialog.ShowLoginDialog();
             return;
         }
         const detail = $DetailContent.GetFormEditData();
@@ -331,6 +347,7 @@ const DetailFrameController = {
             $Dom.ToggleShow(_DetailFrameCore.btnCurrent, true);
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, false);
             $Dom.ToggleShow(_DetailFrameCore.btnReport, false);
+            $Dom.ToggleShow(_DetailFrameCore.btnCancel, true);
             $Dom.ToggleShow(_DetailFrameCore.btnSave, true);
             $Dom.ToggleShow(_DetailFrameCore.btnCancel, true);
             $Dom.ToggleShow(_DetailFrameCore.groupMove, false);
@@ -341,6 +358,7 @@ const DetailFrameController = {
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, isOwner);
             $Dom.ToggleShow(_DetailFrameCore.btnReport, !isOwner && isPublic);
             $DetailContent.RenderDetail(detail, false);
+            $Dom.ToggleShow(_DetailFrameCore.btnCancel, false);
             $Dom.ToggleShow(_DetailFrameCore.btnSave, false);
             $Dom.ToggleShow(_DetailFrameCore.groupMove, true);
             // リアクションボタンの制御

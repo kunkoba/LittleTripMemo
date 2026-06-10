@@ -73,7 +73,7 @@ public class AdminUnpublishArchiveService : _BaseService
             await _userNoteRepo.InsertAsync(new TSysUserNotification
             {
                 user_id = req.target_user_id,
-                emoji = "🚫",
+                kind = (short)UserNotificationKind.Warning, // 9
                 body = $"【重要】公開中のまとめ『{archive.title}』が規約違反により運営側で公開停止されました。データは「非公開」へ戻され、評価等はリセットされました。"
             });
 

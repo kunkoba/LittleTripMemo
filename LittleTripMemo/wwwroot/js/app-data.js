@@ -1,3 +1,8 @@
+// ホスティングサーバ
+// const BaseUrl = "https://localhost:7292";
+const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
+// const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
+
 // データ管理（通信・保持）を統合したオブジェクト
 window.$Data = {
     // 取得したデータを保持する（常に上書き）
@@ -10,9 +15,6 @@ window.$Data = {
     },
     // 通信関連のメソッド群
     Access: {
-        baseUrl: "https://localhost:7292",
-        // baseUrl: "https://eminently-meet-terrapin.ngrok-free.app",  // 固定ドメイン（ngrok）
-        // baseUrl: "http://localhost:5000",   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
         _rawData: {
             archive: null,
             details: [],
@@ -22,13 +24,12 @@ window.$Data = {
         },
         // サーバー通信の基礎
         async _fetchData(method, url, params, isDebug = false) {
-            console.log("▼ Access:", this.baseUrl + url, params);
+            console.log("▼ Access:", BaseUrl + url, params);
             // メイン処理
             const token = $App.AppData.Owner.Token;
             const options = {
                 method: method.toUpperCase(),
                 headers: {
-                    // "ngrok-skip-browser-warning": "true", // ngrok対応
                     "ngrok-skip-browser-warning": "69420", // ngrok対応
                 }
             };
@@ -45,7 +46,9 @@ window.$Data = {
                 options.body = JSON.stringify(params);
             }
             // 接続
-            const response = await fetch(this.baseUrl + url, options);
+            $Notice.Loading.Show();
+            const response = await fetch(BaseUrl + url, options);
+            $Notice.Loading.Hide();
             // 結果
             if (!response.ok) {
                 if (response.status === 401) {
@@ -108,7 +111,6 @@ window.$Data = {
         },
         // --- (既存のアプリアクセスメソッド群省略なし) ---
         async LoginToServer(email) {
-            $Notice.Info("LoginToServer: " + email);
             const url = '/api/Account/LoginFirebase';
             const params = { Email: email };
             return await $Warn.CatchAsync(async () => {
@@ -265,7 +267,10 @@ window.$Data = {
         _getDetails(archiveId, seq) {
             const list = this._details;
             if (archiveId == null && seq == null) return list;
-            const hit = list.find(x => x.archive_id === Number(archiveId) && x.seq === Number(seq));
+            const hit = list.find(x => {
+                if (seq > 0) return x.archive_id === Number(archiveId) && x.seq === Number(seq);
+                return x.dbid === Number(detail.dbid);
+            });
             return hit ? [hit] :[];
         },
         GetArchive() {
@@ -294,13 +299,21 @@ window.$Data = {
                 return 0;
             });
         },
-        GetDetails(field = "date", order = "asc") {
+        GetDetailsSort(field = "date", order = "asc") {
             this._sortData(field, order);
             return this._getDetails();
         },
-        GetDetailByKey(archiveId, seq) {
-            const res = this._getDetails(archiveId, seq);
-            return res[0] || null;
+        GetDetails() {
+            return this._getDetails();
+        },
+        GetDetailByKey(archiveId, seq, dbid = null) {
+            const list = this._details;
+            const hit = list.find(x => {
+                if (seq && Number(seq) > 0) return x.archive_id === Number(archiveId) && x.seq === Number(seq);
+                if (dbid && Number(dbid) > 0) return x.dbid === Number(dbid);
+                return false;
+            });
+            return hit || null;
         },
         GetMyReactions() {
             return this._myReactions;
@@ -394,13 +407,11 @@ window.$Data = {
             const archive = $Data.Store.GetArchive();
             if (!archive) return;
             const archiveId = archive.archive_id;
-            const details = $Data.Store.GetDetails();
+            const details = $Data.Store.GetDetailsSort();
             const rawReactions = $Data.Store.GetMyReactions(); // サーバーから取得した生リスト
             // ローカルDBの ParseAndSaveMyReactions を呼び出す
             await $Warn.CatchAsync(async () => {
                 await $LocalDb.Reaction.ParseAndSaveMyReactions(archiveId, rawReactions, details);
-                // 通知
-                console.log(`SyncReactions: Archive ${archiveId} の同期完了`);
             })();
         },
         // バックグラウンドでリアクションを一括送信

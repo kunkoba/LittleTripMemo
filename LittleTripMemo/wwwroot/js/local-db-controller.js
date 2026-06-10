@@ -228,6 +228,10 @@ const LocalDbController = {
         storeName: _LocalDbCore.STORE_NAMES.DETAIL,
         // データ保存（成否が返却、「dbid」が付与される）
         async Save(detail) {
+            // 念のため、ここでも dbid が 0 なら削除して自動採番を促す
+            if (detail.hasOwnProperty('dbid') && (detail.dbid === 0 || detail.dbid === null)) {
+                delete detail.dbid;
+            }
             detail.send_flag = 0;
             detail.user_id = getUserId();
             return await _LocalDbCore.upsertData(this.storeName, detail);

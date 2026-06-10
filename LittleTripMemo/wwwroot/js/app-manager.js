@@ -108,7 +108,7 @@ const AppManager = {
                     // 通知
                     $Notice.Info("バックグラウンド同期は成功しました。");
                 })();
-            }, 60);
+            }, 600);
             // リアクションデータ送信処理（秒）
             $Polling.Add($Polling.TASKS.DATA_REACTION, async () => {
                 if (!$App.AppData.Context.IsLoggedIn) return;
@@ -149,7 +149,6 @@ const AppManager = {
             // システム情報取得
             let isSuccess = await $Data.Access.GetSystemInfo();
             if (!isSuccess) {
-                $Dialog.ShowLoginDialog();
                 return;
             };
         }
@@ -196,16 +195,9 @@ const AppManager = {
         switch (this.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
                 if (this.AppData.Context.IsLoggedIn) {
-                    // // システム情報取得
-                    // isSuccess = await $Data.Access.GetSystemInfo();
-                    // if (!isSuccess) {
-                    //     $Dialog.ShowLoginDialog();
-                    //     return;
-                    // };
                     // 地点データ取得
                     isSuccess = await $Data.Access.GetUnMergeDetails({});
                     if (!isSuccess) {
-                        $Dialog.ShowLoginDialog();
                         return;
                     };
                 }
@@ -239,13 +231,10 @@ const AppManager = {
                 isSuccess = await $Data.Access.GetArchiveDetailsPub({ archive_id: archiveId });
                 if (!isSuccess) {
                     if (!this.AppData.Context.IsLoggedIn) {
-                        $Dialog.ShowLoginDialog();
                         return;
                     }
                     this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
                     window.history.replaceState(null, '', window.location.pathname); // エラー時にURLをクリア
-                    // this.RefreshScreen();
-                    // return;
                 } else {
                     // 取得した直後にローカルDBへ同期
                     if (this.AppData.Context.IsLoggedIn) {

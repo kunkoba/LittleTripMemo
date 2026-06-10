@@ -324,7 +324,7 @@ export default {
         this._core.open({
             title: "GPS TRACKING",
             content: el,
-            help: "GPSの更新間隔を設定します。0sにすると停止します。",
+            help: "GPSの更新間隔を設定します。\n0sにすると停止します。\n更新間隔が短いほど、バッテリーの消費が早くなります。",
             onClose: () => {
                 // 保存せずに閉じた場合は何もしない（値は oldSec のまま維持される）
             },
@@ -492,6 +492,7 @@ export default {
             title: "EDIT PROFILE",
             content: el,
             help: "",
+            isFooterFixed: false,   // 編集用
             buttons: [
                 [
                     {
@@ -560,10 +561,10 @@ export default {
         // --- 1. アーカイブタイトルの表示制御 ---
         const titleEl = $Dom.QuerySelector("#view-report-archive-title", el);
         if (report.is_deleted) {
-            titleEl.textContent = "このまとめは既に削除されています";
+            titleEl.textContent = "既に削除されています";
             titleEl.classList.add("text-slate-400"); // 無効な感じの色
         } else if (report.is_closed) {
-            titleEl.textContent = "このまとめは現在「CLOSE」中です";
+            titleEl.textContent = "現在「CLOSE」中です";
             titleEl.classList.add("text-red-400");   // 警告・停止中の色
         } else {
             titleEl.textContent = report.archive_title || "(No Title)";

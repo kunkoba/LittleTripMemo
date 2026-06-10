@@ -53,7 +53,7 @@ const _BottomCore = {
 					// 検索結果のリスト表示、またはマーカーの再描画
 					$Marker.RefreshPointMarker();
 					// 検索結果が0件だった場合の通知（任意）
-					const details = $Data.Store.GetDetails();
+					const details = $Data.Store.GetDetailsSort();
 					if (details.length === 0) {
 						$Notice.Info("条件に一致するメモが見つかりませんでした。");
 					}

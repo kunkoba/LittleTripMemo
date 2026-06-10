@@ -122,6 +122,7 @@ export default {
             title: isNew ? "NEW NOTICE" : "EDIT NOTICE",
             content: el,
             help: "",
+            isFooterFixed: false,   // 編集用
             buttons:[[
                 {
                     label: "CANCEL",
@@ -364,7 +365,7 @@ export default {
         countBody.textContent = inputBody.value.length;
         inputBody.addEventListener('input', () => countBody.textContent = inputBody.value.length);
         this._core.open({
-            title: "SEND NOTIFICATION",
+            title: "SEND MAIL",
             content: el,
             help: "",
             buttons: [[
@@ -374,7 +375,7 @@ export default {
                     handler: () => this._core.close()
                 },
                 {
-                    label: "SEND MESSAGE",
+                    label: "SEND",
                     handler: async () => {
                         const body = inputBody.value.trim();
                         if (!body) return $Notice.Warn("本文を入力してください");

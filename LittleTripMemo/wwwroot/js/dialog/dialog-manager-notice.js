@@ -390,7 +390,7 @@ export default {
         if (count > 0) {
             btn.classList.add("relative");
             btn.insertAdjacentHTML('beforeend', 
-                `<span class="js-unread-badge absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white pointer-events-none shadow-sm"></span>`
+                `<span class="js-unread-badge absolute top-0 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-white pointer-events-none shadow-sm"></span>`
             );
         }
     },

@@ -3,10 +3,16 @@ window.$Err = {
 	_errMode: "fatal",
 	// エラー処理
     Handle(err, mode) {
-		console.error(err);
+		console.error("App.Err >> ",err);
+        $Notice.Loading.Hide(); // ローディングを消す
+        if ($App.AppData.Context.IsLoggedIn) {
+            $Dialog.ShowError(); // エラー表示画面
+        } else {
+            $Dialog.ShowLoginDialog(); // ログイン画面
+        }
         // DebugInfoがあれば出力
-        if (err.debugInfo) console.error("DebugInfo:", err.debugInfo);
-        $Notice.Warn(err.message || "問題が発生しました。");
+        if (err.debugInfo) console.error("App.DebugInfo >> ", err.debugInfo);
+        if (err.message) $Notice.Warn(err.message || "問題が発生しました。");
         if (mode === this._errMode) {
 			console.log("エラーページへジャンプ！");
 			// window.location.href = "component/fatal-error.html";
@@ -92,6 +98,12 @@ window.$Dom = {
 
 // 汎用処理
 window.$Util = {
+    SAFE_DOMAINS: [
+        'youtube.com', 'youtu.be', 'twitter.com', 'x.com',
+        'instagram.com', 'facebook.com', 'tiktok.com', 'github.com',
+        'google.com', 'google.co.jp', 'maps.app.goo.gl',
+        window.location.hostname // 自サイト
+    ],
     // 日付オブジェクトを文字列に変換（デフォルトをハイフン区切りに変更）
     FormatDate(dateObj = new Date(), format = 'YYYY-MM-DD　HH:mm') {
         dateObj = new Date(dateObj);
@@ -245,5 +257,40 @@ window.$Util = {
         } catch (e) {
             return 0;
         }
-    }
+    },
+    // 安全なURLかホワイトリストチェック
+    IsSafeUrl(url) {
+        try {
+            const hostname = new URL(url).hostname.toLowerCase();
+            return this.SAFE_DOMAINS.some(domain => hostname === domain || hostname.endsWith('.' + domain));
+        } catch (e) {
+            return false;
+        }
+    },
+    // 遷移用のアクション関数
+    async OpenSafeUrl(url) {
+        if (!url) return;
+        const isSafe = this.IsSafeUrl(url);
+        // ダイアログのメッセージとボタン名を変える
+        const title = isSafe ? "外部アプリ/サイトを開く" : "セキュリティ警告";
+        const message = isSafe 
+            ? `次のリンクを開きます。よろしいですか？\n\n${url}`
+            : `安全性が確認されていないURLです。\n直接アクセスせず、Googleで安全性を検索しますか？\n\n${url}`;
+        const btnLabel = isSafe ? "開く" : "Googleで検索";
+        // 必ず確認ダイアログを出す
+        const isOk = await $Dialog.ShowConfirm({
+            title: title,
+            message: message,
+            label: btnLabel
+        });
+        if (!isOk) return; // キャンセルなら何もしない
+        if (isSafe) {
+            // ホワイトリストならそのまま飛ぶ（アプリ連動）
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+            // ホワイトリスト外ならGoogle検索へ
+            const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(url)}`;
+            window.open(searchUrl, '_blank', 'noopener,noreferrer');
+        }
+    },
 };

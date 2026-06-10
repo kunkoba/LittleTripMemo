@@ -36,6 +36,7 @@ const _DetailContentCore = {
                     this.editUrl = $Dom.GetElementById("detail-edit-link_url");
                     this.editArchiveId = $Dom.GetElementById("detail-edit-archive_id");
                     this.editSeq = $Dom.GetElementById("detail-edit-seq");
+                    this.editDbid = $Dom.GetElementById("detail-edit-dbid");
                     this.editLat = $Dom.GetElementById("detail-edit-latitude");
                     this.editLng = $Dom.GetElementById("detail-edit-longitude");
                     this.editPrice = $Dom.GetElementById("detail-edit-memo_price");
@@ -237,6 +238,7 @@ const _DetailContentCore = {
         // 更新用隠しフィールド
         this.editArchiveId.value = detail.archive_id;
         this.editSeq.value = detail.seq;
+        this.editDbid.value = detail.dbid || "";
         this.editLat.value = detail.latitude;
         this.editLng.value = detail.longitude;
         // 文字数カウンターの同期
@@ -292,17 +294,26 @@ const _DetailContentCore = {
         // FormDataを使用して全入力を一括取得し、オブジェクトに変換
         const formData = new FormData(this.editRoot);
         const data = Object.fromEntries(formData.entries());
+        console.log("元data:", data);
         // 数値項目（金額）を文字列から数値型に変換しておく
         // 空文字 "" の場合は 0 になるように ( || 0 ) を入れています
         data.seq = Number(data.seq || 0);
+        // dbid が空文字、または "0" の場合はプロパティを削除する
+        // これにより、IndexedDB が「新規データ」と判断して 1 以上の番号を自動で振るようになる
+        if (data.dbid === "" || data.dbid === "0" || Number(data.dbid) === 0) {
+            delete data.dbid; 
+        } else {
+            data.dbid = Number(data.dbid);
+        }
         data.archive_id = Number(data.archive_id || 0);
         data.latitude = Number(data.latitude || 0);
         data.longitude = Number(data.longitude || 0);
         data.memo_price = Number(data.memo_price || 0);
         // データストアから元の明細データを取得（新規作成時(seq=0)は空オブジェクト）
         let originalData = {};
-        if (data.seq > 0) {
-            originalData = $Data.Store.GetDetailByKey(data.archive_id, data.seq) || {};
+        // seq または dbid を使って元データを特定する
+        if (data.seq > 0 || data.dbid > 0) {
+            originalData = $Data.Store.GetDetailByKey(data.archive_id, data.seq, data.dbid) || {};
         }
         // 元データとフォームデータをマージ
         const mergedData = { ...originalData, ...data };

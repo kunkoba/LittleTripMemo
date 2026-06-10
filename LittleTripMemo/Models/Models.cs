@@ -135,7 +135,7 @@ public class TReactionPub
     {
         public long seq { get; set; }   // ただの連番
         public Guid user_id { get; set; }     // 対象ユーザー
-        public string emoji { get; set; } = string.Empty;
+        public short kind { get; set; } // varchar から short に変更
         public string body { get; set; } = string.Empty;
         public DateTime send_tim { get; set; }
     }

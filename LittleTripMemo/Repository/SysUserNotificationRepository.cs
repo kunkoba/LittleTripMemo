@@ -12,8 +12,9 @@ public class SysUserNotificationRepository : _BaseRepository
     public async Task<int> InsertAsync(TSysUserNotification note)
     {
         const string sql = @"
-            INSERT INTO t_sys_user_notifications (user_id, emoji, body, send_tim)
-            VALUES (@user_id, @emoji, @body, CURRENT_TIMESTAMP)";
+            INSERT INTO t_sys_user_notifications (user_id, kind, body, link_url, send_tim)
+            VALUES (@user_id, @kind, @body, @link_url, CURRENT_TIMESTAMP)";
+
         return await ExecuteAsync(sql, note);
     }
 
@@ -26,6 +27,7 @@ public class SysUserNotificationRepository : _BaseRepository
             SELECT * FROM t_sys_user_notifications 
             WHERE user_id = @user_id 
             ORDER BY send_tim DESC LIMIT 20";
+
         return await QueryAsync<TSysUserNotification>(sql, new { user_id = _user.UserId });
     }
 

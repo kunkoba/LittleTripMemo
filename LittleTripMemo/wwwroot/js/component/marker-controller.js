@@ -187,7 +187,14 @@ const _MarkerCore = {
             if ($App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH) {
                 if (actionText) actionText.textContent = detail.a_title || "VIEW ARCHIVE";
                 if (btnAction) {
-                    btnAction.onclick = (e) => {
+                    btnAction.onclick = async (e) => {
+                        const isOk = await $Dialog.ShowConfirm({
+                            title: "Archive",
+                            help: "",
+                            message: `このまとめを開きますか？`
+                        });
+                        if (!isOk) return;
+                        //
                         e.stopPropagation();
                         $App.AppData.Context.ScreenMode = detail.is_public ? $Const.SCREEN_MODE.ARCHIVE_PUB : $Const.SCREEN_MODE.ARCHIVE;
                         $App.AppData.Context.TargetArchiveId = detail.archive_id;
@@ -196,11 +203,10 @@ const _MarkerCore = {
                     };
                 }
             } else {
-                if (actionText) actionText.textContent = "VIEW SUMMARY";
+                if (actionText) actionText.textContent = "VIEW detail";
                 if (btnAction) {
                     btnAction.onclick = (e) => {
                         e.stopPropagation();
-                        // console.log("> toggleMarkerPopup:", detail);
                         $DetailFrame.Open(detail);
                     };
                 }
@@ -252,7 +258,7 @@ const MarkerController = {
 	},
     // 描画リフレッシュ
     RefreshPointMarker() {
-        const details = $Data.Store.GetDetails();
+        const details = $Data.Store.GetDetailsSort();
         if (!details) return;
         this.Clear();
         _MarkerCore.generateArrowList();
@@ -296,11 +302,11 @@ const MarkerController = {
         _MarkerCore.clearAll();
     },
     // 現在の状態に基づくフォーカス実行
-    FocusToCurrentMarker(delay = 500) {
+    FocusToCurrentMarker(delay = 200) {
         // console.log("★FocusToCurrentMarker");
         const marker = _MarkerCore.getMarker(this._currentIndex);
         if (!marker) return;
-        const details = $Data.Store.GetDetails();
+        const details = $Data.Store.GetDetailsSort();
         $Map.FocusToTargetMarker(marker, delay);
         _MarkerCore.toggleMarkerPopup(true, this._currentIndex, details[this._currentIndex]);
         // ハイライト
@@ -318,14 +324,14 @@ const MarkerController = {
         }
     },
     FocusNext() {
-        const details = $Data.Store.GetDetails();
+        const details = $Data.Store.GetDetailsSort();
         if (details && this._currentIndex < details.length - 1) {
             this._currentIndex++;
             this.FocusToCurrentMarker();
         }
     },
     FocusLast() {
-        const details = $Data.Store.GetDetails();
+        const details = $Data.Store.GetDetailsSort();
         if (details) {
             this._currentIndex = details.length - 1;
             this.FocusToCurrentMarker();
@@ -348,7 +354,7 @@ const MarkerController = {
     },
     // カレントデータ取得
     GetDataWithCurrentIndex() {
-        const details = $Data.Store.GetDetails();
+        const details = $Data.Store.GetDetailsSort();
         return details[this._currentIndex];
     },
     // 変更を破棄して元に戻す

@@ -35,7 +35,7 @@ public class ExceptionHandling
     /// <summary>
     /// 例外の種類を判定し、適切なHTTPレスポンスを作成する。
     /// </summary>
-    private async Task HandleExceptionAsync(HttpContext context, Exception ex)
+    private async Task HandleExceptionAsync(HttpContext context, Exception ex) 
     {
         context.Response.ContentType = "application/json";
         var errorRes = new ErrorResponse();
