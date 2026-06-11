@@ -25,6 +25,7 @@ public class ArchivePubRepository : _BaseRepository
     public async Task<int> UpdateByKeyAsync(TMemoArchivePub archive)
     {
         archive.user_id = _user.UserId;
+
         const string sql = @"
             UPDATE t_memo_archive_pub SET
                 title      = @title,
@@ -35,6 +36,7 @@ public class ArchivePubRepository : _BaseRepository
             WHERE
                 archive_id = @archive_id
                 AND user_id = @user_id";
+        
         return await ExecuteAsync(sql, archive);
     }
 

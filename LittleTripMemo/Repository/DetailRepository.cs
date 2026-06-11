@@ -44,9 +44,9 @@ public class DetailRepository : _BaseRepository
     /// <summary>
     /// 主キー（seq）による単一更新。
     /// </summary>
-    public async Task<int> UpdateByKeyAsync(TMemoDetail entity)
+    public async Task<int> UpdateByKeyAsync(TMemoDetail detail)
     {
-        entity.user_id = _user.UserId;
+        detail.user_id = _user.UserId;
 
         string sql = $@"
             UPDATE t_memo_detail_{_user.TableId} SET
@@ -61,11 +61,12 @@ public class DetailRepository : _BaseRepository
                 link_url     = @link_url,
                 memo_price   = @memo_price,
                 update_tim   = CURRENT_TIMESTAMP
-            WHERE 
-                seq     = @seq 
-                AND user_id = @user_id";
+            WHERE seq        = @seq 
+              AND user_id    = @user_id 
+              AND archive_id = @archive_id
+              AND del_flg    = false";
 
-        return await ExecuteAsync(sql, entity);
+        return await ExecuteAsync(sql, detail);
     }
 
     /// <summary>

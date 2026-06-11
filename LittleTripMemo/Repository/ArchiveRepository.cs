@@ -53,7 +53,8 @@ public class ArchiveRepository : _BaseRepository
                 update_tim = CURRENT_TIMESTAMP
             WHERE 
                 archive_id = @archive_id 
-                AND user_id = @user_id";
+                AND user_id = @user_id
+                AND del_flg    = false"; // 公開済み(論理削除)なら更新させない
 
         return await ExecuteAsync(sql, archive);
     }
@@ -144,4 +145,5 @@ public class ArchiveRepository : _BaseRepository
         const string sql = "UPDATE t_memo_archive SET del_flg = false, update_tim = CURRENT_TIMESTAMP WHERE archive_id = @archive_id AND user_id = @target_user_id";
         return await ExecuteAsync(sql, new { archive_id = archiveId, target_user_id = targetUserId });
     }
+
 }
