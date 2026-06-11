@@ -136,9 +136,6 @@ export default {
                         const isSubmitSuccess = await $Data.Access.UpsertFeedback(req);
                         if (!isSubmitSuccess) return;
                         console.log(">$App.AppData.Owner.myFeedback:", $App.AppData.Owner.myFeedback);
-                        $App.AppData.Owner.myFeedback.score = rating;
-                        $App.AppData.Owner.myFeedback.body = body;
-                        console.log($App.AppData.Owner.myFeedback);
                         $Notice.Info("フィードバックを送信しました！");
                         // 投稿ダイアログと一覧ダイアログを閉じて、最新の状態で一覧を開き直す
                         this._core.closeAll(); // 投稿を閉じる

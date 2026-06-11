@@ -394,6 +394,7 @@ window.$Data = {
                 for (const detail of list) {
                     await $LocalDb.Detail.DeleteById(detail.dbid);
                 }
+                return true;
             } else {
                 console.error(`一括同期に失敗しました。環境が回復するまで待機します。`);
                 for (const detail of list) {
@@ -439,7 +440,8 @@ window.$Data = {
             const isSuccess = await $Data.Access.BulkSyncReactions(payload);
             if (isSuccess) {
                 // 送信成功時：フラグ1のまま保持（同期済みデータとしてローカルDBに残す）
-                console.log(`リアクション ${list.length}件の同期が完了しました。`);
+                // console.log(`リアクション ${list.length}件の同期が完了しました。`);
+                return true;
             } else {
                 // 送信失敗時：環境が回復するまで待機するため、フラグを未送信(0)に戻す
                 console.error(`リアクション一括同期に失敗しました。`);

@@ -191,7 +191,7 @@
 			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight border-l-4 border-brand-3 pl-3"></h1>
 		</div>
 		<!-- 3. 本文（中央） -->
-		<div id="view-mem-body" class="flex-1 bg-brand-1 rounded-lg p-2 text-[1rem] _min-h-[200px] overflow-y-auto pr-2 text-slate-600 leading-[2] whitespace-pre-wrap break-words mb-2">
+		<div id="view-mem-body" class="flex-1 bg-brand-1 rounded-lg p-2 text-[1rem] min-h-[200px] overflow-y-auto pr-2 text-slate-600 leading-[2] whitespace-pre-wrap break-words mb-2">
 		</div>
 		<!-- 4. 下部アクション（リンク ＋ メモ数） -->
 		<div class="mt-auto pb-1 flex items-end justify-between border-t border-slate-50">
@@ -211,19 +211,19 @@
 <template id="tpl-edit-archive">
     <div class="w-full text-black-5 space-y-4 mb-4">
         <div>
-            <div class="flex justify-between items-end mb-1"><label class="block text-[0.7rem] font-bold uppercase">Trip Title</label><span class="text-[0.6rem] text-slate-300 font-bold"><span id="edit-mem-title-count">0</span>/30</span></div>
+            <div class="flex justify-between items-end mb-1"><label class="text-black-3 block text-[0.7rem] font-bold uppercase">Trip Title</label><span class="text-[0.6rem] text-slate-300 font-bold"><span id="edit-mem-title-count">0</span>/30</span></div>
             <input id="edit-mem-title" type="text" maxlength="30" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
         </div>
         <div>
-            <div class="flex justify-between items-end mb-1"><label class="block text-[0.7rem] font-bold uppercase">Description / Memo</label><span class="text-[0.6rem] text-slate-300 font-bold"><span id="edit-mem-body-count">0</span>/300</span></div>
+            <div class="flex justify-between items-end mb-1"><label class="text-black-3 block text-[0.7rem] font-bold uppercase">Description / Memo</label><span class="text-[0.6rem] text-slate-300 font-bold"><span id="edit-mem-body-count">0</span>/300</span></div>
             <textarea id="edit-mem-body" maxlength="300" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
         <div>
-            <label class="block text-[0.7rem] font-bold mb-1 uppercase">Link URL</label>
+            <label class="text-black-3 block text-[0.7rem] font-bold mb-1 uppercase">Link URL</label>
             <input id="edit-mem-url" type="url" placeholder="https://..." class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
         </div>
         <div>
-            <label class="block text-[0.7rem] font-bold mb-1 uppercase">Currency</label>
+            <label class="text-black-3 block text-[0.7rem] font-bold mb-1 uppercase">Currency</label>
             <input id="edit-mem-currency" type="text" maxlength="5" placeholder="JPY, USD..." class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white uppercase text-black-5">
         </div>
     </div>

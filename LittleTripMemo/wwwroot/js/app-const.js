@@ -30,11 +30,17 @@ window.$Const = {
         SURPRISE: { id: 3, emoji: '😮' }, //びっくり
         SAD:      { id: 4, emoji: '😭' }, //悲しい
     },
-    // 通知種別の定数
+    // 全体通知種別
     NOTICE_KIND: {
         OTHER:     { id: 0, emoji: '💬', label: 'Other' },
         IMPORTANT: { id: 1, emoji: '📢', label: 'Important' },
         NOTICE:    { id: 2, emoji: '🔔', label: 'Notice' },
+    },
+    // 個別通知（メール）種別
+    USER_NOTICE_KIND: {
+        INFO:    { id: 1, emoji: '✉️', label: 'Info' },
+        CAUTION: { id: 8, emoji: '⚠️', label: 'Caution' },
+        WARNING: { id: 9, emoji: '🚫', label: 'Warning' },
     },
 };
 

@@ -352,12 +352,19 @@ export default {
         $Dom.QuerySelector('#admin-send-target-name', el).textContent = profile.nick_name;
         // --- 2. メッセージ用アイコン選択 (明細入力風) ---
         const previewEmoji = $Dom.QuerySelector('#admin-send-emoji-preview', el);
-        const inputEmoji = $Dom.QuerySelector('#admin-send-emoji-val', el);
+        const inputKind = $Dom.QuerySelector('#admin-send-emoji-val', el); // 内部的に ID は reuse
+        let currentKind = $Const.USER_NOTICE_KIND.INFO;
+        inputKind.value = currentKind.id;
+        previewEmoji.textContent = `${currentKind.emoji} ${currentKind.label}`;
+
         $Dom.QuerySelector('#btn-admin-send-emoji-trigger', el).onclick = () => {
-            $Util.ShowEmojiPicker((emoji) => {
-                previewEmoji.textContent = emoji;
-                inputEmoji.value = emoji;
-            });
+            // 3つの種別を順番に切り替える単純なトグル（または選択肢が少ないのでこれで十分）
+            const kinds = Object.values($Const.USER_NOTICE_KIND);
+            let nextIdx = (kinds.findIndex(k => k.id === Number(inputKind.value)) + 1) % kinds.length;
+            const nextKind = kinds[nextIdx];
+            inputKind.value = nextKind.id;
+            previewEmoji.textContent = `${nextKind.emoji} ${nextKind.label}`;
+            previewEmoji.className = "text-[1.2rem] font-bold py-1"; // テキストが出るのでサイズ調整
         };
         // --- 3. 本文入力の設定 ---
         const inputBody = $Dom.QuerySelector('#admin-send-body', el);
@@ -379,9 +386,14 @@ export default {
                     handler: async () => {
                         const body = inputBody.value.trim();
                         if (!body) return $Notice.Warn("本文を入力してください");
+                        // const isSuccess = await $Data.Access.SendUserNotification({
+                        //     target_user_id: profile.user_id,
+                        //     emoji: inputEmoji.value,
+                        //     body: body
+                        // });
                         const isSuccess = await $Data.Access.SendUserNotification({
                             target_user_id: profile.user_id,
-                            emoji: inputEmoji.value,
+                            kind: Number(inputKind.value), // emoji ではなく kind を送る
                             body: body
                         });
                         if (isSuccess) {
@@ -405,7 +417,8 @@ export default {
                 $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim);
                 $Dom.QuerySelector(".js-target-icon", child).textContent = item.icon || "👤";
                 $Dom.QuerySelector(".js-target-user", child).textContent = item.nick_name || item.user_id.slice(0,8);
-                $Dom.QuerySelector(".js-emoji", child).textContent = item.emoji || "✉️";
+                const kindObj = Object.values($Const.USER_NOTICE_KIND).find(k => k.id === item.kind) || $Const.USER_NOTICE_KIND.INFO;
+                $Dom.QuerySelector(".js-emoji", child).textContent = kindObj.emoji; // リスト時
                 $Dom.QuerySelector(".js-body", child).textContent = item.body;
                 child.onclick = () => this.ShowAdminUserMailDetail(item);
                 root.appendChild(child);
@@ -441,7 +454,8 @@ export default {
             }
         };
         // 右上のメール（封筒）アイコンなど
-        $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️";
+        const kindObj = Object.values($Const.USER_NOTICE_KIND).find(k => k.id === item.kind) || $Const.USER_NOTICE_KIND.INFO;
+        $Dom.QuerySelector('#view-notice-icon', el).textContent = kindObj.emoji; // 詳細時
         // 送信日時
         $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
         // 本文（全文表示）

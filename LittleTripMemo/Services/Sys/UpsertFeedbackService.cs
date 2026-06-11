@@ -1,4 +1,6 @@
-﻿using LittleTripMemo.Common;
+﻿// Services/Sys/UpsertFeedbackService.cs
+
+using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
@@ -8,18 +10,19 @@ namespace LittleTripMemo.Services.Sys;
 public class UpsertFeedbackService : _BaseService
 {
     private readonly SysFeedbackRepository _repo;
-    private readonly SysUserNotificationRepository _userNoteRepo; // ★追加
-    private readonly ITransactionProvider _provider;           // ★トランザクション用に追加
+    private readonly SysUserNotificationRepository _userNoteRepo;
+    private readonly ITransactionProvider _provider;
 
-    // 前回の修正方針に合わせ ILoginUserRequest を実装
     public record UpsertFeedbackReq(Guid login_user_id, string? body, int score) : ILoginUserRequest;
-    public record Response(bool is_success);
+
+    // ✅ レスポンスを bool から フィードバックモデル(TSysFeedback) に変更
+    public record Response(TSysFeedback? feedback);
 
     public UpsertFeedbackService(
         UserContext user,
         SysFeedbackRepository repo,
-        SysUserNotificationRepository userNoteRepo, // ★追加
-        ITransactionProvider provider               // ★追加
+        SysUserNotificationRepository userNoteRepo,
+        ITransactionProvider provider
     ) : base(user)
     {
         _repo = repo;
@@ -31,11 +34,10 @@ public class UpsertFeedbackService : _BaseService
     {
         await ValidateAsync(req);
 
-        // 2. 実行（フィードバックと通知をセットで行うためトランザクション開始）
         using var tran = _provider.BeginTransaction();
         try
         {
-            // ① 初回投稿かどうかをチェック（既存データがあるか）
+            // ① 初回投稿かどうかをチェック
             var existing = await _repo.GetMyFeedbacksAsync();
             bool isFirstTime = (existing == null);
 
@@ -53,27 +55,27 @@ public class UpsertFeedbackService : _BaseService
                 await _userNoteRepo.InsertAsync(new TSysUserNotification
                 {
                     user_id = _user.UserId,
-                    kind = (short)UserNotificationKind.Info, // 1: 通常
+                    kind = (short)UserNotificationKind.Info,
                     body = "フィードバックありがとうございます！\nいただいた内容はアプリの改善に役立てさせていただきます。今後ともよろしくお願いいたします。🌻",
                 });
             }
 
             tran.Commit();
-            return new Response(true);
+
+            // ✅ ④ コミット後、最新のフィードバック情報を取得して返却する
+            var updatedFeedback = await _repo.GetMyFeedbacksAsync();
+            return new Response(updatedFeedback);
         }
         catch
         {
-            // ロールバックは provider が自動で行う
             throw;
         }
     }
 
     private async Task ValidateAsync(UpsertFeedbackReq req)
     {
-        // 権限チェック
         BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(req.score < 1 || req.score > 5, "スコアは1~5の間で指定してください");
         await Task.CompletedTask;
     }
-
 }

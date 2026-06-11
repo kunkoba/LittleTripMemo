@@ -92,7 +92,7 @@ const _DetailFrameCore = {
                     const data = $DetailContent.GetFormEditData();
                     console.log("btnEdit:", data);
                     const currentData = $Data.Store.GetDetailByKey(data.archive_id, data.seq, data.dbid);
-                    if (currentData && currentData.is_owner) {
+                    if (currentData) {
                         $DetailContent.RenderDetail(currentData, true); // 編集モード
                         $Dom.ToggleShow(this.btnEdit, false); // 編集ボタン隠す
                         $Dom.ToggleShow(this.groupMove, false);

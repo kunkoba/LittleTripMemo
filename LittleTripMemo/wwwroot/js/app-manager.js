@@ -69,6 +69,9 @@ const AppManager = {
     },
     // 定期タスクの定義と開始
     _initPollingTasks() {
+        const gpsTrackingSec = $App.AppData.Owner.GpsTrackingSec; // ★変更
+        const saveDetailSec = 600;
+        const saveReactionSec = 600;
         $Polling.Init();
         // オフライン監視
         $Polling.Add($Polling.TASKS.OFFLINE_CHECK, () => {
@@ -90,36 +93,40 @@ const AppManager = {
         // オンライン監視
         if ($App.AppData.Context.IsOnline) {
             // GPSトラッキング
-            const sec = $App.AppData.Owner.GpsTrackingSec; // ★変更
-            if (sec > 0) {
+            if (gpsTrackingSec > 0) {
                 // 現在地追従（保存された秒数で登録）
                 $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
                     $Marker.RefreshCurrentLocation();
-                }, sec);
+                }, gpsTrackingSec);
                 $Polling.Start($Polling.TASKS.GPS_FOLLOW);
             }
             // データ送信処理（秒）
             $Polling.Add($Polling.TASKS.DATA_DETAIL, async () => {
+                console.log("$Polling.TASKS.DATA_DETAIL");
                 if (!$App.AppData.Context.IsLoggedIn) return;
                 if (await $LocalDb.Detail.GetCount() === 0) return;
-                await $Warn.CatchAsync(async () => {
-                    // 全て $Data.LocalDb に任せる
-                    await $Data.LocalDb.BulkSendDetails();
+                // 全て $Data.LocalDb に任せる
+                const isSuccess = await $Data.LocalDb.BulkSendDetails();
+                if (isSuccess) {
+                    // 最新データをサーバーから再取得し、マーカーを再描画する
+                    await this.RefreshScreen(); 
                     // 通知
                     $Notice.Info("バックグラウンド同期は成功しました。");
-                })();
-            }, 600);
+                }
+            }, saveDetailSec);
             // リアクションデータ送信処理（秒）
             $Polling.Add($Polling.TASKS.DATA_REACTION, async () => {
+                console.log("$Polling.TASKS.DATA_REACTION");
                 if (!$App.AppData.Context.IsLoggedIn) return;
                 const unsent = await $LocalDb.Reaction.GetUnsentAll();
                 if (!unsent || unsent.length === 0) return;
-                await $Warn.CatchAsync(async () => {
-                    await $Data.LocalDb.BulkSendReactions();
-                    // 通知が必要な場合は以下をコメントイン
+                // 全て $Data.LocalDb に任せる
+                const isSuccess = await $Data.LocalDb.BulkSendReactions();
+                if (isSuccess) {
+                    // 通知
                     $Notice.Info("バックグラウンド同期は成功しました。");
-                })();
-            }, 60); // 60秒おきに実行
+                }
+            }, saveReactionSec); // 60秒おきに実行
         }
         // 定期タスク開始-----
         $Polling.Start($Polling.TASKS.OFFLINE_CHECK);

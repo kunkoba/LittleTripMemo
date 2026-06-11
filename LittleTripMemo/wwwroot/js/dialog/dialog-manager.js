@@ -111,7 +111,8 @@ const _DialogCore = {
                 const isArray = Array.isArray(rowDef);
                 const items = isArray ? rowDef : (rowDef.items || [rowDef]);
                 const rowDiv = document.createElement("div");
-                rowDiv.className = "w-full flex gap-3 py-2";
+                // isFooterFixed が false（埋め込み）の時だけ mt-4 を追加
+                rowDiv.className = "w-full flex gap-3 " + (isFooterFixed === false ? "mt-4 pb-4" : "");
                 if (!isArray && rowDef.rowId) rowDiv.id = rowDef.rowId;
                 if (!isArray && rowDef.isHidden) rowDiv.classList.add("hidden");
                 const sizeClass = items.length > 1 ? "flex-1" : "w-full";

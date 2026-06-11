@@ -137,6 +137,7 @@ public class TReactionPub
         public Guid user_id { get; set; }     // 対象ユーザー
         public short kind { get; set; } // varchar から short に変更
         public string body { get; set; } = string.Empty;
+        public string link_url { get; set; } = string.Empty;
         public DateTime send_tim { get; set; }
     }
 
