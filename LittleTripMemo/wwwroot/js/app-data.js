@@ -79,7 +79,7 @@ window.$Data = {
         // 取得データを内部に保持
         _setData(data) {
             $Data.resData = data;
-            console.log(">>$Data.resData:", $Data.resData);
+            // console.log(">>$Data.resData:", $Data.resData);
             if (data.archiveId) $App.AppData.Context.TargetArchiveId = data.archiveId;
             // アプリ基幹のデータ
             if (data.archive) this._rawData.archive = data.archive;

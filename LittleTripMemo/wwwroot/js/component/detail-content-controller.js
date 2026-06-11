@@ -294,7 +294,6 @@ const _DetailContentCore = {
         // FormDataを使用して全入力を一括取得し、オブジェクトに変換
         const formData = new FormData(this.editRoot);
         const data = Object.fromEntries(formData.entries());
-        console.log("元data:", data);
         // 数値項目（金額）を文字列から数値型に変換しておく
         // 空文字 "" の場合は 0 になるように ( || 0 ) を入れています
         data.seq = Number(data.seq || 0);

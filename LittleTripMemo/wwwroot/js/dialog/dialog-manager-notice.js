@@ -14,7 +14,6 @@ export default {
         }
         // systemInfo からスコア平均を取得して反映
         const sysInfo = $App.AppData.Owner.SystemInfo || {};
-        console.log(">sysInfo:", sysInfo);
         const scoreAvg = sysInfo.score_avg || 0;
         $Dom.QuerySelector('.js-app-score', el).textContent = `★ ${scoreAvg.toFixed(1)}`;
         $Dom.QuerySelector('#btn-info-review', el).onclick = () => this.ShowReviewList();
@@ -32,7 +31,6 @@ export default {
         const container = $Dom.QuerySelector(".js-review-container", el);
         // systemInfo からフィードバック情報を取得
         const sysInfo = $App.AppData.Owner.SystemInfo || {};
-        console.log(">sysInfo:", sysInfo);
         const feedbackList = sysInfo.feedbacks ||[];
         const scoreAvg = sysInfo.score_avg || 0;
         $Dom.QuerySelector(".js-avg-score", el).textContent = scoreAvg.toFixed(1);

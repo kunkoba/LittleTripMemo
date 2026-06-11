@@ -102,7 +102,6 @@ const AppManager = {
             }
             // データ送信処理（秒）
             $Polling.Add($Polling.TASKS.DATA_DETAIL, async () => {
-                console.log("$Polling.TASKS.DATA_DETAIL");
                 if (!$App.AppData.Context.IsLoggedIn) return;
                 if (await $LocalDb.Detail.GetCount() === 0) return;
                 // 全て $Data.LocalDb に任せる
@@ -116,7 +115,6 @@ const AppManager = {
             }, saveDetailSec);
             // リアクションデータ送信処理（秒）
             $Polling.Add($Polling.TASKS.DATA_REACTION, async () => {
-                console.log("$Polling.TASKS.DATA_REACTION");
                 if (!$App.AppData.Context.IsLoggedIn) return;
                 const unsent = await $LocalDb.Reaction.GetUnsentAll();
                 if (!unsent || unsent.length === 0) return;
@@ -179,7 +177,6 @@ const AppManager = {
             $Dialog.ShowLoginDialog();
         }
         // メイン処理
-        console.log("★App.Init", this.AppData, params);
         this._initViewport();
         this._initPollingTasks();
         // ユーザ設定反映
@@ -194,7 +191,6 @@ const AppManager = {
     },
     // 画面モード変更
     async RefreshScreen() {
-        console.log("App.RefreshScreen:", this.AppData.Context.ScreenMode)
         // アーカイブID
         const archiveId = this.AppData.Context.TargetArchiveId;
         let isSuccess = false;
@@ -300,7 +296,6 @@ const AppManager = {
         if (targetSec > 0 && this.AppData.Context.IsOnline) {
             $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
                 $Marker.RefreshCurrentLocation();
-                console.log("GPS Follow logic executed.", this.AppData.Owner.GpsTrackingSec);
             }, targetSec);
             $Polling.Start($Polling.TASKS.GPS_FOLLOW);
         }

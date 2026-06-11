@@ -105,6 +105,17 @@ const _DetailFrameCore = {
                 // 保存ボタン
                 this.btnSave.addEventListener("click", async () => {
                     const detail = $DetailContent.GetFormEditData(); // フォームのデータを取得
+                    console.log("detail:", detail);
+                    // タイトル
+                    if (!detail.title) {
+                        const data = $DetailContent.GetFormEditData();
+                        const addressName = await $Util.GetAddressName(data.latitude, data.longitude, "jp");
+                        detail.title = addressName;
+                    }
+                    // 本文
+                    if (!detail.body) {
+                        detail.body = "簡易メモ";
+                    }
                     // バリデーション実行 ---
                     const isValid = $DetailContent.Validate(detail);
                     if (!isValid) return; // 失敗時はここで中断（NoticeはValidate内で出している）
@@ -117,7 +128,7 @@ const _DetailFrameCore = {
                     });
                     if (!isOk) return;
                     await $Warn.CatchAsync(async () => {
-                        const detail = $DetailContent.GetFormEditData();
+                        // const detail = $DetailContent.GetFormEditData();
                         // 永続化（完了を待機）
                         await $LocalDb.Detail.Save(detail);
                         // API更新

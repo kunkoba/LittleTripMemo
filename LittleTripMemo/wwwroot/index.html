@@ -332,6 +332,11 @@
                             <input name="memo_price" id="detail-edit-memo_price" type="hidden" value="0">
                         </div>
                     </form>
+                    <!-- フォーム内ボタン（スクロールに含める） -->
+                    <div class="flex gap-4 mt-6">
+                        <button id="detail-btn-cancel" type="button" class="flex-1 bg-slate-400 text-white font-black text-[1rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">CANCEL</button>
+                        <button id="detail-btn-save"   type="button" class="flex-1 bg-brand-5   text-white font-black text-[1rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">SAVE</button>
+                    </div>
                 </div>
 
                 <!-- 詳細パネルのフッター (固定) -->
@@ -377,11 +382,6 @@
                             class="w-10 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                             ＞|
                         </button>
-                    </div>
-                    <!-- （キャンセル・保存） -->
-                    <div class="flex gap-4">
-                        <button id="detail-btn-cancel" class="flex-1 bg-slate-400 text-white font-black text-[1rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">CANCEL</button>
-                        <button id="detail-btn-save"   class="flex-1 bg-brand-5   text-white font-black text-[1rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">SAVE</button>
                     </div>
                 </div>
 

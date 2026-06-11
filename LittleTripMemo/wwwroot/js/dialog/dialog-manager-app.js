@@ -55,7 +55,7 @@ export default {
         b.current.onclick = () => {
             this._core.close();
             $Marker.RefreshCurrentLocation();
-            $Marker.FocusToLocationMarker();
+            $Marker.FocusToLocationMarker(1000);
         };
         b.restore.onclick = () => {
             this._core.close();
