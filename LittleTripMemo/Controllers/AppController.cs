@@ -16,7 +16,7 @@ public class AppController : _BaseController
     private readonly GetUnMergeDetailsService _getUnMergeDetailsService;
     private readonly GetArchiveDetailsService _getArchiveDetailsService;
     private readonly GetArchiveListService _getArchiveListService;
-    private readonly UpsertDetailService _upsertDetailService;
+    //private readonly UpsertDetailService _upsertDetailService;
     private readonly MergeDetailsService _mergeDetailsService;
     private readonly AddDetailsService _addDetailsService;
     private readonly DeleteArchiveService _deleteArchiveService;
@@ -24,7 +24,7 @@ public class AppController : _BaseController
     private readonly PublishArchiveService _publishArchiveService;
     private readonly GetArchiveDetailsPubService _getArchiveDetailsPubService;
     private readonly UnpublishArchiveService _unpublishArchiveService;
-    private readonly UpsertReactionService _upsertReactionService;
+    //private readonly UpsertReactionService _upsertReactionService;
     private readonly OpenArchiveService _openArchiveService;
     private readonly CloseArchiveService _closeArchiveService;
     private readonly UpdateArchivePubService _updateArchivePubService;
@@ -40,7 +40,7 @@ public class AppController : _BaseController
         GetUnMergeDetailsService getUnMergeDetailsService,
         GetArchiveDetailsService getArchiveDetailsService,
         GetArchiveListService getArchiveListService,
-        UpsertDetailService upsertDetailService,
+        //UpsertDetailService upsertDetailService,
         MergeDetailsService mergeDetailsService,
         AddDetailsService addDetailsService,
         DeleteArchiveService deleteArchiveService,
@@ -48,7 +48,7 @@ public class AppController : _BaseController
         PublishArchiveService publishArchiveService,
         GetArchiveDetailsPubService getArchiveDetailsPubService,
         UnpublishArchiveService unpublishArchiveService,
-        UpsertReactionService upsertReactionService,
+        //UpsertReactionService upsertReactionService,
         OpenArchiveService openArchiveService,
         CloseArchiveService closeArchiveService,
         UpdateArchivePubService updateArchivePubService,
@@ -62,7 +62,7 @@ public class AppController : _BaseController
         _getUnMergeDetailsService = getUnMergeDetailsService;
         _getArchiveDetailsService = getArchiveDetailsService;
         _getArchiveListService = getArchiveListService;
-        _upsertDetailService = upsertDetailService;
+        //_upsertDetailService = upsertDetailService;
         _mergeDetailsService = mergeDetailsService;
         _addDetailsService = addDetailsService;
         _deleteArchiveService = deleteArchiveService;
@@ -70,7 +70,7 @@ public class AppController : _BaseController
         _publishArchiveService = publishArchiveService;
         _getArchiveDetailsPubService = getArchiveDetailsPubService;
         _unpublishArchiveService = unpublishArchiveService;
-        _upsertReactionService = upsertReactionService;
+        //_upsertReactionService = upsertReactionService;
         _openArchiveService = openArchiveService;
         _closeArchiveService = closeArchiveService;
         _updateArchivePubService = updateArchivePubService;
@@ -83,17 +83,17 @@ public class AppController : _BaseController
 
     #region "Private"
 
-        /// <summary>
-        /// 明細の登録・更新。
-        /// seq=0 で INSERT、seq>0 で UPDATE。
-        /// バリデーションはサービス内の Request record の定義に基づき自動実行されます。
-        /// </summary>
-        [HttpPost("api/UpsertDetail")]
-        public async Task<IActionResult> UpsertDetail([FromBody] UpsertDetailService.UpsertDetailReq req)
-        {
-            var result = await _upsertDetailService.ExecuteAsync(req);
-            return OkWithBase(result);
-        }
+        ///// <summary>
+        ///// 明細の登録・更新。
+        ///// seq=0 で INSERT、seq>0 で UPDATE。
+        ///// バリデーションはサービス内の Request record の定義に基づき自動実行されます。
+        ///// </summary>
+        //[HttpPost("api/UpsertDetail")]
+        //public async Task<IActionResult> UpsertDetail([FromBody] UpsertDetailService.UpsertDetailReq req)
+        //{
+        //    var result = await _upsertDetailService.ExecuteAsync(req);
+        //    return OkWithBase(result);
+        //}
 
         /// <summary>
         /// 明細をまとめる
@@ -231,17 +231,17 @@ public class AppController : _BaseController
             return OkWithBase(result);
         }
 
-        /// <summary>
-        /// リアクションの登録・更新。
-        /// </summary>
-        /// <param name="req"></param>
-        /// <returns></returns>
-        [HttpPost("api/UpsertReaction")]
-        public async Task<IActionResult> UpsertReaction([FromBody] UpsertReactionService.UpsertReactionReq req)
-        {
-            var result = await _upsertReactionService.ExecuteAsync(req);
-            return OkWithBase(result);
-        }
+        ///// <summary>
+        ///// リアクションの登録・更新。
+        ///// </summary>
+        ///// <param name="req"></param>
+        ///// <returns></returns>
+        //[HttpPost("api/UpsertReaction")]
+        //public async Task<IActionResult> UpsertReaction([FromBody] UpsertReactionService.UpsertReactionReq req)
+        //{
+        //    var result = await _upsertReactionService.ExecuteAsync(req);
+        //    return OkWithBase(result);
+        //}
 
         /// <summary>
         /// 公開（非公開→公開）

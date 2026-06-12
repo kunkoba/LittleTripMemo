@@ -1,9 +1,4 @@
 export default {
-    // 以下のメソッドを移動してきてください。
-    // - ShowAppMenu()
-    // - ShowEmojiPicker()
-    // - PointSearchGoogle()
-    // - ShowAtmospherePicker()
     // 【基幹】アプリメニューを表示
     ShowAppMenu() {
         const isLoggedIn = $App.AppData.Context.IsLoggedIn;

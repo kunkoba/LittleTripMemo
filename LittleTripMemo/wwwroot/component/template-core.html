@@ -10,8 +10,10 @@
 
 <!-- オフライン通知 -->
 <template id="tpl-offline">
-    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-[1rem] bg-red-600 text-white text-[0.8rem] opacity-0 pointer-events-none transition-all duration-300 opacity-100 z-[9999]">
-        オフラインです
+    <div class="fixed bottom-[100px] w-full left-1/2 -translate-x-1/2 z-[8000] pointer-events-none transition-all duration-1000 opacity-0 flex flex-col items-center">
+        <div class="bg-black/20 py-2 w-full flex flex-col items-center gap-4 text-white">
+            オフライン中...
+        </div>
     </div>
 </template>
 
@@ -127,13 +129,13 @@
         <div class="absolute top-1 right-1 w-10 h-10 rounded-full bg-brand-4 text-white font-black text-[1.2rem] flex items-center justify-center shadow-md z-20">
             <span class="index"></span>
         </div>
-        <div class="text-[0.8rem] mb-2 tracking-widest font-black text-slate-400 italic">
+        <div class="text-[0.8rem] mb-2 font-black text-slate-400 italic">
             <span class="time"></span>
         </div>
         <div class="text-[0.8rem] border-l-4 border-brand-3 pl-3 font-black text-black-5 mb-2 line-clamp-1 pr-8 relative z-10">
             <span class="title"></span>
         </div>
-        <div class="text-[0.7rem] text-black-3 line-clamp-4 overflow-y-auto">
+        <div class="text-[0.7rem] text-black-3 line-clamp-4 overflow-y-auto leading-[1.8]">
             <span class="body"></span>
         </div>
         <button id="btn-popup-action" class="mt-2 w-full h-10 bg-brand-2 text-brand-5 font-black text-[0.7rem] border-y-2 border-brand-3  items-center justify-center gap-1 uppercase shadow-md active:scale-95 transition-transform tracking-widest">

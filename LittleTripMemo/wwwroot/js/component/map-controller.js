@@ -26,6 +26,10 @@ const _MapCore = {
     _initZoomSlider() {
         const slider = $Dom.GetElementById('ui-map-zoom-slider');
         if (!slider) return;
+        // Leafletによるイベントの横取りを防止（PCのマウス操作対応）
+        const container = slider.parentElement;
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.disableScrollPropagation(container);
         // 1. スライダー操作時に地図へ反映 (inputイベントでリアルタイム反映)
         slider.addEventListener('input', (e) => {
             const zoomLevel = parseInt(e.target.value);

@@ -14,26 +14,23 @@ namespace LittleTripMemo.Services;
 public class AddDetailsService : _BaseService
 {
     private readonly ITransactionProvider _provider;
-    private readonly ArchiveRepository _archiveRepo;
     private readonly DetailRepository _detailRepo;
 
     public record AddDetailsReq(
-        [Required] Guid login_user_id, // ★ 追加
+        [Required] Guid login_user_id,
         [Required(ErrorMessage = "seqリストは必須です")] int[] seqs,
         [Required(ErrorMessage = "archiveIdは必須です")] int archive_id
-    ) : ILoginUserRequest; // ★ インターフェースを実装
+    ) : ILoginUserRequest;
 
     public record Response(int archiveId, int updatedCount);
 
     public AddDetailsService(
         UserContext userContext,
         ITransactionProvider provider,
-        ArchiveRepository archiveRepo,
         DetailRepository detailRepo)
         : base(userContext)
     {
         _provider = provider;
-        _archiveRepo = archiveRepo;
         _detailRepo = detailRepo;
     }
 

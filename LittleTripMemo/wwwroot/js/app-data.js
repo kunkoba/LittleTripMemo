@@ -47,7 +47,20 @@ window.$Data = {
             }
             // 接続
             $Notice.Loading.Show();
-            const response = await fetch(BaseUrl + url, options);
+            // const response = await fetch(BaseUrl + url, options);
+            let response;
+            try {
+                response = await fetch(BaseUrl + url, options);
+            } catch (err) {
+                // ネットワーク断（オフライン）などの物理エラー
+                await $App.HandleServerFailure(0);
+                return false;
+            }
+            if (!response.ok) {
+                // 401, 500 などのステータスエラーを判定会議へ投げる
+                await $App.HandleServerFailure(response.status);
+                return false; // 以降の処理（json解析など）を中止
+            }
             $Notice.Loading.Hide();
             // 結果
             if (!response.ok) {
@@ -125,9 +138,9 @@ window.$Data = {
         async UpdateProfile(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/UpdateProfile', params))();
         },
-        async UpsertDetail(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpsertDetail', params))();
-        },
+        // async UpsertDetail(params) {
+        //     return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpsertDetail', params))();
+        // },
         async UpdateDetailPub(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpdateDetailPub', params))();
         },
@@ -279,29 +292,25 @@ window.$Data = {
         GetArchiveList() {
             return this._archiveList;
         },
-        _sortData(field = "date", order = "asc") {
-            if (!this._details || this._details.length === 0) return;
-            const isAsc = order.toLowerCase() === "asc";
-            this._details.sort((a, b) => {
-                let valA, valB;
-                switch (field) {
-                    case "date":
-                        valA = (a.memo_date || "") + " " + (a.memo_time || "");
-                        valB = (b.memo_date || "") + " " + (b.memo_time || "");
-                        break;
-                    case "update":
-                        valA = a.update_tim || "";
-                        valB = b.update_tim || "";
-                        break;
-                }
-                if (valA < valB) return isAsc ? -1 : 1;
-                if (valA > valB) return isAsc ? 1 : -1;
-                return 0;
+        // タイムライン用に最適化されたソート済みリストを取得
+        GetDetailsSortByTimeline() {
+            const list = [...this._details]; // 元データを壊さないようコピー
+            list.sort((a, b) => {
+                // 1. 日時文字列で比較 (YYYY-MM-DDHH:mm)
+                const dtA = (a.memo_date || "") + (a.memo_time || "");
+                const dtB = (b.memo_date || "") + (b.memo_time || "");
+                if (dtA !== dtB) return dtA.localeCompare(dtB);
+                // 2. 日時が同じなら seq (サーバーID) で比較
+                const seqA = Number(a.seq || 0);
+                const seqB = Number(b.seq || 0);
+                if (seqA !== seqB) return seqA - seqB;
+                // 3. seqも同じ（共に未同期など）なら dbid (ローカルID) で比較
+                const dbidA = Number(a.dbid || 0);
+                const dbidB = Number(b.dbid || 0);
+                return dbidA - dbidB;
             });
-        },
-        GetDetailsSort(field = "date", order = "asc") {
-            this._sortData(field, order);
-            return this._getDetails();
+
+            return list;
         },
         GetDetails() {
             return this._getDetails();
@@ -408,7 +417,7 @@ window.$Data = {
             const archive = $Data.Store.GetArchive();
             if (!archive) return;
             const archiveId = archive.archive_id;
-            const details = $Data.Store.GetDetailsSort();
+            const details = $Data.Store.GetDetailsSortByTimeline();
             const rawReactions = $Data.Store.GetMyReactions(); // サーバーから取得した生リスト
             // ローカルDBの ParseAndSaveMyReactions を呼び出す
             await $Warn.CatchAsync(async () => {

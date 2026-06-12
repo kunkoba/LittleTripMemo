@@ -11,13 +11,13 @@ public class UpdateArchiveService : _BaseService
     private readonly ArchiveRepository _archiveRepo;
 
     public record UpdateArchiveReq(
-        [Required] Guid login_user_id, // ★ 追加
+        [Required] Guid login_user_id,
         int archive_id,
         string title,
         string memo,
         string? link_url,
         string currency_unit
-    ) : ILoginUserRequest; // ★ インターフェースを実装
+    ) : ILoginUserRequest;
 
     public record Response(int archiveId);
 
@@ -32,7 +32,7 @@ public class UpdateArchiveService : _BaseService
     public async Task<Response> ExecuteAsync(UpdateArchiveReq req)
     {
         await ValidateAsync(req);
-        await _archiveRepo.UpdateByKeyAsync(new TMemoArchive
+        int affected = await _archiveRepo.UpdateByKeyAsync(new TMemoArchive
         {
             archive_id = req.archive_id,
             title = req.title,

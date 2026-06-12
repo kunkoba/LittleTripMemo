@@ -47,18 +47,21 @@ const Notice = {
     },
     // オフライン通知
     Offline: {
+        el: null,
         Show() {
             if (!this.el) {
-                // const tpl = document.getElementById("tpl-offline");
-                // this.el = tpl.content.firstElementChild.cloneNode(true);
-                // document.body.appendChild(this.el);
                 this.el = $Dom.GenerateTemplate("tpl-offline");
             }
-            this.el.classList.remove("opacity-0", "pointer-events-none");
+            // 既存の opacity-100 クラスを消して、直接操作するように変更
+            this.el.style.opacity = "1";
+            $Dom.ToggleShow($Dom.GetElementById('ad-space-mobile-1'), false);
+            $Dom.ToggleShow($Dom.GetElementById('ad-space-mobile-2'), false);
         },
         Hide() {
             if (!this.el) return;
-            this.el.classList.add("opacity-0", "pointer-events-none");
+            this.el.style.opacity = "0";
+            $Dom.ToggleShow($Dom.GetElementById('ad-space-mobile-1'), true);
+            $Dom.ToggleShow($Dom.GetElementById('ad-space-mobile-2'), true);
         }
     }
 };

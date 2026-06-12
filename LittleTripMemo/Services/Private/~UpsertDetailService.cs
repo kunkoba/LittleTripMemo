@@ -17,7 +17,7 @@ public class UpsertDetailService : _BaseService
 
     // --- 専用DTO：全項目必須のアノテーション ---
     public record UpsertDetailReq(
-        [Required] Guid login_user_id, // ★ 追加
+        [Required] Guid login_user_id,
         [Required(ErrorMessage = "seqは必須です")][Range(0, int.MaxValue)] int seq,
         [Required(ErrorMessage = "旅の記録IDは必須です")] int archive_id,
         [Required(ErrorMessage = "緯度は必須です")] decimal latitude,
@@ -30,9 +30,9 @@ public class UpsertDetailService : _BaseService
         [Required(ErrorMessage = "天気IDは必須です")] string weather_code,
         string? link_url,
         [Required(ErrorMessage = "金額は必須です")] int memo_price
-    ) : ILoginUserRequest; // ★ インターフェースを実装
+    ) : ILoginUserRequest;
 
-    public record Response(int seq);
+    public record Response(int updated_count);
 
     public UpsertDetailService(
         UserContext userContext,
@@ -49,37 +49,21 @@ public class UpsertDetailService : _BaseService
     /// </summary>
     public async Task<Response> ExecuteAsync(UpsertDetailReq req)
     {
-        // 1. 検証
         await ValidateAsync(req);
-
-        // 2. マッピング
         var entity = MapToEntity(req);
+        int affected = 0;
+        int seq = req.seq;
 
-        // 3. 実行
-        using var tran = _provider.BeginTransaction();
-        try
+        if (req.seq == 0)
         {
-            int seq;
-
-            if (req.seq == 0)
-            {
-                // 新規登録：採番されたseqを返す
-                seq = await _detailRepo.InsertAsync(entity);
-            }
-            else
-            {
-                // 更新：リクエストのseqをそのまま返す
-                await _detailRepo.UpdateByKeyAsync(entity);
-                seq = req.seq;
-            }
-
-            tran.Commit();
-            return new Response(seq);
+            seq = await _detailRepo.InsertAsync(entity);
+            affected = (seq > 0) ? 1 : 0;
         }
-        catch
+        else
         {
-            throw;
+            affected = await _detailRepo.UpdateByKeyAsync(entity);
         }
+        return new Response(affected);
     }
 
     /// <summary>

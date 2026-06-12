@@ -12,8 +12,8 @@ public class AdminUnpublishArchiveService : _BaseService
     private readonly ITransactionProvider _provider;
     private readonly ArchivePubRepository _archivePubRepo;
     private readonly DetailPubRepository _detailPubRepo;
-    private readonly ReactionPubRepository _reactionPubRepo; // 追加
-    private readonly SysReportRepository _reportRepo;       // 追加
+    private readonly ReactionPubRepository _reactionPubRepo; 
+    private readonly SysReportRepository _reportRepo;       
     private readonly ArchiveRepository _archiveRepo;
     private readonly DetailRepository _detailRepo;
     private readonly SysUserNotificationRepository _userNoteRepo;

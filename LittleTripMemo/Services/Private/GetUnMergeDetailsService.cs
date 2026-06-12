@@ -13,7 +13,7 @@ namespace LittleTripMemo.Services;
 public class GetUnMergeDetailsService : _BaseService
 {
     private readonly DetailRepository _detailRepo;
-    private readonly GetSystemInfoService _getSystemInfoService; // 追加
+    private readonly GetSystemInfoService _getSystemInfoService; 
 
     public class GetUnMergeDetailsReq { }
 

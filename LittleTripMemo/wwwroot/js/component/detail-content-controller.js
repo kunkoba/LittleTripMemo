@@ -129,6 +129,8 @@ const _DetailContentCore = {
     renderDetail(detail, isEdit = false) {
         // 要素の取得チェック
         if (!this.root) this.init();
+        // 表示内容の切り替えに合わせてスクロール位置を最上部にリセット
+        this.root.scrollTop = 0;
         // 引数 detail の有無で「新規作成」かどうかを判定
         const isNew = !detail;
         if (isNew) {

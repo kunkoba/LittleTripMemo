@@ -16,6 +16,7 @@ const _DetailFrameCore = {
                 this.btnCancel = $Dom.GetElementById("detail-btn-cancel");
                 this.btnCancel2 = $Dom.GetElementById("detail-btn-cancel2");
                 this.btnSave = $Dom.GetElementById("detail-btn-save");
+                this.footer = $Dom.GetElementById("detail-footer-id");
                 // 下部ボタン
                 this.groupMove = $Dom.GetElementById("detail-group-move");
                 this.btnMoveFirst = $Dom.GetElementById("detail-btn-first");
@@ -94,6 +95,7 @@ const _DetailFrameCore = {
                     const currentData = $Data.Store.GetDetailByKey(data.archive_id, data.seq, data.dbid);
                     if (currentData) {
                         $DetailContent.RenderDetail(currentData, true); // 編集モード
+                        $Dom.ToggleShow(this.footer, false); // フッターを隠す
                         $Dom.ToggleShow(this.btnEdit, false); // 編集ボタン隠す
                         $Dom.ToggleShow(this.groupMove, false);
                         $Dom.ToggleShow(this.groupReaction, false);
@@ -363,8 +365,10 @@ const DetailFrameController = {
             $Dom.ToggleShow(_DetailFrameCore.btnCancel, true);
             $Dom.ToggleShow(_DetailFrameCore.groupMove, false);
             $Dom.ToggleShow(_DetailFrameCore.groupReaction, false);
+            $Dom.ToggleShow(_DetailFrameCore.footer, false);
         } else {
             // 2. 既存データ参照時
+            $Dom.ToggleShow(_DetailFrameCore.footer, true);
             $Dom.ToggleShow(_DetailFrameCore.btnCurrent, false);
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, isOwner);
             $Dom.ToggleShow(_DetailFrameCore.btnReport, !isOwner && isPublic);

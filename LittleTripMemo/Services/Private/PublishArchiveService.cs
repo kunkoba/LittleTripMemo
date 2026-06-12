@@ -15,9 +15,9 @@ public class PublishArchiveService : _BaseService
     private readonly DetailPubRepository _detailPubRepo;
 
     public record PublishArchiveReq(
-        [Required] Guid login_user_id, // ★ 追加
+        [Required] Guid login_user_id,
         int archive_id
-    ) : ILoginUserRequest; // ★ インターフェースを実装
+    ) : ILoginUserRequest;
 
     public record Response(int archiveId);
 

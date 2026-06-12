@@ -11,12 +11,12 @@ public class UpdateArchivePubService : _BaseService
     private readonly ArchivePubRepository _archivePubRepo;
 
     public record UpdateArchivePubReq(
-        [Required] Guid login_user_id, // ★ 追加
+        [Required] Guid login_user_id,
         int archive_id,
         string title,
         string memo,
         string? link_url
-    ) : ILoginUserRequest; // ★ インターフェースを実装
+    ) : ILoginUserRequest;
 
     public record Response(int archiveId);
 

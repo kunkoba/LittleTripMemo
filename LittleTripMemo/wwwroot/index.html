@@ -74,12 +74,11 @@
             </div>
             <!-- ■　アイコンバー -->
             <div class="mx-2 bg-transparent flex justify-center mt-2">
-                <!-- タイトルバー -->
                 <div class="flex-1 min-w-0 w-10">
                     <!-- まとめタイトル -->
                     <div class="p-0 flex justify-center">
                         <!-- 初期状態を黒背景にし、内部にアイコンとテキストの要素を分割 -->
-                        <button id="ui-archive-title" class="hidden py-1 px-6 flex items-center gap-2 bg-slate-800/50 rounded-full 
+                        <button id="ui-archive-title" class="hidden py-1 px-3 flex items-center gap-2 bg-slate-800/50 rounded-full 
                             text-white text-[0.8rem] font-bold shadow-brand max-w-full transition-colors pointer-events-auto">
                             <span class="js-icon text-[1rem] shrink-0 drop-shadow-md">🔒</span>
                             <span class="js-text truncate  pt-0.5">タイトル</span>
@@ -340,7 +339,7 @@
                 </div>
 
                 <!-- 詳細パネルのフッター (固定) -->
-                <div class="shrink-0 px-4 pb-6 pt-4 bg-slate-50 border z-10">
+                <div id="detail-footer-id" class="shrink-0 px-4 pb-6 pt-4 bg-slate-50 border z-10">
                     <!-- （いいねボタン） -->
                     <div id="detail-group-reaction" class="flex justify-between gap-2 mb-4">
                         <button id="detail-btn-funny"    class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
@@ -391,13 +390,13 @@
         <div class="absolute bottom-4 left-0 right-2 z-[1001] pointer-events-none">
             <div id="ui-bottom-bar">
                 <!-- スマホ用広告スペース（PCでは非表示） -->
-                <div id="ad-space-mobile" class="lg:hidden mt-6 mx-auto max-w-[320px] h-[50px] pointer-events-auto">
+                <div id="ad-space-mobile-1" class="lg:hidden mt-6 mx-auto max-w-[320px] h-[50px] pointer-events-auto">
                     <div class="bg-white w-full h-full border border-brand-2 shadow-brand">
                         AD SPACE
                     </div>
                 </div>
-                <!-- スマホ用広告スペース（下段） -->
-                <div id="ad-space-mobile-bottom" class="lg:hidden mx-auto mb-4 w-[320px] h-[50px] pointer-events-auto">
+                <!-- スマホ用広告スペース（PCでは非表示）2 -->
+                <div id="ad-space-mobile-2" class="lg:hidden mx-auto mb-4 w-[320px] h-[50px] pointer-events-auto">
                     <div class="bg-white w-full h-full border border-brand-2 shadow-brand">
                         AD SPACE2
                     </div>

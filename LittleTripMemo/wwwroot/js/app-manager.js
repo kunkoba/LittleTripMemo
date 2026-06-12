@@ -11,7 +11,7 @@ const AppManager = {
         Owner: {
             Theme: null,
             MapStyle: null,
-            GpsTrackingSec: 0,
+            GpsTrackingSec: 60,
             Token: null,
             Currency_unit: 'JPY',
             SystemInfo: null,
@@ -69,9 +69,10 @@ const AppManager = {
     },
     // 定期タスクの定義と開始
     _initPollingTasks() {
+        const checkSec = 1;
         const gpsTrackingSec = $App.AppData.Owner.GpsTrackingSec; // ★変更
-        const saveDetailSec = 600;
-        const saveReactionSec = 600;
+        const saveDetailSec = 120;
+        const saveReactionSec = 120;
         $Polling.Init();
         // オフライン監視
         $Polling.Add($Polling.TASKS.OFFLINE_CHECK, () => {
@@ -87,9 +88,14 @@ const AppManager = {
                 $Notice.Offline.Show();
                 $Polling.Stop($Polling.TASKS.DATA_DETAIL);
                 $Polling.Stop($Polling.TASKS.DATA_REACTION);
-                console.log("-- offline --");
+                // 検索モードなら作成モードへ強制移動
+                if ($App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH) {
+                    $Notice.Warn("Offline: Switch to Create Mode.");
+                    $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                    $App.RefreshScreen();
+                }
             }
-        }, 30);
+        }, checkSec);
         // オンライン監視
         if ($App.AppData.Context.IsOnline) {
             // GPSトラッキング
@@ -200,9 +206,9 @@ const AppManager = {
                 if (this.AppData.Context.IsLoggedIn) {
                     // 地点データ取得
                     isSuccess = await $Data.Access.GetUnMergeDetails({});
-                    if (!isSuccess) {
-                        return;
-                    };
+                    // if (!isSuccess) {
+                    //     return;
+                    // };
                 }
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
@@ -260,6 +266,40 @@ const AppManager = {
         $UI.ChangeScreenMode();
         // マーカー更新
         $Marker.ChangeScreenMode();
+    },
+    // サーバエラー処理
+    async HandleServerFailure(status) {
+        // 1. ログインエラー (401)
+        if (status === 401) {
+            this.AppData.Owner.Token = null;
+            this.AppData.Context.IsLoggedIn = false;
+            $Dialog.ShowLoginDialog();
+            return;
+        }
+        // 2. オフライン判定時のモード別コントロール
+        if (!this.AppData.Context.IsOnline) {
+            switch (this.AppData.Context.ScreenMode) {
+                case $Const.SCREEN_MODE.SEARCH:
+                    // 検索モード：作成モードへ強制退避
+                    this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                    $Notice.Warn("Offline: Switched to Create mode.");
+                    await this.RefreshScreen();
+                    break;
+                case $Const.SCREEN_MODE.CREATE:
+                    // 作成モード：ローカルDBを正として描画継続
+                    const localData = await $LocalDb.Detail.GetAll();
+                    $Data.Access._rawData.details = localData;
+                    $Data.Store.Restore();
+                    $UI.ChangeScreenMode();
+                    $Marker.ChangeScreenMode();
+                    break;
+                default:
+                    // その他のモード（ARCHIVE等）：現状維持
+                    break;
+            }
+        }
+        // 3. それ以外（サーバ異常等）は介入しない
+        return;
     },
     // ログアウト処理
     async Logout() {

@@ -258,7 +258,7 @@ const MarkerController = {
 	},
     // 描画リフレッシュ
     RefreshPointMarker() {
-        const details = $Data.Store.GetDetailsSort();
+        const details = $Data.Store.GetDetailsSortByTimeline();
         if (!details) return;
         this.Clear();
         _MarkerCore.generateArrowList();
@@ -306,7 +306,7 @@ const MarkerController = {
         // console.log("★FocusToCurrentMarker");
         const marker = _MarkerCore.getMarker(this._currentIndex);
         if (!marker) return;
-        const details = $Data.Store.GetDetailsSort();
+        const details = $Data.Store.GetDetailsSortByTimeline();
         $Map.FocusToTargetMarker(marker, delay);
         _MarkerCore.toggleMarkerPopup(true, this._currentIndex, details[this._currentIndex]);
         // ハイライト
@@ -324,14 +324,14 @@ const MarkerController = {
         }
     },
     FocusNext() {
-        const details = $Data.Store.GetDetailsSort();
+        const details = $Data.Store.GetDetailsSortByTimeline();
         if (details && this._currentIndex < details.length - 1) {
             this._currentIndex++;
             this.FocusToCurrentMarker();
         }
     },
     FocusLast() {
-        const details = $Data.Store.GetDetailsSort();
+        const details = $Data.Store.GetDetailsSortByTimeline();
         if (details) {
             this._currentIndex = details.length - 1;
             this.FocusToCurrentMarker();
@@ -354,7 +354,7 @@ const MarkerController = {
     },
     // カレントデータ取得
     GetDataWithCurrentIndex() {
-        const details = $Data.Store.GetDetailsSort();
+        const details = $Data.Store.GetDetailsSortByTimeline();
         return details[this._currentIndex];
     },
     // 変更を破棄して元に戻す

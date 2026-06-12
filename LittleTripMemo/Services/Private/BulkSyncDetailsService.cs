@@ -30,9 +30,9 @@ public class BulkSyncDetailsService : _BaseService
     );
 
     public record BulkSyncReq(
-        [Required] Guid login_user_id, // ★ 追加
+        [Required] Guid login_user_id,
         [Required(ErrorMessage = "同期データリストは必須です")] IEnumerable<BulkSyncItem> items
-    ) : ILoginUserRequest; // ★ インターフェースを実装
+    ) : ILoginUserRequest;
 
     public record Response(int updatedCount);
 
@@ -55,26 +55,30 @@ public class BulkSyncDetailsService : _BaseService
         using var tran = _provider.BeginTransaction();
         try
         {
-            int count = 0;
+            int totalUpdated = 0;
             foreach (var item in req.items)
             {
+                int affected = 0;
                 if (item.is_public)
                 {
                     var entity = MapToPubEntity(item);
-                    if (item.seq == 0) await _detailPubRepo.InsertAsync(entity);
-                    else await _detailPubRepo.UpdateByKeyAsync(entity);
+                    if (item.seq == 0) affected = await _detailPubRepo.InsertAsync(entity);
+                    // 更新時は archive_id と del_flg の一致を条件にする
+                    else affected = await _detailPubRepo.UpdateByKeyAsync(entity);
                 }
                 else
                 {
                     var entity = MapToPrivateEntity(item);
-                    if (item.seq == 0) await _detailRepo.InsertAsync(entity);
-                    else await _detailRepo.UpdateByKeyAsync(entity);
+                    if (item.seq == 0) affected = await _detailRepo.InsertAsync(entity);
+                    // 更新時は archive_id と del_flg の一致を条件にする
+                    else affected = await _detailRepo.UpdateByKeyAsync(entity);
                 }
-                count++;
+                totalUpdated += affected; // 実際にDBで更新できた件数のみを加算
             }
 
             tran.Commit();
-            return new Response(count);
+            // 10件送って、DBの状態不一致で1件も更新されなければ 0 が返る
+            return new Response(totalUpdated);
         }
         catch
         {

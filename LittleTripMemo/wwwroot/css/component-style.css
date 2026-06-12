@@ -96,7 +96,7 @@
 /* 縦型レンジ入力の標準対応 */
 #ui-map-zoom-slider[orient="vertical"] {
     appearance: slider-vertical; /* Firefox / Safari / Chrome用 */
-    width: 6px;
+    width: 60px;
     height: 100%;
     transform: rotate(180deg);
     cursor: pointer;

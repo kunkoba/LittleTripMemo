@@ -10,7 +10,7 @@ public class AdminCloseArchivePubService : _BaseService
 {
     private readonly ITransactionProvider _provider;
     private readonly ArchivePubRepository _archivePubRepo;
-    private readonly SysUserNotificationRepository _userNoteRepo; // 追加
+    private readonly SysUserNotificationRepository _userNoteRepo; 
 
     // 安全のため target_user_id を必須に
     public record Request(

@@ -35,7 +35,9 @@ public class ArchivePubRepository : _BaseRepository
                 update_tim = CURRENT_TIMESTAMP
             WHERE
                 archive_id = @archive_id
-                AND user_id = @user_id";
+                AND user_id = @user_id
+                AND closed_flg = @closed_flg
+                AND del_flg    = false";
         
         return await ExecuteAsync(sql, archive);
     }
@@ -132,6 +134,23 @@ public class ArchivePubRepository : _BaseRepository
           AND user_id    = @target_user_id"; // 所有者チェック追加
 
         return await ExecuteAsync(sql, new { archive_id = archiveId, target_user_id = targetUserId });
+    }
+
+    /// <summary>
+    /// 他の公開アーカイブ用ID一括チェック
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<int>> GetActiveArchiveIdsAsync(IEnumerable<int> ids)
+    {
+        const string sql = @"
+        SELECT archive_id 
+        FROM t_memo_archive_pub 
+        WHERE archive_id = ANY(@ids) 
+          AND del_flg    = false 
+          AND closed_flg = false";
+
+        return await QueryAsync<int>(sql, new { ids = ids.ToArray() });
     }
 
 }

@@ -9,15 +9,15 @@ public class UnpublishArchiveService : _BaseService
     private readonly ITransactionProvider _provider;
     private readonly ArchivePubRepository _archivePubRepo;
     private readonly DetailPubRepository _detailPubRepo;
-    private readonly ReactionPubRepository _reactionPubRepo; // 追加
-    private readonly SysReportRepository _reportRepo;       // 追加
+    private readonly ReactionPubRepository _reactionPubRepo;
+    private readonly SysReportRepository _reportRepo;
     private readonly ArchiveRepository _archiveRepo;
     private readonly DetailRepository _detailRepo;
 
     public record UnpublishArchiveReq(
-        [Required] Guid login_user_id, // ★ 追加
+        [Required] Guid login_user_id,
         int archive_id
-    ) : ILoginUserRequest; // ★ インターフェースを実装
+    ) : ILoginUserRequest;
 
     public record Response(int archiveId);
 
@@ -26,8 +26,8 @@ public class UnpublishArchiveService : _BaseService
         ITransactionProvider provider,
         ArchivePubRepository archivePubRepo,
         DetailPubRepository detailPubRepo,
-        ReactionPubRepository reactionPubRepo, // 追加
-        SysReportRepository reportRepo,       // 追加
+        ReactionPubRepository reactionPubRepo, 
+        SysReportRepository reportRepo,       
         DetailRepository detailRepo,
         ArchiveRepository archiveRepo)
         : base(userContext)
@@ -35,8 +35,8 @@ public class UnpublishArchiveService : _BaseService
         _provider = provider;
         _archivePubRepo = archivePubRepo;
         _detailPubRepo = detailPubRepo;
-        _reactionPubRepo = reactionPubRepo; // 追加
-        _reportRepo = reportRepo;           // 追加
+        _reactionPubRepo = reactionPubRepo; 
+        _reportRepo = reportRepo;           
         _archiveRepo = archiveRepo;
         _detailRepo = detailRepo;
     }

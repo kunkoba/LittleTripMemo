@@ -80,6 +80,8 @@
   <ItemGroup>
     <Compile Remove="Services\Private\_ArchiveUpdateService.cs" />
     <Compile Remove="Services\Private\_HistoryRegistrationService.cs" />
+    <Compile Remove="Services\Private\~UpsertDetailService.cs" />
+    <Compile Remove="Services\Public\~UpsertReactionService.cs" />
   </ItemGroup>
 
   <ItemGroup>

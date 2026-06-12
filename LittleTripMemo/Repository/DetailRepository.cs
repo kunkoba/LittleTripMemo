@@ -63,7 +63,6 @@ public class DetailRepository : _BaseRepository
                 update_tim   = CURRENT_TIMESTAMP
             WHERE seq        = @seq 
               AND user_id    = @user_id 
-              AND archive_id = @archive_id
               AND del_flg    = false";
 
         return await ExecuteAsync(sql, detail);

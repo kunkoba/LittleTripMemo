@@ -11,6 +11,7 @@ namespace LittleTripMemo.Services;
 public class BulkSyncReactionService : _BaseService
 {
     private readonly ReactionPubRepository _repo;
+    private readonly ArchivePubRepository _archivePubRepo;
     private readonly ITransactionProvider _provider;
 
     // 1明細ごとのリアクション状態
@@ -24,58 +25,58 @@ public class BulkSyncReactionService : _BaseService
     );
 
     public record BulkSyncReactionReq(
-        [Required] Guid login_user_id, // ★ 追加
+        [Required] Guid login_user_id,
         [Required] IEnumerable<ReactionSyncItem> items
-    ) : ILoginUserRequest; // ★ インターフェースを実装
+    ) : ILoginUserRequest;
 
-    public record Response(bool is_success, int updatedCount);
+    public record Response(int updatedCount);
 
     public BulkSyncReactionService(
         UserContext userContext,
         ITransactionProvider provider,
-        ReactionPubRepository repo) : base(userContext)
+        ReactionPubRepository repo,
+        ArchivePubRepository archivePubRepo) : base(userContext)
     {
         _provider = provider;
         _repo = repo;
+        _archivePubRepo = archivePubRepo;
     }
 
     public async Task<Response> ExecuteAsync(BulkSyncReactionReq req)
     {
         await ValidateAsync(req);
 
+        // 1. リクエスト内の全アーカイブIDを抽出し、現在「公開かつオープン」なものだけを取得
+        var targetIds = req.items.Select(x => x.archive_id).Distinct();
+        var activeIds = (await _archivePubRepo.GetActiveArchiveIdsAsync(targetIds)).ToHashSet();
+
         using var tran = _provider.BeginTransaction();
         try
         {
-            // アーカイブごとにまとめて削除するためにグループ化
+            int totalInserted = 0;
             var groups = req.items.GroupBy(x => x.archive_id);
-            int count = 0;
 
             foreach (var group in groups)
             {
-                var archiveId = group.Key;
+                // 2. 公開状態でなければそのアーカイブのリアクション処理はスキップ
+                if (!activeIds.Contains(group.Key)) continue;
+
                 var seqs = group.Select(x => x.seq);
+                await _repo.DeletePhysicalBySeqsAsync(group.Key, seqs);
 
-                // 1. このアーカイブ内の対象seqの自分のリアクションを一括削除
-                await _repo.DeletePhysicalBySeqsAsync(archiveId, seqs);
-
-                // 2. 新しい状態を1つずつ登録
                 foreach (var item in group)
                 {
-                    if (item.is_funny) await _repo.InsertAsync(archiveId, (int)item.seq, 1);
-                    if (item.is_love) await _repo.InsertAsync(archiveId, (int)item.seq, 2);
-                    if (item.is_surprise) await _repo.InsertAsync(archiveId, (int)item.seq, 3);
-                    if (item.is_sad) await _repo.InsertAsync(archiveId, (int)item.seq, 4);
-                    count++;
+                    // 有効なものだけインサート
+                    if (item.is_funny) totalInserted += await _repo.InsertAsync(group.Key, (int)item.seq, 1);
+                    if (item.is_love) totalInserted += await _repo.InsertAsync(group.Key, (int)item.seq, 2);
+                    if (item.is_surprise) totalInserted += await _repo.InsertAsync(group.Key, (int)item.seq, 3);
+                    if (item.is_sad) totalInserted += await _repo.InsertAsync(group.Key, (int)item.seq, 4);
                 }
             }
-
             tran.Commit();
-            return new Response(true, count);
+            return new Response(totalInserted); // メインテーブル(Reaction)の挿入数を返す
         }
-        catch
-        {
-            throw;
-        }
+        catch { throw; }
     }
 
     private async Task ValidateAsync(BulkSyncReactionReq req)

@@ -8,7 +8,7 @@ namespace LittleTripMemo.Services.Sys;
 public class GetReportDetailsService : _BaseService
 {
     private readonly SysReportRepository _repo;
-    private readonly GetUserProfileService _getUserProfileService; // 追加
+    private readonly GetUserProfileService _getUserProfileService; 
 
     public record GetReportDetailsReq(Guid target_user_id, long archive_id);
 

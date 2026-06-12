@@ -27,7 +27,7 @@ export default {
     // タイムライン用リスト
     ShowDetailsTimeLine() {
         // ソートする
-        const details = $Data.Store.GetDetailsSort();
+        const details = $Data.Store.GetDetailsSortByTimeline();
         if (!details || details.length === 0) {
             $Notice.Warn("データはありません。");
             return;
@@ -306,7 +306,7 @@ export default {
     },
     // メモをまとめる（複数選択モード）
     ShowMultiSelectTimeline() {
-        const details = $Data.Store.GetDetailsSort();
+        const details = $Data.Store.GetDetailsSortByTimeline();
         if (!details || details.length === 0) {
             $Notice.Warn("データはありません。");
             return;
@@ -451,7 +451,7 @@ export default {
                 $Dom.ToggleShow(viewUrl, false); // 隠す
             }
             // ④ 件数の反映
-            const details = $Data.Store.GetDetailsSort() || [];
+            const details = $Data.Store.GetDetailsSortByTimeline() || [];
             $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
             $Dom.QuerySelector('#btn-view-mem-timeline', el).onclick = () => {
                 this.ShowDetailsTimeLine();
