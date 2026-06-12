@@ -88,12 +88,12 @@ const AppManager = {
                 $Notice.Offline.Show();
                 $Polling.Stop($Polling.TASKS.DATA_DETAIL);
                 $Polling.Stop($Polling.TASKS.DATA_REACTION);
-                // 検索モードなら作成モードへ強制移動
-                if ($App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH) {
-                    $Notice.Warn("Offline: Switch to Create Mode.");
-                    $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    $App.RefreshScreen();
-                }
+                // // 検索モードなら作成モードへ強制移動
+                // if ($App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH) {
+                //     $Notice.Warn("オフライン中は、機能が制限されます。");
+                //     $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                //     $App.RefreshScreen();
+                // }
             }
         }, checkSec);
         // オンライン監視
@@ -268,38 +268,55 @@ const AppManager = {
         $Marker.ChangeScreenMode();
     },
     // サーバエラー処理
-    async HandleServerFailure(status) {
-        // 1. ログインエラー (401)
-        if (status === 401) {
-            this.AppData.Owner.Token = null;
-            this.AppData.Context.IsLoggedIn = false;
-            $Dialog.ShowLoginDialog();
-            return;
-        }
-        // 2. オフライン判定時のモード別コントロール
-        if (!this.AppData.Context.IsOnline) {
-            switch (this.AppData.Context.ScreenMode) {
-                case $Const.SCREEN_MODE.SEARCH:
-                    // 検索モード：作成モードへ強制退避
-                    this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    $Notice.Warn("Offline: Switched to Create mode.");
-                    await this.RefreshScreen();
-                    break;
-                case $Const.SCREEN_MODE.CREATE:
-                    // 作成モード：ローカルDBを正として描画継続
-                    const localData = await $LocalDb.Detail.GetAll();
-                    $Data.Access._rawData.details = localData;
-                    $Data.Store.Restore();
-                    $UI.ChangeScreenMode();
-                    $Marker.ChangeScreenMode();
-                    break;
-                default:
-                    // その他のモード（ARCHIVE等）：現状維持
-                    break;
+    async HandleServerFailure(response) {
+        console.log(">>HandleServerFailure");
+        $Notice.Loading.Hide();
+        if (response) {
+            // ログインエラー (401)
+            if (response.status === 401) {
+                this.AppData.Owner.Token = null;
+                this.AppData.Context.IsLoggedIn = false;
+                $Dialog.ShowLoginDialog();
+                return;
+            } else {
+                // それ以外のサーバエラー（業務エラー含む）
+                const errData = await response.json();
+                console.error("errData:", errData);
+                const errMsg = errData.Message || errData.message || "同期失敗";
+                const err = new Error(errMsg);
+                // err.debugInfo = errData.debugInfo;
+                throw err;
+                return;
+            }
+        } else {
+            // オフライン判定時のモード別コントロール
+            if (!this.AppData.Context.IsOnline) {
+                $Notice.Warn("オフライン中は、機能が制限されます。");
+                // switch (this.AppData.Context.ScreenMode) {
+                //     case $Const.SCREEN_MODE.SEARCH:
+                //         // 検索モード：作成モードへ強制退避
+                //         this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                //         await this.RefreshScreen();
+                //         break;
+                //     case $Const.SCREEN_MODE.CREATE:
+                //         // 作成モード：ローカルDBを正として描画継続
+                //         const localData = await $LocalDb.Detail.GetAll();
+                //         $Data.Access._rawData.details = localData;
+                //         $Data.Store.Restore();
+                //         $UI.ChangeScreenMode();
+                //         $Marker.ChangeScreenMode();
+                //         break;
+                //     default:
+                //         // その他のモード（ARCHIVE等）：現状維持
+                //         break;
+                // }
+                return;
+            } else {
+                // サーバが稼働していない（おそらく）
+                const err = new Error("サーバが稼働していません。しばらくお待ちください。");
+                throw err;
             }
         }
-        // 3. それ以外（サーバ異常等）は介入しない
-        return;
     },
     // ログアウト処理
     async Logout() {

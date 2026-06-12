@@ -197,7 +197,8 @@ const _DetailContentCore = {
             // 共通メソッドを使用してアイコンを生成（サイズ 28px）
             const iconHtml = $Util.GetUrlIconHtml(detail.link_url, 28);
             // aタグ（displayUrlText）に情報を反映
-            this.displayUrlText.href = detail.link_url;
+            // this.displayUrlText.href = detail.link_url;
+            this.displayUrlText.onclick = () => $Util.OpenSafeUrl(detail.link_url);
             this.displayUrlText.innerHTML = iconHtml;
             // ラッパーのクリックイベント（検索URLへ飛ばす処理）は、
             // 直接リンク（aタグ）として機能させるため削除または null にリセット

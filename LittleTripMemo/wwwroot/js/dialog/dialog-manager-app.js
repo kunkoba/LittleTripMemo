@@ -128,8 +128,8 @@ export default {
                             pos = await $Util.SearchAddressByWord(val);
                         }
                         if (pos && onOk) {
-                            onOk(pos);
                             this._core.closeAll(); // 見つかった時だけ手動で閉じる
+                            onOk(pos);
                         } else {
                             $Notice.Warn("見つかりませんでした。");
                         }

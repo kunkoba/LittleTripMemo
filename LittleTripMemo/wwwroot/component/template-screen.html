@@ -123,7 +123,8 @@
             <div class="bg-white rounded-[1rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                 <div class="flex justify-between items-center p-4 border-b border-slate-100"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">👤</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Developer</span></div><span class="text-[0.8rem] font-black text-slate-800 js-app-developer"></span></div>
                 <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">⭐</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Feedback</span></div><div class="flex items-center gap-1.5"><span class="text-[0.9rem] font-black text-yellow-500 leading-none js-app-score">★ 0.0</span><span class="text-slate-300 text-[1.2rem] font-normal leading-none -mt-0.5">›</span></div></button>
-                <a id="link-info-official" href="" target="_blank" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">🌍</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Official Site</span></div><div class="flex items-center gap-1 bg-blue-50 text-blue-500 px-3 py-1 rounded-full border border-blue-100"><span class="text-[0.65rem] font-black uppercase tracking-wider mt-px">Open</span><span class="text-[0.7rem] leading-none">↗</span></div></a>
+                <button id="link-info-official" type="button"
+                    class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">🌍</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Official Site</span></div><div class="flex items-center gap-1 bg-blue-50 text-blue-500 px-3 py-1 rounded-full border border-blue-100"><span class="text-[0.65rem] font-black uppercase tracking-wider mt-px">Open</span><span class="text-[0.7rem] leading-none">↗</span></div></a>
                 <button id="btn-info-license" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">📜</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">License</span></div><span class="text-slate-300 text-[1.2rem] font-normal leading-none -mt-0.5">›</span></button>
             </div>
         </div>
@@ -210,9 +211,10 @@
                 <span id="view-mem-price-unit" class="text-[0.7rem] font-bold text-slate-400 ml-1.5 uppercase"></span>
             </div>
 			<!-- 左下：リンク（正円ボタン・影あり） -->
-			<a id="view-mem-url" href="" target="_blank" class="shrink-0 w-12 h-12 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
+			<button id="view-mem-url" type="button" 
+                class="shrink-0 w-12 h-12 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
 				<!-- ここにアイコンが挿入される -->
-			</a>
+            </button>
 		</div>
 	</div>
 </template>
@@ -276,10 +278,10 @@
 		<div id="view-notice-body" class="flex-1 bg-brand-1 rounded-lg p-2 text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words pt-2 min-h-[200px] overflow-y-auto pr-2"></div>
         <!-- 4. リンク表示エリア -->
 		<div id="view-notice-url-wrapper" class="hidden mt-auto flex py-1">
-            <a id="view-notice-url" href="" target="_blank" 
+            <button id="view-notice-url" type="button" 
                 class="shrink-0 w-12 h-12 shadow-lg rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
                 <!-- ここにアイコンが挿入される -->
-            </a>
+        </button>
         </div>
 	</div>
 </template>

@@ -200,10 +200,10 @@
                             <span id="detail-display-weather_code" class="hidden"></span>
                             <!-- 下部：Locationカード風のURLリンク -->
                             <div id="detail-display-url-wrapper" class="hidden w-full mt-2">
-                                <a id="detail-display-link_url" href="" target="_blank" 
+                                <button id="detail-display-link_url" type="button" 
                                     class="shrink-0 w-12 h-12 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
                                     <!-- ここに $Util.GetUrlIconHtml が挿入される -->
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -333,8 +333,8 @@
                     </form>
                     <!-- フォーム内ボタン（スクロールに含める） -->
                     <div class="flex gap-4 mt-6">
-                        <button id="detail-btn-cancel" type="button" class="flex-1 bg-slate-400 text-white font-black text-[1rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">CANCEL</button>
-                        <button id="detail-btn-save"   type="button" class="flex-1 bg-brand-5   text-white font-black text-[1rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">SAVE</button>
+                        <button id="detail-btn-cancel" type="button" class="flex-1 bg-slate-400 text-white font-black text-[0.8rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">CANCEL</button>
+                        <button id="detail-btn-save"   type="button" class="flex-1 bg-brand-5   text-white font-black text-[0.8rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">SAVE</button>
                     </div>
                 </div>
 

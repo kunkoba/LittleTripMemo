@@ -8,7 +8,8 @@ export default {
         $Dom.QuerySelector('.js-app-developer', el).textContent = $Const.APP_INFO.DEVELOPER;
         const linkOfficial = $Dom.QuerySelector('#link-info-official', el);
         if ($Const.APP_INFO.OFFICIAL_SITE) {
-            linkOfficial.href = $Const.APP_INFO.OFFICIAL_SITE;
+            // linkOfficial.href = $Const.APP_INFO.OFFICIAL_SITE;
+            linkOfficial.onclick = () => $Util.OpenSafeUrl($Const.APP_INFO.OFFICIAL_SITE);
         } else {
             $Dom.ToggleShow(linkOfficial, false);
         }
@@ -158,7 +159,8 @@ export default {
             $Dom.ToggleShow(urlWrapper, true);
             const urlLink = $Dom.QuerySelector('#view-notice-url', el);
             // aタグのhrefを設定し、中身に共通アイコンHTMLを注入
-            urlLink.href = notice.link_url;
+            // urlLink.href = notice.link_url;
+            urlLink.onclick = () => $Util.OpenSafeUrl(notice.link_url);
             urlLink.innerHTML = $Util.GetUrlIconHtml(notice.link_url, 28);
         } else {
             $Dom.ToggleShow(urlWrapper, false);

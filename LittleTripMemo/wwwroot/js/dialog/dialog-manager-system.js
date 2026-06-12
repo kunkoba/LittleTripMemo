@@ -421,12 +421,13 @@ export default {
             viewLinks.innerHTML = "";
             const links =[pL1, pL2, pL3].filter(l => l && l.trim() !== "");
             links.forEach(l => {
-				const a = document.createElement("a");
-				a.href = l; a.target = "_blank";
-				a.className = "w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-md active:scale-90 transition-transform overflow-hidden";
-				a.innerHTML = $Util.GetUrlIconHtml(l, 24);
-				a.title = l;
-				viewLinks.appendChild(a);
+				const btn = document.createElement("button");
+                btn.type = "button";
+				btn.onclick = () => $Util.OpenSafeUrl(l);
+				btn.className = "w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-md active:scale-90 transition-transform overflow-hidden";
+				btn.innerHTML = $Util.GetUrlIconHtml(l, 24);
+				btn.title = l;
+				viewLinks.appendChild(btn);
 			});
         };
         renderView();

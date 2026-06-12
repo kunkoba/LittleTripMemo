@@ -129,7 +129,7 @@ export default {
                 const price = Number(item.memo_price || 0);
                 if (price !== 0) {
                     $Dom.ToggleShow(priceWrapper, true);
-                    let displayCurrency = $App.AppData.Owner.Currency_unit || 'JPY';
+                    let displayCurrency = item.currency_unit || 'JPY';
                     if (item.archive_id > 0) {
                         const archiveList = $Data.Store.GetArchiveList() || [];
                         const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
@@ -140,7 +140,6 @@ export default {
                     currencyEl.textContent = displayCurrency;
                     if (price > 0) {
                         priceEl.textContent = `+${price.toLocaleString()}`;
-                        // priceEl.className = "js-memo-price text-[1rem] font-black italic  text-blue-500";
                         priceEl.className += " text-blue-500";
                     } else if (price < 0) {
                         priceEl.textContent = price.toLocaleString();
@@ -444,7 +443,8 @@ export default {
             const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
             if (currentArchive.link_url) {
                 const iconHtml = $Util.GetUrlIconHtml(currentArchive.link_url, 28);
-                viewUrl.href = currentArchive.link_url;
+                // viewUrl.href = currentArchive.link_url;
+                viewUrl.onclick = () => $Util.OpenSafeUrl(currentArchive.link_url);
                 viewUrl.innerHTML = iconHtml;
                 $Dom.ToggleShow(viewUrl, true); // 表示する
             } else {

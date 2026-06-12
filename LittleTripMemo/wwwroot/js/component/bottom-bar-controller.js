@@ -44,7 +44,7 @@ const _BottomCore = {
 						sortField: sortSetting.sortField,
 						reactionType: sortSetting.reactionType,
 						keyword: sortSetting.keyword,
-						limit: 50
+						limit: 20
 					};
 					// 通信処理（Public と Private でエンドポイントを分岐）
 					const isSuccess = await $Data.Access.SearchByLocationPub(params);

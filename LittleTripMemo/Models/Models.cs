@@ -86,6 +86,7 @@ public class TMemoDetailPub : IAppRecord
     public int count_surprise { get; set; } = 0;
     public int count_empathy { get; set; } = 0;
     public string a_title { get; set; } = string.Empty;
+    public string currency_unit { get; set; } = string.Empty;
 }
 
 public class TReactionPub
@@ -145,25 +146,25 @@ public class TReactionPub
 
 #region "DTO"
 
-/// <summary>
-/// まとめ親リスト（private＋public）
-/// </summary>
-public class DtoArchive
-    {
-        public long archive_id { get; set; } = 0;
-        public Guid user_id { get; set; }
-        public string title { get; set; } = string.Empty;
-        public string memo { get; set; } = string.Empty;
-        public string link_url { get; set; } = string.Empty;
-        public string currency_unit { get; set; } = "JPY";
-        public bool closed_flg { get; set; } = false;
-        public bool del_flg { get; set; } = false;
-        public DateTime create_tim { get; set; }
-        public DateTime update_tim { get; set; }
-        public bool is_public { get; set; } = true;
-        public bool is_owner { get; set; } = false;
-        public int cnt { get; set; } = 0;
-    }
+    /// <summary>
+    /// まとめ親リスト（private＋public）
+    /// </summary>
+    public class DtoArchive
+        {
+            public long archive_id { get; set; } = 0;
+            public Guid user_id { get; set; }
+            public string title { get; set; } = string.Empty;
+            public string memo { get; set; } = string.Empty;
+            public string link_url { get; set; } = string.Empty;
+            public string currency_unit { get; set; } = "JPY";
+            public bool closed_flg { get; set; } = false;
+            public bool del_flg { get; set; } = false;
+            public DateTime create_tim { get; set; }
+            public DateTime update_tim { get; set; }
+            public bool is_public { get; set; } = true;
+            public bool is_owner { get; set; } = false;
+            public int cnt { get; set; } = 0;
+        }
 
     /// <summary>
     /// フィードバック集計結果

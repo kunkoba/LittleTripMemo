@@ -146,7 +146,15 @@ window.$Util = {
         if (!keyword) return null;
         // OpenStreetMapの無料検索APIを利用
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(keyword)}`;
-        const res = await fetch(url);
+        let res;
+        try {
+            res = await fetch(url);
+        } catch (err) {
+            console.log("err:", err);
+            // ネットワーク断（オフライン）などの物理エラー
+            await $App.HandleServerFailure();
+            return null;
+        }
         const data = await res.json();
         if (data && data.length > 0) {
             return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
@@ -169,7 +177,7 @@ window.$Util = {
             const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=${zoom}&addressdetails=1&accept-language=${lang}`;
             // HTTPリクエストの送信
             const response = await fetch(url);
-            if (!response.ok) throw new Error("API request failed");
+            if (!response.ok) throw new Error("[GetAddressName]でエラーが発生しました。");
             // レスポンスの解析
             const data = await response.json();
             if (!data.display_name) {
@@ -183,11 +191,8 @@ window.$Util = {
             // 整形した文字列の返却
             return `${primary}${secondary}`;
         } catch (error) {
-            // エラーハンドリング
-            if (typeof errorProc === 'function') {
-                errorProc("fetchAddress", error);
-            }
-            return "住所の取得中にエラーが発生しました。";
+            console.log("error:", error);
+            return "住所を取得できませんでした。";
         }
     },
     // 絵文字ピッカー
@@ -270,18 +275,20 @@ window.$Util = {
     // 遷移用のアクション関数
     async OpenSafeUrl(url) {
         if (!url) return;
+        if (!$App.AppData.Context.IsOnline) {
+            $Notice.Warn("オフライン中は、機能が制限されます。");
+            return;
+        }
         const isSafe = this.IsSafeUrl(url);
         // ダイアログのメッセージとボタン名を変える
         const title = isSafe ? "外部アプリ/サイトを開く" : "セキュリティ警告";
         const message = isSafe 
             ? `次のリンクを開きます。よろしいですか？\n\n${url}`
-            : `安全性が確認されていないURLです。\n直接アクセスせず、Googleで安全性を検索しますか？\n\n${url}`;
-        const btnLabel = isSafe ? "開く" : "Googleで検索";
+            : `安全性が確認されていないURLなので\ngoogle検索結果からリンクしてください。\n\n${url}`;
         // 必ず確認ダイアログを出す
         const isOk = await $Dialog.ShowConfirm({
             title: title,
             message: message,
-            label: btnLabel
         });
         if (!isOk) return; // キャンセルなら何もしない
         if (isSafe) {

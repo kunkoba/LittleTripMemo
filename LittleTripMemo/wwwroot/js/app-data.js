@@ -45,38 +45,39 @@ window.$Data = {
                 }
                 options.body = JSON.stringify(params);
             }
-            // 接続
+            // 接続準備
             $Notice.Loading.Show();
-            // const response = await fetch(BaseUrl + url, options);
             let response;
             try {
+                // サーバ接続
                 response = await fetch(BaseUrl + url, options);
             } catch (err) {
+                console.log("err:", err);
                 // ネットワーク断（オフライン）などの物理エラー
-                await $App.HandleServerFailure(0);
+                await $App.HandleServerFailure();
                 return false;
             }
             if (!response.ok) {
                 // 401, 500 などのステータスエラーを判定会議へ投げる
-                await $App.HandleServerFailure(response.status);
+                await $App.HandleServerFailure(response);
                 return false; // 以降の処理（json解析など）を中止
             }
+            // // 結果
+            // if (!response.ok) {
+            //     if (response.status === 401) {
+            //         $App.AppData.Owner.Token = null;
+            //         $App.AppData.Context.IsLoggedIn = false;
+            //         $Dialog.ShowLoginDialog();
+            //         return false;
+            //     }
+            //     const errData = await response.json();
+            //     console.log("errData:", errData);
+            //     const errMsg = errData.Message || errData.message || "同期失敗";
+            //     const err = new Error(errMsg);
+            //     err.debugInfo = errData.debugInfo;
+            //     throw err;
+            // }
             $Notice.Loading.Hide();
-            // 結果
-            if (!response.ok) {
-                if (response.status === 401) {
-                    $App.AppData.Owner.Token = null;
-                    $App.AppData.Context.IsLoggedIn = false;
-                    $Dialog.ShowLoginDialog();
-                    return false;
-                }
-                const errData = await response.json();
-                console.log("errData:", errData);
-                const errMsg = errData.Message || errData.message || "同期失敗";
-                const err = new Error(errMsg);
-                err.debugInfo = errData.debugInfo;
-                throw err;
-            }
             const result = await response.json();
             console.log("■ Result:", url, result);
             const data = structuredClone(result.data);  // 値渡し

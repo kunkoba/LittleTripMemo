@@ -124,7 +124,7 @@ public class DetailPubRepository : _BaseRepository
     /// </summary>
     public async Task<IEnumerable<TMemoDetailPub>> GetByLocationBasicAsync(
         decimal latMin, decimal latMax, decimal lngMin, decimal lngMax,
-        string? keyword, int sortField, Guid loginUserId, int limit = 50)
+        string? keyword, int sortField, Guid loginUserId, int limit = 20)
     {
         var parameters = new DynamicParameters();
         parameters.Add("lat_min", latMin); parameters.Add("lat_max", latMax);
@@ -136,7 +136,7 @@ public class DetailPubRepository : _BaseRepository
         string orderBy = sortField == 2 ? "d.update_tim DESC" : "d.create_tim DESC";
 
         var sql = $@"
-        SELECT d.*, a.title AS a_title
+        SELECT d.*, a.title AS a_title, a.currency_unit
         FROM t_memo_detail_pub d
         INNER JOIN t_memo_archive_pub a ON d.archive_id = a.archive_id
         WHERE d.latitude  BETWEEN @lat_min AND @lat_max
@@ -161,7 +161,7 @@ public class DetailPubRepository : _BaseRepository
     /// </summary>
     public async Task<IEnumerable<TMemoDetailPub>> GetByLocationRankAsync(
         decimal latMin, decimal latMax, decimal lngMin, decimal lngMax,
-        string? keyword, int reactionType, Guid loginUserId, int limit = 50)
+        string? keyword, int reactionType, Guid loginUserId, int limit = 20)
     {
         var parameters = new DynamicParameters();
         parameters.Add("lat_min", latMin); parameters.Add("lat_max", latMax);
@@ -180,7 +180,7 @@ public class DetailPubRepository : _BaseRepository
         };
 
         var sql = $@"
-        SELECT d.*, a.title AS a_title,
+        SELECT d.*, a.title AS a_title, a.currency_unit,
             COUNT(CASE WHEN r.reaction_type = 1 THEN 1 END) as count_funny,
             COUNT(CASE WHEN r.reaction_type = 2 THEN 1 END) as count_helpful,
             COUNT(CASE WHEN r.reaction_type = 3 THEN 1 END) as count_surprise,
@@ -200,8 +200,9 @@ public class DetailPubRepository : _BaseRepository
             parameters.Add("keyword", $"%{keyword}%");
         }
 
-        sql += $@" GROUP BY d.archive_id, d.seq, a.title
-               ORDER BY {orderCol} DESC LIMIT @limit";
+        sql += $@"
+                GROUP BY d.archive_id, d.seq, a.title, a.currency_unit
+                ORDER BY {orderCol} DESC LIMIT @limit";
 
         return await QueryAsync<TMemoDetailPub>(sql, parameters);
     }
