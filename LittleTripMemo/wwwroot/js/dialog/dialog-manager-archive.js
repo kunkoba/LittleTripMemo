@@ -102,7 +102,7 @@ export default {
         });
     },
     // 検索結果用リスト
-    ShowDetailsSearchResult() {
+    ShowDetailsSearchResult_2() {
         // ソートしない
         const details = $Data.Store.GetDetails();
         console.log("ShowDetailsSearchResult:", details);
@@ -112,7 +112,7 @@ export default {
         }
         const el = $Dom.GenerateTemplate("tpl-list-parent");
         details.forEach((item, index) => {
-            const child = $Dom.GenerateTemplate("tpl-list-child-simple");
+            const child = $Dom.GenerateTemplate("tpl-list-child-search");
             const dateStr = (item.memo_date || "");
             $Dom.QuerySelector(".js-date", child).textContent = dateStr;
             $Dom.QuerySelector(".js-time", child).textContent = item.memo_time || "";
@@ -156,6 +156,77 @@ export default {
             };
             el.appendChild(child);
         });
+        this._core.open({
+            title: "SEARCH RESULTS",
+            content: el,
+            help: "",
+            buttons: []
+        });
+    },
+    // 検索結果用リスト
+    ShowDetailsSearchResult() {
+        const details = $Data.Store.GetDetails();
+        if (!details || details.length === 0) {
+            $Notice.Warn("データはありません。");
+            return;
+        }
+        const el = $Dom.GenerateTemplate("tpl-list-parent");
+        const rt = $Const.REACTION_TYPE; // 定数ショートカット
+
+        details.forEach((item, index) => {
+            const child = $Dom.GenerateTemplate("tpl-list-child-search");
+            
+            // --- 基本・追加情報の反映 ---
+            $Dom.QuerySelector(".js-index", child).textContent = (index + 1);
+            $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
+            $Dom.QuerySelector(".js-archive-title", child).textContent = item.a_title || "(No Archive)";
+            $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
+            $Dom.QuerySelector(".js-body", child).textContent = (item.body || "").replace(/\r?\n/g, ' ');
+
+            // --- 日時 (作成・更新) ---
+            $Dom.QuerySelector(".js-create-tim", child).textContent = $Util.FormatDate(item.create_tim, 'YYYY.MM.DD HH:mm');
+            $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY.MM.DD HH:mm');
+
+            // --- リアクション統計 (定数から絵文字を取得) ---
+            $Dom.QuerySelector(".js-icon-funny", child).textContent = rt.FUNNY.emoji;
+            $Dom.QuerySelector(".js-count-funny", child).textContent = item.count_funny || 0;
+            $Dom.QuerySelector(".js-icon-love", child).textContent = rt.LOVE.emoji;
+            $Dom.QuerySelector(".js-count-love", child).textContent = item.count_helpful || 0;
+            $Dom.QuerySelector(".js-icon-surprise", child).textContent = rt.SURPRISE.emoji;
+            $Dom.QuerySelector(".js-count-surprise", child).textContent = item.count_surprise || 0;
+            $Dom.QuerySelector(".js-icon-sad", child).textContent = rt.SAD.emoji;
+            $Dom.QuerySelector(".js-count-sad", child).textContent = item.count_empathy || 0;
+
+            // --- 金額エリア（既存ロジック維持） ---
+            const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
+            const priceEl = $Dom.QuerySelector(".js-memo-price", child);
+            const currencyEl = $Dom.QuerySelector(".js-memo-currency", child);
+            const price = Number(item.memo_price || 0);
+            if (price !== 0) {
+                $Dom.ToggleShow(priceWrapper, true);
+                let displayCurrency = item.currency_unit || 'JPY';
+                if (item.archive_id > 0) {
+                    const archiveList = $Data.Store.GetArchiveList() || [];
+                    const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
+                    if (targetArc && targetArc.currency_unit) displayCurrency = targetArc.currency_unit;
+                }
+                currencyEl.textContent = displayCurrency;
+                if (price > 0) {
+                    priceEl.textContent = `+${price.toLocaleString()}`;
+                    priceEl.classList.add("text-blue-500");
+                } else {
+                    priceEl.textContent = price.toLocaleString();
+                    priceEl.classList.add("text-red-500");
+                }
+            }
+
+            child.onclick = () => {
+                this._core.closeAll();
+                $Marker.SelectMarker(index);
+            };
+            el.appendChild(child);
+        });
+
         this._core.open({
             title: "SEARCH RESULTS",
             content: el,

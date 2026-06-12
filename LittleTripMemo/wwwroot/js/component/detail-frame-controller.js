@@ -24,10 +24,17 @@ const _DetailFrameCore = {
                 this.btnMoveNext = $Dom.GetElementById("detail-btn-next");
                 this.btnMoveLast = $Dom.GetElementById("detail-btn-last");
                 this.groupReaction = $Dom.GetElementById("detail-group-reaction");
-                this.btnReactionFunny = $Dom.GetElementById("detail-btn-funny");
-                this.btnReactionHelpful = $Dom.GetElementById("detail-btn-helpful");
-                this.btnReactionSurprise = $Dom.GetElementById("detail-btn-surprise");
-                this.btnReactionSad = $Dom.GetElementById("detail-btn-sad");
+                // this.btnReactionFunny = $Dom.GetElementById("detail-btn-funny");
+                // this.btnReactionHelpful = $Dom.GetElementById("detail-btn-helpful");
+                // this.btnReactionSurprise = $Dom.GetElementById("detail-btn-surprise");
+                // this.btnReactionSad = $Dom.GetElementById("detail-btn-sad");
+                // リアクションボタンを定数から一括取得・登録
+                this.reactionButtons = {};
+                Object.values($Const.REACTION_TYPE).forEach(type => {
+                    const btn = $Dom.GetElementById(type.btnId);
+                    this.reactionButtons[type.id] = btn;
+                    btn.addEventListener("click", () => this._onReactionClick(type));
+                });
                 // 
                 this.mapBarrier = $Dom.GetElementById("ui-map-barrier");
             }
@@ -153,11 +160,11 @@ const _DetailFrameCore = {
                 this.btnMoveNext.addEventListener("click",  () => this._moveAndRender(() => $Marker.FocusNext()));
                 this.btnMoveLast.addEventListener("click",  () => this._moveAndRender(() => $Marker.FocusLast()));
                 this.mapBarrier.addEventListener("click", () => this.handleCloseOrCancel());
-                // リアクションボタン
-                this.btnReactionFunny.addEventListener("click", () => this._onReactionClick("is_funny", 1));
-                this.btnReactionHelpful.addEventListener("click", () => this._onReactionClick("is_love", 2));
-                this.btnReactionSurprise.addEventListener("click", () => this._onReactionClick("is_surprise", 3));
-                this.btnReactionSad.addEventListener("click", () => this._onReactionClick("is_sad", 4));
+                // // リアクションボタン
+                // this.btnReactionFunny.addEventListener("click", () => this._onReactionClick("is_funny", 1));
+                // this.btnReactionHelpful.addEventListener("click", () => this._onReactionClick("is_love", 2));
+                // this.btnReactionSurprise.addEventListener("click", () => this._onReactionClick("is_surprise", 3));
+                // this.btnReactionSad.addEventListener("click", () => this._onReactionClick("is_sad", 4));
             }
         }
     },
@@ -260,7 +267,7 @@ const _DetailFrameCore = {
         $Map.ResizeMap(400);
     },
     // リアクションのカウントと状態を反映する
-    async renderReactions(detail) {
+    async renderReactions_2(detail) {
         if (!detail) return;
         // --- 【追加】UIの初期化（リセット） ---
         const btns = [this.btnReactionFunny, this.btnReactionHelpful, this.btnReactionSurprise, this.btnReactionSad];
@@ -297,8 +304,27 @@ const _DetailFrameCore = {
             }
         });
     },
+    async renderReactions(detail) {
+        if (!detail) return;
+        const myLocal = await $LocalDb.Reaction.Get(detail.archive_id, detail.seq) || {};
+        Object.values($Const.REACTION_TYPE).forEach(type => {
+            const btn = this.reactionButtons[type.id];
+            const emojiSpan = btn.querySelector('span:not(.js-count)');
+            if (emojiSpan) emojiSpan.textContent = type.emoji;
+            if (!btn) return;
+            // 数値の計算：サーバー値 + 自分のローカルフラグ
+            const count = (detail[`count_${type.prop.split('_')[1]}`] || 0) + (myLocal[type.prop] ? 1 : 0);
+            $Dom.QuerySelector('.js-count', btn).textContent = count;
+            // 自分の選択状態を反映
+            const isActive = myLocal[type.prop];
+            btn.classList.toggle('text-brand-5', isActive);
+            btn.classList.toggle('border-brand-3', isActive);
+            btn.classList.toggle('bg-brand-1', isActive);
+            btn.classList.toggle('shadow-brand', isActive);
+        });
+    },
     // リアクションボタンクリック
-    async _onReactionClick(propName, unusedType) {
+    async _onReactionClick_2(propName, unusedType) {
         // 未ログイン時はダイアログを出して処理を中断
         if (!$App.AppData.Context.IsLoggedIn) {
             $Dialog.ShowLoginDialog();
@@ -322,6 +348,20 @@ const _DetailFrameCore = {
         // 4. 送信フラグを 0 (未送信) に設定
         myLocal.send_flag = 0;
         // 5. ローカルDBへ保存 ＆ UIを即座に再描画
+        await $LocalDb.Reaction.Save(myLocal);
+        await this.renderReactions(detail);
+    },
+    async _onReactionClick(type) {
+        const detail = $DetailContent.GetFormEditData();
+        if (!detail || !detail.archive_id) return;
+        if (detail.is_owner) return $Notice.Warn("You cannot react to your own memories.");
+        let myLocal = await $LocalDb.Reaction.Get(detail.archive_id, detail.seq);
+        if (!myLocal) {
+            myLocal = { archive_id: Number(detail.archive_id), seq: Number(detail.seq) };
+        }
+        // 定数で定義されたプロパティ名を反転
+        myLocal[type.prop] = !myLocal[type.prop];
+        myLocal.send_flag = 0;
         await $LocalDb.Reaction.Save(myLocal);
         await this.renderReactions(detail);
     },

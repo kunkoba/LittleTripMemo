@@ -23,12 +23,12 @@ window.$Const = {
         UPDATED: 2, // 登録順
         REACTION: 3, // 登録順
     },
-    // リアクション種別
+    // リアクション種別（ID, 絵文字, DBプロパティ名, ボタンID を統合）
     REACTION_TYPE: {
-        FUNNY:    { id: 1, emoji: '🤣' }, //笑える
-        LOVE:     { id: 2, emoji: '😍' }, //好き
-        SURPRISE: { id: 3, emoji: '😮' }, //びっくり
-        SAD:      { id: 4, emoji: '😭' }, //悲しい
+        FUNNY:    { id: 1, emoji: '🤣', prop: 'is_funny',    btnId: 'detail-btn-funny' },
+        LOVE:     { id: 2, emoji: '😍', prop: 'is_love',     btnId: 'detail-btn-helpful' },
+        SURPRISE: { id: 3, emoji: '😮', prop: 'is_surprise', btnId: 'detail-btn-surprise' },
+        SAD:      { id: 4, emoji: '😰', prop: 'is_sad',      btnId: 'detail-btn-sad' },
     },
     // 全体通知種別
     NOTICE_KIND: {
