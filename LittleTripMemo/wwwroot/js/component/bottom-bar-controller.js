@@ -10,7 +10,6 @@ const _BottomCore = {
 				this.btnCreate = $Dom.GetElementById('btn-create');
 				this.btnSearch = $Dom.GetElementById('btn-search');
 				this.btnAppMenu = $Dom.GetElementById('btn-app-menu');
-				// this.popAppMenu = $Dom.GetElementById('pop-app-menu');
 				this.groupMove = $Dom.GetElementById('bot-group-move');
 				this.btnFirst = $Dom.GetElementById('btn-bot-move-first');
 				this.btnPrev = $Dom.GetElementById('btn-bot-move-prev');
