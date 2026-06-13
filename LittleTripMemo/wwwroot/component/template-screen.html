@@ -181,7 +181,7 @@
 	</div>
 </template>
 
-<template id="tpl-view-archive">
+<template id="tpl-view-archive_2">
 	<div class="relative min-h-full flex flex-col bg-white">
         <!-- ▼ 新設：状態表示バッジ（全体が1つのボタンになっています） -->
         <button id="btn-status-change" class="w-full flex bg-slate-50 rounded-full p-1 mb-4 border border-slate-100 shadow-inner outline-none active:scale-[0.98] transition-transform">
@@ -230,6 +230,90 @@
 		</div>
 	</div>
 </template>
+<template id="tpl-view-archive">
+	<div class="relative min-h-full flex flex-col bg-white">
+        
+        <!-- ユーザー情報と件数 -->
+        <div class="flex items-center justify-between gap-2 mb-3">
+            <button id="btn-mem-user-profile"
+                class="rounded-full pl-2 pr-4 h-10 max-w-[200px] min-w-[100px] border-4 shadow-md flex items-center gap-2 bg-white outline-none active:opacity-60 transition-opacity">
+                <span id="view-mem-user-icon" class="text-[1.4rem] drop-shadow-md"></span>
+                <span id="view-mem-user-id" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
+            </button>
+			<button id="btn-view-mem-timeline" class="h-10 shadow-md rounded-[1rem] flex items-center justify-center gap-2 active:scale-95 transition-transform px-4 outline-none bg-white">
+				<span id="mem-stat-count" class="text-[1.1rem] font-black text-slate-800">0</span>
+				<span class="text-[0.7rem] font-bold text-slate-400 uppercase tracking-wider">memos</span>
+			</button>
+        </div>
+		<!-- タイトル -->
+		<div class="mb-3">
+			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight border-l-4 border-brand-3 pl-3"></h1>
+		</div>
+		<!-- 本文 -->
+		<div id="view-mem-body" class="flex-1 bg-brand-1 rounded-lg p-3 text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words mb-3 min-h-[100px] overflow-y-auto">
+		</div>
+		<!-- 金額とリンク -->
+		<div class="pb-3 flex items-end justify-between border-b border-slate-100">
+            <div class="pl-3 flex items-baseline italic border-b-2 border-brand-3 pb-0.5">
+                <span id="mem-stat-price" class="text-[1.2rem] font-black italic leading-none"></span>
+                <span id="view-mem-price-unit" class="text-[0.7rem] font-bold text-slate-400 ml-1.5 uppercase leading-none"></span>
+            </div>
+			<a id="view-mem-url" href="" target="_blank" class="shrink-0 w-12 h-12 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50 outline-none">
+			</a>
+		</div>
+        <!-- ========================================== -->
+        <!-- ▼ 状態変更の3連ボタン（最下段に固定） -->
+        <!-- ========================================== -->
+        <div class="mt-auto pt-4 pb-2 w-full">
+            
+            <!-- ① 現在が <private> の場合 -->
+            <div id="status-group-private" class="hidden flex gap-2 w-full">
+                <!-- 1: 解体 (押せる/影あり) -->
+                <button id="btn-status-priv-memo" class="flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none">
+                    1&gt; memo
+                </button>
+                <!-- 2: private (現在地/押せない/影なし・内側シャドウ) -->
+                <button class="flex-1 h-11 bg-brand-5 text-white font-black text-[0.75rem] rounded-[0.5rem] shadow-inner border border-brand-5 cursor-default tracking-wider outline-none">
+                    2&gt; private
+                </button>
+                <!-- 3: closeへ遷移 (public表記/押せる/影あり) -->
+                <button id="btn-status-priv-public" class="flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none">
+                    3&gt; public
+                </button>
+            </div>
+            <!-- ② 現在が <close> の場合 -->
+            <div id="status-group-close" class="hidden flex gap-2 w-full">
+                <!-- 2: privateへ遷移 (押せる/影あり) -->
+                <button id="btn-status-close-priv" class="flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none">
+                    2&gt; private
+                </button>
+                <!-- 3: close (現在地/押せない/影なし・内側シャドウ) -->
+                <button class="flex-1 h-11 bg-brand-5 text-white font-black text-[0.75rem] rounded-[0.5rem] shadow-inner border border-brand-5 cursor-default tracking-wider outline-none">
+                    3&gt; close
+                </button>
+                <!-- 4: openへ遷移 (押せる/影あり) -->
+                <button id="btn-status-close-open" class="flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none">
+                    4&gt; open
+                </button>
+            </div>
+            <!-- ③ 現在が <open> の場合 -->
+            <div id="status-group-open" class="hidden flex gap-2 w-full">
+                <!-- 2: privateへ遷移 (押せる/影あり) -->
+                <button id="btn-status-open-priv" class="flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none">
+                    2&gt; private
+                </button>
+                <!-- 3: closeへ遷移 (押せる/影あり) -->
+                <button id="btn-status-open-close" class="flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none">
+                    3&gt; close
+                </button>
+                <!-- 4: open (現在地/押せない/影なし・内側シャドウ) -->
+                <button class="flex-1 h-11 bg-brand-5 text-white font-black text-[0.75rem] rounded-[0.5rem] shadow-inner border border-brand-5 cursor-default tracking-wider outline-none">
+                    4&gt; open
+                </button>
+            </div>
+        </div>
+	</div>
+</template>
 
 <template id="tpl-edit-archive">
     <div class="w-full text-black-5 space-y-4 mb-4">
@@ -260,16 +344,6 @@
                 <img id="share-qr-image" src="" alt="QR Code" class="w-48 h-[200px] object-contain">
             </button>
         </div>
-    </div>
-</template>
-
-<!-- 【ダイアログ子】まとめ状態変更 -->
-<template id="tpl-archive-status-change">
-    <div class="p-6 flex flex-col items-center text-center space-y-4">
-        <div id="status-change-icon" class="text-[3.5rem] drop-shadow-md leading-none mb-2"></div>
-        <div id="status-change-title" class="font-black text-[1.2rem] text-slate-800 tracking-wider"></div>
-        <div class="w-full h-px bg-slate-200"></div>
-        <div id="status-change-desc" class="text-[0.8rem] text-slate-600 leading-[1.8] whitespace-pre-wrap text-left w-full"></div>
     </div>
 </template>
 

@@ -29,11 +29,15 @@ public class AccountRepository : _BaseRepository
         // テーブル番号は外部入力のため、数値前提で制御
         var tableName = $"t_memo_detail_{tableNo}";
 
-        // 動的テーブル名のため ExecuteScalarAsync<T> を直接使用
-        var sql = $"SELECT COUNT(*) FROM {tableName}";
+        // システムカタログ(pg_class)からタプル推定数を取得
+        const string sql = @"
+        SELECT reltuples::BIGINT 
+        FROM pg_class 
+        WHERE relname = @tableName";
 
         return await ExecuteScalarAsync<long>(sql);
     }
+
 }
 
 

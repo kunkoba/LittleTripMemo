@@ -635,7 +635,7 @@ export default {
         updateSelectionUI(); // フッターボタン生成後に再度呼んで初期状態の disabled を反映
     },
     // まとめ親詳細参照（アーカイブ）
-    ShowArchiveInfo() {
+    ShowArchiveInfo_2() {
         const archive = $Data.Store.GetArchive();
         // 管理者かどうかの判定
         const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.plan === "Admin";
@@ -856,6 +856,362 @@ export default {
             help: "",
             headerButtons: headerButtons, // ここで上段ボタンを渡す
             buttons: dialogButtons,
+        });
+    },
+    // まとめ親詳細参照（アーカイブ）
+    ShowArchiveInfo() {
+        const archive = $Data.Store.GetArchive();
+        const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.plan === "Admin";
+        
+        const el = $Dom.GenerateTemplate('tpl-view-archive');
+        
+        const renderView = () => {
+            // 常に最新のデータを取得
+            const currentArchive = $Data.Store.GetArchive(); 
+
+            // ==========================================
+            // ▼ ステータスボタンの表示切替とイベント登録
+            // ==========================================
+            const groupPriv  = $Dom.QuerySelector('#status-group-private', el);
+            const groupClose = $Dom.QuerySelector('#status-group-close', el);
+            const groupOpen  = $Dom.QuerySelector('#status-group-open', el);
+
+            // 一旦すべて隠す
+            $Dom.ToggleShow(groupPriv, false);
+            $Dom.ToggleShow(groupClose, false);
+            $Dom.ToggleShow(groupOpen, false);
+
+            if (currentArchive.is_owner) {
+                if (!currentArchive.is_public) {
+                    // ① PRIVATE 状態
+                    $Dom.ToggleShow(groupPriv, true);
+                    
+                    // 1> memo (解体)
+                    $Dom.QuerySelector('#btn-status-priv-memo', el).onclick = () => {
+                        this._execStatusChange(
+                            'DeleteArchive',
+                            { archive_id: currentArchive.archive_id },
+                            "RESTORE TO DETAILS",
+                            "このまとめを解体し、単独のメモに戻しますか？",
+                            "単体のメモに戻しました。",
+                            $Const.SCREEN_MODE.CREATE
+                        );
+                    };
+                    // 3> public (Close状態へ移行)
+                    $Dom.QuerySelector('#btn-status-priv-public', el).onclick = () => {
+                        this._execStatusChange(
+                            'PublishArchive',
+                            { archive_id: currentArchive.archive_id },
+                            "SWITCH TO CLOSE",
+                            "まとめを [CLOSE] 状態（URLを知っている人のみ閲覧可）にしますか？",
+                            "[CLOSE] 状態に移行しました。",
+                            $Const.SCREEN_MODE.ARCHIVE_PUB,
+                            () => $Data.Store.UpdateArchive({ is_public: true, closed_flg: true })
+                        );
+                    };
+
+                } else if (currentArchive.closed_flg) {
+                    // ② CLOSE 状態
+                    $Dom.ToggleShow(groupClose, true);
+                    
+                    // 2> private (戻す)
+                    $Dom.QuerySelector('#btn-status-close-priv', el).onclick = () => {
+                        this._execStatusChange(
+                            'UnpublishArchive',
+                            { archive_id: currentArchive.archive_id },
+                            "SWITCH TO PRIVATE",
+                            "完全に非公開 (PRIVATE) に戻しますか？",
+                            "[PRIVATE] に戻しました。",
+                            $Const.SCREEN_MODE.ARCHIVE,
+                            () => $Data.Store.UpdateArchive({ is_public: false, closed_flg: false })
+                        );
+                    };
+                    // 4> open (公開へ移行)
+                    $Dom.QuerySelector('#btn-status-close-open', el).onclick = () => {
+                        this._execStatusChange(
+                            'OpenArchive',
+                            { archive_id: currentArchive.archive_id },
+                            "SWITCH TO OPEN",
+                            "まとめをマップ上に公開 (OPEN) しますか？",
+                            "[OPEN] に切り替えました。",
+                            null,
+                            () => $Data.Store.UpdateArchive({ closed_flg: false })
+                        );
+                    };
+
+                } else {
+                    // ③ OPEN 状態
+                    $Dom.ToggleShow(groupOpen, true);
+                    
+                    // 2> private (戻す)
+                    $Dom.QuerySelector('#btn-status-open-priv', el).onclick = () => {
+                        this._execStatusChange(
+                            'UnpublishArchive',
+                            { archive_id: currentArchive.archive_id },
+                            "SWITCH TO PRIVATE",
+                            "完全に非公開 (PRIVATE) に戻しますか？",
+                            "[PRIVATE] に戻しました。",
+                            $Const.SCREEN_MODE.ARCHIVE,
+                            () => $Data.Store.UpdateArchive({ is_public: false, closed_flg: false })
+                        );
+                    };
+                    // 3> close (戻す)
+                    $Dom.QuerySelector('#btn-status-open-close', el).onclick = () => {
+                        this._execStatusChange(
+                            'CloseArchive',
+                            { archive_id: currentArchive.archive_id },
+                            "SWITCH TO CLOSE",
+                            "公開を一時停止 (CLOSE) しますか？",
+                            "[CLOSE] に切り替えました。",
+                            null,
+                            () => $Data.Store.UpdateArchive({ closed_flg: true })
+                        );
+                    };
+                }
+            } else {
+                // オーナーでない場合は、3連ボタンの親枠（mt-auto のコンテナ）ごと非表示にする
+                const statusBarParent = groupPriv.parentElement;
+                if (statusBarParent) {
+                    $Dom.ToggleShow(statusBarParent, false);
+                }
+            }
+            // ==========================================
+
+            // タイトルと本文の反映
+            $Dom.QuerySelector('#view-mem-title', el).textContent = currentArchive.title || "";
+            $Dom.QuerySelector('#view-mem-body', el).textContent = currentArchive.memo || "";
+            
+            // リンクの反映
+            const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
+            if (currentArchive.link_url) {
+                const iconHtml = $Util.GetUrlIconHtml(currentArchive.link_url, 28);
+                viewUrl.href = currentArchive.link_url;
+                viewUrl.innerHTML = iconHtml;
+                $Dom.ToggleShow(viewUrl, true);
+            } else {
+                $Dom.ToggleShow(viewUrl, false);
+            }
+            
+            // 件数の反映
+            const details = $Data.Store.GetDetails() || [];
+            $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
+            $Dom.QuerySelector('#btn-view-mem-timeline', el).onclick = () => {
+                this.ShowDetailsTimeLine();
+            };
+            
+            // 金額の反映
+            const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
+            const priceVal = $Dom.QuerySelector('#mem-stat-price', el);
+            const priceUnit = $Dom.QuerySelector('#view-mem-price-unit', el);
+            const displayCurrency = currentArchive.currency_unit || $App.AppData.Owner.Currency_unit || 'JPY';
+            priceUnit.textContent = displayCurrency;
+            if (totalPrice > 0) {
+                priceVal.className += " text-blue-600";
+                priceVal.textContent = `+${totalPrice.toLocaleString()}`;
+            } else if (totalPrice < 0) {
+                priceVal.className += " text-red-600";
+                priceVal.textContent = `- ${Math.abs(totalPrice).toLocaleString()}`;
+            } else {
+                priceVal.className += " text-black-5";
+                priceVal.textContent = `0`;
+            }
+        };
+        
+        // 初期描画の実行
+        renderView();
+
+        const btnUserProfile = $Dom.QuerySelector('#btn-mem-user-profile', el);
+        const profile = $Data.Store.GetUserProfile();
+        if (profile) {
+            $Dom.QuerySelector('#view-mem-user-icon', el).textContent = profile.icon || "😀";
+            $Dom.QuerySelector('#view-mem-user-id', el).textContent = profile.nick_name;
+            btnUserProfile.onclick = () => this.ShowUserProfile(profile, archive.is_owner);
+        } else {
+            $Dom.ToggleShow(btnUserProfile, false);
+        }
+
+        // --- ヘッダーボタンの定義 ---
+        const headerButtons = [];
+        if (archive.is_public && !archive.closed_flg) {
+            headerButtons.push({
+                label: "🔗",
+                handler: () => this.ShowShareArchive(archive, profile)
+            });
+        }
+        if (archive.is_owner) {
+            headerButtons.push({
+                label: "✏️",
+                handler: () => this.ShowEditArchive(archive, renderView)
+            });
+        }
+        if (!archive.is_owner) {
+            headerButtons.push({
+                label: "🚫",
+                handler: () => this.ShowReportPost(archive)
+            });
+        }
+
+        // --- 管理者専用ボタン ---
+        const dialogButtons = [];
+        if (isAdmin && archive.is_public && !archive.is_owner) {
+            if (!archive.closed_flg) {
+                dialogButtons.push([{
+                    label: "【ADMIN】強制 Close",
+                    className: "bg-red-500 text-white shadow-md",
+                    handler: async () => {
+                        const isOk = await this.ShowConfirm({ title: "ADMIN: CLOSE", help: "", message: "【注意】\n強制的にClose状態にしますか？" });
+                        if (!isOk) return;
+                        const isSuccess = await $Data.Access.AdminCloseArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
+                        if (!isSuccess) return;
+                        $Notice.Info("強制的にCloseしました");
+                        this._core.closeAll();
+                        $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                        await $App.RefreshScreen();
+                    }
+                }]);
+            }
+            dialogButtons.push([{
+                label: "【ADMIN】強制 Privateに戻す",
+                className: "bg-white text-red-600 border-2 border-red-500 shadow-sm",
+                handler: async () => {
+                    const isOk = await this.ShowConfirm({ title: "ADMIN: UNPUBLISH", help: "", message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？" });
+                    if (!isOk) return;
+                    const isSuccess = await $Data.Access.AdminUnpublishArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
+                    if (!isSuccess) return;
+                    $Notice.Info("強制的にPrivateに戻しました");
+                    this._core.closeAll();
+                    $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                    await $App.RefreshScreen();
+                }
+            }]);
+        }
+
+        this._core.open({
+            title: "Archive info",
+            content: el,
+            help: "",
+            headerButtons: headerButtons,
+            buttons: dialogButtons, // 一般ユーザーはダイアログ下部フッター(buttons)は無し
+        });
+    },
+    // 状態変更専用ダイアログ
+    ShowStatusChangeDialog(archive) {
+        const el = $Dom.GenerateTemplate("tpl-archive-status-change");
+        const iconEl = $Dom.QuerySelector("#status-change-icon", el);
+        const titleEl = $Dom.QuerySelector("#status-change-title", el);
+        const descEl = $Dom.QuerySelector("#status-change-desc", el);
+        let title, desc, icon, buttons = [];
+        const btnMainClass = "bg-brand-5 text-white shadow-md font-bold";
+        const btnSubClass = "bg-white text-slate-600 border border-slate-300 shadow-md font-bold";
+        const btnDangerClass = "bg-red-50 text-red-500 border border-red-300 shadow-md font-bold";
+        if (!archive.is_public) {
+            // ===================================
+            // 【現在 PRIVATE の場合】 -> CLOSE または 解体
+            // ===================================
+            title = "PRIVATE 状態";
+            icon = "🔒";
+            desc = "現在のステータスは「PRIVATE」です。\n自分以外のユーザーは見ることはできません。\n\n「公開するか解体するか」を選択できます。\n\n※「公開（PUBLIC）」状態に移行すると「公開する準備」が整いますが、即座に公開されるわけではありません。";
+            buttons.push([{
+                label: "🔒　Private　⇒　－　Public",
+                className: btnMainClass,
+                handler: () => this._execStatusChange(
+                    'PublishArchive',
+                    { archive_id: archive.archive_id },
+                    "Switch to [CLOSE]",
+                    "まとめを [CLOSE] 状態にしますか？",
+                    "[CLOSE] 状態に移行しました。",
+                    $Const.SCREEN_MODE.ARCHIVE_PUB, // Publicモードへ移行
+                    () => $Data.Store.UpdateArchive({ is_public: true, closed_flg: true })
+                )
+            }]);
+            buttons.push([{
+                label: "まとめを解体する",
+                className: btnDangerClass,
+                handler: () => this._execStatusChange(
+                    'DeleteArchive',
+                    { archive_id: archive.archive_id },
+                    "Restore to Details",
+                    "このまとめを解体し、単体のメモに戻しますか？",
+                    "単体のメモに戻しました。",
+                    $Const.SCREEN_MODE.CREATE
+                )
+            }]);
+        } else if (archive.closed_flg) {
+            // ===================================
+            // 【現在 CLOSE の場合】 -> OPEN または PRIVATE
+            // ===================================
+            title = "CLOSE 状態";
+            icon = "－";
+            desc = "現在は「公開準備中 (CLOSE)」です。\nURLを知っているユーザーのみアクセス可能です。\n\n「OPEN」に切り替えるとマップ上に公開され、全てのユーザーが検索・閲覧できるようになります。";
+            buttons.push([{
+                label: "－　CLOSE　⇒　◎　OPEN",
+                className: btnMainClass,
+                handler: () => this._execStatusChange(
+                    'OpenArchive',
+                    { archive_id: archive.archive_id },
+                    "Switch to [OPEN]",
+                    "まとめをマップ上に公開(OPEN)しますか？",
+                    "[OPEN] に切り替えました。",
+                    null,
+                    () => $Data.Store.UpdateArchive({ closed_flg: false })
+                )
+            }]);
+            buttons.push([{
+                label: "－　CLOSE　⇒　🔒　PRIVATE",
+                className: btnSubClass,
+                handler: () => this._execStatusChange(
+                    'UnpublishArchive',
+                    { archive_id: archive.archive_id },
+                    "Switch to [PRIVATE]",
+                    "完全に非公開(PRIVATE)に戻しますか？",
+                    "[PRIVATE] に戻しました。",
+                    $Const.SCREEN_MODE.ARCHIVE, // Privateモードへ戻る
+                    () => $Data.Store.UpdateArchive({ is_public: false, closed_flg: false })
+                )
+            }]);
+        } else {
+            // ===================================
+            // 【現在 OPEN の場合】 -> CLOSE または PRIVATE
+            // ===================================
+            title = "OPEN 状態";
+            icon = "◎";
+            desc = "現在は「公開中 (OPEN)」です。\nマップ上に公開され、全てのユーザーが検索・閲覧できます。\n\n一時的にマップから隠す場合は「CLOSE」に、完全に非公開に戻す場合は「PRIVATE」に変更してください。";
+            buttons.push([{
+                label: "◎　OPEN　⇒　－　CLOSE",
+                className: btnMainClass,
+                handler: () => this._execStatusChange(
+                    'CloseArchive',
+                    { archive_id: archive.archive_id },
+                    "Switch to [CLOSE]",
+                    "公開を一時停止(CLOSE)しますか？",
+                    "[CLOSE] に切り替えました。",
+                    null,
+                    () => $Data.Store.UpdateArchive({ closed_flg: true })
+                )
+            }]);
+            buttons.push([{
+                label: "◎　OPEN　⇒　🔒　PRIVATE",
+                className: btnSubClass,
+                handler: () => this._execStatusChange(
+                    'UnpublishArchive',
+                    { archive_id: archive.archive_id },
+                    "Switch to [PRIVATE]",
+                    "完全に非公開(PRIVATE)に戻しますか？",
+                    "[PRIVATE] に戻しました。",
+                    $Const.SCREEN_MODE.ARCHIVE,
+                    () => $Data.Store.UpdateArchive({ is_public: false, closed_flg: false })
+                )
+            }]);
+        }
+        iconEl.textContent = icon;
+        titleEl.textContent = title;
+        descEl.textContent = desc;
+        // すでにダイアログがスタックされる仕様なので、そのまま上に開く
+        this._core.open({
+            title: "CHANGE STATUS",
+            content: el,
+            help: "",
+            buttons: buttons
         });
     },
     // まとめ親編集（上にスタックされる）
