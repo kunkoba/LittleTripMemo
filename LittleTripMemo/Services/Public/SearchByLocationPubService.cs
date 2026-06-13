@@ -12,8 +12,10 @@ public class SearchByLocationPubService : _BaseService
     public record SearchByLocationPubReq(
         decimal lat_min, decimal lat_max,
         decimal lng_min, decimal lng_max,
+        int sortField,     // 1:作成順, 2:更新順, 3:リアクション順
+        int? reactionType,  // 1:funny, 2:love, 3:surprise, 4:sad (sortField=3の時使用)
         string? keyword,
-        int sort_type = 1 // 1:新着, 2:更新, 3~6:リアクション別
+        int limit = 20
     );
     public record Response(IEnumerable<TMemoDetailPub> details);
 
@@ -29,10 +31,13 @@ public class SearchByLocationPubService : _BaseService
     {
         await ValidateAsync(req);
 
-        // 統合された検索メソッドを呼び出す
         var result = await _detailPubRepo.SearchByLocationAsync(
             req.lat_min, req.lat_max, req.lng_min, req.lng_max,
-            req.keyword, req.sort_type, _user.UserId
+            req.keyword,
+            req.sortField,
+            req.reactionType,
+            _user.UserId,
+            req.limit
         );
 
         // 所有者フラグなどをセット

@@ -207,12 +207,12 @@ public class AppController : _BaseController
 
     #region "Public"
 
-    /// <summary>
-    /// 公開済みデータを秘密データにする
-    /// </summary>
-    /// <param name="req"></param>
-    /// <returns></returns>
-    [HttpPost("api/UnpublishArchive")]
+        /// <summary>
+        /// 公開済みデータを秘密データにする
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [HttpPost("api/UnpublishArchive")]
         public async Task<IActionResult> UnpublishArchive([FromBody] UnpublishArchiveService.UnpublishArchiveReq req)
         {
             var result = await _unpublishArchiveService.ExecuteAsync(req);

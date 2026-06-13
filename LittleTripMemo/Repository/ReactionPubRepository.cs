@@ -21,17 +21,17 @@ public class ReactionPubRepository : _BaseRepository
         const string sql = @"
             INSERT INTO t_reaction_pub (
                 archive_id, seq, user_id, 
-                has_funny, has_helpful, has_surprise, has_sad, 
+                has_funny, has_love, has_surprise, has_sad, 
                 update_tim
             ) VALUES (
                 @archive_id, @seq, @user_id, 
-                @has_funny, @has_helpful, @has_surprise, @has_sad, 
+                @has_funny, @has_love, @has_surprise, @has_sad, 
                 CURRENT_TIMESTAMP
             )
             ON CONFLICT (archive_id, seq, user_id) 
             DO UPDATE SET
                 has_funny    = EXCLUDED.has_funny,
-                has_helpful  = EXCLUDED.has_helpful,
+                has_love  = EXCLUDED.has_love,
                 has_surprise = EXCLUDED.has_surprise,
                 has_sad      = EXCLUDED.has_sad,
                 update_tim   = CURRENT_TIMESTAMP";
