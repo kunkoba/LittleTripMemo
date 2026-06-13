@@ -262,55 +262,13 @@
 			</a>
 		</div>
         <!-- ========================================== -->
-        <!-- ▼ 状態変更の3連ボタン（最下段に固定） -->
+        <!-- ▼ 状態変更の4連ボタン（最下段に固定） -->
         <!-- ========================================== -->
-        <div class="mt-auto pt-4 pb-2 w-full">
-            
-            <!-- ① 現在が <private> の場合 -->
-            <div id="status-group-private" class="hidden flex gap-2 w-full">
-                <!-- 1: 解体 (押せる/影あり) -->
-                <button id="btn-status-priv-memo" class="flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none">
-                    1&gt; memo
-                </button>
-                <!-- 2: private (現在地/押せない/影なし・内側シャドウ) -->
-                <button class="flex-1 h-11 bg-brand-5 text-white font-black text-[0.75rem] rounded-[0.5rem] shadow-inner border border-brand-5 cursor-default tracking-wider outline-none">
-                    2&gt; private
-                </button>
-                <!-- 3: closeへ遷移 (public表記/押せる/影あり) -->
-                <button id="btn-status-priv-public" class="flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none">
-                    3&gt; public
-                </button>
-            </div>
-            <!-- ② 現在が <close> の場合 -->
-            <div id="status-group-close" class="hidden flex gap-2 w-full">
-                <!-- 2: privateへ遷移 (押せる/影あり) -->
-                <button id="btn-status-close-priv" class="flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none">
-                    2&gt; private
-                </button>
-                <!-- 3: close (現在地/押せない/影なし・内側シャドウ) -->
-                <button class="flex-1 h-11 bg-brand-5 text-white font-black text-[0.75rem] rounded-[0.5rem] shadow-inner border border-brand-5 cursor-default tracking-wider outline-none">
-                    3&gt; close
-                </button>
-                <!-- 4: openへ遷移 (押せる/影あり) -->
-                <button id="btn-status-close-open" class="flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none">
-                    4&gt; open
-                </button>
-            </div>
-            <!-- ③ 現在が <open> の場合 -->
-            <div id="status-group-open" class="hidden flex gap-2 w-full">
-                <!-- 2: privateへ遷移 (押せる/影あり) -->
-                <button id="btn-status-open-priv" class="flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none">
-                    2&gt; private
-                </button>
-                <!-- 3: closeへ遷移 (押せる/影あり) -->
-                <button id="btn-status-open-close" class="flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none">
-                    3&gt; close
-                </button>
-                <!-- 4: open (現在地/押せない/影なし・内側シャドウ) -->
-                <button class="flex-1 h-11 bg-brand-5 text-white font-black text-[0.75rem] rounded-[0.5rem] shadow-inner border border-brand-5 cursor-default tracking-wider outline-none">
-                    4&gt; open
-                </button>
-            </div>
+        <div id="archive-status-bar" class="mt-auto pt-4 pb-2 w-full flex gap-2">
+            <button id="btn-status-memo" class="hidden"></button>
+            <button id="btn-status-private" class="hidden"></button>
+            <button id="btn-status-close" class="hidden"></button>
+            <button id="btn-status-open" class="hidden"></button>
         </div>
 	</div>
 </template>

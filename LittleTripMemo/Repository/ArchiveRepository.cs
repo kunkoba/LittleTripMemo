@@ -80,20 +80,6 @@ public class ArchiveRepository : _BaseRepository
     }
 
     /// <summary>
-    /// 一覧取得。スネークケースのモデルへそのままマッピング。
-    /// </summary>
-    public async Task<IEnumerable<TMemoArchive>> GetAllAsync()
-    {
-        string sql = @"
-        SELECT * FROM t_memo_archive 
-        WHERE user_id = @user_id AND del_flg = false
-        ORDER BY create_tim DESC";
-
-        // 取得系も継承元のラッパーを使用
-        return await QueryAsync<TMemoArchive>(sql, new { user_id = _user.UserId });
-    }
-
-    /// <summary>
     /// 主キー（archive_id）による1件取得。
     /// </summary>
     public async Task<TMemoArchive?> GetByKeyAsync(int archiveId)
@@ -138,6 +124,41 @@ public class ArchiveRepository : _BaseRepository
     {
         const string sql = "UPDATE t_memo_archive SET del_flg = false, update_tim = CURRENT_TIMESTAMP WHERE archive_id = @archive_id AND user_id = @target_user_id";
         return await ExecuteAsync(sql, new { archive_id = archiveId, target_user_id = targetUserId });
+    }
+
+    /// <summary>
+    /// 明細テーブルから現在の件数を集計し、archiveテーブルの detail_count を更新する
+    /// </summary>
+    public async Task UpdateDetailCountAsync(int archiveId)
+    {
+        // _user.TableId を使って、自分の明細テーブルから件数を取得して更新
+        string sql = $@"
+        UPDATE t_memo_archive a
+        SET detail_count = (
+            SELECT count(*) 
+            FROM t_memo_detail_{_user.TableId} d 
+            WHERE d.archive_id = a.archive_id 
+              AND d.del_flg = false
+        )
+        WHERE a.archive_id = @archiveId 
+          AND a.user_id = @user_id";
+
+        await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
+    }
+
+    /// <summary>
+    /// 一覧取得（JOINなし・高速版）
+    /// </summary>
+    public async Task<IEnumerable<TMemoArchive>> GetAllAsync()
+    {
+        // COUNTのJOINを排除。detail_countカラムをそのまま返す
+        const string sql = @"
+        SELECT * FROM t_memo_archive 
+        WHERE user_id = @user_id 
+          AND del_flg = false
+        ORDER BY create_tim DESC";
+
+        return await QueryAsync<TMemoArchive>(sql, new { user_id = _user.UserId });
     }
 
 }

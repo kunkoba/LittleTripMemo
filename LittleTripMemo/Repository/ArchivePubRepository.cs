@@ -42,20 +42,6 @@ public class ArchivePubRepository : _BaseRepository
         return await ExecuteAsync(sql, archive);
     }
 
-    /// <summary>
-    /// 一覧取得。スネークケースのモデルへそのままマッピング。
-    /// </summary>
-    public async Task<IEnumerable<TMemoArchivePub>> GetAllAsync()
-    {
-        string sql = @"
-        SELECT * FROM t_memo_archive_pub 
-        WHERE user_id = @user_id AND del_flg = false
-        ORDER BY create_tim DESC";
-
-        // 取得系も継承元のラッパーを使用
-        return await QueryAsync<TMemoArchivePub>(sql, new { user_id = _user.UserId });
-    }
-
     public async Task<TMemoArchivePub?> GetByKeyAsync(int archiveId)
     {
         const string sql = @"
@@ -147,4 +133,38 @@ public class ArchivePubRepository : _BaseRepository
         return await QueryAsync<int>(sql, new { ids = ids.ToArray() });
     }
 
+    /// <summary>
+    /// 明細件数を更新
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <returns></returns>
+    public async Task UpdateDetailCountAsync(int archiveId)
+    {
+        const string sql = @"
+        UPDATE t_memo_archive_pub a
+        SET detail_count = (
+            SELECT count(*) 
+            FROM t_memo_detail_pub d 
+            WHERE d.archive_id = a.archive_id 
+              AND d.del_flg = false
+        )
+        WHERE a.archive_id = @archiveId";
+
+        await ExecuteAsync(sql, new { archive_id = archiveId });
+    }
+
+    /// <summary>
+    /// 一覧取得
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IEnumerable<TMemoArchivePub>> GetAllAsync()
+    {
+        const string sql = @"
+        SELECT * FROM t_memo_archive_pub
+        WHERE user_id = @user_id
+          AND del_flg = false
+        ORDER BY create_tim DESC";
+
+        return await QueryAsync<TMemoArchivePub>(sql, new { user_id = _user.UserId });
+    }
 }
