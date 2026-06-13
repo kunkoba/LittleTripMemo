@@ -189,4 +189,40 @@ public class DetailRepository : _BaseRepository
         return await ExecuteAsync(sql, new { archive_id = archiveId, target_user_id = targetUserId });
     }
 
+    // Repository/DetailRepository.cs に追加
+
+    /// <summary>
+    /// 指定された seq リスト（未まとめ明細のみ）を論理削除する
+    /// </summary>
+    public async Task<int> DeleteStrayBySeqsAsync(int[] seqs)
+    {
+        string sql = $@"
+        UPDATE t_memo_detail_{_user.TableId} SET
+            del_flg    = true,
+            update_tim = CURRENT_TIMESTAMP
+        WHERE 
+            seq        = ANY(@seqs)
+            AND archive_id = 0
+            AND user_id    = @user_id";
+
+        return await ExecuteAsync(sql, new { seqs, user_id = _user.UserId });
+    }
+
+    /// <summary>
+    /// 指定された seq リストをアーカイブから切り離す（archive_id を 0 に戻す）
+    /// </summary>
+    public async Task<int> DetachBySeqsAsync(int[] seqs)
+    {
+        string sql = $@"
+        UPDATE t_memo_detail_{_user.TableId} SET
+            archive_id = 0,
+            update_tim = CURRENT_TIMESTAMP
+        WHERE 
+            seq        = ANY(@seqs)
+            AND archive_id > 0
+            AND user_id    = @user_id";
+
+        return await ExecuteAsync(sql, new { seqs, user_id = _user.UserId });
+    }
+
 }

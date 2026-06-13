@@ -27,7 +27,7 @@ export default {
     // タイムライン用リスト
     ShowDetailsTimeLine() {
         // ソートする
-        const details = $Data.Store.GetDetailsSortByTimeline();
+        const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) {
             $Notice.Warn("データはありません。");
             return;
@@ -166,6 +166,7 @@ export default {
     // 検索結果用リスト
     ShowDetailsSearchResult() {
         const details = $Data.Store.GetDetails();
+        console.log("ShowDetailsSearchResult:", details);
         if (!details || details.length === 0) {
             $Notice.Warn("データはありません。");
             return;
@@ -175,18 +176,15 @@ export default {
 
         details.forEach((item, index) => {
             const child = $Dom.GenerateTemplate("tpl-list-child-search");
-            
             // --- 基本・追加情報の反映 ---
             $Dom.QuerySelector(".js-index", child).textContent = (index + 1);
             $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
             $Dom.QuerySelector(".js-archive-title", child).textContent = item.a_title || "(No Archive)";
             $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
             $Dom.QuerySelector(".js-body", child).textContent = (item.body || "").replace(/\r?\n/g, ' ');
-
             // --- 日時 (作成・更新) ---
-            $Dom.QuerySelector(".js-create-tim", child).textContent = $Util.FormatDate(item.create_tim, 'YYYY.MM.DD HH:mm');
-            $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim, 'YYYY.MM.DD HH:mm');
-
+            $Dom.QuerySelector(".js-create-tim", child).textContent = $Util.FormatDate(item.create_tim);
+            $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
             // --- リアクション統計 (定数から絵文字を取得) ---
             $Dom.QuerySelector(".js-icon-funny", child).textContent = rt.FUNNY.emoji;
             $Dom.QuerySelector(".js-count-funny", child).textContent = item.count_funny || 0;
@@ -195,8 +193,7 @@ export default {
             $Dom.QuerySelector(".js-icon-surprise", child).textContent = rt.SURPRISE.emoji;
             $Dom.QuerySelector(".js-count-surprise", child).textContent = item.count_surprise || 0;
             $Dom.QuerySelector(".js-icon-sad", child).textContent = rt.SAD.emoji;
-            $Dom.QuerySelector(".js-count-sad", child).textContent = item.count_empathy || 0;
-
+            $Dom.QuerySelector(".js-count-sad", child).textContent = item.count_sad || 0;
             // --- 金額エリア（既存ロジック維持） ---
             const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
             const priceEl = $Dom.QuerySelector(".js-memo-price", child);
@@ -219,7 +216,6 @@ export default {
                     priceEl.classList.add("text-red-500");
                 }
             }
-
             child.onclick = () => {
                 this._core.closeAll();
                 $Marker.SelectMarker(index);
@@ -376,7 +372,7 @@ export default {
     },
     // メモをまとめる（複数選択モード）
     ShowMultiSelectTimeline() {
-        const details = $Data.Store.GetDetailsSortByTimeline();
+        const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) {
             $Notice.Warn("データはありません。");
             return;
@@ -522,7 +518,7 @@ export default {
                 $Dom.ToggleShow(viewUrl, false); // 隠す
             }
             // ④ 件数の反映
-            const details = $Data.Store.GetDetailsSortByTimeline() || [];
+            const details = $Data.Store.GetDetails() || [];
             $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
             $Dom.QuerySelector('#btn-view-mem-timeline', el).onclick = () => {
                 this.ShowDetailsTimeLine();

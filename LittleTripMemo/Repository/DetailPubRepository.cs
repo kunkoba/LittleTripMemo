@@ -136,9 +136,20 @@ public class DetailPubRepository : _BaseRepository
         string orderBy = sortField == 2 ? "d.update_tim DESC" : "d.create_tim DESC";
 
         var sql = $@"
-        SELECT d.*, a.title AS a_title, a.currency_unit
+        SELECT 
+            d.*, 
+            a.title AS a_title, 
+            a.currency_unit,
+            COUNT(CASE WHEN r.reaction_type = 1 THEN 1 END) as count_funny,
+            COUNT(CASE WHEN r.reaction_type = 2 THEN 1 END) as count_helpful,
+            COUNT(CASE WHEN r.reaction_type = 3 THEN 1 END) as count_surprise,
+            COUNT(CASE WHEN r.reaction_type = 4 THEN 1 END) as count_empathy
         FROM t_memo_detail_pub d
-        INNER JOIN t_memo_archive_pub a ON d.archive_id = a.archive_id
+        INNER JOIN t_memo_archive_pub a 
+            ON d.archive_id = a.archive_id
+        LEFT JOIN t_reaction_pub r 
+            ON d.archive_id = r.archive_id 
+           AND d.seq = r.seq
         WHERE d.latitude  BETWEEN @lat_min AND @lat_max
           AND d.longitude BETWEEN @lng_min AND @lng_max
           AND d.user_id   <> @login_user_id
@@ -151,7 +162,9 @@ public class DetailPubRepository : _BaseRepository
             parameters.Add("keyword", $"%{keyword}%");
         }
 
-        sql += $" ORDER BY {orderBy} LIMIT @limit";
+        sql += $@"
+            GROUP BY d.archive_id, d.seq, a.title, a.currency_unit
+            ORDER BY {orderBy} LIMIT @limit";
 
         return await QueryAsync<TMemoDetailPub>(sql, parameters);
     }
@@ -175,7 +188,7 @@ public class DetailPubRepository : _BaseRepository
             1 => "count_funny",
             2 => "count_helpful",
             3 => "count_surprise",
-            4 => "count_empathy",
+            4 => "count_sad",
             _ => "count_funny"
         };
 
@@ -184,7 +197,7 @@ public class DetailPubRepository : _BaseRepository
             COUNT(CASE WHEN r.reaction_type = 1 THEN 1 END) as count_funny,
             COUNT(CASE WHEN r.reaction_type = 2 THEN 1 END) as count_helpful,
             COUNT(CASE WHEN r.reaction_type = 3 THEN 1 END) as count_surprise,
-            COUNT(CASE WHEN r.reaction_type = 4 THEN 1 END) as count_empathy
+            COUNT(CASE WHEN r.reaction_type = 4 THEN 1 END) as count_sad
         FROM t_memo_detail_pub d
         INNER JOIN t_memo_archive_pub a ON d.archive_id = a.archive_id
         LEFT JOIN t_reaction_pub r ON d.archive_id = r.archive_id AND d.seq = r.seq

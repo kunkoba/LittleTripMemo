@@ -1,6 +1,6 @@
 // ホスティングサーバ
-// const BaseUrl = "https://localhost:7292";
-const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
+const BaseUrl = "https://localhost:7292";
+// const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
 // const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
 
 // データ管理（通信・保持）を統合したオブジェクト
@@ -203,6 +203,14 @@ window.$Data = {
         // Guid userId
         async GetUserProfile(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/GetUserProfile', params))();
+        },
+        // [Required(ErrorMessage = "削除対象のseqリストは必須です")] int[] seqs
+        async DeleteStrayDetails(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/DeleteStrayDetails', params))();
+        },
+        // [Required(ErrorMessage = "解除対象のseqリストは必須です")] int[] seqs
+        async DetachDetails(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/DetachDetails', params))();
         },
 
 
@@ -418,7 +426,7 @@ window.$Data = {
             const archive = $Data.Store.GetArchive();
             if (!archive) return;
             const archiveId = archive.archive_id;
-            const details = $Data.Store.GetDetailsSortByTimeline();
+            const details = $Data.Store.GetDetails();
             const rawReactions = $Data.Store.GetMyReactions(); // サーバーから取得した生リスト
             // ローカルDBの ParseAndSaveMyReactions を呼び出す
             await $Warn.CatchAsync(async () => {

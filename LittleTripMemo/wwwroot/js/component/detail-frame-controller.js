@@ -379,17 +379,18 @@ const DetailFrameController = {
 	},
     // 開く
     Open(detail) {
+        console.log("Open: ", detail);
         // ▼ 画面を開く前にポップアップを閉じる
         $Marker.ClosePopup();
         const isNew = !detail;
-        // // パネルを開く際、中心に固定するターゲット座標を決定
-        // let targetPos = null;
-        // if (isNew) {
-        //     targetPos = $Marker.GetLocationMarkerPos(); // 新規作成時は現在地マーカー
-        // } else {
-        //     targetPos = $Marker.GetCurrentMarkerPos(); // 既存データ時は選択中のマーカー
-        // }
-        // _DetailFrameCore.toggleDetailPanel(true, targetPos);
+        // パネルを開く際、中心に固定するターゲット座標を決定
+        let targetPos = null;
+        if (isNew) {
+            targetPos = $Marker.GetLocationMarkerPos(); // 新規作成時は現在地マーカー
+        } else {
+            targetPos = $Marker.GetCurrentMarkerPos(); // 既存データ時は選択中のマーカー
+        }
+        _DetailFrameCore.toggleDetailPanel(true, targetPos);
         _DetailFrameCore.toggleDetailPanel(true);
         const isOwner = detail?.is_owner ?? true;
         // ScreenMode または detailのプロパティでPublicデータか判定

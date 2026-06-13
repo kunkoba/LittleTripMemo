@@ -16,7 +16,6 @@ public class AppController : _BaseController
     private readonly GetUnMergeDetailsService _getUnMergeDetailsService;
     private readonly GetArchiveDetailsService _getArchiveDetailsService;
     private readonly GetArchiveListService _getArchiveListService;
-    //private readonly UpsertDetailService _upsertDetailService;
     private readonly MergeDetailsService _mergeDetailsService;
     private readonly AddDetailsService _addDetailsService;
     private readonly DeleteArchiveService _deleteArchiveService;
@@ -24,7 +23,6 @@ public class AppController : _BaseController
     private readonly PublishArchiveService _publishArchiveService;
     private readonly GetArchiveDetailsPubService _getArchiveDetailsPubService;
     private readonly UnpublishArchiveService _unpublishArchiveService;
-    //private readonly UpsertReactionService _upsertReactionService;
     private readonly OpenArchiveService _openArchiveService;
     private readonly CloseArchiveService _closeArchiveService;
     private readonly UpdateArchivePubService _updateArchivePubService;
@@ -33,6 +31,8 @@ public class AppController : _BaseController
     private readonly BulkSyncReactionService _bulkSyncReactionService;
     private readonly BulkSyncDetailsService _bulkSyncDetailsService;
     private readonly GetUserProfileService _getUserProfileService;
+    private readonly DeleteStrayDetailsService _deleteStrayDetailsService;
+    private readonly DetachDetailsService _detachDetailsService;
 
     // コンストラクタに追加
     public AppController(
@@ -40,7 +40,6 @@ public class AppController : _BaseController
         GetUnMergeDetailsService getUnMergeDetailsService,
         GetArchiveDetailsService getArchiveDetailsService,
         GetArchiveListService getArchiveListService,
-        //UpsertDetailService upsertDetailService,
         MergeDetailsService mergeDetailsService,
         AddDetailsService addDetailsService,
         DeleteArchiveService deleteArchiveService,
@@ -48,7 +47,6 @@ public class AppController : _BaseController
         PublishArchiveService publishArchiveService,
         GetArchiveDetailsPubService getArchiveDetailsPubService,
         UnpublishArchiveService unpublishArchiveService,
-        //UpsertReactionService upsertReactionService,
         OpenArchiveService openArchiveService,
         CloseArchiveService closeArchiveService,
         UpdateArchivePubService updateArchivePubService,
@@ -56,13 +54,14 @@ public class AppController : _BaseController
         SearchByLocationPubService searchByLocationPubService,
         BulkSyncReactionService ulkSyncReactionService,
         BulkSyncDetailsService bulkSyncDetailsService,
-        GetUserProfileService getUserProfileService
+        GetUserProfileService getUserProfileService,
+        DeleteStrayDetailsService deleteStrayDetailsService,
+        DetachDetailsService detachDetailsService
     ) : base(userContext)
     {
         _getUnMergeDetailsService = getUnMergeDetailsService;
         _getArchiveDetailsService = getArchiveDetailsService;
         _getArchiveListService = getArchiveListService;
-        //_upsertDetailService = upsertDetailService;
         _mergeDetailsService = mergeDetailsService;
         _addDetailsService = addDetailsService;
         _deleteArchiveService = deleteArchiveService;
@@ -70,7 +69,6 @@ public class AppController : _BaseController
         _publishArchiveService = publishArchiveService;
         _getArchiveDetailsPubService = getArchiveDetailsPubService;
         _unpublishArchiveService = unpublishArchiveService;
-        //_upsertReactionService = upsertReactionService;
         _openArchiveService = openArchiveService;
         _closeArchiveService = closeArchiveService;
         _updateArchivePubService = updateArchivePubService;
@@ -79,6 +77,8 @@ public class AppController : _BaseController
         _bulkSyncDetailsService = bulkSyncDetailsService;
         _bulkSyncReactionService = ulkSyncReactionService;
         _getUserProfileService = getUserProfileService;
+        _deleteStrayDetailsService = deleteStrayDetailsService;
+        _detachDetailsService = detachDetailsService;
     }
 
     #region "Private"
@@ -183,16 +183,36 @@ public class AppController : _BaseController
             return OkWithBase(result);
         }
 
+        /// <summary>
+        /// 未まとめ明細の削除
+        /// </summary>
+        [HttpPost("api/DeleteStrayDetails")]
+        public async Task<IActionResult> DeleteStrayDetails([FromBody] DeleteStrayDetailsService.DeleteStrayDetailsReq req)
+        {
+            var result = await _deleteStrayDetailsService.ExecuteAsync(req);
+            return OkWithBase(result);
+        }
+
+        /// <summary>
+        /// アーカイブからの明細解除（未まとめに戻す）
+        /// </summary>
+        [HttpPost("api/DetachDetails")]
+        public async Task<IActionResult> DetachDetails([FromBody] DetachDetailsService.DetachDetailsReq req)
+        {
+            var result = await _detachDetailsService.ExecuteAsync(req);
+            return OkWithBase(result);
+        }
+
     #endregion
 
     #region "Public"
 
-        /// <summary>
-        /// 公開済みデータを秘密データにする
-        /// </summary>
-        /// <param name="req"></param>
-        /// <returns></returns>
-        [HttpPost("api/UnpublishArchive")]
+    /// <summary>
+    /// 公開済みデータを秘密データにする
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("api/UnpublishArchive")]
         public async Task<IActionResult> UnpublishArchive([FromBody] UnpublishArchiveService.UnpublishArchiveReq req)
         {
             var result = await _unpublishArchiveService.ExecuteAsync(req);

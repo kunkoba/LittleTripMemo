@@ -42,6 +42,24 @@ const _TopCore = {
                 });
                 // リアクション種別（アイコン）のクリックイベント
                 if (this.sortReaction) {
+                    // this.sortReaction.addEventListener("click", (e) => {
+                    //     const btn = e.target.closest("button");
+                    //     if (!btn) return;
+                    //     this.sortReaction.querySelectorAll("button").forEach((b) => {
+                    //         b.classList.remove("bg-brand-3");
+                    //         b.classList.add("bg-brand-0");
+                    //     });
+                    //     btn.classList.remove("bg-brand-0");
+                    //     btn.classList.add("bg-brand-3");
+                    // });
+                    // 1. 定数に基づいてボタンを生成（1番目を初期選択にする）
+                    const reactionTypes = Object.values($Const.REACTION_TYPE);
+                    this.sortReaction.innerHTML = reactionTypes.map((type, idx) => `
+                        <button data-value="${type.id}" class="ui-btn h-full px-3 transition-colors ${idx === 0 ? 'bg-brand-3' : 'bg-brand-0'}">
+                            ${type.emoji}
+                        </button>
+                    `).join('');
+                    // 2. イベント登録
                     this.sortReaction.addEventListener("click", (e) => {
                         const btn = e.target.closest("button");
                         if (!btn) return;

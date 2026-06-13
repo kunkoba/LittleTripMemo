@@ -10,7 +10,7 @@ export default {
             current: $Dom.QuerySelector('#btn-app-current', el),
             restore: $Dom.QuerySelector('#btn-app-restore', el),
             archiveInfo: $Dom.QuerySelector('#btn-app-info', el),
-            detailList: $Dom.QuerySelector('#btn-app-list', el),
+            detailList: $Dom.QuerySelector('#btn-app-pointlist', el),
             batch:   $Dom.QuerySelector('#btn-app-batch', el),
             point:   $Dom.QuerySelector('#btn-app-point', el),
             archiveList: $Dom.QuerySelector('#btn-app-archive-list', el),

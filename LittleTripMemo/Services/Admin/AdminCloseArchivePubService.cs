@@ -13,7 +13,7 @@ public class AdminCloseArchivePubService : _BaseService
     private readonly SysUserNotificationRepository _userNoteRepo; 
 
     // 安全のため target_user_id を必須に
-    public record Request(
+    public record AdminCloseArchivePubReq(
         [Required] Guid login_user_id, // ★ 追加
         int archive_id, 
         Guid target_user_id
@@ -32,7 +32,7 @@ public class AdminCloseArchivePubService : _BaseService
         _userNoteRepo = un;
     }
 
-    public async Task<Response> ExecuteAsync(Request req)
+    public async Task<Response> ExecuteAsync(AdminCloseArchivePubReq req)
     {
         // 1. 検証
         await ValidateAsync(req);
@@ -68,7 +68,7 @@ public class AdminCloseArchivePubService : _BaseService
         }
     }
 
-    private async Task ValidateAsync(Request req)
+    private async Task ValidateAsync(AdminCloseArchivePubReq req)
     {
         BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(_user.Plan != PlanType.Admin.ToString(), "管理者権限が必要です");

@@ -46,13 +46,15 @@ const _BottomCore = {
 						keyword: sortSetting.keyword,
 						limit: 20
 					};
+					// データをクリア
+					$Data.Clear();
 					// 通信処理（Public と Private でエンドポイントを分岐）
 					const isSuccess = await $Data.Access.SearchByLocationPub(params);
 					if (!isSuccess) return;
 					// 検索結果のリスト表示、またはマーカーの再描画
 					$Marker.RefreshPointMarker();
 					// 検索結果が0件だった場合の通知（任意）
-					const details = $Data.Store.GetDetailsSortByTimeline();
+					const details = $Data.Store.GetDetails();
 					if (details.length === 0) {
 						$Notice.Info("条件に一致するメモが見つかりませんでした。");
 					}

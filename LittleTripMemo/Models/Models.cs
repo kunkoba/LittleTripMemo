@@ -84,7 +84,7 @@ public class TMemoDetailPub : IAppRecord
     public int count_funny { get; set; } = 0;
     public int count_helpful { get; set; } = 0;
     public int count_surprise { get; set; } = 0;
-    public int count_empathy { get; set; } = 0;
+    public int count_sad { get; set; } = 0;
     public string a_title { get; set; } = string.Empty;
     public string currency_unit { get; set; } = string.Empty;
 }

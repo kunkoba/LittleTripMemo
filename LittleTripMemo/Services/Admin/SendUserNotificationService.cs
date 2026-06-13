@@ -10,7 +10,7 @@ public class SendUserNotificationService : _BaseService
 {
     private readonly SysUserNotificationRepository _repo;
 
-    public record Request(
+    public record SendUserNotificationReq(
         [Required] Guid login_user_id, // ★ 追加
         Guid target_user_id, 
         short kind, 
@@ -21,7 +21,7 @@ public class SendUserNotificationService : _BaseService
 
     public SendUserNotificationService(UserContext u, SysUserNotificationRepository r) : base(u) => _repo = r;
 
-    public async Task<Response> ExecuteAsync(Request req)
+    public async Task<Response> ExecuteAsync(SendUserNotificationReq req)
     {
         // 1. 検証
         await ValidateAsync(req);
@@ -37,7 +37,7 @@ public class SendUserNotificationService : _BaseService
         return new Response(true);
     }
 
-    private async Task ValidateAsync(Request req)
+    private async Task ValidateAsync(SendUserNotificationReq req)
     {
         // 権限チェック
         BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ログインが必要です");

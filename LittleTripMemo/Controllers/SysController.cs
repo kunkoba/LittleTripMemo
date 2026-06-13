@@ -148,7 +148,7 @@ public class SysController : _BaseController
     /// <param name="req"></param>
     /// <returns></returns>
     [HttpPost("api/Sys/AdminCloseArchive")]
-    public async Task<IActionResult> AdminCloseArchive([FromBody] AdminCloseArchivePubService.Request req)
+    public async Task<IActionResult> AdminCloseArchive([FromBody] AdminCloseArchivePubService.AdminCloseArchivePubReq req)
     {
         var result = await _adminCloseArchivePubService.ExecuteAsync(req);
         return OkWithBase(result);
@@ -160,7 +160,7 @@ public class SysController : _BaseController
     /// <param name="req"></param>
     /// <returns></returns>
     [HttpPost("api/Sys/AdminUnpublishArchive")]
-    public async Task<IActionResult> AdminUnpublishArchive([FromBody] AdminUnpublishArchiveService.Request req)
+    public async Task<IActionResult> AdminUnpublishArchive([FromBody] AdminUnpublishArchiveService.AdminUnpublishArchiveReq req)
     {
         var result = await _adminUnpublishArchiveService.ExecuteAsync(req);
         return OkWithBase(result);
@@ -172,7 +172,7 @@ public class SysController : _BaseController
     /// <param name="req"></param>
     /// <returns></returns>
     [HttpPost("api/Sys/SendUserNotification")]
-    public async Task<IActionResult> SendUserNotification([FromBody] SendUserNotificationService.Request req)
+    public async Task<IActionResult> SendUserNotification([FromBody] SendUserNotificationService.SendUserNotificationReq req)
     {
         var result = await _sendUserNotificationService.ExecuteAsync(req);
         return OkWithBase(result);
@@ -212,7 +212,7 @@ public class SysController : _BaseController
     /// 【管理者権限】管理画面に必要な情報を一括取得する
     /// </summary>
     [HttpPost("api/Sys/GetAdminAllInfo")]
-    public async Task<IActionResult> GetAdminAllInfo([FromBody] GetAdminAllInfoService.Request req)
+    public async Task<IActionResult> GetAdminAllInfo([FromBody] GetAdminAllInfoService.GetAdminAllInfoReq req)
     {
         var result = await _getAdminAllInfoService.ExecuteAsync(req);
         return OkWithBase(result);

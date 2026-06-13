@@ -19,7 +19,7 @@ public class AdminUnpublishArchiveService : _BaseService
     private readonly SysUserNotificationRepository _userNoteRepo;
     private readonly UserManager<MyAppUser> _userManager;
 
-    public record Request(
+    public record AdminUnpublishArchiveReq(
         [Required] Guid login_user_id, // ★ 追加  
         int archive_id, 
         Guid target_user_id
@@ -41,7 +41,7 @@ public class AdminUnpublishArchiveService : _BaseService
         _userNoteRepo = un; _userManager = um;
     }
 
-    public async Task<Response> ExecuteAsync(Request req)
+    public async Task<Response> ExecuteAsync(AdminUnpublishArchiveReq req)
     {
         // 1. 検証
         await ValidateAsync(req);
@@ -83,7 +83,7 @@ public class AdminUnpublishArchiveService : _BaseService
         catch { throw; }
     }
 
-    private async Task ValidateAsync(Request req)
+    private async Task ValidateAsync(AdminUnpublishArchiveReq req)
     {
         // お作法の管理者チェック
         BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ログインが必要です");

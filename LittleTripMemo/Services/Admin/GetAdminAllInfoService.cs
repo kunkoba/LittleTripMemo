@@ -18,7 +18,7 @@ public class GetAdminAllInfoService : _BaseService
     private readonly GetAllUserNotificationsService _userNotificationsService;
 
     // まとめて取得する際の各サービスのパラメータ
-    public record Request();
+    public record GetAdminAllInfoReq();
 
     // 4つのデータセットを内包するレスポンス
     public record Response(
@@ -47,7 +47,7 @@ public class GetAdminAllInfoService : _BaseService
     /// </summary>
     /// <param name="req"></param>
     /// <returns></returns>
-    public async Task<Response> ExecuteAsync(Request req)
+    public async Task<Response> ExecuteAsync(GetAdminAllInfoReq req)
     {
         // 1. 検証（管理者権限チェック）
         await ValidateAsync();
