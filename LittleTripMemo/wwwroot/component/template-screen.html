@@ -183,6 +183,18 @@
 
 <template id="tpl-view-archive">
 	<div class="relative min-h-full flex flex-col bg-white">
+        <!-- ▼ 新設：状態表示バッジ（全体が1つのボタンになっています） -->
+        <button id="btn-status-change" class="w-full flex bg-slate-50 rounded-full p-1 mb-4 border border-slate-100 shadow-inner outline-none active:scale-[0.98] transition-transform">
+            <div id="badge-private" class="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-full text-[0.7rem] font-black transition-all tracking-wider">
+                <span class="text-[0.8rem]">🔒</span><span>PRIVATE</span>
+            </div>
+            <div id="badge-close" class="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-full text-[0.7rem] font-black transition-all tracking-wider">
+                <span class="text-[0.8rem]">－</span><span>CLOSE</span>
+            </div>
+            <div id="badge-open" class="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-full text-[0.7rem] font-black transition-all tracking-wider">
+                <span class="text-[0.8rem]">◎</span><span>OPEN</span>
+            </div>
+        </button>
         <div class="flex items-center justify-between gap-2 mb-4">
             <!-- 右：ユーザ情報（プロフボタン） -->
             <button id="btn-mem-user-profile"
@@ -248,6 +260,16 @@
                 <img id="share-qr-image" src="" alt="QR Code" class="w-48 h-[200px] object-contain">
             </button>
         </div>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】まとめ状態変更 -->
+<template id="tpl-archive-status-change">
+    <div class="p-6 flex flex-col items-center text-center space-y-4">
+        <div id="status-change-icon" class="text-[3.5rem] drop-shadow-md leading-none mb-2"></div>
+        <div id="status-change-title" class="font-black text-[1.2rem] text-slate-800 tracking-wider"></div>
+        <div class="w-full h-px bg-slate-200"></div>
+        <div id="status-change-desc" class="text-[0.8rem] text-slate-600 leading-[1.8] whitespace-pre-wrap text-left w-full"></div>
     </div>
 </template>
 

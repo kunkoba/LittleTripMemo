@@ -58,28 +58,10 @@ public class DetailPubRepository : _BaseRepository
 
         string sql = $@"
             SELECT 
-                d.*,
-                COALESCE(r.count_funny, 0)   AS count_funny,
-                COALESCE(r.count_love, 0)    AS count_love,
-                COALESCE(r.count_surprise, 0)AS count_surprise,
-                COALESCE(r.count_sad, 0)     AS count_sad
+                d.*
             FROM t_memo_detail_pub d
-            LEFT JOIN (
-                SELECT 
-                    archive_id,
-                    seq,
-                    COUNT(CASE WHEN reaction_type = 1 THEN 1 END) as count_funny,
-                    COUNT(CASE WHEN reaction_type = 2 THEN 1 END) as count_love,
-                    COUNT(CASE WHEN reaction_type = 3 THEN 1 END) as count_surprise,
-                    COUNT(CASE WHEN reaction_type = 4 THEN 1 END) as count_sad
-                FROM t_reaction_pub
-                WHERE user_id <> @login_user_id
-                GROUP BY archive_id, seq
-            ) r
-                ON d.archive_id = r.archive_id
-                AND d.seq        = r.seq
             WHERE d.del_flg = false
-                AND d.archive_id = @archive_id
+              AND d.archive_id = @archive_id
             ORDER BY d.memo_date ASC, d.memo_time ASC";
 
         return await QueryAsync<TMemoDetailPub>(sql, new
@@ -120,36 +102,48 @@ public class DetailPubRepository : _BaseRepository
     }
 
     /// <summary>
-    /// 通常検索（軽量）：作成順(1) または 更新順(2)
+    /// 地点検索用
     /// </summary>
-    public async Task<IEnumerable<TMemoDetailPub>> GetByLocationBasicAsync(
+    /// <param name="latMin"></param>
+    /// <param name="latMax"></param>
+    /// <param name="lngMin"></param>
+    /// <param name="lngMax"></param>
+    /// <param name="keyword"></param>
+    /// <param name="sortType"></param>
+    /// <param name="loginUserId"></param>
+    /// <param name="limit"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<TMemoDetailPub>> SearchByLocationAsync(
         decimal latMin, decimal latMax, decimal lngMin, decimal lngMax,
-        string? keyword, int sortField, Guid loginUserId, int limit = 20)
+        string? keyword, int sortType, Guid loginUserId, int limit = 20)
     {
         var parameters = new DynamicParameters();
-        parameters.Add("lat_min", latMin); parameters.Add("lat_max", latMax);
-        parameters.Add("lng_min", lngMin); parameters.Add("lng_max", lngMax);
+        parameters.Add("lat_min", latMin);
+        parameters.Add("lat_max", latMax);
+        parameters.Add("lng_min", lngMin);
+        parameters.Add("lng_max", lngMax);
         parameters.Add("login_user_id", loginUserId);
         parameters.Add("limit", limit);
 
-        // ソート句の決定
-        string orderBy = sortField == 2 ? "d.update_tim DESC" : "d.create_tim DESC";
+        // ソート順の決定（3~6は集計済みカラムを直接ソート）
+        string orderBy = sortType switch
+        {
+            2 => "d.update_tim DESC",
+            3 => "d.count_funny DESC",
+            4 => "d.count_love DESC",
+            5 => "d.count_surprise DESC",
+            6 => "d.count_sad DESC",
+            _ => "d.create_tim DESC"
+        };
 
+        // リアクションテーブルへのJOIN・GROUP BYが消えて劇的にシンプルに
         var sql = $@"
         SELECT 
             d.*, 
             a.title AS a_title, 
-            a.currency_unit,
-            COUNT(CASE WHEN r.reaction_type = 1 THEN 1 END) as count_funny,
-            COUNT(CASE WHEN r.reaction_type = 2 THEN 1 END) as count_helpful,
-            COUNT(CASE WHEN r.reaction_type = 3 THEN 1 END) as count_surprise,
-            COUNT(CASE WHEN r.reaction_type = 4 THEN 1 END) as count_empathy
+            a.currency_unit
         FROM t_memo_detail_pub d
-        INNER JOIN t_memo_archive_pub a 
-            ON d.archive_id = a.archive_id
-        LEFT JOIN t_reaction_pub r 
-            ON d.archive_id = r.archive_id 
-           AND d.seq = r.seq
+        INNER JOIN t_memo_archive_pub a ON d.archive_id = a.archive_id
         WHERE d.latitude  BETWEEN @lat_min AND @lat_max
           AND d.longitude BETWEEN @lng_min AND @lng_max
           AND d.user_id   <> @login_user_id
@@ -162,62 +156,28 @@ public class DetailPubRepository : _BaseRepository
             parameters.Add("keyword", $"%{keyword}%");
         }
 
-        sql += $@"
-            GROUP BY d.archive_id, d.seq, a.title, a.currency_unit
-            ORDER BY {orderBy} LIMIT @limit";
+        sql += $" ORDER BY {orderBy}, d.seq DESC LIMIT @limit";
 
         return await QueryAsync<TMemoDetailPub>(sql, parameters);
     }
 
     /// <summary>
-    /// ランキング検索（重め）：リアクション順(3)
+    /// 指定された明細(seq)のリアクション数を再集計して t_memo_detail_pub に反映する
     /// </summary>
-    public async Task<IEnumerable<TMemoDetailPub>> GetByLocationRankAsync(
-        decimal latMin, decimal latMax, decimal lngMin, decimal lngMax,
-        string? keyword, int reactionType, Guid loginUserId, int limit = 20)
+    public async Task UpdateReactionCountsAsync(int archiveId, long[] seqs)
     {
-        var parameters = new DynamicParameters();
-        parameters.Add("lat_min", latMin); parameters.Add("lat_max", latMax);
-        parameters.Add("lng_min", lngMin); parameters.Add("lng_max", lngMax);
-        parameters.Add("login_user_id", loginUserId);
-        parameters.Add("limit", limit);
+        const string sql = @"
+        UPDATE t_memo_detail_pub d
+        SET 
+            count_funny    = (SELECT count(*) FROM t_reaction_pub r WHERE r.archive_id = d.archive_id AND r.seq = d.seq AND r.has_funny = true),
+            count_love     = (SELECT count(*) FROM t_reaction_pub r WHERE r.archive_id = d.archive_id AND r.seq = d.seq AND r.has_love = true),
+            count_surprise = (SELECT count(*) FROM t_reaction_pub r WHERE r.archive_id = d.archive_id AND r.seq = d.seq AND r.has_surprise = true),
+            count_sad      = (SELECT count(*) FROM t_reaction_pub r WHERE r.archive_id = d.archive_id AND r.seq = d.seq AND r.has_sad = true)
+        WHERE d.archive_id = @archiveId 
+          AND d.seq = ANY(@seqs)";
 
-        // リアクション種別に応じたソートカラム
-        string orderCol = reactionType switch
-        {
-            1 => "count_funny",
-            2 => "count_helpful",
-            3 => "count_surprise",
-            4 => "count_sad",
-            _ => "count_funny"
-        };
-
-        var sql = $@"
-        SELECT d.*, a.title AS a_title, a.currency_unit,
-            COUNT(CASE WHEN r.reaction_type = 1 THEN 1 END) as count_funny,
-            COUNT(CASE WHEN r.reaction_type = 2 THEN 1 END) as count_helpful,
-            COUNT(CASE WHEN r.reaction_type = 3 THEN 1 END) as count_surprise,
-            COUNT(CASE WHEN r.reaction_type = 4 THEN 1 END) as count_sad
-        FROM t_memo_detail_pub d
-        INNER JOIN t_memo_archive_pub a ON d.archive_id = a.archive_id
-        LEFT JOIN t_reaction_pub r ON d.archive_id = r.archive_id AND d.seq = r.seq
-        WHERE d.latitude  BETWEEN @lat_min AND @lat_max
-          AND d.longitude BETWEEN @lng_min AND @lng_max
-          AND d.user_id   <> @login_user_id
-          AND d.del_flg   = false
-          AND a.closed_flg = false";
-
-        if (!string.IsNullOrWhiteSpace(keyword))
-        {
-            sql += " AND (d.body ILIKE @keyword OR d.title ILIKE @keyword)";
-            parameters.Add("keyword", $"%{keyword}%");
-        }
-
-        sql += $@"
-                GROUP BY d.archive_id, d.seq, a.title, a.currency_unit
-                ORDER BY {orderCol} DESC LIMIT @limit";
-
-        return await QueryAsync<TMemoDetailPub>(sql, parameters);
+        await ExecuteAsync(sql, new { archiveId, seqs });
     }
+
 
 }

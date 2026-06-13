@@ -25,7 +25,7 @@ const _DetailFrameCore = {
                 this.btnMoveLast = $Dom.GetElementById("detail-btn-last");
                 this.groupReaction = $Dom.GetElementById("detail-group-reaction");
                 // this.btnReactionFunny = $Dom.GetElementById("detail-btn-funny");
-                // this.btnReactionHelpful = $Dom.GetElementById("detail-btn-helpful");
+                // this.btnReactionHelpful = $Dom.GetElementById("detail-btn-love");
                 // this.btnReactionSurprise = $Dom.GetElementById("detail-btn-surprise");
                 // this.btnReactionSad = $Dom.GetElementById("detail-btn-sad");
                 // リアクションボタンを定数から一括取得・登録
@@ -281,13 +281,13 @@ const _DetailFrameCore = {
         // 2. サーバー数値 + ローカルフラグ を加算
         const counts = {
             funny:    (detail.count_funny || 0)    + (myLocal.is_funny ? 1 : 0),
-            helpful:  (detail.count_helpful || 0)  + (myLocal.is_love ? 1 : 0),
+            love:  (detail.count_love || 0)  + (myLocal.is_love ? 1 : 0),
             surprise: (detail.count_surprise || 0) + (myLocal.is_surprise ? 1 : 0),
             sad:  (detail.count_sad || 0)  + (myLocal.is_sad ? 1 : 0)
         };
         // 3. UIに数値を反映
         if (this.btnReactionFunny)    $Dom.QuerySelector('.js-count', this.btnReactionFunny).textContent = counts.funny;
-        if (this.btnReactionHelpful)  $Dom.QuerySelector('.js-count', this.btnReactionHelpful).textContent = counts.helpful;
+        if (this.btnReactionHelpful)  $Dom.QuerySelector('.js-count', this.btnReactionHelpful).textContent = counts.love;
         if (this.btnReactionSurprise) $Dom.QuerySelector('.js-count', this.btnReactionSurprise).textContent = counts.surprise;
         if (this.btnReactionSad)  $Dom.QuerySelector('.js-count', this.btnReactionSad).textContent = counts.sad;
         // 4. 自分の状態を反映

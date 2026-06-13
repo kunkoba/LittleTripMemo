@@ -10,8 +10,9 @@ namespace LittleTripMemo.Services;
 
 public class BulkSyncReactionService : _BaseService
 {
-    private readonly ReactionPubRepository _repo;
+    private readonly ReactionPubRepository _reactionRepo;
     private readonly ArchivePubRepository _archivePubRepo;
+    private readonly DetailPubRepository _detailPubRepo;
     private readonly ITransactionProvider _provider;
 
     // 1明細ごとのリアクション状態
@@ -34,49 +35,53 @@ public class BulkSyncReactionService : _BaseService
     public BulkSyncReactionService(
         UserContext userContext,
         ITransactionProvider provider,
-        ReactionPubRepository repo,
-        ArchivePubRepository archivePubRepo) : base(userContext)
+        ReactionPubRepository reactionRepo,
+        ArchivePubRepository archivePubRepo,
+        DetailPubRepository detailPubRepo
+    ) : base(userContext)
     {
         _provider = provider;
-        _repo = repo;
+        _reactionRepo = reactionRepo;
         _archivePubRepo = archivePubRepo;
+        _detailPubRepo = detailPubRepo;
     }
 
     public async Task<Response> ExecuteAsync(BulkSyncReactionReq req)
     {
         await ValidateAsync(req);
 
-        // 1. リクエスト内の全アーカイブIDを抽出し、現在「公開かつオープン」なものだけを取得
+        // 1. 公開状態チェック
         var targetIds = req.items.Select(x => x.archive_id).Distinct();
         var activeIds = (await _archivePubRepo.GetActiveArchiveIdsAsync(targetIds)).ToHashSet();
 
         using var tran = _provider.BeginTransaction();
         try
         {
-            int totalInserted = 0;
-            var groups = req.items.GroupBy(x => x.archive_id);
-
-            foreach (var group in groups)
+            int totalProcessed = 0;
+            foreach (var item in req.items)
             {
-                // 2. 公開状態でなければそのアーカイブのリアクション処理はスキップ
-                if (!activeIds.Contains(group.Key)) continue;
+                if (!activeIds.Contains(item.archive_id)) continue;
 
-                var seqs = group.Select(x => x.seq);
-                await _repo.DeletePhysicalBySeqsAsync(group.Key, seqs);
-
-                foreach (var item in group)
+                // 1件ずつデルタ更新を実行
+                // SQL内で「旧値」と「新値」を比較して +1 / -1 / 0 を自動判定
+                await _reactionRepo.UpsertWithCounterAsync(new TReactionPub
                 {
-                    // 有効なものだけインサート
-                    if (item.is_funny) totalInserted += await _repo.InsertAsync(group.Key, (int)item.seq, 1);
-                    if (item.is_love) totalInserted += await _repo.InsertAsync(group.Key, (int)item.seq, 2);
-                    if (item.is_surprise) totalInserted += await _repo.InsertAsync(group.Key, (int)item.seq, 3);
-                    if (item.is_sad) totalInserted += await _repo.InsertAsync(group.Key, (int)item.seq, 4);
-                }
+                    archive_id = item.archive_id,
+                    seq = item.seq,
+                    has_funny = item.is_funny,
+                    has_love = item.is_love,
+                    has_surprise = item.is_surprise,
+                    has_sad = item.is_sad
+                });
+
+                totalProcessed++;
             }
+
             tran.Commit();
-            return new Response(totalInserted); // メインテーブル(Reaction)の挿入数を返す
+            return new Response(totalProcessed);
         }
         catch { throw; }
+
     }
 
     private async Task ValidateAsync(BulkSyncReactionReq req)

@@ -293,7 +293,7 @@ export default {
             $Dom.QuerySelector(".js-icon-funny", child).textContent = rt.FUNNY.emoji;
             $Dom.QuerySelector(".js-count-funny", child).textContent = item.count_funny || 0;
             $Dom.QuerySelector(".js-icon-love", child).textContent = rt.LOVE.emoji;
-            $Dom.QuerySelector(".js-count-love", child).textContent = item.count_helpful || 0;
+            $Dom.QuerySelector(".js-count-love", child).textContent = item.count_love || 0;
             $Dom.QuerySelector(".js-icon-surprise", child).textContent = rt.SURPRISE.emoji;
             $Dom.QuerySelector(".js-count-surprise", child).textContent = item.count_surprise || 0;
             $Dom.QuerySelector(".js-icon-sad", child).textContent = rt.SAD.emoji;
@@ -475,7 +475,20 @@ export default {
         })();
     },
     // メモをまとめる（複数選択モード）
-    ShowMultiSelectTimeline() {
+    async ShowMultiSelectTimeline() {
+        // --- ローカルの未更新データを同期処理 ---
+        $Notice.Loading.Show(); // ローディング表示
+        try {
+            // 1. ローカルDBの未送信明細を一括送信
+            await $Data.LocalDb.BulkSendDetails();
+            // 2. サーバーから最新の「未マージ明細リスト」を再取得
+            // (これが成功すると Store も最新化される)
+            const isSuccess = await $Data.Access.GetUnMergeDetails({});
+            if (!isSuccess) return; // 失敗時はエラーハンドラに任せて終了
+        } finally {
+            $Notice.Loading.Hide(); // ローディング解除
+        }
+        // 最新データを表示
         const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) {
             $Notice.Warn("データはありません。");
@@ -631,6 +644,27 @@ export default {
         const renderView = () => {
             // ① 常に最新のデータを取得
             const currentArchive = $Data.Store.GetArchive(); 
+            // ステータスバッジの表示制御
+            const bPrivate = $Dom.QuerySelector('#badge-private', el);
+            const bClose = $Dom.QuerySelector('#badge-close', el);
+            const bOpen = $Dom.QuerySelector('#badge-open', el);
+            // 一旦すべて「非アクティブ（グレー文字・背景透明）」にリセット
+            const inactiveClass = "flex-1 flex items-center justify-center gap-1 py-1.5 rounded-full text-[0.7rem] font-black transition-all tracking-wider text-slate-300";
+            bPrivate.className = inactiveClass;
+            bClose.className = inactiveClass;
+            bOpen.className = inactiveClass;
+            // 状態に応じて1つだけ「アクティブ（色付き・影あり）」にする
+            const activeBaseClass = "flex-1 flex items-center justify-center gap-1 py-1.5 rounded-full text-[0.7rem] font-black transition-all tracking-wider text-white shadow-md ";
+            if (!currentArchive.is_public) {
+                // PRIVATE (黒系)
+                bPrivate.className = activeBaseClass + "bg-slate-900";
+            } else if (currentArchive.closed_flg) {
+                // CLOSE (グレー系)
+                bClose.className = activeBaseClass + "bg-slate-400";
+            } else {
+                // OPEN (赤系)
+                bOpen.className = activeBaseClass + "bg-red-500";
+            }
             // ② タイトルと本文の反映
             $Dom.QuerySelector('#view-mem-title', el).textContent = currentArchive.title || "";
             $Dom.QuerySelector('#view-mem-body', el).textContent = currentArchive.memo || "";

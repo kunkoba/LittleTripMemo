@@ -8,53 +8,37 @@ namespace LittleTripMemo.Services;
 public class SearchByLocationPubService : _BaseService
 {
     private readonly DetailPubRepository _detailPubRepo;
-    private readonly ReactionPubRepository _reactionPubRepo;
 
     public record SearchByLocationPubReq(
-        decimal lat_min,
-        decimal lat_max,
-        decimal lng_min,
-        decimal lng_max,
+        decimal lat_min, decimal lat_max,
+        decimal lng_min, decimal lng_max,
         string? keyword,
-        int sortField,      // 1:作成順, 2:更新順, 3:リアクション順
-        int? reactionType,  // sort_fieldが3の場合に使用
-        int limit = 50
+        int sort_type = 1 // 1:新着, 2:更新, 3~6:リアクション別
     );
     public record Response(IEnumerable<TMemoDetailPub> details);
 
     public SearchByLocationPubService(
         UserContext userContext,
-        DetailPubRepository detailPubRepo,
-        ReactionPubRepository reactionPubRepo)
+        DetailPubRepository detailPubRepo)
         : base(userContext)
     {
         _detailPubRepo = detailPubRepo;
-        _reactionPubRepo = reactionPubRepo;
     }
 
     public async Task<Response> ExecuteAsync(SearchByLocationPubReq req)
     {
         await ValidateAsync(req);
 
-        IEnumerable<TMemoDetailPub> details;
+        // 統合された検索メソッドを呼び出す
+        var result = await _detailPubRepo.SearchByLocationAsync(
+            req.lat_min, req.lat_max, req.lng_min, req.lng_max,
+            req.keyword, req.sort_type, _user.UserId
+        );
 
-        if (req.sortField == 3 && req.reactionType.HasValue)
-        {
-            // リアクション順（RANK）
-            details = await _detailPubRepo.GetByLocationRankAsync(
-                req.lat_min, req.lat_max, req.lng_min, req.lng_max,
-                req.keyword, req.reactionType.Value, _user.UserId, req.limit);
-        }
-        else
-        {
-            // 作成順 or 更新順（BASIC）
-            details = await _detailPubRepo.GetByLocationBasicAsync(
-                req.lat_min, req.lat_max, req.lng_min, req.lng_max,
-                req.keyword, req.sortField, _user.UserId, req.limit);
-        }
+        // 所有者フラグなどをセット
+        SetAppFlags(result);
 
-        SetAppFlags(details);
-        return new Response(details);
+        return new Response(result);
     }
 
     private async Task ValidateAsync(SearchByLocationPubReq req)

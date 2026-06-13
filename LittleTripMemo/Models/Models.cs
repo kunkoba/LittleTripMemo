@@ -82,7 +82,7 @@ public class TMemoDetailPub : IAppRecord
     public bool is_public { get; set; } = true;
     public bool is_owner { get; set; } = false;
     public int count_funny { get; set; } = 0;
-    public int count_helpful { get; set; } = 0;
+    public int count_love { get; set; } = 0;
     public int count_surprise { get; set; } = 0;
     public int count_sad { get; set; } = 0;
     public string a_title { get; set; } = string.Empty;
@@ -94,13 +94,20 @@ public class TReactionPub
     public int archive_id { get; set; } = 0;
     public long seq { get; set; }
     public Guid user_id { get; set; }
-    public int reaction_type { get; set; } = 0;
+
+    // 4つのリアクションを固定で持つ
+    public bool has_funny { get; set; }    // Type 1
+    public bool has_love { get; set; }  // Type 2
+    public bool has_surprise { get; set; } // Type 3
+    public bool has_sad { get; set; }      // Type 4
+
+    public DateTime update_tim { get; set; }
 }
 
 #region "System"
 
-    // フィードバック
-    public class TSysFeedback
+// フィードバック
+public class TSysFeedback
     {
         public Guid user_id { get; set; } // アプリ側はGuid
         public string? body { get; set; }

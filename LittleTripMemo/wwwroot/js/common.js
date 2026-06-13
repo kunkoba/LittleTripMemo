@@ -176,7 +176,9 @@ window.$Util = {
             const zoom = 18;
             const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=${zoom}&addressdetails=1&accept-language=${lang}`;
             // HTTPリクエストの送信
+            $Notice.Loading.Show();
             const response = await fetch(url);
+            $Notice.Loading.Hide();
             if (!response.ok) throw new Error("[GetAddressName]でエラーが発生しました。");
             // レスポンスの解析
             const data = await response.json();
