@@ -197,6 +197,9 @@ const AppManager = {
     },
     // 画面モード変更
     async RefreshScreen() {
+        console.log("◆RefreshScreen");
+        // データをクリア
+        $Data.Clear();
         // アーカイブID
         const archiveId = this.AppData.Context.TargetArchiveId;
         let isSuccess = false;
@@ -254,7 +257,6 @@ const AppManager = {
                 };
                 break;
             case $Const.SCREEN_MODE.SEARCH:
-                $Data.Store.Clear();
                 $Marker.Clear();
                 break;
             default:

@@ -102,7 +102,7 @@ window.$Util = {
         'youtube.com', 'youtu.be', 'twitter.com', 'x.com',
         'instagram.com', 'facebook.com', 'tiktok.com', 'github.com',
         'google.com', 'google.co.jp', 'maps.app.goo.gl',
-        window.location.hostname // 自サイト
+        // window.location.hostname // 自サイト
     ],
     // 日付オブジェクトを文字列に変換（デフォルトをハイフン区切りに変更）
     FormatDate(dateObj = new Date(), format = 'YYYY-MM-DD　HH:mm') {

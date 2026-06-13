@@ -25,7 +25,7 @@ export default {
         })();
     },
     // タイムライン用リスト
-    ShowDetailsTimeLine() {
+    ShowDetailsTimeLine_2() {
         // ソートする
         const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) {
@@ -78,6 +78,110 @@ export default {
                     if (price > 0) {
                         priceEl.textContent = `+${price.toLocaleString()}`;
                         // priceEl.className = "js-price text-[1rem] font-black italic  text-blue-500";
+                        priceEl.className += " text-blue-500";
+                    } else if (price < 0) {
+                        priceEl.textContent = price.toLocaleString();
+                        priceEl.className += " text-red-500";
+                    }
+                } else {
+                    // 0円の時は枠ごと隠す
+                    $Dom.ToggleShow(priceWrapper, false);
+                }
+            }
+            child.onclick = () => {
+                this._core.closeAll();
+                $Marker.SelectMarker(index); // details自体がソート済みなので、このindexをそのまま使える
+            };
+            listContainer.appendChild(child);
+        });
+        this._core.open({
+            title: "TRIP LOG",
+            content: el,
+            help: "",
+            buttons: []
+        });
+    },
+    ShowDetailsTimeLine() {
+        // ソートする
+        const details = $Data.Store.GetDetails();
+        if (!details || details.length === 0) {
+            $Notice.Warn("データはありません。");
+            return;
+        }
+        // ▼ 追加：現在のアーカイブがプライベートかつ自分がオーナーか判定
+        const archive = $Data.Store.GetArchive();
+        const canDetach = archive && !archive.is_public && archive.is_owner;
+        console.log("canDetach:", archive);
+        const el = $Dom.GenerateTemplate("tpl-timeline-container");
+        const listContainer = $Dom.QuerySelector(".js-list-container", el);
+        let currentDate = ""; // 現在描画中の日付を保持
+        // すでにソート済みなので、上から順にループするだけでOK！
+        details.forEach((item, index) => {
+            const dateStr = (item.memo_date || "");
+            // 日付が変わったタイミングでだけヘッダーを差し込む
+            if (currentDate !== dateStr) {
+                const header = $Dom.GenerateTemplate("tpl-timeline-date");
+                $Dom.QuerySelector(".js-date-text", header).textContent = dateStr;
+                listContainer.appendChild(header);
+                currentDate = dateStr;
+            }
+            // アイテムの描画
+            const child = $Dom.GenerateTemplate("tpl-timeline-item");
+            // インデックス番号のセット
+            const indexBadge = $Dom.QuerySelector(".js-index-badge", child);
+            if (indexBadge) indexBadge.textContent = (index + 1);
+            $Dom.QuerySelector(".js-time", child).textContent = item.memo_time || "";
+            $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
+            $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
+            $Dom.QuerySelector(".js-body", child).textContent = item.body || "";
+            // ==========================================
+            // ▼ 追加：野良化（切り離し）ボタンの制御
+            // ==========================================
+            const btnDetach = $Dom.QuerySelector(".js-btn-detach", child);
+            if (btnDetach) {
+                if (canDetach) {
+                    $Dom.ToggleShow(btnDetach, true);
+                    btnDetach.onclick = async (e) => {
+                        e.stopPropagation(); // 親の「マーカー選択(onclick)」が誤爆しないようにストップ
+                        const isOk = await this.ShowConfirm({
+                            title: "REMOVE ITEM",
+                            help: "",
+                            message: "このメモをまとめから外し、単独のメモに戻しますか？"
+                        });
+                        if (!isOk) return;
+                        // API通信（対象の seq を送る）
+                        const isSuccess = await $Data.Access.DetachDetails({ seqs: [item.seq] });
+                        if (!isSuccess) return;
+                        $Notice.Info("まとめから外しました。");
+                        this._core.closeAll();
+                        // まとめを再読み込みして画面をリフレッシュ
+                        await $App.RefreshScreen(); 
+                    };
+                } else {
+                    $Dom.ToggleShow(btnDetach, false); // 表示条件を満たさない場合は隠す
+                }
+            }
+            // 金額のセットと色分け
+            const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
+            const priceEl = $Dom.QuerySelector(".js-price", child);
+            const priceUnitEl = $Dom.QuerySelector(".js-price-unit", child);
+            if (priceEl && priceWrapper) {
+                const price = Number(item.memo_price || 0);
+                if (price !== 0) {
+                    // 金額がある場合は表示
+                    $Dom.ToggleShow(priceWrapper, true);
+                    // 通貨単位の取得（親アーカイブの設定、またはユーザー設定）
+                    let displayCurrency = $App.AppData.Owner.Currency_unit || 'JPY';
+                    if (item.archive_id > 0) {
+                        const archiveList = $Data.Store.GetArchiveList() || [];
+                        const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
+                        if (targetArc && targetArc.currency_unit) {
+                            displayCurrency = targetArc.currency_unit;
+                        }
+                    }
+                    if (priceUnitEl) priceUnitEl.textContent = displayCurrency;
+                    if (price > 0) {
+                        priceEl.textContent = `+${price.toLocaleString()}`;
                         priceEl.className += " text-blue-500";
                     } else if (price < 0) {
                         priceEl.textContent = price.toLocaleString();
@@ -401,8 +505,6 @@ export default {
                 const cardHtml = "js-item-card flex items-center gap-3 p-3 mb-2 rounded-[1rem] border-2 cursor-pointer active:scale-[0.98] transition-all";
                 const checkHtml = "shrink-0 w-6 h-6 rounded-[1rem] border-2 flex items-center justify-center js-checkbox transition-colors";
                 if (isSel) {
-                    // card.className = "js-item-card flex items-center gap-3 p-3 mb-2 rounded-[1rem] border-2 cursor-pointer active:scale-[0.98] transition-all border-brand-5 bg-white shadow-md";
-                    // checkbox.className = "shrink-0 w-6 h-6 rounded-[1rem] border-2 flex items-center justify-center js-checkbox transition-colors border-brand-5 bg-brand-5";
                     card.className = cardHtml + " border-brand-5 bg-white shadow-md";
                     checkbox.className = checkHtml + " border-brand-5 bg-brand-5";
                     mark.classList.remove("hidden");
@@ -456,8 +558,7 @@ export default {
             buttons: [[
                 {
                     id: "btn-ms-merge",
-                    label: "⇄ MERGE",
-                    // className: "bg-brand-5 text-white shadow-md disabled:opacity-50 flex items-center justify-center gap-2",
+                    label: "⇄　MERGE",
                     className: "disabled:opacity-50 flex items-center justify-center gap-2",
                     handler: async () => {
                         const seqs = Array.from(selectedSeqs);
@@ -489,6 +590,33 @@ export default {
                         this.SelectArchiveForAdd(seqs);
                     }
                 },
+                {
+                    id: "btn-ms-delete",
+                    label: "🗑　DELETE",
+                    // 危険な操作なので赤枠・赤文字でデザイン
+                    className: "disabled:opacity-50 flex items-center justify-center gap-2",
+                    handler: async () => {
+                        const seqs = Array.from(selectedSeqs);
+                        const isOk = await this.ShowConfirm({
+                            title: "DELETE ITEMS",
+                            help: "",
+                            message: `選択した ${seqs.length} 件のアイテムを削除しますか？\n（この操作は元に戻せません）`
+                        });
+                        if (!isOk) return;
+                        const isOk2 = await this.ShowConfirm({
+                            title: "DELETE ITEMS",
+                            help: "",
+                            message: `選択した ${seqs.length} 件のアイテムを削除します。`
+                        });
+                        if (!isOk2) return;     
+                        // API通信でサーバー側に配列を渡す
+                        const isSuccess = await $Data.Access.DeleteStrayDetails({ seqs: seqs });
+                        if (!isSuccess) return;
+                        $Notice.Info("選択したメモを削除しました。");
+                        this._core.closeAll();
+                        await $App.RefreshScreen(); // マーカーと一覧を最新化
+                    }
+                }
             ]]
         });
         updateSelectionUI(); // フッターボタン生成後に再度呼んで初期状態の disabled を反映

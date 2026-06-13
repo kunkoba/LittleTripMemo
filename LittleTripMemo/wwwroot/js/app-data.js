@@ -1,6 +1,6 @@
 // ホスティングサーバ
-const BaseUrl = "https://localhost:7292";
-// const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
+// const BaseUrl = "https://localhost:7292";
+const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
 // const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
 
 // データ管理（通信・保持）を統合したオブジェクト
@@ -9,9 +9,16 @@ window.$Data = {
     resData: null,
     // データの完全初期化
     Clear() {
-        this.Access._rawData.archives =[];
-        this.Access._rawData.details =[];
-        this.Store.Restore();
+        // ① resData もクリアする
+        this.resData = null;
+        // ② "archives" ではなく "archive"（単数形）にし、初期値を null にする
+        this.Access._rawData.archive = null; 
+        this.Access._rawData.details = [];
+        this.Access._rawData.myReactions = [];
+        this.Access._rawData.archiveList = [];
+        this.Access._rawData.userProfile = null;
+        // ③ Restore() でも良いですが、Store内に既に Clear() があるのでそちらを呼ぶとより確実です
+        this.Store.Restore(); 
     },
     // 通信関連のメソッド群
     Access: {
@@ -281,9 +288,6 @@ window.$Data = {
             this._myReactions = structuredClone($Data.Access._rawData.myReactions || []);
             this._archiveList = structuredClone($Data.Access._rawData.archiveList ||[]);
             this._userProfile = structuredClone($Data.Access._rawData.userProfile || null);
-        },
-        Clear(){
-            this._archive = null; this._details =[]; this._archiveList = null; this._userProfile = null;
         },
         // 詳細データを取得
         _getDetails(archiveId, seq) {

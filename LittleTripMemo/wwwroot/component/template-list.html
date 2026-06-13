@@ -31,6 +31,21 @@
 </template>
 
 <!-- 【リスト子】タイムラインアイテム -->
+<template id="tpl-timeline-item_2">
+    <div class="relative flex items-stretch gap-2 group cursor-pointer active:scale-[0.98] transition-transform mb-2 mt-1">
+        <div class="shrink-0 w-10 flex flex-col items-center pt-2 z-10">
+            <div class="js-face text-[24px] bg-brand-0 pb-1"></div>
+            <div class="text-[0.6rem] font-black text-black-5 js-time tracking-wider bg-brand-0 px-1"></div>
+        </div>
+        <div class="flex-1 bg-white rounded-[1rem] p-3 border border-slate-200 shadow-md relative overflow-hidden flex flex-col items-start gap-2">
+            <div class="js-index-badge absolute top-2 right-2 w-7 h-7 rounded-full bg-brand-4 text-white font-black text-[0.8rem] flex items-center justify-center shadow-sm z-20"></div>
+            <div class="border-l-4 border-brand-3 pl-2 py-0.5 w-full"><div class="js-title text-[0.8rem] font-black text-black-5 break-words "></div></div>
+            <div class="js-price-wrapper pl-3 flex items-baseline italic w-full hidden"><span class="js-price text-[1rem] font-black italic "></span><span class="js-price-unit text-[0.6rem] font-bold text-slate-400 ml-1.5 uppercase"></span></div>
+            <div class="js-body text-[0.8rem] text-black-4 whitespace-pre-wrap break-words w-full"></div>
+        </div>
+    </div>
+</template>
+<!-- 【リスト子】タイムラインアイテム -->
 <template id="tpl-timeline-item">
     <div class="relative flex items-stretch gap-2 group cursor-pointer active:scale-[0.98] transition-transform mb-2 mt-1">
         <div class="shrink-0 w-10 flex flex-col items-center pt-2 z-10">
@@ -39,6 +54,10 @@
         </div>
         <div class="flex-1 bg-white rounded-[1rem] p-3 border border-slate-200 shadow-md relative overflow-hidden flex flex-col items-start gap-2">
             <div class="js-index-badge absolute top-2 right-2 w-7 h-7 rounded-full bg-brand-4 text-white font-black text-[0.8rem] flex items-center justify-center shadow-sm z-20"></div>
+            
+            <!-- ▼ 追加：野良化（Detach）ボタン（デフォルトは hidden） -->
+            <button class="js-btn-detach hidden absolute top-2 right-10 w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-500 flex items-center justify-center shadow-sm z-20 hover:bg-slate-100 active:scale-95 transition-all text-[0.8rem]">🗑</button>
+            
             <div class="border-l-4 border-brand-3 pl-2 py-0.5 w-full"><div class="js-title text-[0.8rem] font-black text-black-5 break-words "></div></div>
             <div class="js-price-wrapper pl-3 flex items-baseline italic w-full hidden"><span class="js-price text-[1rem] font-black italic "></span><span class="js-price-unit text-[0.6rem] font-bold text-slate-400 ml-1.5 uppercase"></span></div>
             <div class="js-body text-[0.8rem] text-black-4 whitespace-pre-wrap break-words w-full"></div>
