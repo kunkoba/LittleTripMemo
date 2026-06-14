@@ -40,8 +40,8 @@ public class SendUserNotificationService : _BaseService
     private async Task ValidateAsync(SendUserNotificationReq req)
     {
         // 権限チェック
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ログインが必要です");
-        BusinessException.ThrowIf(_user.Plan != PlanType.Admin.ToString(), "管理者権限が必要です");
+        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ログインが必要です");
+        BusinessException.ThrowIf(_user.plan_type != PlanType.Admin.ToString(), "管理者権限が必要です");
 
         // 入力チェック
         BusinessException.ThrowIf(req.target_user_id == Guid.Empty, "対象ユーザーIDが不正です");

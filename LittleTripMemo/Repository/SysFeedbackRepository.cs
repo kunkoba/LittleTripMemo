@@ -18,7 +18,7 @@ public class SysFeedbackRepository : _BaseRepository
     /// </summary>
     public async Task<int> UpsertAsync(TSysFeedback feedback)
     {
-        feedback.user_id = _user.UserId;
+        feedback.user_id = _user.user_id;
 
         const string sql = @"
             INSERT INTO t_sys_feedbacks (
@@ -49,7 +49,7 @@ public class SysFeedbackRepository : _BaseRepository
             SELECT * FROM t_sys_feedbacks 
             WHERE user_id = @user_id";
 
-        return await QuerySingleOrDefaultAsync<TSysFeedback>(sql, new { user_id = _user.UserId });
+        return await QuerySingleOrDefaultAsync<TSysFeedback>(sql, new { user_id = _user.user_id });
     }
 
     /// <summary>

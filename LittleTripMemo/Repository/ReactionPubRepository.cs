@@ -16,7 +16,7 @@ public class ReactionPubRepository : _BaseRepository
     /// </summary>
     public async Task<int> UpsertAsync(TReactionPub reaction)
     {
-        reaction.user_id = _user.UserId;
+        reaction.user_id = _user.user_id;
 
         const string sql = @"
             INSERT INTO t_reaction_pub (
@@ -50,7 +50,7 @@ public class ReactionPubRepository : _BaseRepository
             WHERE archive_id = @archiveId 
               AND user_id    = @user_id";
 
-        return await QueryAsync<TReactionPub>(sql, new { archiveId = archiveId, user_id = _user.UserId });
+        return await QueryAsync<TReactionPub>(sql, new { archiveId = archiveId, user_id = _user.user_id });
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public class ReactionPubRepository : _BaseRepository
               AND seq        = @seq
               AND user_id    = @user_id";
 
-        return await ExecuteAsync(sql, new { archiveId, seq, user_id = _user.UserId });
+        return await ExecuteAsync(sql, new { archiveId, seq, user_id = _user.user_id });
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public class ReactionPubRepository : _BaseRepository
     /// </summary>
     public async Task UpsertWithCounterAsync(TReactionPub reaction)
     {
-        reaction.user_id = _user.UserId;
+        reaction.user_id = _user.user_id;
 
         // CTE (Common Table Expressions) を使用して
         // 1. 既存の値を取得 (old_val)

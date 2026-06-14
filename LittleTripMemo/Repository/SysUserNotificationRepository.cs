@@ -28,7 +28,7 @@ public class SysUserNotificationRepository : _BaseRepository
             WHERE user_id = @user_id 
             ORDER BY send_tim DESC LIMIT 20";
 
-        return await QueryAsync<TSysUserNotification>(sql, new { user_id = _user.UserId });
+        return await QueryAsync<TSysUserNotification>(sql, new { user_id = _user.user_id });
     }
 
     /// <summary>

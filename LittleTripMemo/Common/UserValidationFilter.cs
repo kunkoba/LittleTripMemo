@@ -18,7 +18,7 @@ public class UserValidationFilter : IActionFilter
             if (arg is ILoginUserRequest req)
             {
                 // サーバー側のJWT情報（_user.UserId）とリクエスト内のIDを比較
-                if (_user.UserId != Guid.Empty && _user.UserId != req.login_user_id)
+                if (_user.user_id != Guid.Empty && _user.user_id != req.login_user_id)
                 {
                     //// 管理者でない場合はエラー
                     //if (_user.Plan != PlanType.Admin.ToString())

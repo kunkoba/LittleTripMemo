@@ -10,7 +10,7 @@ namespace LittleTripMemo.Controllers;
 public abstract class _BaseController : ControllerBase
 {
     protected readonly UserContext _user;
-    protected bool IsLoggedIn => _user.UserId != Guid.Empty;
+    protected bool IsLoggedIn => _user.user_id != Guid.Empty;
 
     protected _BaseController(UserContext userContext)
     {
@@ -23,7 +23,7 @@ public abstract class _BaseController : ControllerBase
         return Ok(new
         {
             is_logged_in = IsLoggedIn,
-            plan = _user.Plan,
+            plan = _user.plan_type,
             data = result
         });
     }

@@ -1,116 +1,91 @@
-﻿// Services/AccountService.cs
-
-using LittleTripMemo.Configs;
+﻿using LittleTripMemo.Configs;
 using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using LittleTripMemo.Common;
 
 namespace LittleTripMemo.Services;
 
 public class RegistrationUserService
 {
     private readonly UserManager<MyAppUser> _userManager;
-    private readonly AccountRepository _accountRepository;
-    private readonly ILogger<RegistrationUserService> _logger;
-    private readonly MyAppSettings _settings;
+    private readonly AppUserRepository _appUserRepo; // AppUserRepositoryを使用
     private readonly JwtService _jwtService;
+    private readonly MyAppSettings _settings;
 
-    // リクエスト
     public record FirebaseLoginRequest(string Email);
-
-    // レスポンス（tokenを追加）
-    //public record Response(bool is_success, string message, string? token = null);
     public record Response(bool is_success, string message, string? token = null, Guid? userId = null, string? plan = null);
 
     public RegistrationUserService(
         UserManager<MyAppUser> userManager,
-        AccountRepository userRepo,
+        AppUserRepository appUserRepo,
         IOptions<MyAppSettings> settings,
-        ILogger<RegistrationUserService> logger,
-        JwtService jwtService) // ★DIで受け取る
+        JwtService jwtService)
     {
         _userManager = userManager;
-        _accountRepository = userRepo;
+        _appUserRepo = appUserRepo;
         _settings = settings.Value;
-        _logger = logger;
-        _jwtService = jwtService; // ★代入
+        _jwtService = jwtService;
     }
 
-    /// <summary>
-    /// ログイン・登録を一括で行い、トークンを返す（ユースケース）
-    /// </summary>
     public async Task<Response> LoginOrRegisterAsync(FirebaseLoginRequest request)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
+        // 1. まず Identity(AspNetUsers) を検索
+        var authUser = await _userManager.FindByEmailAsync(request.Email);
 
-        if (user == null)
+        if (authUser == null)
         {
-            // 下記の RegisterAsync を実行
-            var regResult = await RegisterAsync(request.Email);
+            // 未登録なら新規作成（認証 ＋ アプリ用データの両方）
+            var regResult = await RegisterInternalAsync(request.Email);
             if (!regResult.is_success) return regResult;
-
-            // ユーザ検索
-            user = await _userManager.FindByEmailAsync(request.Email);
+            authUser = await _userManager.FindByEmailAsync(request.Email);
         }
 
-        if (user == null) return new Response(false, "ユーザー取得失敗");
+        // 2. アプリ用テーブル (t_app_user) から詳細データを取得
+        var appUser = await _appUserRepo.GetByUserIdAsync(authUser!.Id);
 
-        // JwtService を使ってトークン生成
-        var token = _jwtService.CreateToken(user);
+        // もし認証はあるのにアプリデータがない場合はここで補完（またはエラー）
+        if (appUser == null) return new Response(false, "ユーザー業務データが不足しています。");
 
-        //return new Response(true, "成功", token);
-        return new Response(true, "成功", token, user.Id, user.Plan);
+        // 3. トークン生成（Identity情報とアプリ情報の両方を使ってJWTを作る）
+        var token = _jwtService.CreateToken(authUser, appUser);
+
+        return new Response(true, "成功", token, appUser.user_id, appUser.plan_type);
     }
 
-    /// <summary>
-    /// 新規ユーザー登録（認証という仕事なのでサービス層で処理）
-    /// </summary>
-    public async Task<Response> RegisterAsync(string email)
+    private async Task<Response> RegisterInternalAsync(string email)
     {
-        if (await _userManager.FindByEmailAsync(email) != null)
-        {
-            return new Response(false, "既に登録済みです。");
-        }
+        // ① 認証ユーザーの作成 (AspNetUsers)
+        var identityUser = new MyAppUser { Email = email, UserName = email };
+        var result = await _userManager.CreateAsync(identityUser);
+        if (!result.Succeeded) return new Response(false, "認証登録に失敗しました。");
 
-        var tableId = await SelectTableIdAsync();
-
-        var user = new MyAppUser
+        // ② アプリ用データの作成 (t_app_user)
+        var table_id = await SelectTableIdAsync();
+        var appUser = new TAppUser
         {
-            Email = email,
-            TableId = tableId,
-            UserName = email,
-            Icon = "❔",
-            NickName = email.Split('@')[0],
-            Description = "はじめまして！",
+            user_id = identityUser.Id,
+            table_id = table_id,
+            plan_type = PlanType.Free.ToString(),
+            nick_name = email.Split('@')[0],
+            icon = "❔"
         };
-
-        var result = await _userManager.CreateAsync(user);
-
-        if (!result.Succeeded)
-        {
-            _logger.LogWarning("User creation failed: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
-            return new Response(false, "ユーザー登録に失敗しました。");
-        }
+        await _appUserRepo.InsertAsync(appUser);
 
         return new Response(true, "成功");
     }
 
-    /// <summary>
-    /// テーブルID取得（テーブル分散したテーブルから件数が一番少ないテーブルを取得）
-    /// </summary>
-    /// <returns></returns>
     private async Task<int> SelectTableIdAsync()
     {
-        var tableCounts = new List<(int Id, long Count)>();
+        var tableCounts = new List<(int id, long count)>();
         for (int i = 1; i <= _settings.MaxTableNum; i++)
         {
-            var count = await _accountRepository.GetTableCountAsync(i);
+            var count = await _appUserRepo.GetTableCountAsync(i);
             tableCounts.Add((i, count));
         }
-        // 一番小さいものを取得
-        return tableCounts.OrderBy(x => x.Count).ThenBy(x => x.Id).First().Id;
+        return tableCounts.OrderBy(x => x.count).ThenBy(x => x.id).First().id;
     }
-}
 
+}

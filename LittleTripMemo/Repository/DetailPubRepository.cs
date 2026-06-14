@@ -13,7 +13,7 @@ public class DetailPubRepository : _BaseRepository
 
     public async Task<int> InsertAsync(TMemoDetailPub detail)
     {
-        detail.user_id = _user.UserId;
+        detail.user_id = _user.user_id;
 
         const string sql = @"
             INSERT INTO t_memo_detail_pub (
@@ -30,7 +30,7 @@ public class DetailPubRepository : _BaseRepository
 
     public async Task<int> UpdateByKeyAsync(TMemoDetailPub detail)
     {
-        detail.user_id = _user.UserId;
+        detail.user_id = _user.user_id;
 
         const string sql = @"
             UPDATE t_memo_detail_pub SET
@@ -54,7 +54,7 @@ public class DetailPubRepository : _BaseRepository
 
     public async Task<IEnumerable<TMemoDetailPub>> GetByArchiveIdAsync(int archiveId)
     {
-        var loginUserId = _user.UserId;
+        var loginUserId = _user.user_id;
 
         string sql = $@"
             SELECT 
@@ -82,7 +82,7 @@ public class DetailPubRepository : _BaseRepository
         DELETE FROM t_memo_detail_pub
         WHERE archive_id = @archive_id
           AND user_id    = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
     }
 
     /// <summary>

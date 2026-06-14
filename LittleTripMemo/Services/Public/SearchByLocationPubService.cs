@@ -36,7 +36,7 @@ public class SearchByLocationPubService : _BaseService
             req.keyword,
             req.sortField,
             req.reactionType,
-            _user.UserId,
+            _user.user_id,
             req.limit
         );
 
@@ -48,7 +48,7 @@ public class SearchByLocationPubService : _BaseService
 
     private async Task ValidateAsync(SearchByLocationPubReq req)
     {
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
         await Task.CompletedTask;
     }
 }

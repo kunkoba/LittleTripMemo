@@ -44,7 +44,7 @@ public class UpsertFeedbackService : _BaseService
             // ② フィードバックを保存（Upsert）
             await _repo.UpsertAsync(new TSysFeedback
             {
-                user_id = _user.UserId,
+                user_id = _user.user_id,
                 body = req.body,
                 score = req.score
             });
@@ -54,7 +54,7 @@ public class UpsertFeedbackService : _BaseService
             {
                 await _userNoteRepo.InsertAsync(new TSysUserNotification
                 {
-                    user_id = _user.UserId,
+                    user_id = _user.user_id,
                     kind = (short)UserNotificationKind.Info,
                     body = "フィードバックありがとうございます！\nいただいた内容はアプリの改善に役立てさせていただきます。今後ともよろしくお願いいたします。🌻",
                 });
@@ -74,7 +74,7 @@ public class UpsertFeedbackService : _BaseService
 
     private async Task ValidateAsync(UpsertFeedbackReq req)
     {
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ログインが必要です");
+        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(req.score < 1 || req.score > 5, "スコアは1~5の間で指定してください");
         await Task.CompletedTask;
     }

@@ -24,11 +24,11 @@ public class DetailRepository : _BaseRepository
     /// </summary>
     public async Task<int> InsertAsync(TMemoDetail entity)
     {
-        entity.user_id = _user.UserId;
+        entity.user_id = _user.user_id;
 
         // _tableId を用いて物理テーブル名を指定
         string sql = $@"
-            INSERT INTO t_memo_detail_{_user.TableId} (
+            INSERT INTO t_memo_detail_{_user.table_id} (
                 archive_id, user_id, latitude, longitude, title, body, 
                 memo_date, memo_time, face_emoji, weather_code, link_url, 
                 memo_price, create_tim, update_tim
@@ -46,10 +46,10 @@ public class DetailRepository : _BaseRepository
     /// </summary>
     public async Task<int> UpdateByKeyAsync(TMemoDetail detail)
     {
-        detail.user_id = _user.UserId;
+        detail.user_id = _user.user_id;
 
         string sql = $@"
-            UPDATE t_memo_detail_{_user.TableId} SET
+            UPDATE t_memo_detail_{_user.table_id} SET
                 latitude     = @latitude,
                 longitude    = @longitude,
                 title        = @title,
@@ -74,13 +74,13 @@ public class DetailRepository : _BaseRepository
     public async Task<IEnumerable<TMemoDetail>> GetByArchiveIdAsync(int archiveId)
     {
         string sql = $@"
-            SELECT * FROM t_memo_detail_{_user.TableId} 
+            SELECT * FROM t_memo_detail_{_user.table_id} 
             WHERE archive_id = @archive_id 
               AND user_id    = @user_id 
               AND del_flg    = false 
             ORDER BY memo_date ASC, memo_time ASC";
 
-        return await QueryAsync<TMemoDetail>(sql, new { archive_id = archiveId, user_id = _user.UserId });
+        return await QueryAsync<TMemoDetail>(sql, new { archive_id = archiveId, user_id = _user.user_id });
     }
 
     /// <summary>
@@ -90,7 +90,7 @@ public class DetailRepository : _BaseRepository
     public async Task<int> UpdateArchiveIdBySeqsAsync(int archiveId, int[] seqs)
     {
         string sql = $@"
-        UPDATE t_memo_detail_{_user.TableId} SET
+        UPDATE t_memo_detail_{_user.table_id} SET
             archive_id = @archive_id,
             update_tim = CURRENT_TIMESTAMP
         WHERE 
@@ -102,7 +102,7 @@ public class DetailRepository : _BaseRepository
         {
             archive_id = archiveId,
             seqs,
-            user_id = _user.UserId
+            user_id = _user.user_id
         });
     }
 
@@ -112,14 +112,14 @@ public class DetailRepository : _BaseRepository
     public async Task<int> DeleteByArchiveIdAsync(int archive_id)
     {
         string sql = $@"
-            UPDATE t_memo_detail_{_user.TableId} SET
+            UPDATE t_memo_detail_{_user.table_id} SET
                 del_flg    = true,
                 update_tim = CURRENT_TIMESTAMP
             WHERE 
                 archive_id = @archive_id 
                 AND user_id = @user_id";
 
-        return await ExecuteAsync(sql, new { archive_id, user_id = _user.UserId });
+        return await ExecuteAsync(sql, new { archive_id, user_id = _user.user_id });
     }
 
     /// <summary>
@@ -128,13 +128,13 @@ public class DetailRepository : _BaseRepository
     public async Task<IEnumerable<TMemoDetail>> GetUnMergedAsync()
     {
         string sql = $@"
-        SELECT * FROM t_memo_detail_{_user.TableId} 
+        SELECT * FROM t_memo_detail_{_user.table_id} 
         WHERE archive_id = 0
           AND user_id    = @user_id 
           AND del_flg    = false 
         ORDER BY memo_date ASC, memo_time ASC";
 
-        return await QueryAsync<TMemoDetail>(sql, new { user_id = _user.UserId });
+        return await QueryAsync<TMemoDetail>(sql, new { user_id = _user.user_id });
     }
 
     /// <summary>
@@ -143,7 +143,7 @@ public class DetailRepository : _BaseRepository
     public async Task<int> ReleaseArchiveIdAsync(int archiveId)
     {
         string sql = $@"
-            UPDATE t_memo_detail_{_user.TableId} SET
+            UPDATE t_memo_detail_{_user.table_id} SET
                 archive_id = 0,
                 update_tim = CURRENT_TIMESTAMP
             WHERE 
@@ -153,7 +153,7 @@ public class DetailRepository : _BaseRepository
         return await ExecuteAsync(sql, new
         {
             archive_id = archiveId,
-            user_id = _user.UserId
+            user_id = _user.user_id
         });
     }
 
@@ -165,13 +165,13 @@ public class DetailRepository : _BaseRepository
     public async Task<int> RestoreByKeyAsync(int archiveId)
     {
         string sql = $@"
-            UPDATE t_memo_detail_{_user.TableId}
+            UPDATE t_memo_detail_{_user.table_id}
             SET del_flg    = false,
                 update_tim = CURRENT_TIMESTAMP
             WHERE
                 archive_id = @archive_id
                 AND user_id = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
     }
 
     /// <summary>
@@ -197,7 +197,7 @@ public class DetailRepository : _BaseRepository
     public async Task<int> DeleteStrayBySeqsAsync(int[] seqs)
     {
         string sql = $@"
-        UPDATE t_memo_detail_{_user.TableId} SET
+        UPDATE t_memo_detail_{_user.table_id} SET
             del_flg    = true,
             update_tim = CURRENT_TIMESTAMP
         WHERE 
@@ -205,7 +205,7 @@ public class DetailRepository : _BaseRepository
             AND archive_id = 0
             AND user_id    = @user_id";
 
-        return await ExecuteAsync(sql, new { seqs, user_id = _user.UserId });
+        return await ExecuteAsync(sql, new { seqs, user_id = _user.user_id });
     }
 
     /// <summary>
@@ -214,7 +214,7 @@ public class DetailRepository : _BaseRepository
     public async Task<int> DetachBySeqsAsync(int[] seqs)
     {
         string sql = $@"
-        UPDATE t_memo_detail_{_user.TableId} SET
+        UPDATE t_memo_detail_{_user.table_id} SET
             archive_id = 0,
             update_tim = CURRENT_TIMESTAMP
         WHERE 
@@ -222,7 +222,7 @@ public class DetailRepository : _BaseRepository
             AND archive_id > 0
             AND user_id    = @user_id";
 
-        return await ExecuteAsync(sql, new { seqs, user_id = _user.UserId });
+        return await ExecuteAsync(sql, new { seqs, user_id = _user.user_id });
     }
 
 }

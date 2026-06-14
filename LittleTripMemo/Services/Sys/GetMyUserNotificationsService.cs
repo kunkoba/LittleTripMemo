@@ -24,7 +24,7 @@ public class GetMyUserNotificationsService : _BaseService
 
     private async Task ValidateAsync()
     {
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です。ログインしてください。");
+        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です。ログインしてください。");
         await Task.CompletedTask;
     }
 }

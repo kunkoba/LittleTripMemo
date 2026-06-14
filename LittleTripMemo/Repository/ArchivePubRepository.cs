@@ -12,7 +12,7 @@ public class ArchivePubRepository : _BaseRepository
 
     public async Task<int> InsertAsync(TMemoArchivePub archive)
     {
-        archive.user_id = _user.UserId;
+        archive.user_id = _user.user_id;
         const string sql = @"
             INSERT INTO t_memo_archive_pub (
                 archive_id, user_id, title, memo, link_url, currency_unit, closed_flg, del_flg, create_tim, update_tim
@@ -24,7 +24,7 @@ public class ArchivePubRepository : _BaseRepository
 
     public async Task<int> UpdateByKeyAsync(TMemoArchivePub archive)
     {
-        archive.user_id = _user.UserId;
+        archive.user_id = _user.user_id;
 
         const string sql = @"
             UPDATE t_memo_archive_pub SET
@@ -57,7 +57,7 @@ public class ArchivePubRepository : _BaseRepository
         DELETE FROM t_memo_archive_pub
         WHERE archive_id = @archive_id
           AND user_id    = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
     }
 
     public async Task<int> OpenByKeyAsync(int archiveId)
@@ -68,7 +68,7 @@ public class ArchivePubRepository : _BaseRepository
             update_tim = CURRENT_TIMESTAMP
         WHERE archive_id = @archive_id
           AND user_id    = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
     }
 
     public async Task<int> CloseByKeyAsync(int archiveId)
@@ -79,7 +79,7 @@ public class ArchivePubRepository : _BaseRepository
             update_tim = CURRENT_TIMESTAMP
         WHERE archive_id = @archive_id
           AND user_id    = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
     }
 
     /// <summary>
@@ -165,6 +165,6 @@ public class ArchivePubRepository : _BaseRepository
           AND del_flg = false
         ORDER BY create_tim DESC";
 
-        return await QueryAsync<TMemoArchivePub>(sql, new { user_id = _user.UserId });
+        return await QueryAsync<TMemoArchivePub>(sql, new { user_id = _user.user_id });
     }
 }

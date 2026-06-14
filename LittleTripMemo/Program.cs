@@ -88,7 +88,7 @@ builder.Services.AddScoped<JwtService>();
 // ---- Repository（DBアクセス層） ----
 
 // Service からのみ使用され、Controller からは直接触らせない
-builder.Services.AddScoped<AccountRepository>();
+builder.Services.AddScoped<AppUserRepository>();
 builder.Services.AddScoped<ArchiveRepository>();
 builder.Services.AddScoped<DetailRepository>();
 builder.Services.AddScoped<ArchivePubRepository>();

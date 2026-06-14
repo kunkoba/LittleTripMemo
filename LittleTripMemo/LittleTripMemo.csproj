@@ -10,6 +10,7 @@
     <Compile Remove="Controllers\Account\**" />
     <Compile Remove="Controllers\Private\**" />
     <Compile Remove="Logs\**" />
+    <Compile Remove="Migrations\**" />
     <Compile Remove="Repository\Account\**" />
     <Compile Remove="Repository\Private\**" />
     <Compile Remove="ViewModels\**" />
@@ -27,6 +28,7 @@
     <Content Remove="Controllers\Account\**" />
     <Content Remove="Controllers\Private\**" />
     <Content Remove="Logs\**" />
+    <Content Remove="Migrations\**" />
     <Content Remove="Repository\Account\**" />
     <Content Remove="Repository\Private\**" />
     <Content Remove="ViewModels\**" />
@@ -44,6 +46,7 @@
     <EmbeddedResource Remove="Controllers\Account\**" />
     <EmbeddedResource Remove="Controllers\Private\**" />
     <EmbeddedResource Remove="Logs\**" />
+    <EmbeddedResource Remove="Migrations\**" />
     <EmbeddedResource Remove="Repository\Account\**" />
     <EmbeddedResource Remove="Repository\Private\**" />
     <EmbeddedResource Remove="ViewModels\**" />
@@ -61,6 +64,7 @@
     <None Remove="Controllers\Account\**" />
     <None Remove="Controllers\Private\**" />
     <None Remove="Logs\**" />
+    <None Remove="Migrations\**" />
     <None Remove="Repository\Account\**" />
     <None Remove="Repository\Private\**" />
     <None Remove="ViewModels\**" />
@@ -78,6 +82,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\~MyAppUser.cs" />
+    <Compile Remove="Repository\~AccountRepository.cs" />
     <Compile Remove="Services\Private\_ArchiveUpdateService.cs" />
     <Compile Remove="Services\Private\_HistoryRegistrationService.cs" />
     <Compile Remove="Services\Private\~UpsertDetailService.cs" />

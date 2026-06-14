@@ -3,6 +3,28 @@ using LittleTripMemo.Common;
 
 namespace LittleTripMemo.Models;
 
+// アプリ固有ユーザ
+public class TAppUser
+{
+    public Guid user_id { get; set; }
+    public int table_id { get; set; }
+    public string plan_type { get; set; } = "Free";
+    public string? icon { get; set; }
+    public string? nick_name { get; set; }
+    public string? description { get; set; }
+    public string? link_1 { get; set; }
+    public string? link_2 { get; set; }
+    public string? link_3 { get; set; }
+    public DateTime create_tim { get; set; }
+    public DateTime update_tim { get; set; }
+}
+
+// 認証用（Identity標準に戻す）
+public class MyAppUser : Microsoft.AspNetCore.Identity.IdentityUser<Guid>
+{
+    // ここにはアプリ固有のプロパティは持たせない
+}
+
 public class TMemoArchive : IAppRecord
 {
     public int archive_id { get; set; } = 0;

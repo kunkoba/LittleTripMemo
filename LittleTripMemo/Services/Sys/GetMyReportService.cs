@@ -26,7 +26,7 @@ public class GetMyReportService : _BaseService
 
     private async Task ValidateAsync(GetMyReportReq req)
     {
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(req.archive_id <= 0, "アーカイブIDが無効です");
         await Task.CompletedTask;
     }

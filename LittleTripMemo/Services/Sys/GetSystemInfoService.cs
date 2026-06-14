@@ -10,18 +10,18 @@ public class GetSystemInfoService : _BaseService
     private readonly SysFeedbackRepository _feedbackRepo;
     private readonly SysNotificationRepository _notificationRepo;
     private readonly SysUserNotificationRepository _userNoteRepo;
-    private readonly SysReportRepository _reportRepo; // ★DI追加
+    private readonly SysReportRepository _reportRepo;
     private readonly GetUserProfileService _getUserProfileService;
 
     // 統合されたレスポンス構造
     public record SystemInfoData(
-        Guid login_user_id, // ★追加
+        Guid login_user_id,
         double score_avg,
         IEnumerable<DtoFeedbackDetail> feedbacks,
         IEnumerable<TSysNotification> notifications,
         GetUserProfileService.Response? ownerProfile,
         IEnumerable<TSysUserNotification>? userNotifications,
-        IEnumerable<DtoMyReportDetail>? myReports // ★これを通報履歴として追加
+        IEnumerable<DtoMyReportDetail>? myReports
     );
 
     // レスポンス形式（systemInfo でラップ）
@@ -32,7 +32,7 @@ public class GetSystemInfoService : _BaseService
         SysFeedbackRepository feedbackRepo,
         SysNotificationRepository notificationRepo,
         SysUserNotificationRepository userNoteRepo,
-        SysReportRepository reportRepo, // ★DI追加
+        SysReportRepository reportRepo,
         GetUserProfileService getUserProfileService)
         : base(userContext)
     {
@@ -56,26 +56,26 @@ public class GetSystemInfoService : _BaseService
         // 2. ユーザー固有情報の取得（ログイン時のみ）
         GetUserProfileService.Response? profile = null;
         IEnumerable<TSysUserNotification>? userNotes = null;
-        IEnumerable<DtoMyReportDetail>? myReports = null; // ★変数用意
+        IEnumerable<DtoMyReportDetail>? myReports = null;
 
-        if (_user.UserId != Guid.Empty)
+        if (_user.user_id != Guid.Empty)
         {
             // プロフィール取得（既存サービス再利用）
-            profile = await _getUserProfileService.ExecuteAsync(_user.UserId);
+            profile = await _getUserProfileService.ExecuteAsync(_user.user_id);
             // 自分宛通知
             userNotes = await _userNoteRepo.GetByUserIdAsync();
             // ユーザ通報情報
-            myReports = await _reportRepo.GetMyReportsWithDetailsAsync(); // ★ここで取得
+            myReports = await _reportRepo.GetMyReportsWithDetailsAsync();
         }
 
         return new Response(new SystemInfoData(
-            _user.UserId, avg, feeds, notes, profile, userNotes, myReports
+            _user.user_id, avg, feeds, notes, profile, userNotes, myReports
         ));
     }
 
     private async Task ValidateAsync()
     {
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
         await Task.CompletedTask;
     }
 }

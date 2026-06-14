@@ -119,8 +119,8 @@ public class BulkSyncDetailsService : _BaseService
 
     private async Task ValidateAsync(BulkSyncReq req)
     {
-        BusinessException.ThrowIf(_user.TableId == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
+        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(req.items == null || !req.items.Any(), "同期するデータがありません");
         await Task.CompletedTask;
     }
@@ -129,7 +129,7 @@ public class BulkSyncDetailsService : _BaseService
     {
         seq = item.seq,
         archive_id = item.archive_id,
-        user_id = _user.UserId,
+        user_id = _user.user_id,
         latitude = item.latitude,
         longitude = item.longitude,
         title = item.title,
@@ -147,7 +147,7 @@ public class BulkSyncDetailsService : _BaseService
     {
         seq = item.seq,
         archive_id = item.archive_id,
-        user_id = _user.UserId,
+        user_id = _user.user_id,
         latitude = item.latitude,
         longitude = item.longitude,
         title = item.title,

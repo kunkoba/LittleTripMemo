@@ -17,13 +17,14 @@ public class AdminUnpublishArchiveService : _BaseService
     private readonly ArchiveRepository _archiveRepo;
     private readonly DetailRepository _detailRepo;
     private readonly SysUserNotificationRepository _userNoteRepo;
+	private readonly AppUserRepository _appUserRepo;
     private readonly UserManager<MyAppUser> _userManager;
 
-    public record AdminUnpublishArchiveReq(
-        [Required] Guid login_user_id, // ★ 追加  
+	public record AdminUnpublishArchiveReq(
+        [Required] Guid login_user_id,
         int archive_id, 
         Guid target_user_id
-    ) : ILoginUserRequest; // ★ インターフェースを実装
+    ) : ILoginUserRequest;
 
     public record Response(bool is_success);
 
@@ -33,12 +34,14 @@ public class AdminUnpublishArchiveService : _BaseService
         ReactionPubRepository rp, SysReportRepository srr,
         ArchiveRepository ar, DetailRepository dr,
         SysUserNotificationRepository un,
-        UserManager<MyAppUser> um) : base(u)
+		AppUserRepository appUserRepo,
+		UserManager<MyAppUser> um) : base(u)
     {
         _provider = p; _archivePubRepo = ap; _detailPubRepo = dp;
         _reactionPubRepo = rp; _reportRepo = srr;
         _archiveRepo = ar; _detailRepo = dr;
-        _userNoteRepo = un; _userManager = um;
+        _appUserRepo = appUserRepo;
+		_userNoteRepo = un; _userManager = um;
     }
 
     public async Task<Response> ExecuteAsync(AdminUnpublishArchiveReq req)
@@ -47,10 +50,10 @@ public class AdminUnpublishArchiveService : _BaseService
         await ValidateAsync(req);
 
         // 対象ユーザーの情報を取得（TableId特定のため）
-        var targetUser = await _userManager.FindByIdAsync(req.target_user_id.ToString());
-        BusinessException.ThrowIf(targetUser == null, "対象ユーザーが見つかりません");
+		var user = await _appUserRepo.GetByUserIdAsync(req.target_user_id);
+		BusinessException.ThrowIf(user == null, "ユーザーが存在しません");
 
-        var archive = await _archivePubRepo.GetByKeyAsync(req.archive_id);
+		var archive = await _archivePubRepo.GetByKeyAsync(req.archive_id);
         BusinessException.ThrowIf(archive == null || archive.user_id != req.target_user_id, "対象の公開アーカイブが見つかりません");
 
         // 2. 実行
@@ -67,7 +70,7 @@ public class AdminUnpublishArchiveService : _BaseService
 
             // ③ 秘密側を復元（論理削除解除）
             await _archiveRepo.AdminRestoreByKeyAsync(req.archive_id, req.target_user_id);
-            await _detailRepo.AdminRestoreByKeyAsync(req.archive_id, req.target_user_id, targetUser.TableId);
+            await _detailRepo.AdminRestoreByKeyAsync(req.archive_id, req.target_user_id, user.table_id);
 
             // ④ 対象ユーザーへ個人通知送信（固定文言）
             await _userNoteRepo.InsertAsync(new TSysUserNotification
@@ -86,12 +89,13 @@ public class AdminUnpublishArchiveService : _BaseService
     private async Task ValidateAsync(AdminUnpublishArchiveReq req)
     {
         // お作法の管理者チェック
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ログインが必要です");
-        BusinessException.ThrowIf(_user.Plan != PlanType.Admin.ToString(), "管理者権限が必要です");
+        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ログインが必要です");
+        BusinessException.ThrowIf(_user.plan_type != PlanType.Admin.ToString(), "管理者権限が必要です");
 
         BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが不正です");
         BusinessException.ThrowIf(req.target_user_id == Guid.Empty, "ターゲットユーザーIDが不正です");
 
         await Task.CompletedTask;
     }
+
 }

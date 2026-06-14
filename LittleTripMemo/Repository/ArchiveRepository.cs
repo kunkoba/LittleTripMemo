@@ -24,7 +24,7 @@ public class ArchiveRepository : _BaseRepository
     public async Task<int> InsertAsync(TMemoArchive archive)
     {
         // ログイン中のユーザーIDを強制セット
-        archive.user_id = _user.UserId;
+        archive.user_id = _user.user_id;
 
         const string sql = @"
             INSERT INTO t_memo_archive (
@@ -42,7 +42,7 @@ public class ArchiveRepository : _BaseRepository
     /// </summary>
     public async Task<int> UpdateByKeyAsync(TMemoArchive archive)
     {
-        archive.user_id = _user.UserId;
+        archive.user_id = _user.user_id;
 
         const string sql = @"
             UPDATE t_memo_archive SET
@@ -75,7 +75,7 @@ public class ArchiveRepository : _BaseRepository
         return await ExecuteAsync(sql, new
         {
             archive_id = archiveId,
-            user_id = _user.UserId
+            user_id = _user.user_id
         });
     }
 
@@ -93,7 +93,7 @@ public class ArchiveRepository : _BaseRepository
         return await QuerySingleOrDefaultAsync<TMemoArchive>(sql, new
         {
             archive_id = archiveId,
-            user_id = _user.UserId
+            user_id = _user.user_id
         });
     }
 
@@ -111,7 +111,7 @@ public class ArchiveRepository : _BaseRepository
         WHERE
             archive_id = @archive_id
             AND user_id = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
     }
 
     /// <summary>
@@ -136,14 +136,14 @@ public class ArchiveRepository : _BaseRepository
         UPDATE t_memo_archive a
         SET detail_count = (
             SELECT count(*) 
-            FROM t_memo_detail_{_user.TableId} d 
+            FROM t_memo_detail_{_user.table_id} d 
             WHERE d.archive_id = a.archive_id 
               AND d.del_flg = false
         )
         WHERE a.archive_id = @archive_id 
           AND a.user_id = @user_id";
 
-        await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });
+        await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
     }
 
     /// <summary>
@@ -158,7 +158,7 @@ public class ArchiveRepository : _BaseRepository
           AND del_flg = false
         ORDER BY create_tim DESC";
 
-        return await QueryAsync<TMemoArchive>(sql, new { user_id = _user.UserId });
+        return await QueryAsync<TMemoArchive>(sql, new { user_id = _user.user_id });
     }
 
 }

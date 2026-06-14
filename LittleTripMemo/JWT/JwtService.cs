@@ -22,32 +22,28 @@ public class JwtService
     /// <summary>
     /// ユーザ情報から JWTトークン を生成する
     /// </summary>
-    public string CreateToken(MyAppUser user)
+    public string CreateToken(MyAppUser auth_user, TAppUser app_user)
     {
         var claims = new List<Claim>
         {
-            // ASP.NET Identity 標準クレーム
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email ?? ""),
-
-            new Claim(nameof(UserContext.TableId), user.TableId.ToString()),
-
-            // 権限（free / standard / premium / admin）
-            new Claim(nameof(UserContext.Plan), user.Plan)
+            new Claim(ClaimTypes.NameIdentifier, auth_user.Id.ToString()),
+            new Claim(ClaimTypes.Email, auth_user.Email ?? ""),
+            // 業務情報は TAppUser から取得
+            new Claim("user_id", app_user.user_id.ToString()),
+            new Claim("table_id", app_user.table_id.ToString()),
+            new Claim("plan_type", app_user.plan_type)
         };
 
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_settings.SecretKey));
-
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.SecretKey));
         var token = new JwtSecurityToken(
             issuer: _settings.Issuer,
             audience: _settings.Audience,
             claims: claims,
             expires: DateTime.UtcNow.AddDays(_settings.ExpireDays),
-            signingCredentials:
-                new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
 }

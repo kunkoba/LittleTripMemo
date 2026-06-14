@@ -52,9 +52,9 @@ public class JwtMiddleware
 
                 // 成功したら UserContext に注入
                 var userContext = context.RequestServices.GetRequiredService<UserContext>();
-                userContext.UserId = Guid.Parse(principal.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                userContext.TableId = int.Parse(principal.FindFirst(nameof(UserContext.TableId))?.Value ?? "0");
-                userContext.Plan = principal.FindFirst(nameof(UserContext.Plan))?.Value ?? PlanType.Free.ToString();
+                userContext.user_id = Guid.Parse(principal.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                userContext.table_id = int.Parse(principal.FindFirst(nameof(UserContext.table_id))?.Value ?? "0");
+                userContext.plan_type = principal.FindFirst(nameof(UserContext.plan_type))?.Value ?? PlanType.Free.ToString();
 
                 context.User = principal; // 標準のUserもセットしておく
             }

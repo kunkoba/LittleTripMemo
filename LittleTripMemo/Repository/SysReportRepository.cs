@@ -20,7 +20,7 @@ public class SysReportRepository : _BaseRepository
     public async Task<int> UpsertAsync(TSysReport report)
     {
         // ログイン中のユーザーを通報者としてセット
-        report.reporter_user_id = _user.UserId;
+        report.reporter_user_id = _user.user_id;
 
         const string sql = @"
         INSERT INTO t_sys_reports (
@@ -111,7 +111,7 @@ public class SysReportRepository : _BaseRepository
             WHERE reporter_user_id = @user_id 
               AND archive_id = @archive_id";
 
-        return await QuerySingleOrDefaultAsync<TSysReport>(sql, new { user_id = _user.UserId, archive_id = archiveId });
+        return await QuerySingleOrDefaultAsync<TSysReport>(sql, new { user_id = _user.user_id, archive_id = archiveId });
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public class SysReportRepository : _BaseRepository
             WHERE reporter_user_id = @user_id 
               AND archive_id        = @archive_id";
 
-        return await ExecuteAsync(sql, new { user_id = _user.UserId, archive_id = archiveId });
+        return await ExecuteAsync(sql, new { user_id = _user.user_id, archive_id = archiveId });
     }
 
     /// <summary>
@@ -160,7 +160,7 @@ public class SysReportRepository : _BaseRepository
             ORDER BY r.report_tim DESC
             LIMIT 100"; // 直近20件程度
 
-        return await QueryAsync<DtoMyReportDetail>(sql, new { user_id = _user.UserId });
+        return await QueryAsync<DtoMyReportDetail>(sql, new { user_id = _user.user_id });
     }
 
 }

@@ -41,8 +41,8 @@ public class AccountController : _BaseController // 基底クラスを _BaseCont
         }
 
         // ✅ 重要：OkWithBase が参照している _user オブジェクトにログイン情報を手動でセットする
-        _user.UserId = result.userId ?? Guid.Empty;
-        _user.Plan = result.plan ?? PlanType.Free.ToString();
+        _user.user_id = result.userId ?? Guid.Empty;
+        _user.plan_type = result.plan ?? PlanType.Free.ToString();
 
         // 共通レスポンス形式で返却
         return OkWithBase(new

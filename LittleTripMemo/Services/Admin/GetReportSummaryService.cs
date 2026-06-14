@@ -21,7 +21,7 @@ public class GetReportSummaryService : _BaseService
 
     private async Task ValidateAsync()
     {
-        BusinessException.ThrowIf(_user.Plan != PlanType.Admin.ToString(), "管理者権限が必要です");
+        BusinessException.ThrowIf(_user.plan_type != PlanType.Admin.ToString(), "管理者権限が必要です");
         await Task.CompletedTask;
     }
 }

@@ -86,7 +86,7 @@ public class BulkSyncReactionService : _BaseService
 
     private async Task ValidateAsync(BulkSyncReactionReq req)
     {
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ログインが必要です");
+        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(req.items == null || !req.items.Any(), "同期データがありません");
         await Task.CompletedTask;
     }

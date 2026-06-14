@@ -1,4 +1,5 @@
 ﻿using LittleTripMemo.Common;
+using LittleTripMemo.Models;
 
 namespace LittleTripMemo.Repository;
 
@@ -36,6 +37,22 @@ public class AccountRepository : _BaseRepository
         WHERE relname = @tableName";
 
         return await ExecuteScalarAsync<long>(sql, new { tableName });
+    }
+    
+    // 業務ユーザ情報の1件取得
+    public async Task<TAppUser?> GetAppUserByIdAsync(Guid user_id)
+    {
+        const string sql = "SELECT * FROM t_app_user WHERE user_id = @user_id";
+        return await QuerySingleOrDefaultAsync<TAppUser>(sql, new { user_id });
+    }
+
+    // 業務ユーザ情報の新規登録
+    public async Task<int> InsertAsync(TAppUser user)
+    {
+        const string sql = @"
+        INSERT INTO t_app_user (user_id, table_id, plan_type, nick_name, icon)
+        VALUES (@user_id, @table_id, @plan_type, @nick_name, @icon)";
+        return await ExecuteAsync(sql, user);
     }
 
 }

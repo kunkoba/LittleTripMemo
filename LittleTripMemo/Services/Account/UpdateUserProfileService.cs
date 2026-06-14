@@ -3,63 +3,59 @@
 using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
+using LittleTripMemo.Repository;
 using Microsoft.AspNetCore.Identity;
 
 namespace LittleTripMemo.Services;
 
 public class UpdateUserProfileService : _BaseService
 {
-    private readonly UserManager<MyAppUser> _userManager;
+    private readonly AppUserRepository _appUserRepo;
 
     public record UpdateUserReq(
         string icon,
         string nick_name,
         string description,
-        string link1,
-        string link2,
-        string link3
+        string link_1,
+        string link_2,
+        string link_3
     );
 
     public record Response();
 
     public UpdateUserProfileService(
         UserContext userContext,
-        UserManager<MyAppUser> userManager)
+        AppUserRepository appUserRepo)
         : base(userContext)
     {
-        _userManager = userManager;
+        _appUserRepo = appUserRepo;
     }
 
     public async Task<Response> ExecuteAsync(UpdateUserReq req)
     {
         await ValidateAsync(req);
 
-        // ログインユーザー取得
-        var user = await _userManager.FindByIdAsync(_user.UserId.ToString());
-        BusinessException.ThrowIf(user == null, "ユーザーが存在しません");
+        // IdentityUser(認証)ではなく、AppUser(業務プロフ)を更新
+        var app_user = new TAppUser
+        {
+            user_id = _user.user_id,
+            icon = req.icon,
+            nick_name = req.nick_name,
+            description = req.description,
+            link_1 = req.link_1,
+            link_2 = req.link_2,
+            link_3 = req.link_3
+        };
 
-        // 更新
-        user.Icon = req.icon;
-        user.NickName = req.nick_name;
-        user.Description = req.description;
-        user.Link1 = req.link1;
-        user.Link2 = req.link2;
-        user.Link3 = req.link3;
-
-        var result = await _userManager.UpdateAsync(user);
-
-        BusinessException.ThrowIf(
-            !result.Succeeded,
-            string.Join(",", result.Errors.Select(x => x.Description))
-        );
+        await _appUserRepo.UpdateProfileAsync(app_user);
 
         return new Response();
     }
 
     private async Task ValidateAsync(UpdateUserReq req)
     {
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
-        BusinessException.ThrowIf(_user.TableId == 0, "テーブルIDが無効です");
+        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
 
         BusinessException.ThrowIf(string.IsNullOrWhiteSpace(req.nick_name), "ニックネームは必須です");
         BusinessException.ThrowIf(req.nick_name.Length > 50, "ニックネームが長すぎます");

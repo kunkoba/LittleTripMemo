@@ -287,9 +287,7 @@ const AppManager = {
                 console.error("errData:", errData);
                 const errMsg = errData.Message || errData.message || "同期失敗";
                 const err = new Error(errMsg);
-                // err.debugInfo = errData.debugInfo;
                 throw err;
-                return;
             }
         } else {
             // オフライン判定時のモード別コントロール

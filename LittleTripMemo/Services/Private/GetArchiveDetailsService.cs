@@ -48,8 +48,8 @@ public class GetArchiveDetailsService : _BaseService
 
     private async Task ValidateAsync()
     {
-        BusinessException.ThrowIf(_user.TableId == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
+        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
         await Task.CompletedTask;
     }
 }

@@ -45,7 +45,7 @@ public class GetArchiveDetailsPubService : _BaseService
         BusinessException.ThrowIf(archive == null, "アーカイブが見つかりません");
         
         // 「非公開(closed)」かつ「所有者ではない」場合はエラーにする
-        if (archive.closed_flg && archive.user_id != _user.UserId)
+        if (archive.closed_flg && archive.user_id != _user.user_id)
         {
             throw new BusinessException("このアーカイブは現在非公開に設定されています。");
         }
@@ -57,7 +57,7 @@ public class GetArchiveDetailsPubService : _BaseService
         SetAppFlags(details);
 
         // 自分のリアクション取得（ログイン済みの場合のみ）
-        var reactions = _user.UserId != Guid.Empty
+        var reactions = _user.user_id != Guid.Empty
             ? await _reactionPubRepo.GetMyReactionsByArchiveIdAsync(req.archive_id)
             : Enumerable.Empty<TReactionPub>();
 

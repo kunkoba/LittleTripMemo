@@ -70,8 +70,8 @@ public class AddDetailsService : _BaseService
     /// </summary>
     private async Task ValidateAsync(AddDetailsReq req)
     {
-        BusinessException.ThrowIf(_user.TableId == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.UserId == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
+        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(req.seqs.Length == 0, "seqリストが空です");
         BusinessException.ThrowIf(req.archive_id == 0, "archiveIdが無効です");
         await Task.CompletedTask;
