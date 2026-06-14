@@ -7,6 +7,7 @@ const AppManager = {
             IsOnline: navigator.onLine,
             IsLoggedIn: false,
             TargetArchiveId: 0,
+            TargetSeq: 0,
         },
         Owner: {
             Theme: null,
@@ -71,8 +72,8 @@ const AppManager = {
     _initPollingTasks() {
         const checkSec = 1;
         const gpsTrackingSec = $App.AppData.Owner.GpsTrackingSec; // ★変更
-        const saveDetailSec = 6;
-        const saveReactionSec = 6;
+        const saveDetailSec = 60;
+        const saveReactionSec = 60;
         $Polling.Init();
         // オフライン監視
         $Polling.Add($Polling.TASKS.OFFLINE_CHECK, () => {
@@ -294,24 +295,6 @@ const AppManager = {
             // オフライン判定時のモード別コントロール
             if (!this.AppData.Context.IsOnline) {
                 $Notice.Warn("オフライン中は、機能が制限されます。");
-                // switch (this.AppData.Context.ScreenMode) {
-                //     case $Const.SCREEN_MODE.SEARCH:
-                //         // 検索モード：作成モードへ強制退避
-                //         this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                //         await this.RefreshScreen();
-                //         break;
-                //     case $Const.SCREEN_MODE.CREATE:
-                //         // 作成モード：ローカルDBを正として描画継続
-                //         const localData = await $LocalDb.Detail.GetAll();
-                //         $Data.Access._rawData.details = localData;
-                //         $Data.Store.Restore();
-                //         $UI.ChangeScreenMode();
-                //         $Marker.ChangeScreenMode();
-                //         break;
-                //     default:
-                //         // その他のモード（ARCHIVE等）：現状維持
-                //         break;
-                // }
                 return;
             } else {
                 // サーバが稼働していない（おそらく）

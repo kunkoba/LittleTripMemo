@@ -171,8 +171,6 @@ const _MarkerCore = {
             const marker = this._markerList[index];
             const el = $Dom.GenerateTemplate("tpl-marker-popup");
             $Dom.QuerySelector(".index", el).textContent = (index + 1);
-            // const dateStr = (detail.memo_date || "").replace(/-/g, '/');
-            // $Dom.QuerySelector(".time", el).textContent = `${dateStr} ${detail.memo_time || ""}`;
             $Dom.QuerySelector(".time", el).textContent = detail.memo_date + '  ' + detail.memo_time
             $Dom.QuerySelector(".title", el).textContent = detail.title || "";
             const bodyEl = $Dom.QuerySelector(".body", el);
@@ -186,30 +184,27 @@ const _MarkerCore = {
             // 画面モードによるアクションボタンの制御
             if ($App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH) {
                 if (actionText) actionText.textContent = detail.a_title || "VIEW ARCHIVE";
-                if (btnAction) {
-                    btnAction.onclick = async (e) => {
-                        const isOk = await $Dialog.ShowConfirm({
-                            title: "Archive",
-                            help: "",
-                            message: `このまとめを開きますか？`
-                        });
-                        if (!isOk) return;
-                        //
-                        e.stopPropagation();
-                        $App.AppData.Context.ScreenMode = detail.is_public ? $Const.SCREEN_MODE.ARCHIVE_PUB : $Const.SCREEN_MODE.ARCHIVE;
-                        $App.AppData.Context.TargetArchiveId = detail.archive_id;
-                        $App.RefreshScreen();
-                        this._map.closePopup();
-                    };
-                }
+                btnAction.onclick = async (e) => {
+                    const isOk = await $Dialog.ShowConfirm({
+                        title: "Archive",
+                        help: "",
+                        message: `このまとめを開きますか？`
+                    });
+                    if (!isOk) return;
+                    //
+                    e.stopPropagation();
+                    $App.AppData.Context.ScreenMode = detail.is_public ? $Const.SCREEN_MODE.ARCHIVE_PUB : $Const.SCREEN_MODE.ARCHIVE;
+                    $App.AppData.Context.TargetArchiveId = detail.archive_id;
+                    $App.AppData.Context.TargetSeq = detail.seq;
+                    $App.RefreshScreen();
+                    this._map.closePopup();
+                };
             } else {
                 if (actionText) actionText.textContent = "VIEW detail";
-                if (btnAction) {
-                    btnAction.onclick = (e) => {
-                        e.stopPropagation();
-                        $DetailFrame.Open(detail);
-                    };
-                }
+                btnAction.onclick = (e) => {
+                    e.stopPropagation();
+                    $DetailFrame.Open(detail);
+                };
             }
             // ポップアップ
             L.popup({
@@ -252,10 +247,6 @@ const MarkerController = {
     ClosePopup() {
         _MarkerCore.toggleMarkerPopup(false);
     },
-    // 画面モード変更時
-    ChangeScreenMode(){
-		this.RefreshPointMarker();
-	},
     // 描画リフレッシュ
     RefreshPointMarker() {
         const details = $Data.Store.GetDetails();
@@ -284,6 +275,10 @@ const MarkerController = {
         });
     },
     // 画面モード変更時
+    ChangeScreenMode_2(){
+		this.RefreshPointMarker();
+	},
+    // 画面モード変更時
     ChangeScreenMode(){
         switch ($App.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
@@ -292,10 +287,14 @@ const MarkerController = {
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
             case $Const.SCREEN_MODE.ARCHIVE_PUB:
-                this.FocusFirst();
+                const seq = $App.AppData.Context.TargetSeq;
+                if (seq > 0) {
+                    $Marker.FocusBySeq(seq);
+                } else {
+                    this.FocusFirst();
+                }
                 break;
         }
-        // _MarkerCore.generateArrowList();
 	},
     // クリア指示
     Clear() {
@@ -375,6 +374,18 @@ const MarkerController = {
         if (detail) {
             const googleMapsUrl = `https://www.google.com/maps?q=${detail.latitude},${detail.longitude}`;
             window.open(encodeURI(googleMapsUrl), '_blank');
+        }
+    },
+    // seqを指定してその地点へジャンプする
+    FocusBySeq(seq) {
+        const details = $Data.Store.GetDetails();
+        // seq が一致するデータの「インデックス番号」を探す
+        const index = details.findIndex(d => Number(d.seq) === Number(seq));
+        if (index !== -1) {
+            // 見つかったら既存の選択メソッドを実行（移動・強調・ポップアップが走る）
+            this.SelectMarker(index);
+        } else {
+            console.warn(`Marker with seq ${seq} not found.`);
         }
     },
 };
