@@ -35,7 +35,7 @@ public class AccountRepository : _BaseRepository
         FROM pg_class 
         WHERE relname = @tableName";
 
-        return await ExecuteScalarAsync<long>(sql);
+        return await ExecuteScalarAsync<long>(sql, new { tableName });
     }
 
 }

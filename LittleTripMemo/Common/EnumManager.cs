@@ -3,10 +3,10 @@
 // 料金プラン・権限
 public enum PlanType
 {
+    Admin,       // 管理者
     Free,       // 無料プラン
     Standard,   // 標準プラン
     Premium,    // プレミアムプラン
-    Admin       // 管理者
 }
 
 // リアクション種別

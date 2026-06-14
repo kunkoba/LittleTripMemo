@@ -65,8 +65,9 @@ const _BottomCore = {
 				this.btnNext.addEventListener('click',  () => { $Marker.FocusNext();  });
 				this.btnLast.addEventListener('click',  () => { $Marker.FocusLast();  });
 				this.btnOpen.addEventListener('click',  () => {
-                    $Marker.FocusToCurrentMarker();
-					$DetailFrame.Open($Marker.GetDataWithCurrentIndex());
+                    const detail = $Marker.GetDataWithCurrentIndex();
+					$DetailFrame.Open(detail);
+					// $Marker.FocusToCurrentMarker();
 				});
 			}
 		}

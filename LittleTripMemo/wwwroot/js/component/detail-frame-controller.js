@@ -241,6 +241,8 @@ const _DetailFrameCore = {
             // this.root.style.borderWidth = "2px";
             this.root.classList.remove("opacity-0", "translate-y-full");
             this.root.classList.add("opacity-100", "translate-y-0");
+            // このタイミングで移動（Mapのリサイズ含み）
+            $Marker.FocusToCurrentMarker();
         } else {
             // バリアを解除
             if (this.mapBarrier) $Dom.ToggleShow(this.mapBarrier, false);
@@ -260,11 +262,11 @@ const _DetailFrameCore = {
             this.root.style.borderWidth = "0";
             this.root.classList.remove("opacity-100", "translate-y-0");
             this.root.classList.add("opacity-0", "translate-y-full");
+            // シンプルにリサイズだけを呼ぶ
+            $Map.ResizeMap(400);
         }
         // アイコン表示切替
         $UI.ToggleIconBar(!isShow);
-        // 不要な条件分岐を消し、シンプルにリサイズだけを呼ぶ
-        $Map.ResizeMap(400);
     },
     // リアクションのカウントと状態を反映する
     async renderReactions_2(detail) {
@@ -379,7 +381,7 @@ const DetailFrameController = {
 	},
     // 開く
     Open(detail) {
-        console.log("Open: ", detail);
+        // console.log("Open: ", detail);
         // ▼ 画面を開く前にポップアップを閉じる
         $Marker.ClosePopup();
         const isNew = !detail;
