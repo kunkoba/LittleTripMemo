@@ -15,6 +15,7 @@ public class AddDetailsService : _BaseService
 {
     private readonly ITransactionProvider _provider;
     private readonly DetailRepository _detailRepo;
+    private readonly ArchiveRepository _archiveRepo;
 
     public record AddDetailsReq(
         [Required] Guid login_user_id,
@@ -27,11 +28,13 @@ public class AddDetailsService : _BaseService
     public AddDetailsService(
         UserContext userContext,
         ITransactionProvider provider,
-        DetailRepository detailRepo)
+        DetailRepository detailRepo,
+        ArchiveRepository archiveRepo)
         : base(userContext)
     {
         _provider = provider;
         _detailRepo = detailRepo;
+        _archiveRepo = archiveRepo;
     }
 
     /// <summary>
@@ -49,6 +52,9 @@ public class AddDetailsService : _BaseService
             var archiveId = req.archive_id;
             // 対象の明細に 指定のarchive_id をセット
             var updatedCount = await _detailRepo.UpdateArchiveIdBySeqsAsync(archiveId, req.seqs);
+
+            // 親の件数を更新
+            await _archiveRepo.UpdateDetailCountAsync(req.archive_id);
 
             tran.Commit();
             return new Response(archiveId, updatedCount);
@@ -70,4 +76,5 @@ public class AddDetailsService : _BaseService
         BusinessException.ThrowIf(req.archive_id == 0, "archiveIdが無効です");
         await Task.CompletedTask;
     }
+
 }

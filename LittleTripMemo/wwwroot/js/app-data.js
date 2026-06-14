@@ -407,7 +407,7 @@ window.$Data = {
                     weather_code: d.weather_code,
                     link_url: d.link_url,
                     memo_price: d.memo_price,
-                    is_public: !!d.is_public
+                    is_public: !!d.is_public,
                 }))
             };
             // 3. 一括送信

@@ -148,7 +148,7 @@ public class ArchivePubRepository : _BaseRepository
             WHERE d.archive_id = a.archive_id 
               AND d.del_flg = false
         )
-        WHERE a.archive_id = @archiveId";
+        WHERE a.archive_id = @archive_id";
 
         await ExecuteAsync(sql, new { archive_id = archiveId });
     }

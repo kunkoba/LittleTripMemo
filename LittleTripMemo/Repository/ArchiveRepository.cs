@@ -140,7 +140,7 @@ public class ArchiveRepository : _BaseRepository
             WHERE d.archive_id = a.archive_id 
               AND d.del_flg = false
         )
-        WHERE a.archive_id = @archiveId 
+        WHERE a.archive_id = @archive_id 
           AND a.user_id = @user_id";
 
         await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.UserId });

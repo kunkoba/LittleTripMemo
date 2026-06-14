@@ -75,7 +75,7 @@ public class TMemoDetailPub : IAppRecord
     public string weather_code { get; set; } = string.Empty;
     public string? link_url { get; set; } = string.Empty;
     public int memo_price { get; set; } = 0;
-    public bool closed_flg { get; set; } = false;
+    //public bool closed_flg { get; set; } = false;
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }
     public DateTime update_tim { get; set; }

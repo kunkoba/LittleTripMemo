@@ -11,6 +11,8 @@ public class BulkSyncDetailsService : _BaseService
     private readonly ITransactionProvider _provider;
     private readonly DetailRepository _detailRepo;
     private readonly DetailPubRepository _detailPubRepo;
+    private readonly ArchiveRepository _archiveRepo;
+    private readonly ArchivePubRepository _archivePubRepo;
 
     // --- 既存の UpdateDetailPubReq 等と完全に同一の形式に is_public を追加 ---
     public record BulkSyncItem(
@@ -26,7 +28,8 @@ public class BulkSyncDetailsService : _BaseService
         [Required(ErrorMessage = "天気IDは必須です")] string weather_code,
         string? link_url,
         [Required(ErrorMessage = "金額は必須です")] int memo_price,
-        [Required] bool is_public // 振替判定用
+        [Required] bool is_public,
+        [Required] bool is_close = false
     );
 
     public record BulkSyncReq(
@@ -40,12 +43,16 @@ public class BulkSyncDetailsService : _BaseService
         UserContext userContext,
         ITransactionProvider provider,
         DetailRepository detailRepo,
-        DetailPubRepository detailPubRepo)
-        : base(userContext)
+        DetailPubRepository detailPubRepo,
+        ArchiveRepository archiveRepository,
+        ArchivePubRepository archivePubRepository
+    ) : base(userContext)
     {
         _provider = provider;
         _detailRepo = detailRepo;
         _detailPubRepo = detailPubRepo;
+        _archiveRepo = archiveRepository;
+        _archivePubRepo = archivePubRepository;
     }
 
     public async Task<Response> ExecuteAsync(BulkSyncReq req)
@@ -74,6 +81,30 @@ public class BulkSyncDetailsService : _BaseService
                     else affected = await _detailRepo.UpdateByKeyAsync(entity);
                 }
                 totalUpdated += affected; // 実際にDBで更新できた件数のみを加算
+            }
+
+            // 1. 非公開データとして同期されたアーカイブIDを抽出（is_public = false）
+            var privateAffectedIds = req.items
+                .Where(x => !x.is_public && x.archive_id > 0)
+                .Select(x => x.archive_id)
+                .Distinct();
+
+            foreach (var archiveId in privateAffectedIds)
+            {
+                // 秘密テーブル(t_memo_archive)のカウントを更新
+                await _archiveRepo.UpdateDetailCountAsync(archiveId);
+            }
+
+            // 2. 公開データとして同期されたアーカイブIDを抽出（is_public = true）
+            var publicAffectedIds = req.items
+                .Where(x => x.is_public && x.archive_id > 0)
+                .Select(x => x.archive_id)
+                .Distinct();
+
+            foreach (var archiveId in publicAffectedIds)
+            {
+                // 公開テーブル(t_memo_archive_pub)のカウントを更新
+                await _archivePubRepo.UpdateDetailCountAsync(archiveId);
             }
 
             tran.Commit();
@@ -114,8 +145,8 @@ public class BulkSyncDetailsService : _BaseService
 
     private TMemoDetailPub MapToPubEntity(BulkSyncItem item) => new()
     {
-        archive_id = item.archive_id,
         seq = item.seq,
+        archive_id = item.archive_id,
         user_id = _user.UserId,
         latitude = item.latitude,
         longitude = item.longitude,
@@ -127,7 +158,7 @@ public class BulkSyncDetailsService : _BaseService
         weather_code = item.weather_code,
         link_url = item.link_url,
         memo_price = item.memo_price,
-        closed_flg = false,
+        //closed_flg = false,
         del_flg = false
     };
 }

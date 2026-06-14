@@ -71,8 +71,8 @@ const AppManager = {
     _initPollingTasks() {
         const checkSec = 1;
         const gpsTrackingSec = $App.AppData.Owner.GpsTrackingSec; // ★変更
-        const saveDetailSec = 60;
-        const saveReactionSec = 60;
+        const saveDetailSec = 6;
+        const saveReactionSec = 6;
         $Polling.Init();
         // オフライン監視
         $Polling.Add($Polling.TASKS.OFFLINE_CHECK, () => {

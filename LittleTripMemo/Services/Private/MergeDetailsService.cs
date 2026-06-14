@@ -60,6 +60,9 @@ public class MergeDetailsService : _BaseService
             // 2-2. 対象の明細に archive_id をセット
             var updatedCount = await _detailRepo.UpdateArchiveIdBySeqsAsync(archiveId, req.seqs);
 
+            // 親の件数を更新
+            await _archiveRepo.UpdateDetailCountAsync(archiveId);
+
             tran.Commit();
             return new Response(archiveId, updatedCount);
         }

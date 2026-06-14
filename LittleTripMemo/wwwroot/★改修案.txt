@@ -35,5 +35,11 @@
 　　・ユーザ画面の受信BOXと送信履歴（管理者
 
 
+
+            // ★追加：影響を受けたアーカイブIDのカウントをリフレッシュ
+            // ※req に archive_id が含まれている、もしくは明細から特定して渡す
+            await _archiveRepo.UpdateDetailCountAsync(req.archive_id);
+            
+
 docker cp C:\Users\Owner\Desktop\backup.sql trip_memo_db:/backup.sql
 docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql

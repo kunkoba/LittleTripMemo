@@ -89,7 +89,7 @@ public class PublishArchiveService : _BaseService
                     weather_code = detail.weather_code,
                     link_url = detail.link_url,
                     memo_price = detail.memo_price,
-                    closed_flg = false,     // 初期値はfalse
+                    //closed_flg = false,     // 初期値はfalse
                 };
                 await _detailPubRepo.InsertAsync(pubDetail);
             }
@@ -98,6 +98,9 @@ public class PublishArchiveService : _BaseService
             await _archiveRepo.DeleteByKeyAsync(req.archive_id);
             // ⑦ 秘密明細を論理削除
             await _detailRepo.DeleteByArchiveIdAsync(req.archive_id);
+
+            // 公開側の件数を反映させる
+            await _archivePubRepo.UpdateDetailCountAsync(req.archive_id);
 
             tran.Commit();
             return new Response(archive.archive_id);

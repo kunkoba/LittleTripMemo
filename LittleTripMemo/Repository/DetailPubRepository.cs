@@ -185,11 +185,11 @@ public class DetailPubRepository : _BaseRepository
 
         // 1. 基本となるWHERE句
         string whereClause = @"
-        WHERE d.latitude  BETWEEN @lat_min AND @lat_max
-          AND d.longitude BETWEEN @lng_min AND @lng_max
-          AND d.user_id   <> @login_user_id
-          AND d.del_flg   = false
-          AND a.closed_flg = false";
+            WHERE d.latitude  BETWEEN @lat_min AND @lat_max
+              AND d.longitude BETWEEN @lng_min AND @lng_max
+              AND d.user_id   <> @login_user_id
+              AND d.del_flg   = false
+              AND a.closed_flg = false";
 
         // 2. ソート順と「0件除外」条件の決定
         string orderBy = "d.create_tim DESC";
@@ -224,15 +224,15 @@ public class DetailPubRepository : _BaseRepository
 
         // 4. 最終的なSQL組み立て
         var sql = $@"
-    SELECT 
-        d.*, 
-        a.title AS a_title, 
-        a.currency_unit
-    FROM t_memo_detail_pub d
-    INNER JOIN t_memo_archive_pub a ON d.archive_id = a.archive_id
-    {whereClause}
-    ORDER BY {orderBy}, d.seq DESC
-    LIMIT @limit";
+            SELECT 
+                d.*, 
+                a.title AS a_title, 
+                a.currency_unit
+            FROM t_memo_detail_pub d
+            INNER JOIN t_memo_archive_pub a ON d.archive_id = a.archive_id
+            {whereClause}
+            ORDER BY {orderBy}, d.seq DESC
+            LIMIT @limit";
 
         return await QueryAsync<TMemoDetailPub>(sql, parameters);
     }

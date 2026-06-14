@@ -150,7 +150,7 @@ export default {
                         });
                         if (!isOk) return;
                         // API通信（対象の seq を送る）
-                        const isSuccess = await $Data.Access.DetachDetails({ seqs: [item.seq] });
+                        const isSuccess = await $Data.Access.DetachDetails({ seqs: [item.seq], archive_id: item.archive_id });
                         if (!isSuccess) return;
                         $Notice.Info("まとめから外しました。");
                         this._core.closeAll();
@@ -873,47 +873,63 @@ export default {
             const btnPrivate = $Dom.QuerySelector('#btn-status-private', el);
             const btnClose = $Dom.QuerySelector('#btn-status-close', el);
             const btnOpen = $Dom.QuerySelector('#btn-status-open', el);
-            // 一旦すべて非表示にリセット
-            [btnMemo, btnPrivate, btnClose, btnOpen].forEach(btn => $Dom.ToggleShow(btn, false));
             // スタイル定義（通常時 vs 現在地）
-            const styleActive = "flex-1 h-11 bg-white text-slate-600 font-black text-[0.75rem] rounded-[0.5rem] shadow-md border border-slate-200 active:scale-95 transition-all tracking-wider outline-none";
-            const styleCurrent = "flex-1 h-11 bg-brand-5 text-white font-black text-[0.75rem] rounded-[0.5rem] shadow-inner border border-brand-5 cursor-default tracking-wider outline-none";
+            // const styleBase = "flex-1 h-11 font-black text-[0.75rem] rounded-[0.5rem] tracking-wider outline-none";
+            const styleActive = ` bg-white text-slate-600 shadow-md border border-slate-200 active:scale-95 transition-all`;
+            const styleCurrent = ` bg-brand-5 text-white shadow-inner border border-brand-5 cursor-default`;
+            const styleDisabled = ` bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed`;
             // ボタンスタイルとテキストを適用するヘルパー関数
-            const setBtnStyle = (btn, isCurrent, text) => {
-                btn.className = isCurrent ? styleCurrent : styleActive;
-                btn.textContent = text;
-                if (isCurrent) btn.onclick = null; // 現在地ならクリック無効
+            const setBtnStyle = (btn, isCurrent, isEnabled, text) => {
+                if (text.length > 0) btn.textContent = text;
+                if (!isEnabled) {
+                    btn.disabled = true;
+                    btn.onclick = null;
+                    btn.className += styleDisabled;
+                    return;
+                }
+                btn.disabled = false;
+                if (isCurrent) {
+                    btn.onclick = null;
+                    btn.className += styleCurrent;
+                } else {
+                    btn.className += styleActive;
+                }
             };
+            // 一旦すべて非表示にリセット
+            // [btnMemo, btnPrivate, btnClose, btnOpen].forEach(btn => $Dom.ToggleShow(btn, false));
             if (currentArchive.is_owner) {
                 $Dom.ToggleShow(statusBar, true);
                 if (!currentArchive.is_public) {
                     // ① PRIVATE 状態 [ 1> memo | (2> private) | 3> public ]
-                    $Dom.ToggleShow(btnMemo, true);
-                    $Dom.ToggleShow(btnPrivate, true);
-                    $Dom.ToggleShow(btnClose, true);
-                    setBtnStyle(btnMemo, false, "1> memo");
-                    setBtnStyle(btnPrivate, true, "2> private");
-                    setBtnStyle(btnClose, false, "3> public");
+                    // $Dom.ToggleShow(btnMemo, true);
+                    // $Dom.ToggleShow(btnPrivate, true);
+                    // $Dom.ToggleShow(btnClose, true);
+                    setBtnStyle(btnMemo, false, true, "memo");
+                    setBtnStyle(btnPrivate, true, true, "");
+                    setBtnStyle(btnClose, false, true, "public");
+                    setBtnStyle(btnOpen, false, false, "open");
                     btnMemo.onclick = () => this._execStatusChange('DeleteArchive', { archive_id: currentArchive.archive_id }, "RESTORE TO DETAILS", "まとめを解体し、単独のメモに戻しますか？", "単体のメモに戻しました。", $Const.SCREEN_MODE.CREATE);
                     btnClose.onclick = () => this._execStatusChange('PublishArchive', { archive_id: currentArchive.archive_id }, "SWITCH TO CLOSE", "まとめを [CLOSE] 状態にしますか？", "[CLOSE] 状態に移行しました。", $Const.SCREEN_MODE.ARCHIVE_PUB, () => $Data.Store.UpdateArchive({ is_public: true, closed_flg: true }));
                 } else if (currentArchive.closed_flg) {
                     // ② CLOSE 状態 [ 2> private | (3> close) | 4> open ]
-                    $Dom.ToggleShow(btnPrivate, true);
-                    $Dom.ToggleShow(btnClose, true);
-                    $Dom.ToggleShow(btnOpen, true);
-                    setBtnStyle(btnPrivate, false, "2> private");
-                    setBtnStyle(btnClose, true, "3> close");
-                    setBtnStyle(btnOpen, false, "4> open");
+                    // $Dom.ToggleShow(btnPrivate, true);
+                    // $Dom.ToggleShow(btnClose, true);
+                    // $Dom.ToggleShow(btnOpen, true);
+                    setBtnStyle(btnMemo, false, false, "memo");
+                    setBtnStyle(btnPrivate, false, true, "private");
+                    setBtnStyle(btnClose, true, true, "close");
+                    setBtnStyle(btnOpen, false, true, "open");
                     btnPrivate.onclick = () => this._execStatusChange('UnpublishArchive', { archive_id: currentArchive.archive_id }, "SWITCH TO PRIVATE", "完全に非公開 (PRIVATE) に戻しますか？", "[PRIVATE] に戻しました。", $Const.SCREEN_MODE.ARCHIVE, () => $Data.Store.UpdateArchive({ is_public: false, closed_flg: false }));
                     btnOpen.onclick = () => this._execStatusChange('OpenArchive', { archive_id: currentArchive.archive_id }, "SWITCH TO OPEN", "マップ上に公開 (OPEN) しますか？", "[OPEN] に切り替えました。", null, () => $Data.Store.UpdateArchive({ closed_flg: false }));
                 } else {
                     // ③ OPEN 状態 [ 2> private | 3> close | (4> open) ]
-                    $Dom.ToggleShow(btnPrivate, true);
-                    $Dom.ToggleShow(btnClose, true);
-                    $Dom.ToggleShow(btnOpen, true);
-                    setBtnStyle(btnPrivate, false, "2> private");
-                    setBtnStyle(btnClose, false, "3> close");
-                    setBtnStyle(btnOpen, true, "4> open");
+                    // $Dom.ToggleShow(btnPrivate, true);
+                    // $Dom.ToggleShow(btnClose, true);
+                    // $Dom.ToggleShow(btnOpen, true);
+                    setBtnStyle(btnMemo, false, false, "memo");
+                    setBtnStyle(btnPrivate, false, true, "private");
+                    setBtnStyle(btnClose, false, true, "close");
+                    setBtnStyle(btnOpen, true, true, "open");
                     btnPrivate.onclick = () => this._execStatusChange('UnpublishArchive', { archive_id: currentArchive.archive_id }, "SWITCH TO PRIVATE", "完全に非公開 (PRIVATE) に戻しますか？", "[PRIVATE] に戻しました。", $Const.SCREEN_MODE.ARCHIVE, () => $Data.Store.UpdateArchive({ is_public: false, closed_flg: false }));
                     btnClose.onclick = () => this._execStatusChange('CloseArchive', { archive_id: currentArchive.archive_id }, "SWITCH TO CLOSE", "公開を一時停止 (CLOSE) しますか？", "[CLOSE] に切り替えました。", null, () => $Data.Store.UpdateArchive({ closed_flg: true }));
                 }
