@@ -11,19 +11,20 @@ namespace LittleTripMemo.Controllers;
 public class AccountController : _BaseController // 基底クラスを _BaseController に変更
 {
     private readonly RegistrationUserService _accountService;
-    private readonly GetUserProfileService _getUserProfileService;
     private readonly UpdateUserProfileService _updateUserProfileService;
+    private readonly EnsureLoginUserService _ensureLoginUserService;
 
     public AccountController(
         UserContext userContext,
         RegistrationUserService accountService,
-        GetUserProfileService getUserProfileService,
-        UpdateUserProfileService updateUserProfileService)
+        UpdateUserProfileService updateUserProfileService,
+        EnsureLoginUserService ensureLoginUserService
+        )
         : base(userContext) // 基底クラスのコンストラクタを呼び出す
     {
         _accountService = accountService;
-        _getUserProfileService = getUserProfileService;
         _updateUserProfileService = updateUserProfileService;
+        _ensureLoginUserService = ensureLoginUserService;
     }
 
     /// <summary>
@@ -31,9 +32,9 @@ public class AccountController : _BaseController // 基底クラスを _BaseCont
     /// </summary>
     [HttpPost("LoginFirebase")]
     public async Task<IActionResult> FirebaseLogin(
-        [FromBody] RegistrationUserService.FirebaseLoginRequest request)
+        [FromBody] RegistrationUserService.FirebaseLoginRequest req)
     {
-        var result = await _accountService.LoginOrRegisterAsync(request);
+        var result = await _accountService.LoginOrRegisterAsync(req);
 
         if (!result.is_success)
         {
@@ -57,10 +58,22 @@ public class AccountController : _BaseController // 基底クラスを _BaseCont
     /// ユーザー情報更新
     /// </summary>
     [HttpPost("UpdateProfile")]
-    public async Task<IActionResult> Update(
-        [FromBody] UpdateUserProfileService.UpdateUserReq req)
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileService.UpdateUserReq req)
     {
         var result = await _updateUserProfileService.ExecuteAsync(req);
         return OkWithBase(result);
     }
+
+    /// <summary>
+    /// ユーザ存在チェック
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("EnsureLoginUser")]
+    public async Task<IActionResult> EnsureLoginUser([FromBody] EnsureLoginUserService.EnsureLoginUserReq req)
+    {
+        var result = await _ensureLoginUserService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
 }

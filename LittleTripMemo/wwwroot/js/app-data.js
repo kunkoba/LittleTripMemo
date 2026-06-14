@@ -140,6 +140,10 @@ window.$Data = {
                 // await $App.RefreshScreen();
             })();
         },
+        // public record EnsureLoginUserReq(Guid login_user_id)
+        async EnsureLoginUser(params = {}) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/EnsureLoginUser', params))();
+        },
         async GetProfile(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/GetProfile', params))();
         },

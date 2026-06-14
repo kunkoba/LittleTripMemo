@@ -143,6 +143,7 @@ builder.Services.AddScoped<AdminCloseArchivePubService>();
 builder.Services.AddScoped<AdminUnpublishArchiveService>();
 builder.Services.AddScoped<GetAllUserNotificationsService>();
 builder.Services.AddScoped<GetAdminAllInfoService>();
+builder.Services.AddScoped<EnsureLoginUserService>();
 
 
 // ======================================================================

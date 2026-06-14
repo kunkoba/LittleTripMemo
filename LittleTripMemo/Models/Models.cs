@@ -3,139 +3,142 @@ using LittleTripMemo.Common;
 
 namespace LittleTripMemo.Models;
 
-// アプリ固有ユーザ
-public class TAppUser
-{
-    public Guid user_id { get; set; }
-    public int table_id { get; set; }
-    public string plan_type { get; set; } = "Free";
-    public string? icon { get; set; }
-    public string? nick_name { get; set; }
-    public string? description { get; set; }
-    public string? link_1 { get; set; }
-    public string? link_2 { get; set; }
-    public string? link_3 { get; set; }
-    public DateTime create_tim { get; set; }
-    public DateTime update_tim { get; set; }
-}
+#region "App"
 
-// 認証用（Identity標準に戻す）
-public class MyAppUser : Microsoft.AspNetCore.Identity.IdentityUser<Guid>
-{
-    // ここにはアプリ固有のプロパティは持たせない
-}
+    // アプリ固有ユーザ
+    public class TAppUser
+    {
+        public Guid user_id { get; set; }
+        public int table_id { get; set; }
+        public string plan_type { get; set; } = "Free";
+        public string? icon { get; set; }
+        public string? nick_name { get; set; }
+        public string? description { get; set; }
+        public string? link_1 { get; set; }
+        public string? link_2 { get; set; }
+        public string? link_3 { get; set; }
+        public DateTime create_tim { get; set; }
+        public DateTime update_tim { get; set; }
+    }
 
-public class TMemoArchive : IAppRecord
-{
-    public int archive_id { get; set; } = 0;
-    public Guid user_id { get; set; }
-    public string title { get; set; } = "仮のタイトル";
-    public string memo { get; set; } = "仮の本文";
-    public string link_url { get; set; } = string.Empty;
-    public string currency_unit { get; set; } = "JPY";
-    public bool closed_flg { get; set; } = false;
-    public bool del_flg { get; set; } = false;
-    public DateTime create_tim { get; set; }
-    public DateTime update_tim { get; set; }
-    public bool is_public { get; set; } = false;
-    public bool is_owner { get; set; } = true;
-    public int cnt { get; set; } = 0;
-}
+    // 認証用（Identity標準に戻す）
+    public class MyAppUser : Microsoft.AspNetCore.Identity.IdentityUser<Guid>
+    {
+        // ここにはアプリ固有のプロパティは持たせない
+    }
 
-public class TMemoArchivePub : IAppRecord
-{
-    public int archive_id { get; set; } = 0;
-    public Guid user_id { get; set; }
-    public string title { get; set; } = string.Empty;
-    public string memo { get; set; } = string.Empty;
-    public string link_url { get; set; } = string.Empty;
-    public string currency_unit { get; set; } = "JPY";
-    public bool closed_flg { get; set; } = false;
-    public bool del_flg { get; set; } = false;
-    public DateTime create_tim { get; set; }
-    public DateTime update_tim { get; set; }
-    public bool is_public { get; set; } = true;
-    public bool is_owner { get; set; } = false;
-    public int cnt { get; set; } = 0;
-}
+    public class TMemoArchive : IAppRecord
+    {
+        public int archive_id { get; set; } = 0;
+        public Guid user_id { get; set; }
+        public string title { get; set; } = "仮のタイトル";
+        public string memo { get; set; } = "仮の本文";
+        public string link_url { get; set; } = string.Empty;
+        public string currency_unit { get; set; } = "JPY";
+        public bool closed_flg { get; set; } = false;
+        public bool del_flg { get; set; } = false;
+        public DateTime create_tim { get; set; }
+        public DateTime update_tim { get; set; }
+        public bool is_public { get; set; } = false;
+        public bool is_owner { get; set; } = true;
+        public int detail_count { get; set; } = 0;
+    }
 
-public class TMemoDetail : IAppRecord
-{
-    public long seq { get; set; }
-    public int archive_id { get; set; } = 0;
-    public Guid user_id { get; set; }
-    public decimal latitude { get; set; }
-    public decimal longitude { get; set; }
-    public string title { get; set; } = string.Empty;
-    public string body { get; set; } = string.Empty;
-    public string memo_date { get; set; } = string.Empty;
-    public string memo_time { get; set; } = string.Empty;
-    public string face_emoji { get; set; } = string.Empty;
-    public string weather_code { get; set; } = string.Empty;
-    public string? link_url { get; set; } = string.Empty;
-    public int memo_price { get; set; } = 0;
-    public bool del_flg { get; set; } = false;
-    public DateTime create_tim { get; set; }
-    public DateTime update_tim { get; set; }
-    public bool is_public { get; set; } = false;
-    public bool is_owner { get; set; } = true;
-    public string a_title { get; set; } = string.Empty;
-}
+    public class TMemoArchivePub : IAppRecord
+    {
+        public int archive_id { get; set; } = 0;
+        public Guid user_id { get; set; }
+        public string title { get; set; } = string.Empty;
+        public string memo { get; set; } = string.Empty;
+        public string link_url { get; set; } = string.Empty;
+        public string currency_unit { get; set; } = "JPY";
+        public bool closed_flg { get; set; } = false;
+        public bool del_flg { get; set; } = false;
+        public DateTime create_tim { get; set; }
+        public DateTime update_tim { get; set; }
+        public bool is_public { get; set; } = true;
+        public bool is_owner { get; set; } = false;
+        public int detail_count { get; set; } = 0;
+    }
 
-public class TMemoDetailPub : IAppRecord
-{
-    public int archive_id { get; set; } = 0;
-    public long seq { get; set; }
-    public Guid user_id { get; set; }
-    public decimal latitude { get; set; }
-    public decimal longitude { get; set; }
-    public string? title { get; set; } = string.Empty;
-    public string? body { get; set; } = string.Empty;
-    public string memo_date { get; set; } = string.Empty;
-    public string memo_time { get; set; } = string.Empty;
-    public string face_emoji { get; set; } = string.Empty;
-    public string weather_code { get; set; } = string.Empty;
-    public string? link_url { get; set; } = string.Empty;
-    public int memo_price { get; set; } = 0;
-    //public bool closed_flg { get; set; } = false;
-    public bool del_flg { get; set; } = false;
-    public DateTime create_tim { get; set; }
-    public DateTime update_tim { get; set; }
-    public bool is_public { get; set; } = true;
-    public bool is_owner { get; set; } = false;
-    public int count_funny { get; set; } = 0;
-    public int count_love { get; set; } = 0;
-    public int count_surprise { get; set; } = 0;
-    public int count_sad { get; set; } = 0;
-    public string a_title { get; set; } = string.Empty;
-    public string currency_unit { get; set; } = string.Empty;
-}
+    public class TMemoDetail : IAppRecord
+    {
+        public long seq { get; set; }
+        public int archive_id { get; set; } = 0;
+        public Guid user_id { get; set; }
+        public decimal latitude { get; set; }
+        public decimal longitude { get; set; }
+        public string title { get; set; } = string.Empty;
+        public string body { get; set; } = string.Empty;
+        public string memo_date { get; set; } = string.Empty;
+        public string memo_time { get; set; } = string.Empty;
+        public string face_emoji { get; set; } = string.Empty;
+        public string weather_code { get; set; } = string.Empty;
+        public string? link_url { get; set; } = string.Empty;
+        public int memo_price { get; set; } = 0;
+        public bool del_flg { get; set; } = false;
+        public DateTime create_tim { get; set; }
+        public DateTime update_tim { get; set; }
+        public bool is_public { get; set; } = false;
+        public bool is_owner { get; set; } = true;
+        public string a_title { get; set; } = string.Empty;
+    }
 
-public class TReactionPub
-{
-    public int archive_id { get; set; } = 0;
-    public long seq { get; set; }
-    public Guid user_id { get; set; }
+    public class TMemoDetailPub : IAppRecord
+    {
+        public int archive_id { get; set; } = 0;
+        public long seq { get; set; }
+        public Guid user_id { get; set; }
+        public decimal latitude { get; set; }
+        public decimal longitude { get; set; }
+        public string? title { get; set; } = string.Empty;
+        public string? body { get; set; } = string.Empty;
+        public string memo_date { get; set; } = string.Empty;
+        public string memo_time { get; set; } = string.Empty;
+        public string face_emoji { get; set; } = string.Empty;
+        public string weather_code { get; set; } = string.Empty;
+        public string? link_url { get; set; } = string.Empty;
+        public int memo_price { get; set; } = 0;
+        //public bool closed_flg { get; set; } = false;
+        public bool del_flg { get; set; } = false;
+        public DateTime create_tim { get; set; }
+        public DateTime update_tim { get; set; }
+        public bool is_public { get; set; } = true;
+        public bool is_owner { get; set; } = false;
+        public int count_funny { get; set; } = 0;
+        public int count_love { get; set; } = 0;
+        public int count_surprise { get; set; } = 0;
+        public int count_sad { get; set; } = 0;
+        public string a_title { get; set; } = string.Empty;
+        public string currency_unit { get; set; } = string.Empty;
+    }
 
-    // 4つのリアクションを固定で持つ
-    public bool has_funny { get; set; }    // Type 1
-    public bool has_love { get; set; }  // Type 2
-    public bool has_surprise { get; set; } // Type 3
-    public bool has_sad { get; set; }      // Type 4
+    public class TReactionPub
+    {
+        public int archive_id { get; set; } = 0;
+        public long seq { get; set; }
+        public Guid user_id { get; set; }
 
-    public DateTime update_tim { get; set; }
-}
+        // 4つのリアクションを固定で持つ
+        public bool has_funny { get; set; }
+        public bool has_love { get; set; }
+        public bool has_surprise { get; set; }
+        public bool has_sad { get; set; }
+    }
+
+#endregion
 
 #region "System"
 
-// フィードバック
-public class TSysFeedback
-    {
-        public Guid user_id { get; set; } // アプリ側はGuid
-        public string? body { get; set; }
-        public int score { get; set; }
-        public DateTime update_tim { get; set; }
-    }
+    // フィードバック
+    public class TSysFeedback
+        {
+            public Guid user_id { get; set; } // アプリ側はGuid
+            public string? body { get; set; }
+            public int score { get; set; }
+            public DateTime create_tim { get; set; }
+            public DateTime update_tim { get; set; }
+        }
 
     // お知らせ
     public class TSysNotification
@@ -147,6 +150,7 @@ public class TSysFeedback
         public short kind { get; set; }
         public DateTime disp_from { get; set; }
         public DateTime disp_to { get; set; }
+        public DateTime create_tim { get; set; }
         public DateTime update_tim { get; set; }
     }
 
@@ -157,7 +161,8 @@ public class TSysFeedback
         public Guid target_user_id { get; set; }
         public long archive_id { get; set; }
         public string? body { get; set; }
-        public DateTime report_tim { get; set; }
+        public DateTime create_tim { get; set; }
+        public DateTime update_tim { get; set; }
     }
 
     // 個人向け通知
@@ -192,7 +197,7 @@ public class TSysFeedback
             public DateTime update_tim { get; set; }
             public bool is_public { get; set; } = true;
             public bool is_owner { get; set; } = false;
-            public int cnt { get; set; } = 0;
+            public int detail_count { get; set; } = 0;
         }
 
     /// <summary>
@@ -225,10 +230,9 @@ public class TSysFeedback
         public Guid target_user_id { get; set; }
         public long archive_id { get; set; }
         public string? body { get; set; }
-        public DateTime report_tim { get; set; }
+        public DateTime create_tim { get; set; }
+        public DateTime update_tim { get; set; }
 
-        // --- 通報した人（Reporter）の情報 (AspNetUsers) ---
-        // 管理者が「誰が通報してきたか」を判別するために使用
         public string icon { get; set; } = string.Empty;
         public string nick_name { get; set; } = string.Empty;
     }
@@ -274,7 +278,8 @@ public class TSysFeedback
         public Guid target_user_id { get; set; }
         public long archive_id { get; set; }
         public string? body { get; set; }
-        public DateTime report_tim { get; set; }
+        public DateTime create_tim { get; set; }
+        public DateTime update_tim { get; set; }
 
         // --- ターゲットユーザー情報 (AspNetUsers) ---
         public string target_icon { get; set; } = string.Empty;

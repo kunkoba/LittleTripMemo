@@ -28,18 +28,20 @@ public class SysReportRepository : _BaseRepository
             target_user_id, 
             archive_id, 
             body, 
-            report_tim
+            create_tim, 
+            update_tim
         ) VALUES (
             @reporter_user_id, 
             @target_user_id, 
             @archive_id, 
             @body, 
+            CURRENT_TIMESTAMP,
             CURRENT_TIMESTAMP
         )
         ON CONFLICT (reporter_user_id, target_user_id, archive_id) 
         DO UPDATE SET
             body       = EXCLUDED.body,
-            report_tim = CURRENT_TIMESTAMP";
+            update_tim = CURRENT_TIMESTAMP";
 
         return await ExecuteAsync(sql, report);
     }
@@ -77,22 +79,16 @@ public class SysReportRepository : _BaseRepository
     /// <returns></returns>
     public async Task<IEnumerable<DtoReportDetail>> GetReportsByTargetAsync(Guid targetUserId, long archiveId)
     {
-        // Identity(EF Core)の標準テーブルはカラム名が大文字・小文字を区別するためダブルクォートで囲みます
         const string sql = @"
-        SELECT 
-            r.reporter_user_id,
-            r.target_user_id,
-            r.archive_id,
-            r.body,
-            r.report_tim,
-            u.""Icon""        AS icon,
-            u.""NickName""    AS nick_name
-        FROM t_sys_reports r
-        LEFT JOIN ""AspNetUsers"" u 
-            ON r.reporter_user_id = u.""Id""
-        WHERE r.target_user_id = @target_user_id 
-          AND r.archive_id     = @archive_id 
-        ORDER BY r.report_tim DESC";
+            SELECT 
+                r.*,
+                u.icon,
+                u.nick_name
+            FROM t_sys_reports r
+            LEFT JOIN t_app_user u ON r.reporter_user_id = u.user_id 
+            WHERE r.target_user_id = @target_user_id 
+              AND r.archive_id     = @archive_id 
+            ORDER BY r.update_tim DESC";
 
         return await QueryAsync<DtoReportDetail>(sql, new
         {
@@ -147,18 +143,18 @@ public class SysReportRepository : _BaseRepository
                 r.target_user_id,
                 r.archive_id,
                 r.body,
-                r.report_tim,
-                u.""Icon""        AS target_icon,
-                u.""NickName""    AS target_nick_name,
-                a.title           AS archive_title,
-                COALESCE(a.closed_flg, true)  AS is_closed,
-                COALESCE(a.del_flg, true)     AS is_deleted
+                r.create_tim,
+                u.nick_name AS target_nick_name,
+                u.icon AS target_icon,
+                a.title AS archive_title,
+                a.closed_flg AS is_closed,
+                a.del_flg AS is_deleted
             FROM t_sys_reports r
-            LEFT JOIN ""AspNetUsers"" u ON r.target_user_id = u.""Id""
+            LEFT JOIN t_app_user u ON r.target_user_id = u.user_id 
             LEFT JOIN t_memo_archive_pub a ON r.archive_id = a.archive_id
             WHERE r.reporter_user_id = @user_id
-            ORDER BY r.report_tim DESC
-            LIMIT 100"; // 直近20件程度
+            ORDER BY r.create_tim DESC 
+            LIMIT 100";
 
         return await QueryAsync<DtoMyReportDetail>(sql, new { user_id = _user.user_id });
     }

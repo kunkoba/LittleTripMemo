@@ -46,7 +46,7 @@ public class GetArchiveListService : _BaseService
             update_tim = x.update_tim,
             is_public = x.is_public,
             is_owner = x.is_owner,
-            cnt = x.cnt,
+            detail_count = x.detail_count,
         });
 
         var list2 = archivesPub.Select(x => new DtoArchive
@@ -63,7 +63,7 @@ public class GetArchiveListService : _BaseService
             update_tim = x.update_tim,
             is_public = x.is_public,
             is_owner = x.is_owner,
-            cnt = x.cnt,
+            detail_count = x.detail_count,
         });
 
         // 結合

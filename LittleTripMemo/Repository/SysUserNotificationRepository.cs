@@ -41,10 +41,10 @@ public class SysUserNotificationRepository : _BaseRepository
         const string sql = @"
         SELECT 
             n.*,
-            u.""NickName"" AS nick_name,
-            u.""Icon""     AS icon
+            u.nick_name,
+            u.icon
         FROM t_sys_user_notifications n
-        LEFT JOIN ""AspNetUsers"" u ON n.user_id = u.""Id""
+        LEFT JOIN t_app_user u ON n.user_id = u.user_id
         ORDER BY n.send_tim DESC 
         LIMIT @limit";
 

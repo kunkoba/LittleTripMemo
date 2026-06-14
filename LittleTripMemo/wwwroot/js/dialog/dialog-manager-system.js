@@ -511,9 +511,9 @@ export default {
                                 nick_name: editNickname.value.trim(),
                                 icon: editIconInput.value,
                                 description: editDesc.value.trim(),
-                                link1: editLink1.value.trim(),
-                                link2: editLink2.value.trim(),
-                                link3: editLink3.value.trim(),
+                                link_1: editLink1.value.trim(),
+                                link_2: editLink2.value.trim(),
+                                link_3: editLink3.value.trim(),
                             };
                             const isSuccess = await $Data.Access.UpdateProfile(updatedFields);
                             if (!isSuccess) return;

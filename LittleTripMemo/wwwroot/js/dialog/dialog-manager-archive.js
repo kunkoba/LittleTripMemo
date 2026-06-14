@@ -377,7 +377,7 @@ export default {
                     $Dom.QuerySelector(".js-title", child).textContent = item.title;
                     $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
                     $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
-                    $Dom.QuerySelector(".js-count", child).textContent = item.cnt || "0";
+                    $Dom.QuerySelector(".js-count", child).textContent = item.detail_count || "0";
                     const leftBorder = $Dom.QuerySelector(".js-item-border", child);
                     if (isPublicGroup) {
                         if (item.closed_flg) {
@@ -441,7 +441,7 @@ export default {
                 $Dom.QuerySelector(".js-title", child).textContent = item.title;
                 $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
                 $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
-                $Dom.QuerySelector(".js-count", child).textContent = item.cnt || "0";
+                $Dom.QuerySelector(".js-count", child).textContent = item.detail_count || "0";
                 // バッジの装飾（PRIVATE固定）
                 const leftBorder = $Dom.QuerySelector(".js-item-border", child);
                 // leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-800";

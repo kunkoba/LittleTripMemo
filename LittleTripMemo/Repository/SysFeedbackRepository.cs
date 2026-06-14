@@ -72,15 +72,15 @@ public class SysFeedbackRepository : _BaseRepository
 
         // 2. SQL（最新100件固定）
         var sql = $@"
-        SELECT 
-            f.*,
-            u.""Icon""     AS icon,
-            u.""NickName"" AS nick_name
-        FROM t_sys_feedbacks f
-        LEFT JOIN ""AspNetUsers"" u ON f.user_id = u.""Id""
-        {whereClause}
-        ORDER BY f.update_tim DESC 
-        LIMIT 100";
+            SELECT 
+                f.*,
+                u.icon,      
+                u.nick_name  
+            FROM t_sys_feedbacks f
+            LEFT JOIN t_app_user u ON f.user_id = u.user_id 
+            {whereClause}
+            ORDER BY f.update_tim DESC 
+            LIMIT 100";
 
         // 取得系ラッパーを使用。戻り値は単一のリスト。
         return await QueryAsync<DtoFeedbackDetail>(sql, new { score });

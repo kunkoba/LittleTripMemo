@@ -66,7 +66,6 @@ const _MapCore = {
     },
     // 視点移動の実体
     focusToTargetMarker(marker, delay = 500) {
-        console.log("focusToTargetMarker:", delay);
         if (delay > 0) {
             // パネルが開く時などは従来通り遅延＋リサイズ追従
             setTimeout(() => {

@@ -302,7 +302,6 @@ const MarkerController = {
     },
     // 現在の状態に基づくフォーカス実行
     FocusToCurrentMarker(delay = 200) {
-        console.log("★FocusToCurrentMarker", this._currentIndex);
         const marker = _MarkerCore.getMarker(this._currentIndex);
         if (!marker) return;
         const details = $Data.Store.GetDetails();

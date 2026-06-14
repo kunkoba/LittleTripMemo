@@ -153,13 +153,21 @@ const AppManager = {
     },
     // アプリ起動時フロー
     async Init() {
+        console.log("★App.Init");
         this._loadSettings();
         await $LocalDb.Init();
         // 最初に設定をロードし、トークンがあればログイン状態にしておく
         if (this.AppData.Owner.Token) {
             this.AppData.Context.IsLoggedIn = true;
+            // ユーザ存在チェック
+            let isSuccess = await $Data.Access.EnsureLoginUser();
+            if (!isSuccess) {
+                // ログイン画面へ
+                $Dialog.ShowLoginDialog();
+                return;
+            }
             // システム情報取得
-            let isSuccess = await $Data.Access.GetSystemInfo();
+            isSuccess = await $Data.Access.GetSystemInfo();
             if (!isSuccess) {
                 return;
             };
