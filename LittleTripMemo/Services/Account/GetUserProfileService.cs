@@ -9,6 +9,8 @@ public class GetUserProfileService : _BaseService
 {
     private readonly AppUserRepository _appUserRepo;
 
+    public record GetUserProfileReq(Guid target_user_id);
+
     public record Response(
         Guid user_id,
         string? icon,

@@ -340,7 +340,7 @@ public class AppController : _BaseController
         public async Task<IActionResult> GetUserProfile([FromBody] GetUserProfileService.GetUserProfileReq req)
         {
                 // 既存のサービスをそのまま利用
-                var result = await _getUserProfileService.ExecuteAsync(req.userId);
+                var result = await _getUserProfileService.ExecuteAsync(req.target_user_id);
                 return OkWithBase(result);
             }
 
