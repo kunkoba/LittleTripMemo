@@ -35,23 +35,32 @@
 <template id="tpl-menu-app">
     <div class="w-full flex flex-col bg-brand-0">
         <button id="btn-app-current" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📍</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Focus to Current</span></button>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">📍</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Focus to Current</span>
+        </button>
         <button id="btn-app-restore" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">♻️</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Restore Map</span></button>
-        <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">➕</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Create Memo</span></button>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">♻️</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Restore Map</span>
+        </button>
         <button id="btn-app-archive-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📚</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Archive List</span></button>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">📚</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Archive List</span>
+        </button>
         <button id="btn-app-info" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📖</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">archive info</span></button>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">📖</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">archive info</span>
+        </button>
         <button id="btn-app-pointlist" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">☰</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">point list</span></button>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">☰</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">point list</span>
+        </button>
         <button id="btn-app-batch" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📦</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">[Merge] Or [Add]</span></button>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">📦</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">[Merge] Or [Add]</span>
+        </button>
         <button id="btn-app-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">🔎</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Map Search</span></button>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">🔎</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Map Search</span>
+        </button>
         <button id="btn-app-point" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">👇</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Word Search</span></button>
+            <span class="col-span-1 flex justify-center text-[1.2rem]">👇</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Word Search</span>
+        </button>
+        <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
+            <span class="col-span-1 flex justify-center text-[1.2rem]">➕</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Create Memo</span>
+        </button>
     </div>
 </template>
 

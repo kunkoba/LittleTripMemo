@@ -12,19 +12,39 @@ public class ArchivePubRepository : _BaseRepository
 
     public async Task<int> InsertAsync(TMemoArchivePub archive)
     {
-        archive.user_id = _user.user_id;
+        archive.user_id = _user.login_user_id;
         const string sql = @"
             INSERT INTO t_memo_archive_pub (
-                archive_id, user_id, title, memo, link_url, currency_unit, closed_flg, del_flg, create_tim, update_tim
-            ) VALUES (
-                @archive_id, @user_id, @title, @memo, @link_url, @currency_unit, true, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-            )";
+                archive_id,
+                user_id,
+                title,
+                memo,
+                link_url,
+                currency_unit,
+                closed_flg,
+                del_flg,
+                create_tim,
+                update_tim
+            )
+            VALUES (
+                @archive_id,
+                @user_id,
+                @title,
+                @memo,
+                @link_url,
+                @currency_unit,
+                TRUE,
+                FALSE,
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
+            );
+        ";
         return await ExecuteAsync(sql, archive);
     }
 
     public async Task<int> UpdateByKeyAsync(TMemoArchivePub archive)
     {
-        archive.user_id = _user.user_id;
+        archive.user_id = _user.login_user_id;
 
         const string sql = @"
             UPDATE t_memo_archive_pub SET
@@ -57,7 +77,7 @@ public class ArchivePubRepository : _BaseRepository
         DELETE FROM t_memo_archive_pub
         WHERE archive_id = @archive_id
           AND user_id    = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
     public async Task<int> OpenByKeyAsync(int archiveId)
@@ -68,18 +88,18 @@ public class ArchivePubRepository : _BaseRepository
             update_tim = CURRENT_TIMESTAMP
         WHERE archive_id = @archive_id
           AND user_id    = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
     public async Task<int> CloseByKeyAsync(int archiveId)
     {
         const string sql = @"
-        UPDATE t_memo_archive_pub
-        SET closed_flg = true,
-            update_tim = CURRENT_TIMESTAMP
-        WHERE archive_id = @archive_id
-          AND user_id    = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
+            UPDATE t_memo_archive_pub
+            SET closed_flg = true,
+                update_tim = CURRENT_TIMESTAMP
+            WHERE archive_id = @archive_id
+              AND user_id    = @user_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
     /// <summary>
@@ -141,16 +161,18 @@ public class ArchivePubRepository : _BaseRepository
     public async Task UpdateDetailCountAsync(int archiveId)
     {
         const string sql = @"
-        UPDATE t_memo_archive_pub a
-        SET detail_count = (
-            SELECT count(*) 
-            FROM t_memo_detail_pub d 
-            WHERE d.archive_id = a.archive_id 
-              AND d.del_flg = false
-        )
-        WHERE a.archive_id = @archive_id";
+            UPDATE t_memo_archive_pub
+            SET update_tim = CURRENT_TIMESTAMP,
+                detail_count = (
+                    SELECT count(*) 
+                    FROM t_memo_detail_pub d 
+                    WHERE d.archive_id = t_memo_archive_pub.archive_id 
+                      AND d.del_flg = false
+                )
+            WHERE archive_id = @archive_id 
+              AND user_id = @user_id";
 
-        await ExecuteAsync(sql, new { archive_id = archiveId });
+        await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
     /// <summary>
@@ -163,8 +185,19 @@ public class ArchivePubRepository : _BaseRepository
         SELECT * FROM t_memo_archive_pub
         WHERE user_id = @user_id
           AND del_flg = false
-        ORDER BY create_tim DESC";
+        ORDER BY update_tim DESC";
 
-        return await QueryAsync<TMemoArchivePub>(sql, new { user_id = _user.user_id });
+        return await QueryAsync<TMemoArchivePub>(sql, new { user_id = _user.login_user_id });
     }
+
+    ///// <summary>
+    ///// アーカイブの更新日時を現在時刻に更新する
+    ///// </summary>
+    //public async Task UpdateTimestampAsync(int archiveId)
+    //{
+    //    // クラス名に合わせてテーブル名を読み替えてください
+    //    const string sql = "UPDATE t_memo_archive SET update_tim = CURRENT_TIMESTAMP WHERE archive_id = @archive_id AND user_id = @user_id";
+    //    await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
+    //}
+
 }

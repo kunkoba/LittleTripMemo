@@ -33,7 +33,7 @@ public class GetUserProfileService : _BaseService
         BusinessException.ThrowIf(targetUser == null, "ユーザーが存在しません", "USER_NOT_FOUND");
 
         // 2. 所有者判定: 対象者が自分（_user.user_id）自身かどうかを判定
-        bool is_owner = (targetUser.user_id == _user.user_id);
+        bool is_owner = (targetUser.user_id == _user.login_user_id);
 
         return new Response(
             targetUser.user_id,

@@ -53,7 +53,7 @@ public class UnpublishArchiveService : _BaseService
             // ※既存の各Repositoryメソッドが内部で _user.UserId をチェックしているため安全ですが、
             //   リアクションと通報は全ユーザー分を消すため、ここで親の存在を確定させます。
             var archive = await _archivePubRepo.GetByKeyAsync(req.archive_id);
-            BusinessException.ThrowIf(archive == null || archive.user_id != _user.user_id, "対象のアーカイブが見つからないか、権限がありません。");
+            BusinessException.ThrowIf(archive == null || archive.user_id != _user.login_user_id, "対象のアーカイブが見つからないか、権限がありません。");
 
             // ① 公開明細を物理削除（自分の分）
             await _detailPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
@@ -82,7 +82,7 @@ public class UnpublishArchiveService : _BaseService
     private async Task ValidateAsync(UnpublishArchiveReq req)
     {
         BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが無効です");
         await Task.CompletedTask;
     }

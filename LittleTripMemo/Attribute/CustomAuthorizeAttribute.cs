@@ -17,7 +17,7 @@ public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
         var userContext = context.HttpContext.RequestServices.GetRequiredService<UserContext>();
 
         // Middlewareでセットされた UserId がなければ未認証とみなす
-        if (userContext.user_id == Guid.Empty)
+        if (userContext.login_user_id == Guid.Empty)
         {
             context.Result = new UnauthorizedObjectResult(new { message = "Token is missing or invalid" });
         }

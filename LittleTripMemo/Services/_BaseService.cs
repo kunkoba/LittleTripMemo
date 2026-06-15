@@ -17,12 +17,12 @@ public abstract class _BaseService
     /// </summary>
     protected async Task<TAppUser> EnsureLoginUserAsync(AppUserRepository appUserRepo)
     {
-        if (_user.user_id == Guid.Empty)
+        if (_user.login_user_id == Guid.Empty)
         {
             throw new BusinessException("ログインが必要です。", "AUTH_REQUIRED");
         }
 
-        var loginUser = await appUserRepo.GetByUserIdAsync(_user.user_id);
+        var loginUser = await appUserRepo.GetByUserIdAsync(_user.login_user_id);
         if (loginUser == null)
         {
             // トークンは正しいが、アプリ側のユーザーテーブルにいない異常事態
@@ -37,7 +37,7 @@ public abstract class _BaseService
     {
         if (entity != null)
         {
-            entity.is_owner = (entity.user_id == _user.user_id);
+            entity.is_owner = (entity.user_id == _user.login_user_id);
         }
     }
 

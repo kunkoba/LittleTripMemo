@@ -38,7 +38,7 @@ public class UpdateUserProfileService : _BaseService
         // IdentityUser(認証)ではなく、AppUser(業務プロフ)を更新
         var app_user = new TAppUser
         {
-            user_id = _user.user_id,
+            user_id = _user.login_user_id,
             icon = req.icon,
             nick_name = req.nick_name,
             description = req.description,
@@ -54,7 +54,7 @@ public class UpdateUserProfileService : _BaseService
 
     private async Task ValidateAsync(UpdateUserReq req)
     {
-        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
 
         BusinessException.ThrowIf(string.IsNullOrWhiteSpace(req.nick_name), "ニックネームは必須です");

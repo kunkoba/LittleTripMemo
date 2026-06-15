@@ -45,7 +45,7 @@ public class DeleteArchiveService : _BaseService
         {
             // 2. 所有権チェック（他人のデータを消させない）
             var archive = await _archiveRepo.GetByKeyAsync(req.archive_id);
-            BusinessException.ThrowIf(archive == null || archive.user_id != _user.user_id, "対象のデータが見つからないか、権限がありません。");
+            BusinessException.ThrowIf(archive == null || archive.user_id != _user.login_user_id, "対象のデータが見つからないか、権限がありません。");
 
             // 3. 明細の解放（対象アーカイブIDを持つ明細の archive_id を 0 にする）
             await _detailRepo.ReleaseArchiveIdAsync(req.archive_id);
@@ -65,7 +65,7 @@ public class DeleteArchiveService : _BaseService
     private async Task ValidateAsync(DeleteArchiveReq req)
     {
         BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(req.archive_id <= 0, "無効なアーカイブIDです");
         await Task.CompletedTask;
     }

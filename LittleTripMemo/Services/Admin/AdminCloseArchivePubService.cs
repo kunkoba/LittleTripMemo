@@ -70,7 +70,7 @@ public class AdminCloseArchivePubService : _BaseService
 
     private async Task ValidateAsync(AdminCloseArchivePubReq req)
     {
-        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ログインが必要です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(_user.plan_type != PlanType.Admin.ToString(), "管理者権限が必要です");
         BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが不正です");
         BusinessException.ThrowIf(req.target_user_id == Guid.Empty, "ターゲットユーザーIDが不正です");

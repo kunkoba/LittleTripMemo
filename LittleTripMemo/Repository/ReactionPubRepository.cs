@@ -16,7 +16,7 @@ public class ReactionPubRepository : _BaseRepository
     /// </summary>
     public async Task<int> UpsertAsync(TReactionPub reaction)
     {
-        reaction.user_id = _user.user_id;
+        reaction.user_id = _user.login_user_id;
 
         const string sql = @"
             INSERT INTO t_reaction_pub (
@@ -50,7 +50,7 @@ public class ReactionPubRepository : _BaseRepository
             WHERE archive_id = @archiveId 
               AND user_id    = @user_id";
 
-        return await QueryAsync<TReactionPub>(sql, new { archiveId = archiveId, user_id = _user.user_id });
+        return await QueryAsync<TReactionPub>(sql, new { archiveId = archiveId, user_id = _user.login_user_id });
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public class ReactionPubRepository : _BaseRepository
               AND seq        = @seq
               AND user_id    = @user_id";
 
-        return await ExecuteAsync(sql, new { archiveId, seq, user_id = _user.user_id });
+        return await ExecuteAsync(sql, new { archiveId, seq, user_id = _user.login_user_id });
     }
 
     /// <summary>
@@ -77,57 +77,46 @@ public class ReactionPubRepository : _BaseRepository
         return await ExecuteAsync(sql, new { archive_id = archiveId });
     }
 
-    // Repository/ReactionPubRepository.cs
-
     /// <summary>
     /// リアクションを更新し、その増減値を DetailPub テーブルにアトミックに反映する
     /// </summary>
     public async Task UpsertWithCounterAsync(TReactionPub reaction)
     {
-        reaction.user_id = _user.user_id;
+        reaction.user_id = _user.login_user_id;
 
-        // CTE (Common Table Expressions) を使用して
-        // 1. 既存の値を取得 (old_val)
-        // 2. 値を更新 (upserted)
-        // 3. 差分を計算して DetailPub を更新
         const string sql = @"
-        WITH old_val AS (
-            SELECT has_funny, has_love, has_surprise, has_sad
-            FROM t_reaction_pub
-            WHERE archive_id = @archive_id AND seq = @seq AND user_id = @user_id
-            FOR UPDATE
-        ),
-        upserted AS (
-            INSERT INTO t_reaction_pub (
-                archive_id, seq, user_id, has_funny, has_love, has_surprise, has_sad, update_tim
-            ) VALUES (
-                @archive_id, @seq, @user_id, @has_funny, @has_love, @has_surprise, @has_sad, CURRENT_TIMESTAMP
+            WITH old_val AS (
+                SELECT has_funny, has_love, has_surprise, has_sad
+                FROM t_reaction_pub
+                WHERE archive_id = @archive_id AND seq = @seq AND user_id = @user_id
+                FOR UPDATE
+            ),
+            upserted AS (
+                INSERT INTO t_reaction_pub (
+                    archive_id, seq, user_id, has_funny, has_love, has_surprise, has_sad, update_tim
+                ) VALUES (
+                    @archive_id, @seq, @user_id, @has_funny, @has_love, @has_surprise, @has_sad, CURRENT_TIMESTAMP
+                )
+                ON CONFLICT (archive_id, seq, user_id) DO UPDATE SET
+                    has_funny    = EXCLUDED.has_funny,
+                    has_love     = EXCLUDED.has_love,
+                    has_surprise = EXCLUDED.has_surprise,
+                    has_sad      = EXCLUDED.has_sad,
+                    update_tim   = CURRENT_TIMESTAMP
+                RETURNING *
             )
-            ON CONFLICT (archive_id, seq, user_id) DO UPDATE SET
-                has_funny    = EXCLUDED.has_funny,
-                has_love     = EXCLUDED.has_love,
-                has_surprise = EXCLUDED.has_surprise,
-                has_sad      = EXCLUDED.has_sad,
-                update_tim   = CURRENT_TIMESTAMP
-            RETURNING *
-        )
-        UPDATE t_memo_detail_pub d
-        SET 
-            count_funny = count_funny + (
-                (CASE WHEN u.has_funny THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_funny, false) THEN 1 ELSE 0 END)
-            ),
-            count_love = count_love + (
-                (CASE WHEN u.has_love THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_love, false) THEN 1 ELSE 0 END)
-            ),
-            count_surprise = count_surprise + (
-                (CASE WHEN u.has_surprise THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_surprise, false) THEN 1 ELSE 0 END)
-            ),
-            count_sad = count_sad + (
-                (CASE WHEN u.has_sad THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_sad, false) THEN 1 ELSE 0 END)
-            )
-        FROM upserted u
-        LEFT JOIN old_val o ON true
-        WHERE d.archive_id = u.archive_id AND d.seq = u.seq;";
+            UPDATE t_memo_detail_pub
+            SET 
+                count_funny = count_funny + ((CASE WHEN u.has_funny THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_funny, false) THEN 1 ELSE 0 END)),
+                count_love = count_love + ((CASE WHEN u.has_love THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_love, false) THEN 1 ELSE 0 END)),
+                count_surprise = count_surprise + ((CASE WHEN u.has_surprise THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_surprise, false) THEN 1 ELSE 0 END)),
+                count_sad = count_sad + ((CASE WHEN u.has_sad THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_sad, false) THEN 1 ELSE 0 END))
+            FROM upserted u
+            LEFT JOIN old_val o ON true
+            WHERE t_memo_detail_pub.archive_id = u.archive_id 
+              AND t_memo_detail_pub.seq = u.seq";
+            // ※ t_memo_detail_pub 側の user_id チェックは、公開データであるため 
+            //    archive_id/seq が一致すれば OK（作成者以外もリアクションするため）
 
         await ExecuteAsync(sql, reaction);
     }

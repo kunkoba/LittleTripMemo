@@ -114,7 +114,7 @@ public class PublishArchiveService : _BaseService
     private async Task ValidateAsync(PublishArchiveReq req)
     {
         BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが無効です");
         await Task.CompletedTask;
     }

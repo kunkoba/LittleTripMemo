@@ -20,7 +20,7 @@ public class EnsureLoginUserService : _BaseService
         await ValidateAsync(req);
 
         // 2. ユーザー情報を取得して返却（初期化用データとして利用可能）
-        var user = await _appUserRepo.GetByUserIdAsync(_user.user_id);
+        var user = await _appUserRepo.GetByUserIdAsync(_user.login_user_id);
         return new Response(user!);
     }
 

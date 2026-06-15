@@ -10,14 +10,15 @@ public class GetArchiveDetailsPubService : _BaseService
     private readonly ArchivePubRepository _archivePubRepo;
     private readonly DetailPubRepository _detailPubRepo;
     private readonly ReactionPubRepository _reactionPubRepo;
-    private readonly GetUserProfileService _getUserProfileService;
+    private readonly AppUserRepository _appUserRepo; 
 
     public record GetArchiveDetailsPubReq(int archive_id);
+
     public record Response(
         TMemoArchivePub archive,
         IEnumerable<TMemoDetailPub> details,
         IEnumerable<TReactionPub> myReactions,
-        GetUserProfileService.Response userProfile
+        DtoUserProfile userProfile 
     );
 
     public GetArchiveDetailsPubService(
@@ -25,13 +26,13 @@ public class GetArchiveDetailsPubService : _BaseService
         ArchivePubRepository archivePubRepo,
         DetailPubRepository detailPubRepo,
         ReactionPubRepository reactionPubRepo,
-        GetUserProfileService getUserProfileService)
+        AppUserRepository appUserRepo) 
         : base(userContext)
     {
         _archivePubRepo = archivePubRepo;
         _detailPubRepo = detailPubRepo;
         _reactionPubRepo = reactionPubRepo;
-        _getUserProfileService = getUserProfileService;
+        _appUserRepo = appUserRepo;
     }
 
     public async Task<Response> ExecuteAsync(GetArchiveDetailsPubReq req)
@@ -45,7 +46,7 @@ public class GetArchiveDetailsPubService : _BaseService
         BusinessException.ThrowIf(archive == null, "アーカイブが見つかりません");
         
         // 「非公開(closed)」かつ「所有者ではない」場合はエラーにする
-        if (archive.closed_flg && archive.user_id != _user.user_id)
+        if (archive.closed_flg && archive.user_id != _user.login_user_id)
         {
             throw new BusinessException("このアーカイブは現在非公開に設定されています。");
         }
@@ -57,12 +58,22 @@ public class GetArchiveDetailsPubService : _BaseService
         SetAppFlags(details);
 
         // 自分のリアクション取得（ログイン済みの場合のみ）
-        var reactions = _user.user_id != Guid.Empty
+        var reactions = _user.login_user_id != Guid.Empty
             ? await _reactionPubRepo.GetMyReactionsByArchiveIdAsync(req.archive_id)
             : Enumerable.Empty<TReactionPub>();
 
-        // ユーザプロフィール取得
-        var profile = await _getUserProfileService.ExecuteAsync(archive.user_id);
+        // ユーザープロフィールの取得
+        var user = await _appUserRepo.GetByUserIdAsync(archive.user_id)
+            ?? throw new BusinessException("ユーザーが存在しません");
+
+        var profile = new DtoUserProfile(
+            user.user_id,
+            user.icon,
+            user.nick_name,
+            user.description,
+            user.link_1, user.link_2, user.link_3,
+            is_owner: (user.user_id == _user.login_user_id)
+        );
 
         return new Response(archive, details, reactions, profile);
     }

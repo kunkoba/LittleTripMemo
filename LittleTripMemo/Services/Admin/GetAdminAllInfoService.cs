@@ -1,6 +1,7 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
+using LittleTripMemo.Repository;
 using LittleTripMemo.Services.Admin;
 using LittleTripMemo.Services.Sys;
 
@@ -12,10 +13,10 @@ namespace LittleTripMemo.Services.Admin;
 /// </summary>
 public class GetAdminAllInfoService : _BaseService
 {
-    private readonly GetAllNotificationsService _notificationsService;
-    private readonly GetReportSummaryService _reportSummaryService;
-    private readonly GetAllFeedbackService _feedbackService;
-    private readonly GetAllUserNotificationsService _userNotificationsService;
+    private readonly SysNotificationRepository _notifRepo;
+    private readonly SysReportRepository _reportRepo;
+    private readonly SysFeedbackRepository _feedbackRepo;
+    private readonly SysUserNotificationRepository _userNotifRepo;
 
     // まとめて取得する際の各サービスのパラメータ
     public record GetAdminAllInfoReq();
@@ -30,16 +31,16 @@ public class GetAdminAllInfoService : _BaseService
 
     public GetAdminAllInfoService(
         UserContext user,
-        GetAllNotificationsService notificationsService,
-        GetReportSummaryService reportSummaryService,
-        GetAllFeedbackService feedbackService,
-        GetAllUserNotificationsService userNotificationsService
+        SysNotificationRepository notifRepo,
+        SysReportRepository reportRepo,
+        SysFeedbackRepository feedbackRepo,
+        SysUserNotificationRepository userNotifRepo
     ) : base(user)
     {
-        _notificationsService = notificationsService;
-        _reportSummaryService = reportSummaryService;
-        _feedbackService = feedbackService;
-        _userNotificationsService = userNotificationsService;
+        _notifRepo = notifRepo;
+        _reportRepo = reportRepo;
+        _feedbackRepo = feedbackRepo;
+        _userNotifRepo = userNotifRepo;
     }
 
     /// <summary>
@@ -52,24 +53,31 @@ public class GetAdminAllInfoService : _BaseService
         // 1. 検証（管理者権限チェック）
         await ValidateAsync();
 
-        // 2. 並列(WhenAll)ではなく、1つずつ順番に実行する
-        // PostgreSQLは1つの接続で同時に複数のコマンドを実行できません
-        var resNotes = await _notificationsService.ExecuteAsync(new GetAllNotificationsService.GetAllNotificationsReq());
-        var resReports = await _reportSummaryService.ExecuteAsync(new GetReportSummaryService.GetReportSummaryReq());
-        var resFeedbacks = await _feedbackService.ExecuteAsync(new GetAllFeedbackService.GetAllFeedbackReq(0));
-        var resUserNotes = await _userNotificationsService.ExecuteAsync(new GetAllUserNotificationsService.Request(100));
+        // 2. リポジトリを直接呼び出してデータを取得
+        // お知らせ一覧（最新100件）
+        var notifications = await _notifRepo.GetAllNotificationsAsync(100);
+
+        // 通報サマリー
+        var reportSummary = await _reportRepo.GetReportSummaryAsync();
+
+        // フィードバック一覧（全スコア対象）
+        var feedbackList = await _feedbackRepo.GetAllFeedbacksAsync(0);
+
+        // 個人通知履歴（最新100件）
+        var userMailList = await _userNotifRepo.GetAllAsync(100);
 
         // 3. 結果の集約
         return new Response(
-            resNotes.notifications,
-            resReports.reportSummary,
-            resFeedbacks.feedbackList,
-            resUserNotes.userMailList
+            notifications,
+            reportSummary,
+            feedbackList,
+            userMailList
         );
     }
 
     private async Task ValidateAsync()
     {
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(_user.plan_type != PlanType.Admin.ToString(), "管理者権限が必要です");
         await Task.CompletedTask;
     }

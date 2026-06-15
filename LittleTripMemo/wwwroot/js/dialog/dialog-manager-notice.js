@@ -43,7 +43,7 @@ export default {
                 const child = $Dom.GenerateTemplate("tpl-list-child-review");
                 const score = rev.score || 0;
                 $Dom.QuerySelector(".js-stars", child).textContent = "★".repeat(score) + "☆".repeat(5 - score);
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(rev.create_tim);
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(rev.update_tim);
                 $Dom.QuerySelector(".js-body", child).textContent = rev.body || "（内容なし）";
                 container.appendChild(child);
             });

@@ -8,24 +8,24 @@ namespace LittleTripMemo.Services.Sys;
 public class GetReportDetailsService : _BaseService
 {
     private readonly SysReportRepository _repo;
-    private readonly GetUserProfileService _getUserProfileService; 
+	private readonly AppUserRepository _appUserRepo; // サービスからリポジトリへ変更
 
-    public record GetReportDetailsReq(Guid target_user_id, long archive_id);
+	public record GetReportDetailsReq(Guid target_user_id, long archive_id);
 
-    // ★ Response に target_userProfile を追加
-    public record Response(
-        IEnumerable<DtoReportDetail> reports,
-        GetUserProfileService.Response target_userProfile
-    );
+	public record Response(
+		IEnumerable<DtoReportDetail> reports,
+		DtoUserProfile target_userProfile
+	);
 
-    public GetReportDetailsService(
+	public GetReportDetailsService(
         UserContext user,
         SysReportRepository repo,
-        GetUserProfileService getUserProfileService) : base(user)
-    {
+		AppUserRepository appUserRepo) 
+        : base(user)
+	{
         _repo = repo;
-        _getUserProfileService = getUserProfileService;
-    }
+		_appUserRepo = appUserRepo;
+	}
 
     public async Task<Response> ExecuteAsync(GetReportDetailsReq req)
     {
@@ -36,11 +36,21 @@ public class GetReportDetailsService : _BaseService
         // 通報詳細リスト（通報者情報入り）を取得
         var reports = await _repo.GetReportsByTargetAsync(req.target_user_id, req.archive_id);
 
-        // ターゲットユーザーのプロフィールを取得（既存サービスを再利用）
-        var targetProfile = await _getUserProfileService.ExecuteAsync(req.target_user_id);
+		// ターゲットユーザーの情報を直接取得
+		var user = await _appUserRepo.GetByUserIdAsync(req.target_user_id)
+			?? throw new BusinessException("ユーザーが存在しません", "USER_NOT_FOUND");
 
-        // 3. マッピング
-        return new Response(reports, targetProfile);
+		var targetProfile = new DtoUserProfile(
+			user.user_id,
+			user.icon,
+			user.nick_name,
+			user.description,
+			user.link_1, user.link_2, user.link_3,
+			is_owner: (user.user_id == _user.login_user_id)
+		);
+
+		// 3. マッピング
+		return new Response(reports, targetProfile);
     }
 
     private async Task ValidateAsync()

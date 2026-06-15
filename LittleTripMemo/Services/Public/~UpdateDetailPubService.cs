@@ -14,6 +14,7 @@ public class UpdateDetailPubService : _BaseService
 {
     private readonly ITransactionProvider _provider;
     private readonly DetailPubRepository _detailPubRepo;
+    private readonly ArchiveRepository _archivePubRepo;
 
     // --- 専用DTO：全項目必須のアノテーション ---
     public record UpdateDetailPubReq(
@@ -37,16 +38,15 @@ public class UpdateDetailPubService : _BaseService
     public UpdateDetailPubService(
         UserContext userContext,
         ITransactionProvider provider,
-        DetailPubRepository detailPubRepo)
+        DetailPubRepository detailPubRepo,
+        ArchiveRepository archivePubRepo)
         : base(userContext)
     {
         _provider = provider;
         _detailPubRepo = detailPubRepo;
+        _archivePubRepo = archivePubRepo;
     }
 
-    /// <summary>
-    /// 実行（1.検証 → 2.マッピング → 3.実行 の順に整理）
-    /// </summary>
     public async Task<Response> ExecuteAsync(UpdateDetailPubReq req)
     {
         // 1. 検証
@@ -72,6 +72,9 @@ public class UpdateDetailPubService : _BaseService
                 await _detailPubRepo.UpdateByKeyAsync(entity);
                 seq = req.seq;
             }
+
+            // 親の更新日時を更新
+            await _archivePubRepo.UpdateTimestampAsync(entity.archive_id);
 
             tran.Commit();
             return new Response(seq);

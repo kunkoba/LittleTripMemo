@@ -153,9 +153,9 @@ window.$Data = {
         // async UpsertDetail(params) {
         //     return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpsertDetail', params))();
         // },
-        async UpdateDetailPub(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpdateDetailPub', params))();
-        },
+        // async UpdateDetailPub(params) {
+        //     return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpdateDetailPub', params))();
+        // },
         async MergeDetails(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/MergeDetails', params))();
         },

@@ -13,7 +13,6 @@ namespace LittleTripMemo.Services;
 public class GetUnMergeDetailsService : _BaseService
 {
     private readonly DetailRepository _detailRepo;
-    private readonly GetSystemInfoService _getSystemInfoService; 
 
     public class GetUnMergeDetailsReq { }
 
@@ -23,12 +22,10 @@ public class GetUnMergeDetailsService : _BaseService
 
     public GetUnMergeDetailsService(
         UserContext userContext,
-        DetailRepository detailRepo,
-        GetSystemInfoService getSystemInfoService) // DI追加
+        DetailRepository detailRepo)
         : base(userContext)
     {
         _detailRepo = detailRepo;
-        _getSystemInfoService = getSystemInfoService;
     }
 
     /// <summary>
@@ -51,7 +48,7 @@ public class GetUnMergeDetailsService : _BaseService
     private async Task ValidateAsync()
     {
         BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
         await Task.CompletedTask;
     }
 }

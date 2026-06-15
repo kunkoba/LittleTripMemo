@@ -78,7 +78,7 @@ public class MergeDetailsService : _BaseService
     private async Task ValidateAsync(MergeDetailsReq req)
     {
         BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(req.seqs.Length == 0, "seqリストが空です");
         await Task.CompletedTask;
     }

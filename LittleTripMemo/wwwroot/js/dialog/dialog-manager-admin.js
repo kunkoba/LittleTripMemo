@@ -259,7 +259,7 @@ export default {
         // ボタンクリック時のアクション
         btnUser.onclick = async () => {
             // APIで対象ユーザーのフルプロフィールを取得
-            const isSuccess = await $Data.Access.GetUserProfile({ userId: rep.reporter_user_id });
+            const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: rep.reporter_user_id });
             if (isSuccess) {
                 // $Data.resData (最新レスポンス) から、先ほど取得したプロフィールを抽出
                 const profile = $Data.resData;
@@ -303,7 +303,7 @@ export default {
         } else {
             feedbackList.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim);
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim);
                 $Dom.QuerySelector(".js-score", child).textContent = "★".repeat(item.score) + "☆".repeat(5 - item.score);
                 $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
                 child.onclick = () => this.ShowAdminFeedbackDetail(item);
@@ -319,7 +319,7 @@ export default {
     // 【管理者機能】フィードバック詳細
     ShowAdminFeedbackDetail(item) {
         const el = $Dom.GenerateTemplate("tpl-admin-feedback-detail");
-        $Dom.QuerySelector(".js-date", el).textContent = $Util.FormatDate(item.create_tim);
+        $Dom.QuerySelector(".js-date", el).textContent = $Util.FormatDate(item.update_tim);
         $Dom.QuerySelector(".js-score", el).textContent = "★".repeat(item.score) + "☆".repeat(5 - item.score);
         $Dom.QuerySelector(".js-body", el).textContent = item.body || "（内容なし）";
         // --- ユーザーボタンへの反映 ---
@@ -329,7 +329,7 @@ export default {
         userIcon.textContent = item.icon || "👤";
         userName.textContent = item.nick_name || "Unknown User";
         btnUser.onclick = async () => {
-            const isSuccess = await $Data.Access.GetUserProfile({ userId: item.user_id });
+            const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: item.user_id });
             if (isSuccess) {
                 const profile = $Data.resData;
                 // $Data.resData から取得したプロフィールを表示
@@ -445,7 +445,7 @@ export default {
         // ボタンクリックでユーザー詳細を表示
         btnUser.onclick = async () => {
             // API経由で対象ユーザーのフルプロフィールを取得
-            const isSuccess = await $Data.Access.GetUserProfile({ userId: item.user_id });
+            const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: item.user_id });
             if (isSuccess) {
                 // 最新のプロフィールデータを$Data.resDataから取得
                 const profile = $Data.resData;

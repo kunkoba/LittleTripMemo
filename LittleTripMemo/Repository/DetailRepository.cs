@@ -24,7 +24,7 @@ public class DetailRepository : _BaseRepository
     /// </summary>
     public async Task<int> InsertAsync(TMemoDetail entity)
     {
-        entity.user_id = _user.user_id;
+        entity.user_id = _user.login_user_id;
 
         // _tableId を用いて物理テーブル名を指定
         string sql = $@"
@@ -46,7 +46,7 @@ public class DetailRepository : _BaseRepository
     /// </summary>
     public async Task<int> UpdateByKeyAsync(TMemoDetail detail)
     {
-        detail.user_id = _user.user_id;
+        detail.user_id = _user.login_user_id;
 
         string sql = $@"
             UPDATE t_memo_detail_{_user.table_id} SET
@@ -78,9 +78,9 @@ public class DetailRepository : _BaseRepository
             WHERE archive_id = @archive_id 
               AND user_id    = @user_id 
               AND del_flg    = false 
-            ORDER BY memo_date ASC, memo_time ASC";
+            ORDER BY memo_date ASC, memo_time ASC, seq ASC";
 
-        return await QueryAsync<TMemoDetail>(sql, new { archive_id = archiveId, user_id = _user.user_id });
+        return await QueryAsync<TMemoDetail>(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
     /// <summary>
@@ -102,7 +102,7 @@ public class DetailRepository : _BaseRepository
         {
             archive_id = archiveId,
             seqs,
-            user_id = _user.user_id
+            user_id = _user.login_user_id
         });
     }
 
@@ -119,7 +119,7 @@ public class DetailRepository : _BaseRepository
                 archive_id = @archive_id 
                 AND user_id = @user_id";
 
-        return await ExecuteAsync(sql, new { archive_id, user_id = _user.user_id });
+        return await ExecuteAsync(sql, new { archive_id, user_id = _user.login_user_id });
     }
 
     /// <summary>
@@ -132,9 +132,9 @@ public class DetailRepository : _BaseRepository
         WHERE archive_id = 0
           AND user_id    = @user_id 
           AND del_flg    = false 
-        ORDER BY memo_date ASC, memo_time ASC";
+        ORDER BY memo_date ASC, memo_time ASC, seq ASC";
 
-        return await QueryAsync<TMemoDetail>(sql, new { user_id = _user.user_id });
+        return await QueryAsync<TMemoDetail>(sql, new { user_id = _user.login_user_id });
     }
 
     /// <summary>
@@ -153,7 +153,7 @@ public class DetailRepository : _BaseRepository
         return await ExecuteAsync(sql, new
         {
             archive_id = archiveId,
-            user_id = _user.user_id
+            user_id = _user.login_user_id
         });
     }
 
@@ -171,7 +171,7 @@ public class DetailRepository : _BaseRepository
             WHERE
                 archive_id = @archive_id
                 AND user_id = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
     /// <summary>
@@ -205,7 +205,7 @@ public class DetailRepository : _BaseRepository
             AND archive_id = 0
             AND user_id    = @user_id";
 
-        return await ExecuteAsync(sql, new { seqs, user_id = _user.user_id });
+        return await ExecuteAsync(sql, new { seqs, user_id = _user.login_user_id });
     }
 
     /// <summary>
@@ -222,7 +222,7 @@ public class DetailRepository : _BaseRepository
             AND archive_id > 0
             AND user_id    = @user_id";
 
-        return await ExecuteAsync(sql, new { seqs, user_id = _user.user_id });
+        return await ExecuteAsync(sql, new { seqs, user_id = _user.login_user_id });
     }
 
 }

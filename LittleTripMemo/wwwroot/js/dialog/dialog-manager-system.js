@@ -581,7 +581,7 @@ export default {
         userIcon.textContent = report.target_icon || "👤";
         userName.textContent = report.target_nick_name || "Unknown";
         $Dom.QuerySelector("#btn-report-target-profile", el).onclick = async () => {
-            const isSuccess = await $Data.Access.GetUserProfile({ userId: report.target_user_id });
+            const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: report.target_user_id });
             if (isSuccess) this.ShowUserProfile($Data.resData, false);
         };
         // アーカイブジャンプボタン

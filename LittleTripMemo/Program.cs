@@ -22,6 +22,10 @@ using System.Text;
 using System.Text.Json;
 
 
+// ★ これを一番上（builderの前）に追加
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -119,7 +123,7 @@ builder.Services.AddScoped<UnpublishArchiveService>();
 builder.Services.AddScoped<OpenArchiveService>();
 builder.Services.AddScoped<CloseArchiveService>();
 builder.Services.AddScoped<UpdateArchivePubService>();
-builder.Services.AddScoped<UpdateDetailPubService>();
+//builder.Services.AddScoped<UpdateDetailPubService>();
 builder.Services.AddScoped<SearchByLocationPubService>();
 builder.Services.AddScoped<BulkSyncDetailsService>();
 builder.Services.AddScoped<BulkSyncReactionService>();
@@ -131,8 +135,8 @@ builder.Services.AddScoped<UpsertReportService>();
 builder.Services.AddScoped<GetSystemInfoService>();
 builder.Services.AddScoped<GetAllFeedbackService>();
 builder.Services.AddScoped<UpsertNotificationService>();
-builder.Services.AddScoped<GetReportSummaryService>();
-builder.Services.AddScoped<GetAllNotificationsService>();
+//builder.Services.AddScoped<GetReportSummaryService>();
+//builder.Services.AddScoped<GetAllNotificationsService>();
 builder.Services.AddScoped<GetReportDetailsService>();
 builder.Services.AddScoped<GetMyFeedbackService>();
 builder.Services.AddScoped<GetMyReportService>();
@@ -141,7 +145,7 @@ builder.Services.AddScoped<SendUserNotificationService>();
 builder.Services.AddScoped<GetMyUserNotificationsService>();
 builder.Services.AddScoped<AdminCloseArchivePubService>();
 builder.Services.AddScoped<AdminUnpublishArchiveService>();
-builder.Services.AddScoped<GetAllUserNotificationsService>();
+//builder.Services.AddScoped<GetAllUserNotificationsService>();
 builder.Services.AddScoped<GetAdminAllInfoService>();
 builder.Services.AddScoped<EnsureLoginUserService>();
 

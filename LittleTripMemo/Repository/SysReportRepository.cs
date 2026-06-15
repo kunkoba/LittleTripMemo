@@ -20,7 +20,7 @@ public class SysReportRepository : _BaseRepository
     public async Task<int> UpsertAsync(TSysReport report)
     {
         // ログイン中のユーザーを通報者としてセット
-        report.reporter_user_id = _user.user_id;
+        report.reporter_user_id = _user.login_user_id;
 
         const string sql = @"
         INSERT INTO t_sys_reports (
@@ -107,7 +107,7 @@ public class SysReportRepository : _BaseRepository
             WHERE reporter_user_id = @user_id 
               AND archive_id = @archive_id";
 
-        return await QuerySingleOrDefaultAsync<TSysReport>(sql, new { user_id = _user.user_id, archive_id = archiveId });
+        return await QuerySingleOrDefaultAsync<TSysReport>(sql, new { user_id = _user.login_user_id, archive_id = archiveId });
     }
 
     /// <summary>
@@ -120,7 +120,7 @@ public class SysReportRepository : _BaseRepository
             WHERE reporter_user_id = @user_id 
               AND archive_id        = @archive_id";
 
-        return await ExecuteAsync(sql, new { user_id = _user.user_id, archive_id = archiveId });
+        return await ExecuteAsync(sql, new { user_id = _user.login_user_id, archive_id = archiveId });
     }
 
     /// <summary>
@@ -153,10 +153,10 @@ public class SysReportRepository : _BaseRepository
             LEFT JOIN t_app_user u ON r.target_user_id = u.user_id 
             LEFT JOIN t_memo_archive_pub a ON r.archive_id = a.archive_id
             WHERE r.reporter_user_id = @user_id
-            ORDER BY r.create_tim DESC 
+            ORDER BY r.update_tim DESC 
             LIMIT 100";
 
-        return await QueryAsync<DtoMyReportDetail>(sql, new { user_id = _user.user_id });
+        return await QueryAsync<DtoMyReportDetail>(sql, new { user_id = _user.login_user_id });
     }
 
 }

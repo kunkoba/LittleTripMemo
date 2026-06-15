@@ -31,7 +31,6 @@ export default {
             case $Const.SCREEN_MODE.SEARCH:
                 $Dom.ToggleShow(b.create, true);
                 $Dom.ToggleShow(b.point, true);
-                $Dom.ToggleShow(b.search, true);
                 break;
         }
         // 未ログインなら

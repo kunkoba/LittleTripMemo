@@ -262,6 +262,7 @@ namespace LittleTripMemo.Models;
         public Guid user_id { get; set; }
         public string? body { get; set; }
         public int score { get; set; }
+        public DateTime create_tim { get; set; }
         public DateTime update_tim { get; set; }
 
         // 追加するユーザー情報
@@ -290,5 +291,17 @@ namespace LittleTripMemo.Models;
         public bool is_closed { get; set; } // closed_flg
         public bool is_deleted { get; set; } // del_flg
     }
+
+    /// <summary>
+    /// ユーザープロフィールの共通DTO
+    /// </summary>
+    public record DtoUserProfile(
+    Guid user_id,
+    string? icon,
+    string? nick_name,
+    string? description,
+    string? link_1, string? link_2, string? link_3,
+    bool is_owner
+);
 
 #endregion

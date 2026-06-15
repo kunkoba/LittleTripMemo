@@ -26,7 +26,7 @@ public class AppController : _BaseController
     private readonly OpenArchiveService _openArchiveService;
     private readonly CloseArchiveService _closeArchiveService;
     private readonly UpdateArchivePubService _updateArchivePubService;
-    private readonly UpdateDetailPubService _updateDetailPubService;
+    //private readonly UpdateDetailPubService _updateDetailPubService;
     private readonly SearchByLocationPubService _searchByLocationPubService;
     private readonly BulkSyncReactionService _bulkSyncReactionService;
     private readonly BulkSyncDetailsService _bulkSyncDetailsService;
@@ -50,7 +50,7 @@ public class AppController : _BaseController
         OpenArchiveService openArchiveService,
         CloseArchiveService closeArchiveService,
         UpdateArchivePubService updateArchivePubService,
-        UpdateDetailPubService updateDetailPubService,
+        //UpdateDetailPubService updateDetailPubService,
         SearchByLocationPubService searchByLocationPubService,
         BulkSyncReactionService ulkSyncReactionService,
         BulkSyncDetailsService bulkSyncDetailsService,
@@ -72,7 +72,7 @@ public class AppController : _BaseController
         _openArchiveService = openArchiveService;
         _closeArchiveService = closeArchiveService;
         _updateArchivePubService = updateArchivePubService;
-        _updateDetailPubService = updateDetailPubService;
+        //_updateDetailPubService = updateDetailPubService;
         _searchByLocationPubService = searchByLocationPubService;
         _bulkSyncDetailsService = bulkSyncDetailsService;
         _bulkSyncReactionService = ulkSyncReactionService;
@@ -299,15 +299,15 @@ public class AppController : _BaseController
             return OkWithBase(result);
         }
 
-        /// <summary>
-        /// 明細の登録・更新。
-        /// </summary>
-        [HttpPost("api/UpdateDetailPub")]
-        public async Task<IActionResult> UpdateDetailPub([FromBody] UpdateDetailPubService.UpdateDetailPubReq req)
-        {
-            var result = await _updateDetailPubService.ExecuteAsync(req);
-            return OkWithBase(result);
-        }
+        ///// <summary>
+        ///// 明細の登録・更新。
+        ///// </summary>
+        //[HttpPost("api/UpdateDetailPub")]
+        //public async Task<IActionResult> UpdateDetailPub([FromBody] UpdateDetailPubService.UpdateDetailPubReq req)
+        //{
+        //    var result = await _updateDetailPubService.ExecuteAsync(req);
+        //    return OkWithBase(result);
+        //}
 
         /// <summary>
         /// 明細一括登録更新処理

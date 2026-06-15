@@ -18,24 +18,26 @@ public class SysFeedbackRepository : _BaseRepository
     /// </summary>
     public async Task<int> UpsertAsync(TSysFeedback feedback)
     {
-        feedback.user_id = _user.user_id;
+        feedback.user_id = _user.login_user_id;
 
         const string sql = @"
             INSERT INTO t_sys_feedbacks (
                 user_id, 
                 body, 
                 score, 
+                create_tim,
                 update_tim
             ) VALUES (
                 @user_id, 
                 @body, 
                 @score, 
+                CURRENT_TIMESTAMP,
                 CURRENT_TIMESTAMP
             )
             ON CONFLICT (user_id) DO UPDATE SET
                 body = EXCLUDED.body,
                 score = EXCLUDED.score,
-                update_tim = CURRENT_TIMESTAMP";
+                update_tim = clock_timestamp()";
 
         return await ExecuteAsync(sql, feedback);
     }
@@ -49,7 +51,7 @@ public class SysFeedbackRepository : _BaseRepository
             SELECT * FROM t_sys_feedbacks 
             WHERE user_id = @user_id";
 
-        return await QuerySingleOrDefaultAsync<TSysFeedback>(sql, new { user_id = _user.user_id });
+        return await QuerySingleOrDefaultAsync<TSysFeedback>(sql, new { user_id = _user.login_user_id });
     }
 
     /// <summary>

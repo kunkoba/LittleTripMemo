@@ -29,7 +29,7 @@ public class UpsertReportService : _BaseService
 
     private async Task ValidateAsync(UpsertReportReq req)
     {
-        BusinessException.ThrowIf(_user.user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(req.target_user_id == Guid.Empty, "対象ユーザーが無効です");
         BusinessException.ThrowIf(req.archive_id <= 0, "対象アーカイブIDが無効です");
         await Task.CompletedTask;

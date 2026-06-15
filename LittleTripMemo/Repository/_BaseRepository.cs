@@ -49,7 +49,7 @@ public abstract class _BaseRepository
         {
             // 障害発生時、後から調査ができるように「誰が」「何をしようとして」「どのデータで」失敗したかをErrorレベルで記録。
             // {@param} は構造化ログとしてオブジェクトの中身を展開して出力する。
-            _logger.LogError(ex, "SQL実行失敗 [操作者ID:{UserId}] 実行SQL:{sql} パラメータ:{@param}", _user.user_id, sql, param);
+            _logger.LogError(ex, "SQL実行失敗 [操作者ID:{UserId}] 実行SQL:{sql} パラメータ:{@param}", _user.login_user_id, sql, param);
 
             // 呼び出し元のサービス層でロールバック判定等を行わせるため、例外はそのまま上位へ投げる。
             throw;

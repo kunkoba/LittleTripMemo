@@ -167,10 +167,7 @@ const AppManager = {
                 return;
             }
             // システム情報取得
-            isSuccess = await $Data.Access.GetSystemInfo();
-            if (!isSuccess) {
-                return;
-            };
+            $Data.Access.GetSystemInfo();
         }
         // リクエストパラメータ取得
         const params = new URLSearchParams(location.search);

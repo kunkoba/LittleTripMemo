@@ -24,7 +24,7 @@ public class ArchiveRepository : _BaseRepository
     public async Task<int> InsertAsync(TMemoArchive archive)
     {
         // ログイン中のユーザーIDを強制セット
-        archive.user_id = _user.user_id;
+        archive.user_id = _user.login_user_id;
 
         const string sql = @"
             INSERT INTO t_memo_archive (
@@ -42,7 +42,7 @@ public class ArchiveRepository : _BaseRepository
     /// </summary>
     public async Task<int> UpdateByKeyAsync(TMemoArchive archive)
     {
-        archive.user_id = _user.user_id;
+        archive.user_id = _user.login_user_id;
 
         const string sql = @"
             UPDATE t_memo_archive SET
@@ -75,7 +75,7 @@ public class ArchiveRepository : _BaseRepository
         return await ExecuteAsync(sql, new
         {
             archive_id = archiveId,
-            user_id = _user.user_id
+            user_id = _user.login_user_id
         });
     }
 
@@ -93,7 +93,7 @@ public class ArchiveRepository : _BaseRepository
         return await QuerySingleOrDefaultAsync<TMemoArchive>(sql, new
         {
             archive_id = archiveId,
-            user_id = _user.user_id
+            user_id = _user.login_user_id
         });
     }
 
@@ -111,7 +111,7 @@ public class ArchiveRepository : _BaseRepository
         WHERE
             archive_id = @archive_id
             AND user_id = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
     /// <summary>
@@ -131,19 +131,19 @@ public class ArchiveRepository : _BaseRepository
     /// </summary>
     public async Task UpdateDetailCountAsync(int archiveId)
     {
-        // _user.TableId を使って、自分の明細テーブルから件数を取得して更新
         string sql = $@"
-        UPDATE t_memo_archive a
-        SET detail_count = (
-            SELECT count(*) 
-            FROM t_memo_detail_{_user.table_id} d 
-            WHERE d.archive_id = a.archive_id 
-              AND d.del_flg = false
-        )
-        WHERE a.archive_id = @archive_id 
-          AND a.user_id = @user_id";
+            UPDATE t_memo_archive
+            SET update_tim = CURRENT_TIMESTAMP,
+                detail_count = (
+                    SELECT count(*) 
+                    FROM t_memo_detail_{_user.table_id} d 
+                    WHERE d.archive_id = t_memo_archive.archive_id 
+                      AND d.del_flg = false
+                )
+            WHERE archive_id = @archive_id 
+              AND user_id    = @user_id";
 
-        await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
+        await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
     /// <summary>
@@ -156,9 +156,19 @@ public class ArchiveRepository : _BaseRepository
         SELECT * FROM t_memo_archive 
         WHERE user_id = @user_id 
           AND del_flg = false
-        ORDER BY create_tim DESC";
+        ORDER BY update_tim DESC";
 
-        return await QueryAsync<TMemoArchive>(sql, new { user_id = _user.user_id });
+        return await QueryAsync<TMemoArchive>(sql, new { user_id = _user.login_user_id });
     }
+
+    ///// <summary>
+    ///// アーカイブの更新日時を現在時刻に更新する
+    ///// </summary>
+    //public async Task UpdateTimestampAsync(int archiveId)
+    //{
+    //    // クラス名に合わせてテーブル名を読み替えてください
+    //    const string sql = "UPDATE t_memo_archive SET update_tim = CURRENT_TIMESTAMP WHERE archive_id = @archive_id AND user_id = @user_id";
+    //    await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
+    //}
 
 }
