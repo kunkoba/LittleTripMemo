@@ -1,6 +1,8 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.Services;
-using LittleTripMemo.Services.Sys;
+using LittleTripMemo.Services.Account;
+using LittleTripMemo.Services.Private;
+using LittleTripMemo.Services.Public;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +28,6 @@ public class AppController : _BaseController
     private readonly OpenArchiveService _openArchiveService;
     private readonly CloseArchiveService _closeArchiveService;
     private readonly UpdateArchivePubService _updateArchivePubService;
-    //private readonly UpdateDetailPubService _updateDetailPubService;
     private readonly SearchByLocationPubService _searchByLocationPubService;
     private readonly BulkSyncReactionService _bulkSyncReactionService;
     private readonly BulkSyncDetailsService _bulkSyncDetailsService;
@@ -50,7 +51,6 @@ public class AppController : _BaseController
         OpenArchiveService openArchiveService,
         CloseArchiveService closeArchiveService,
         UpdateArchivePubService updateArchivePubService,
-        //UpdateDetailPubService updateDetailPubService,
         SearchByLocationPubService searchByLocationPubService,
         BulkSyncReactionService ulkSyncReactionService,
         BulkSyncDetailsService bulkSyncDetailsService,
@@ -72,7 +72,6 @@ public class AppController : _BaseController
         _openArchiveService = openArchiveService;
         _closeArchiveService = closeArchiveService;
         _updateArchivePubService = updateArchivePubService;
-        //_updateDetailPubService = updateDetailPubService;
         _searchByLocationPubService = searchByLocationPubService;
         _bulkSyncDetailsService = bulkSyncDetailsService;
         _bulkSyncReactionService = ulkSyncReactionService;

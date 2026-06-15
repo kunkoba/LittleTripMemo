@@ -1,7 +1,6 @@
-﻿// Controllers/AccountController.cs
-
-using LittleTripMemo.Common;
+﻿using LittleTripMemo.Common;
 using LittleTripMemo.Services;
+using LittleTripMemo.Services.Account;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LittleTripMemo.Controllers;

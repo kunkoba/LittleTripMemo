@@ -93,16 +93,15 @@ public class ReactionPubRepository : _BaseRepository
             ),
             upserted AS (
                 INSERT INTO t_reaction_pub (
-                    archive_id, seq, user_id, has_funny, has_love, has_surprise, has_sad, update_tim
+                    archive_id, seq, user_id, has_funny, has_love, has_surprise, has_sad
                 ) VALUES (
-                    @archive_id, @seq, @user_id, @has_funny, @has_love, @has_surprise, @has_sad, CURRENT_TIMESTAMP
+                    @archive_id, @seq, @user_id, @has_funny, @has_love, @has_surprise, @has_sad
                 )
                 ON CONFLICT (archive_id, seq, user_id) DO UPDATE SET
                     has_funny    = EXCLUDED.has_funny,
                     has_love     = EXCLUDED.has_love,
                     has_surprise = EXCLUDED.has_surprise,
-                    has_sad      = EXCLUDED.has_sad,
-                    update_tim   = CURRENT_TIMESTAMP
+                    has_sad      = EXCLUDED.has_sad
                 RETURNING *
             )
             UPDATE t_memo_detail_pub

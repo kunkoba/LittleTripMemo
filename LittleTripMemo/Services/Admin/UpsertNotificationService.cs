@@ -5,6 +5,8 @@ using LittleTripMemo.Repository;
 using LittleTripMemo.Services;
 using System.ComponentModel.DataAnnotations;
 
+namespace LittleTripMemo.Services.Admin;
+
 public class UpsertNotificationService : _BaseService
 {
     private readonly SysNotificationRepository _repo;

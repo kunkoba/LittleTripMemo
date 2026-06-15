@@ -6,7 +6,7 @@ using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using Microsoft.AspNetCore.Identity;
 
-namespace LittleTripMemo.Services;
+namespace LittleTripMemo.Services.Account;
 
 public class UpdateUserProfileService : _BaseService
 {

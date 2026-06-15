@@ -9,7 +9,6 @@ public class GetMyFeedbackService : _BaseService
 {
     private readonly SysFeedbackRepository _repo;
 
-    // 返却件数は1件だが、規約に従い IEnumerable で定義
     public record Response(TSysFeedback? myFeedback);
 
     public GetMyFeedbackService(UserContext user, SysFeedbackRepository repo) : base(user)
