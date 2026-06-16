@@ -3,7 +3,7 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.Repository;
 using System.ComponentModel.DataAnnotations;
 
-namespace LittleTripMemo.Services;
+namespace LittleTripMemo.Services.Public;
 
 public class OpenArchiveService : _BaseService
 {

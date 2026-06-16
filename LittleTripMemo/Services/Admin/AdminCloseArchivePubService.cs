@@ -4,7 +4,7 @@ using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using System.ComponentModel.DataAnnotations;
 
-namespace LittleTripMemo.Services.Sys;
+namespace LittleTripMemo.Services.Admin;
 
 public class AdminCloseArchivePubService : _BaseService
 {

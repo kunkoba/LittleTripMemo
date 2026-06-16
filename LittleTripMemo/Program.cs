@@ -10,12 +10,14 @@ using LittleTripMemo.Services;
 using LittleTripMemo.Services.Account;
 using LittleTripMemo.Services.Admin;
 using LittleTripMemo.Services.Private;
+using LittleTripMemo.Services.Public;
 using LittleTripMemo.Services.Sys;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
@@ -85,6 +87,35 @@ builder.Services.AddIdentity<MyAppUser, IdentityRole<Guid>>()
     .AddDefaultTokenProviders();
 
 
+// ---- Swaggerの有効化 ----
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "LittleTripMemo API", Version = "v1" });
+
+    // JWT認証をSwagger上で試せるようにする設定
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Authorizationヘッダに 'Bearer {token}' の形式で入力してください",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+
+
 // ---- Infrastructure / Cross-cutting ----
 
 builder.Services.AddScoped<JwtService>();
@@ -105,45 +136,49 @@ builder.Services.AddScoped<SysReportRepository>();
 builder.Services.AddScoped<SysUserNotificationRepository>();
 
 // ---- Service（業務ロジック層） ----
-
-// Controller は必ず Service 経由で処理を行う
+// ---- Account ----
 builder.Services.AddScoped<RegistrationUserService>();
 builder.Services.AddScoped<UpdateUserProfileService>();
 builder.Services.AddScoped<GetUserProfileService>();
+builder.Services.AddScoped<EnsureLoginUserService>();
+// ---- Private ----
 builder.Services.AddScoped<GetUnMergeDetailsService>();
 builder.Services.AddScoped<GetArchiveDetailsService>();
 builder.Services.AddScoped<GetArchiveListService>();
 builder.Services.AddScoped<MergeDetailsService>();
 builder.Services.AddScoped<AddDetailsService>();
-builder.Services.AddScoped<DeleteArchiveService>();
 builder.Services.AddScoped<UpdateArchiveService>();
+builder.Services.AddScoped<DeleteArchiveService>();
+builder.Services.AddScoped<DeleteStrayDetailsService>();
+builder.Services.AddScoped<DetachDetailsService>();
+builder.Services.AddScoped<BulkSyncDetailsService>();
 builder.Services.AddScoped<PublishArchiveService>();
+builder.Services.AddScoped<UpdateDetailService>();
+// ---- Public ----
 builder.Services.AddScoped<GetArchiveDetailsPubService>();
+builder.Services.AddScoped<SearchByLocationPubService>();
 builder.Services.AddScoped<UnpublishArchiveService>();
 builder.Services.AddScoped<OpenArchiveService>();
 builder.Services.AddScoped<CloseArchiveService>();
 builder.Services.AddScoped<UpdateArchivePubService>();
-builder.Services.AddScoped<SearchByLocationPubService>();
-builder.Services.AddScoped<BulkSyncDetailsService>();
+builder.Services.AddScoped<UpdateDetailPubService>(); // 復活分
 builder.Services.AddScoped<BulkSyncReactionService>();
-builder.Services.AddScoped<DeleteStrayDetailsService>();
-builder.Services.AddScoped<DetachDetailsService>();
-// ---- Sys / Infrastructure Service ----
-builder.Services.AddScoped<UpsertFeedbackService>();
-builder.Services.AddScoped<UpsertReportService>();
+// ---- Sys ----
 builder.Services.AddScoped<GetSystemInfoService>();
-builder.Services.AddScoped<GetAllFeedbackService>();
-builder.Services.AddScoped<UpsertNotificationService>();
-builder.Services.AddScoped<GetReportDetailsService>();
+builder.Services.AddScoped<UpsertFeedbackService>();
 builder.Services.AddScoped<GetMyFeedbackService>();
+builder.Services.AddScoped<UpsertReportService>();
 builder.Services.AddScoped<GetMyReportService>();
 builder.Services.AddScoped<DeleteMyReportService>();
-builder.Services.AddScoped<SendUserNotificationService>();
 builder.Services.AddScoped<GetMyUserNotificationsService>();
+builder.Services.AddScoped<GetReportDetailsService>();
 builder.Services.AddScoped<AdminCloseArchivePubService>();
 builder.Services.AddScoped<AdminUnpublishArchiveService>();
+// ---- Admin ----
 builder.Services.AddScoped<GetAdminAllInfoService>();
-builder.Services.AddScoped<EnsureLoginUserService>();
+builder.Services.AddScoped<GetAllFeedbackService>();
+builder.Services.AddScoped<UpsertNotificationService>();
+builder.Services.AddScoped<SendUserNotificationService>();
 
 
 // ======================================================================
@@ -282,6 +317,14 @@ app.UseCors();
 // 全体例外を JSON レスポンスに変換
 app.UseMiddleware<ExceptionHandling>();
 
+
+
+// Swagger UIの表示（開発環境のみ）
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 
 

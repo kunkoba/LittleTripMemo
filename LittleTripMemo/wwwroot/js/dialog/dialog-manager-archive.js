@@ -340,7 +340,6 @@ export default {
             const isSuccess = await $Data.Access.GetArchiveList();
             if (!isSuccess) return;
             const root = $Dom.GenerateTemplate("tpl-list-parent");
-            // root.className = "w-full text-black-3 mb-2 px-1";
             const archives = $Data.Store.GetArchiveList() ||[];
             if (archives.length == 0){
                 $Notice.Warn("データはありません");
@@ -392,6 +391,13 @@ export default {
                         // 内部データ（PRIVATE）
                         leftBorder.className += " bg-slate-800";
                     }
+                    // バッヂ適用
+                    const badgeContainer = $Dom.QuerySelector(".js-badge", child);
+                    let sIdx = 0; // Private
+                    if (item.is_public) {
+                        sIdx = item.closed_flg ? 1 : 2; // 1:Close, 2:Open
+                    }
+                    $Util.ApplyBadge(badgeContainer, sIdx);
                     child.onclick = () => {
                         this._core.closeAll();
                         $App.AppData.Context.ScreenMode = isPublicGroup
@@ -865,6 +871,13 @@ export default {
         const el = $Dom.GenerateTemplate('tpl-view-archive');
         const renderView = () => {
             const currentArchive = $Data.Store.GetArchive(); 
+            // バッヂの適用
+            const badgeContainer = $Dom.GetElementById('view-mem-status-badge', el);
+            let sIdx = 0; // Private
+            if (currentArchive.is_public) {
+                sIdx = currentArchive.closed_flg ? 1 : 2; // 1:Close, 2:Open
+            }
+            $Util.ApplyBadge(badgeContainer, sIdx);
             // ==========================================
             // ▼ ステータスボタンの表示・スタイル切替
             // ==========================================
@@ -901,9 +914,6 @@ export default {
                 $Dom.ToggleShow(statusBar, true);
                 if (!currentArchive.is_public) {
                     // ① PRIVATE 状態 [ 1> memo | (2> private) | 3> public ]
-                    // $Dom.ToggleShow(btnMemo, true);
-                    // $Dom.ToggleShow(btnPrivate, true);
-                    // $Dom.ToggleShow(btnClose, true);
                     setBtnStyle(btnMemo, false, true, "memo");
                     setBtnStyle(btnPrivate, true, true, "");
                     setBtnStyle(btnClose, false, true, "public");
@@ -912,9 +922,6 @@ export default {
                     btnClose.onclick = () => this._execStatusChange('PublishArchive', { archive_id: currentArchive.archive_id }, "SWITCH TO CLOSE", "まとめを [CLOSE] 状態にしますか？", "[CLOSE] 状態に移行しました。", $Const.SCREEN_MODE.ARCHIVE_PUB, () => $Data.Store.UpdateArchive({ is_public: true, closed_flg: true }));
                 } else if (currentArchive.closed_flg) {
                     // ② CLOSE 状態 [ 2> private | (3> close) | 4> open ]
-                    // $Dom.ToggleShow(btnPrivate, true);
-                    // $Dom.ToggleShow(btnClose, true);
-                    // $Dom.ToggleShow(btnOpen, true);
                     setBtnStyle(btnMemo, false, false, "memo");
                     setBtnStyle(btnPrivate, false, true, "private");
                     setBtnStyle(btnClose, true, true, "close");
@@ -923,9 +930,6 @@ export default {
                     btnOpen.onclick = () => this._execStatusChange('OpenArchive', { archive_id: currentArchive.archive_id }, "SWITCH TO OPEN", "マップ上に公開 (OPEN) しますか？", "[OPEN] に切り替えました。", null, () => $Data.Store.UpdateArchive({ closed_flg: false }));
                 } else {
                     // ③ OPEN 状態 [ 2> private | 3> close | (4> open) ]
-                    // $Dom.ToggleShow(btnPrivate, true);
-                    // $Dom.ToggleShow(btnClose, true);
-                    // $Dom.ToggleShow(btnOpen, true);
                     setBtnStyle(btnMemo, false, false, "memo");
                     setBtnStyle(btnPrivate, false, true, "private");
                     setBtnStyle(btnClose, false, true, "close");

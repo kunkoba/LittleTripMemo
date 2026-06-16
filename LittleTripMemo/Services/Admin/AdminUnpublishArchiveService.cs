@@ -5,7 +5,7 @@ using LittleTripMemo.Repository;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
-namespace LittleTripMemo.Services.Sys;
+namespace LittleTripMemo.Services.Admin;
 
 public class AdminUnpublishArchiveService : _BaseService
 {

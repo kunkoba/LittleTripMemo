@@ -3,7 +3,7 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 
-namespace LittleTripMemo.Services;
+namespace LittleTripMemo.Services.Account;
 
 public class GetUserProfileService : _BaseService
 {

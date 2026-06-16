@@ -4,6 +4,8 @@ using LittleTripMemo.Repository;
 using LittleTripMemo.Services;
 using System.ComponentModel.DataAnnotations;
 
+namespace LittleTripMemo.Services.Public;
+
 public class UnpublishArchiveService : _BaseService
 {
     private readonly ITransactionProvider _provider;
@@ -86,4 +88,5 @@ public class UnpublishArchiveService : _BaseService
         BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが無効です");
         await Task.CompletedTask;
     }
+
 }

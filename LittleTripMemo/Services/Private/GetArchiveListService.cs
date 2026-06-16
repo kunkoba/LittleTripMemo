@@ -3,7 +3,7 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 
-namespace LittleTripMemo.Services;
+namespace LittleTripMemo.Services.Private;
 
 public class GetArchiveListService : _BaseService
 {

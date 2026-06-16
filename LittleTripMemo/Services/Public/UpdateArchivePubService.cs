@@ -4,7 +4,7 @@ using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using System.ComponentModel.DataAnnotations;
 
-namespace LittleTripMemo.Services;
+namespace LittleTripMemo.Services.Public;
 
 public class UpdateArchivePubService : _BaseService
 {

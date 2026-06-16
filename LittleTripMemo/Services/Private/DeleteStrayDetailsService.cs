@@ -1,11 +1,9 @@
-﻿// Services/DeleteStrayDetailsService.cs
-
-using LittleTripMemo.Common;
+﻿using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Repository;
 using System.ComponentModel.DataAnnotations;
 
-namespace LittleTripMemo.Services;
+namespace LittleTripMemo.Services.Private;
 
 /// <summary>
 /// 未まとめ明細（archive_id=0）を削除（論理削除）するサービス

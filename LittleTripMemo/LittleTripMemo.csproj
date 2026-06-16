@@ -82,6 +82,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\~AppController.cs" />
     <Compile Remove="Models\~MyAppUser.cs" />
     <Compile Remove="Repository\~AccountRepository.cs" />
     <Compile Remove="Services\Admin\~GetAllNotificationsService.cs" />

@@ -150,79 +150,87 @@ window.$Data = {
         async UpdateProfile(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/UpdateProfile', params))();
         },
-        // async UpsertDetail(params) {
-        //     return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpsertDetail', params))();
-        // },
-        // async UpdateDetailPub(params) {
-        //     return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpdateDetailPub', params))();
-        // },
+
+
+
+        async UpsertDetail(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UpsertDetail', params))();
+        },
+        async UpdateDetailPub(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UpdateDetailPub', params))();
+        },
         async MergeDetails(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/MergeDetails', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/MergeDetails', params))();
         },
         async AddDetails(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/AddDetails', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/AddDetails', params))();
         },
         async GetArchiveList(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/GetArchiveList', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/GetArchiveList', params))();
         },
         async GetUnMergeDetails(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/GetUnMergeDetails', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/GetUnMergeDetails', params))();
         },
         async GetArchiveDetails(params, isPublic = false) {
-            const url = isPublic ? "/api/GetArchiveDetails_pub" : "/api/GetArchiveDetails";
+            const url = isPublic ? "/api/GetArchiveDetails_pub" : "/api/Private/GetArchiveDetails";
             return await $Warn.CatchAsync(async () => await this._fetchData('post', url, params))();
         },
         async DeleteArchive(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/DeleteArchive', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/DeleteArchive', params))();
         },
         async UpdateArchive(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpdateArchive', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UpdateArchive', params))();
         },
         async UpdateArchivePub(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UpdateArchivePub', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UpdateArchivePub', params))();
         },
         async PublishArchive(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/PublishArchive', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/PublishArchive', params))();
         },
         async UnpublishArchive(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/UnpublishArchive', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UnpublishArchive', params))();
         },
-        async SearchByLocationPub(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/SearchByLocationPub', params))();
+        async BulkSyncDetails(params = {}) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/BulkSyncDetails', params))();
         },
+
+
+
+        // ★匿名Get
         async GetArchiveDetailsPub(params = {}) {
             const encodedId = $Util.EncodeId(params.archive_id);
             // 引数 params.archive_id を使用して URL を構築
-            const url = `/api/GetArchiveDetailsPub/${encodedId}`;
+            const url = `/api/Public/GetArchiveDetailsPub/${encodedId}`;
             // GET リクエストとして実行 (_fetchData の method 引数を 'get' に)
             return await $Warn.CatchAsync(async () => {
                 return await this._fetchData('get', url, null); 
             })();
         },
+        async SearchByLocationPub(params = {}) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/SearchByLocationPub', params))();
+        },
         async OpenArchive(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/OpenArchive', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/OpenArchive', params))();
         },
         async CloseArchive(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/CloseArchive', params))();
-        },
-        async BulkSyncDetails(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/BulkSyncDetails', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/CloseArchive', params))();
         },
         async BulkSyncReactions(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/BulkSyncReactions', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/BulkSyncReactions', params))();
         },
         // Guid userId
         async GetUserProfile(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/GetUserProfile', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/GetUserProfile', params))();
         },
         // [Required(ErrorMessage = "削除対象のseqリストは必須です")] int[] seqs
         async DeleteStrayDetails(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/DeleteStrayDetails', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/DeleteStrayDetails', params))();
         },
         // [Required(ErrorMessage = "解除対象のseqリストは必須です")] int[] seqs
         async DetachDetails(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/DetachDetails', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/DetachDetails', params))();
         },
+
 
 
         // public record UpsertFeedbackReq(string? body, int score);
@@ -232,18 +240,6 @@ window.$Data = {
         // public record UpsertReportReq(Guid target_user_id, long archive_id, string? body);
         async UpsertReport(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertReport', params))();
-        },
-        // public record UpsertNotificationReq(long seq, string title, string body, short kind, DateTime disp_from, DateTime disp_to);
-        async UpsertNotification(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertNotification', params))();
-        },
-        // public record GetReportDetailsReq(Guid target_user_id, long archive_id);
-        async GetReportDetails(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetReportDetails', params))();
-            // console.warn("TEST: GetMockData(REPORT_DETAIL) を使用します");
-            // $Data.resData.reports = $Const.GetMockData('REPORT_DETAIL', 50);
-            // $Data.resData.target_userProfile = null;
-            // return true;
         },
         async GetMyFeedback(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyFeedback', params))();
@@ -259,27 +255,42 @@ window.$Data = {
         async GetSystemInfo(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetSystemInfo', params))();
         },
-        // public record Request(int archive_id, Guid target_user_id);
-        async AdminCloseArchive(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/AdminCloseArchive', params))();
-        },
-        // public record Request(int archive_id, Guid target_user_id);
-        async AdminUnpublishArchive(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/AdminUnpublishArchive', params))();
-        },
-        // public record Request(Guid target_user_id, string emoji, string body);
-        async SendUserNotification(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/SendUserNotification', params))();
-        },
         async GetMyUserNotifications(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyUserNotifications', params))();
         },
+
+
+
+        // public record UpsertNotificationReq(long seq, string title, string body, short kind, DateTime disp_from, DateTime disp_to);
+        async UpsertNotification(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/UpsertNotification', params))();
+        },
+        // public record GetReportDetailsReq(Guid target_user_id, long archive_id);
+        async GetReportDetails(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/GetReportDetails', params))();
+            // console.warn("TEST: GetMockData(REPORT_DETAIL) を使用します");
+            // $Data.resData.reports = $Const.GetMockData('REPORT_DETAIL', 50);
+            // $Data.resData.target_userProfile = null;
+            // return true;
+        },
+        // public record Request(int archive_id, Guid target_user_id);
+        async AdminCloseArchive(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/AdminCloseArchive', params))();
+        },
+        // public record Request(int archive_id, Guid target_user_id);
+        async AdminUnpublishArchive(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/AdminUnpublishArchive', params))();
+        },
+        // public record Request(Guid target_user_id, string emoji, string body);
+        async SendUserNotification(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/SendUserNotification', params))();
+        },
         // public record GetAllFeedbackReq(int score = 0);
         async GetAllFeedback(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAllFeedback', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/GetAllFeedback', params))();
         },
         async GetAdminAllInfo(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetAdminAllInfo', params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/GetAdminAllInfo', params))();
         },
     },
     // データ操作・取得のメソッド群

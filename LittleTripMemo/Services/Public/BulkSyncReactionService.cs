@@ -1,12 +1,10 @@
-﻿// Services/BulkSyncReactionService.cs
-
-using LittleTripMemo.Common;
+﻿using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using System.ComponentModel.DataAnnotations;
 
-namespace LittleTripMemo.Services;
+namespace LittleTripMemo.Services.Public;
 
 public class BulkSyncReactionService : _BaseService
 {

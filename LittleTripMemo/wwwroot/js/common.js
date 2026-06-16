@@ -302,4 +302,26 @@ window.$Util = {
             window.open(searchUrl, '_blank', 'noopener,noreferrer');
         }
     },
+    // ステータス用バッヂ制御（UI）
+    ApplyBadge(element, statusIndex) {
+        element.innerHTML = "";
+        // rootHtml（第2引数）を渡さず、手動で appendChild する
+        const tpl = document.getElementById("tpl-status-badge");
+        const badge = tpl.content.firstElementChild.cloneNode(true);
+
+        const configs = [
+            ['bg-slate-800', 'bg-white', 'bg-transparent', 'bg-transparent'], // 0: Private
+            ['bg-slate-400', 'bg-transparent', 'bg-white', 'bg-transparent'], // 1: Close
+            ['bg-brand-5',   'bg-transparent', 'bg-transparent', 'bg-white']  // 2: Open
+        ];
+
+        const [bg, d0, d1, d2] = configs[statusIndex];
+        badge.classList.add(bg);
+        const dots = badge.querySelectorAll('.dot');
+        dots[0].classList.add(d0);
+        dots[1].classList.add(d1);
+        dots[2].classList.add(d2);
+
+        element.appendChild(badge);
+    },
 };

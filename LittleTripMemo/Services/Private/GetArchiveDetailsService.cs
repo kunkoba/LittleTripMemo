@@ -4,7 +4,7 @@ using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using System.ComponentModel.DataAnnotations;
 
-namespace LittleTripMemo.Services;
+namespace LittleTripMemo.Services.Private;
 
 public class GetArchiveDetailsService : _BaseService
 {

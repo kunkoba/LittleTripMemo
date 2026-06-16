@@ -2,7 +2,8 @@
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
-using LittleTripMemo.Services;
+
+namespace LittleTripMemo.Services.Admin;
 
 public class GetAllFeedbackService : _BaseService
 {

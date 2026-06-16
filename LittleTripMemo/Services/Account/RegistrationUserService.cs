@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using LittleTripMemo.Common;
 
-namespace LittleTripMemo.Services;
+namespace LittleTripMemo.Services.Account;
 
 public class RegistrationUserService
 {

@@ -4,7 +4,7 @@ using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Services.Sys;
 
-namespace LittleTripMemo.Services;
+namespace LittleTripMemo.Services.Private;
 
 /// <summary>
 /// 未まとめ明細一覧取得ユースケース。

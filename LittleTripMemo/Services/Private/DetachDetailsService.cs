@@ -1,11 +1,9 @@
-﻿// Services/DetachDetailsService.cs
-
-using LittleTripMemo.Common;
+﻿using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Repository;
 using System.ComponentModel.DataAnnotations;
 
-namespace LittleTripMemo.Services;
+namespace LittleTripMemo.Services.Private;
 
 /// <summary>
 /// まとめられた明細をアーカイブから解除し、未まとめ状態に戻すサービス

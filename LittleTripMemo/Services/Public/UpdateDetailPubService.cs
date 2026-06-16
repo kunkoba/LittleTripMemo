@@ -1,0 +1,101 @@
+﻿using LittleTripMemo.Common;
+using LittleTripMemo.Exceptions;
+using LittleTripMemo.Models;
+using LittleTripMemo.Repository;
+using System.ComponentModel.DataAnnotations;
+
+namespace LittleTripMemo.Services.Public;
+
+/// <summary>
+/// 公開済み明細の登録・更新サービス
+/// </summary>
+public class UpdateDetailPubService : _BaseService
+{
+    private readonly ITransactionProvider _provider;
+    private readonly DetailPubRepository _detailPubRepo;
+    private readonly ArchivePubRepository _archivePubRepo;
+
+    public record UpdateDetailPubReq(
+        [Required] Guid login_user_id,
+        [Required(ErrorMessage = "seqは必須です")][Range(0, int.MaxValue)] int seq,
+        [Required(ErrorMessage = "旅の記録IDは必須です")] int archive_id,
+        [Required(ErrorMessage = "緯度は必須です")] decimal latitude,
+        [Required(ErrorMessage = "経度は必須です")] decimal longitude,
+        [Required(ErrorMessage = "タイトルは必須です")][StringLength(100)] string title,
+        [Required(ErrorMessage = "本文は必須です")] string body,
+        [Required(ErrorMessage = "日付は必須です")] string memo_date,
+        [Required(ErrorMessage = "時間は必須です")] string memo_time,
+        [Required(ErrorMessage = "表情IDは必須です")] string face_emoji,
+        [Required(ErrorMessage = "天気IDは必須です")] string weather_code,
+        string? link_url,
+        [Required(ErrorMessage = "金額は必須です")] int memo_price
+    ) : ILoginUserRequest;
+
+    public record Response(long seq);
+
+    public UpdateDetailPubService(
+        UserContext userContext,
+        ITransactionProvider provider,
+        DetailPubRepository detailPubRepo,
+        ArchivePubRepository archivePubRepo)
+        : base(userContext)
+    {
+        _provider = provider;
+        _detailPubRepo = detailPubRepo;
+        _archivePubRepo = archivePubRepo;
+    }
+
+    public async Task<Response> ExecuteAsync(UpdateDetailPubReq req)
+    {
+        // 1. 検証
+        await ValidateAsync(req);
+
+        // 2. 実行
+        using var tran = _provider.BeginTransaction();
+        try
+        {
+            var entity = MapToEntity(req);
+
+            // 更新
+            await _detailPubRepo.UpdateByKeyAsync(entity);
+
+            // 3. 親（公開アーカイブ）の件数および更新日時をリフレッシュ
+            await _archivePubRepo.UpdateDetailCountAsync(req.archive_id);
+
+            tran.Commit();
+            return new Response(req.seq);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    private async Task ValidateAsync(UpdateDetailPubReq req)
+    {
+        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが無効です");
+        BusinessException.ThrowIf(req.seq == 0, "SeqIDが無効です");
+
+        await Task.CompletedTask;
+    }
+
+    private TMemoDetailPub MapToEntity(UpdateDetailPubReq req) => new()
+    {
+        seq = req.seq,
+        archive_id = req.archive_id,
+        user_id = _user.login_user_id,
+        latitude = req.latitude,
+        longitude = req.longitude,
+        title = req.title,
+        body = req.body,
+        memo_date = req.memo_date,
+        memo_time = req.memo_time,
+        face_emoji = req.face_emoji,
+        weather_code = req.weather_code,
+        link_url = req.link_url,
+        memo_price = req.memo_price,
+        del_flg = false
+    };
+}
