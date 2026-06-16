@@ -870,14 +870,7 @@ export default {
         const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.plan === "Admin";
         const el = $Dom.GenerateTemplate('tpl-view-archive');
         const renderView = () => {
-            const currentArchive = $Data.Store.GetArchive(); 
-            // バッヂの適用
-            const badgeContainer = $Dom.GetElementById('view-mem-status-badge', el);
-            let sIdx = 0; // Private
-            if (currentArchive.is_public) {
-                sIdx = currentArchive.closed_flg ? 1 : 2; // 1:Close, 2:Open
-            }
-            $Util.ApplyBadge(badgeContainer, sIdx);
+            const currentArchive = $Data.Store.GetArchive();
             // ==========================================
             // ▼ ステータスボタンの表示・スタイル切替
             // ==========================================
@@ -909,7 +902,6 @@ export default {
                 }
             };
             // 一旦すべて非表示にリセット
-            // [btnMemo, btnPrivate, btnClose, btnOpen].forEach(btn => $Dom.ToggleShow(btn, false));
             if (currentArchive.is_owner) {
                 $Dom.ToggleShow(statusBar, true);
                 if (!currentArchive.is_public) {

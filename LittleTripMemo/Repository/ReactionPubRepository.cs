@@ -89,7 +89,6 @@ public class ReactionPubRepository : _BaseRepository
                 SELECT has_funny, has_love, has_surprise, has_sad
                 FROM t_reaction_pub
                 WHERE archive_id = @archive_id AND seq = @seq AND user_id = @user_id
-                FOR UPDATE
             ),
             upserted AS (
                 INSERT INTO t_reaction_pub (
@@ -107,9 +106,9 @@ public class ReactionPubRepository : _BaseRepository
             UPDATE t_memo_detail_pub
             SET 
                 count_funny = count_funny + ((CASE WHEN u.has_funny THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_funny, false) THEN 1 ELSE 0 END)),
-                count_love = count_love + ((CASE WHEN u.has_love THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_love, false) THEN 1 ELSE 0 END)),
+                count_love  = count_love  + ((CASE WHEN u.has_love  THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_love,  false) THEN 1 ELSE 0 END)),
                 count_surprise = count_surprise + ((CASE WHEN u.has_surprise THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_surprise, false) THEN 1 ELSE 0 END)),
-                count_sad = count_sad + ((CASE WHEN u.has_sad THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_sad, false) THEN 1 ELSE 0 END))
+                count_sad   = count_sad   + ((CASE WHEN u.has_sad   THEN 1 ELSE 0 END) - (CASE WHEN COALESCE(o.has_sad,   false) THEN 1 ELSE 0 END))
             FROM upserted u
             LEFT JOIN old_val o ON true
             WHERE t_memo_detail_pub.archive_id = u.archive_id 

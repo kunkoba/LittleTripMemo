@@ -104,8 +104,20 @@ window.$Data = {
             if (data.archiveId) $App.AppData.Context.TargetArchiveId = data.archiveId;
             // アプリ基幹のデータ
             if (data.archive) this._rawData.archive = data.archive;
-            if (data.details) this._rawData.details = data.details;
+            // if (data.details) this._rawData.details = data.details;
             if (data.myReactions) this._rawData.myReactions = data.myReactions;
+            if (data.details) {
+                // 各明細に「取得時点の自分の状態」を紐付けて、後の計算（差分抽出）に備える
+                const myRes = data.myReactions || [];
+                data.details.forEach(d => {
+                    const my = myRes.find(r => r.seq === d.seq);
+                    d.server_has_funny    = !!my?.has_funny;
+                    d.server_has_love     = !!my?.has_love;
+                    d.server_has_surprise = !!my?.has_surprise;
+                    d.server_has_sad      = !!my?.has_sad;
+                });
+                this._rawData.details = data.details;
+            }
             if (data.archiveList) this._rawData.archiveList = data.archiveList;
             if (data.userProfile) this._rawData.userProfile = data.userProfile;
             // Owner
@@ -130,6 +142,9 @@ window.$Data = {
             if (data.userMailList) $App.AppData.Admin.userMailList = data.userMailList;
             console.log(">>$App.AppData:", $App.AppData);
         },
+
+
+
         // --- (既存のアプリアクセスメソッド群省略なし) ---
         async LoginToServer(email) {
             const url = '/api/Account/LoginFirebase';
@@ -464,13 +479,13 @@ window.$Data = {
             }
             // 3. サーバー側のリクエスト形式に合わせてペイロードを作成
             const payload = {
-                items: list.map(d => ({
+                reactions: list.map(d => ({
                     seq: d.seq,
                     archive_id: d.archive_id,
-                    is_funny: d.is_funny,
-                    is_love: d.is_love,
-                    is_surprise: d.is_surprise,
-                    is_sad: d.is_sad
+                    has_funny: d.has_funny,
+                    has_love: d.has_love,
+                    has_surprise: d.has_surprise,
+                    has_sad: d.has_sad
                 }))
             };
             // 4. 一括送信

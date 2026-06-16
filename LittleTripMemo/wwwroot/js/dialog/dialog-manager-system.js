@@ -124,10 +124,9 @@ export default {
         };
         b.admin.onclick = async () => {
             // メニューを開く前に一括取得を実行
-            const isSuccess = await $Data.Access.GetAdminAllInfo();
-            if (isSuccess) {
-                // this._core.close();
-                this.ShowAdminMenu();
+            if (await $Util.CheckAdminAuth()) {
+                const isSuccess = await $Data.Access.GetAdminAllInfo();
+                if (isSuccess) this.ShowAdminMenu();
             }
         };
         this._core.open({

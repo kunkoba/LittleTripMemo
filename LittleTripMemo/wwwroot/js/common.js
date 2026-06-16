@@ -6,7 +6,7 @@ window.$Err = {
 		console.error("App.Err >> ",err);
         $Notice.Loading.Hide(); // ローディングを消す
         if ($App.AppData.Context.IsLoggedIn) {
-            $Dialog.ShowError(); // エラー表示画面
+            $Dialog.ShowError(err); // エラー表示画面
         } else {
             $Dialog.ShowLoginDialog(); // ログイン画面
         }
@@ -323,5 +323,23 @@ window.$Util = {
         dots[2].classList.add(d2);
 
         element.appendChild(badge);
+    },
+    // リロード処理
+    ReloadApp() {
+        location.reload();
+    },
+    // パスワード入力
+    async CheckAdminAuth() {
+        const pass = await $Dialog.ShowInput({ 
+            title: "ADMIN AUTH", 
+            type: "password", 
+            message: "管理者パスワードを入力してください" 
+        });
+        if (pass === null) return false;
+        if (pass !== $Const.APP_INFO.ADMIN_PW) {
+            $Notice.Error("パスワードが違います");
+            return false;
+        }
+        return true;
     },
 };

@@ -21,7 +21,10 @@ const _DialogCore = {
         this.backdrop = $Dom.GetElementById("ui-dialog-backdrop");
         // 1. 背景クリック時は「今のダイアログ」だけ閉じる（既存通り）
         this.backdrop.onclick = (e) => {
-            if (e.target === this.backdrop) this.close();
+            // if (e.target === this.backdrop) this.close();
+            if (e.target !== this.backdrop) return;
+            if (this.stack[this.stack.length - 1]?._isModal) return; // モーダルなら閉じない
+            this.close();
         };
         // 2. 「すべて閉じる」ボタンの onclick に直接 closeAll を設置
         const btnCloseAll = $Dom.GetElementById("dialog-btn-close-all");
@@ -42,8 +45,9 @@ const _DialogCore = {
     },
     // 1. _DialogCore の create メソッド修正
     create({ title = "", content = "", buttons = [], headerButtons = [], 
-                help = null, onClose = null, theme = null, isFooterFixed = true }) {
+         help = null, onClose = null, theme = null, isFooterFixed = true, isModal = false }) {
         const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
+        frame._isModal = isModal; // フラグ保持
         const titleEl = $Dom.QuerySelector("#dialog-title", frame);
         const contentEl = $Dom.QuerySelector("#dialog-content", frame);
         const headerActions = $Dom.QuerySelector("#dialog-header-actions", frame);
@@ -136,6 +140,14 @@ const _DialogCore = {
             }
         }
         frame._onClose = onClose;
+        // モーダルでない場合のみ「X」ボタンを追加
+        if (!isModal) { 
+            const btnCloseX = document.createElement("button");
+            btnCloseX.className = `${this.HEADER_BTN_CLASS} text-[0.8rem]`;
+            btnCloseX.textContent = "✖";
+            btnCloseX.onclick = () => this.close();
+            headerActions.appendChild(btnCloseX);
+        }
         return frame;
     },
     // ダイアログ閉じる
@@ -168,7 +180,7 @@ const DialogController = {
     // 🌟 コアを内包させる（従ファイルからは this._core でアクセス）
     _core: _DialogCore,
 
-    // 【共通】汎用的な確認ダイアログ
+    // 【共通】確認用ダイアログ
     async ShowConfirm({ title = "", message = "", label = "OK", help = ""}) {
         return new Promise((resolve) => {
             const el = $Dom.GenerateTemplate('tpl-confirm-base');
@@ -186,20 +198,66 @@ const DialogController = {
             });
         });
     },
-    // 【共通】エラーダイアログを表示
-    ShowError(message = "問題が発生しました。\nしばらくお待ちください。") {
+    // 【共通】エラー用ダイアログ
+    ShowError(message) {
         const el = $Dom.GenerateTemplate('tpl-confirm-base');
         const msgEl = $Dom.QuerySelector('.js-message', el);
-        msgEl.innerText = message; // \n を改行として扱うため innerText を使用
-        msgEl.classList.add("text-red-500"); // エラー色を付与
-        this._core.open({
+        msgEl.innerText = message || "問題が発生しました。\nしばらくお待ちください。";
+        msgEl.classList.add("text-red-500");
+        const frame = this._core.open({
             title: "SYSTEM ERROR",
+            isModal: true, // 閉じられない設定
             content: el,
-            buttons: [{
-                label: "OK",
-                className: "bg-slate-600 text-white",
-                handler: () => this._core.close()
-            }]
+            buttons: [[
+                {
+                    label: "RELOAD",
+                    className: "bg-brand-5 text-white w-full",
+                    handler: () => $Util.ReloadApp()
+                }
+            ]]
+        });
+        // ✖ボタンを強制非表示にして閉じられないようにする
+        const headerActions = frame.querySelector("#dialog-header-actions");
+        if (headerActions && headerActions.lastChild) {
+            headerActions.lastChild.classList.add("hidden");
+        }
+    },
+    // 【共通】入力用ダイアログ
+    async ShowInput({ title = "", message = "", type = "text", placeholder = "", initialValue = "", label = "OK" }) {
+        return new Promise((resolve) => {
+            const div = document.createElement('div');
+            div.className = "w-full p-4 space-y-3";
+            if (message) {
+                const msg = document.createElement('p');
+                msg.className = "text-[0.85rem] font-bold text-slate-600";
+                msg.textContent = message;
+                div.appendChild(msg);
+            }
+            const input = (type === 'textarea') 
+                ? document.createElement('textarea') 
+                : document.createElement('input');
+                
+            input.className = "w-full border-2 border-brand-3 px-4 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white";
+            if (type === 'textarea') {
+                input.classList.add("h-[150px]", "resize-none");
+            } else {
+                input.type = type; // text, password等
+                input.classList.add("text-[1.2rem]", "font-bold");
+            }
+            input.placeholder = placeholder;
+            input.value = initialValue;
+            div.appendChild(input);
+            let isResolved = false;
+            this._core.open({
+                title: title,
+                content: div,
+                onClose: () => { if (!isResolved) resolve(null); },
+                buttons: [[
+                    { label: "CANCEL", className: "bg-slate-400 text-white shadow-md", handler: () => { isResolved = true; resolve(null); this._core.close(); } },
+                    { label: label, handler: () => { isResolved = true; resolve(input.value); this._core.close(); } }
+                ]]
+            });
+            setTimeout(() => input.focus(), 100);
         });
     },
 

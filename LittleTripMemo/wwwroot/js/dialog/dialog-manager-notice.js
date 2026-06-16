@@ -138,8 +138,6 @@ export default {
                         $Notice.Info("フィードバックを送信しました！");
                         // 投稿ダイアログと一覧ダイアログを閉じて、最新の状態で一覧を開き直す
                         this._core.closeAll(); // 投稿を閉じる
-                        // システム情報を取得
-                        $Data.Access.GetSystemInfo();
                     }
                 }
             ]]

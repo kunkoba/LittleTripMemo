@@ -25,8 +25,11 @@ public abstract class _BaseService
         var loginUser = await appUserRepo.GetByUserIdAsync(_user.login_user_id);
         if (loginUser == null)
         {
-            // トークンは正しいが、アプリ側のユーザーテーブルにいない異常事態
-            throw new BusinessException("ユーザー登録情報が見つかりません。再ログインしてください。", "AUTH_REQUIRED");
+            //// トークンは正しいが、アプリ側のユーザーテーブルにいない異常事態
+            //throw new BusinessException("ユーザー登録情報が見つかりません。再ログインしてください。", "AUTH_REQUIRED");
+
+            // DBにユーザーが存在しない場合は、一律で認証失敗（401）として扱う
+            throw new BusinessException("認証に失敗しました。再度ログインしてください。", "AUTH_REQUIRED");
         }
 
         return loginUser;

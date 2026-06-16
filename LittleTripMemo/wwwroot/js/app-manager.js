@@ -73,7 +73,7 @@ const AppManager = {
         const checkSec = 1;
         const gpsTrackingSec = $App.AppData.Owner.GpsTrackingSec; // ★変更
         const saveDetailSec = 30;
-        const saveReactionSec = 60;
+        const saveReactionSec = 30;
         $Polling.Init();
         // オフライン監視
         $Polling.Add($Polling.TASKS.OFFLINE_CHECK, () => {
@@ -118,6 +118,7 @@ const AppManager = {
                     await this.RefreshScreen(); 
                     // 通知
                     $Notice.Info("バックグラウンド同期は成功しました。");
+                    console.log("バックグラウンド同期は成功しました。:" + $Polling.TASKS.DATA_DETAIL);
                 }
             }, saveDetailSec);
             // リアクションデータ送信処理（秒）
@@ -130,6 +131,7 @@ const AppManager = {
                 if (isSuccess) {
                     // 通知
                     $Notice.Info("バックグラウンド同期は成功しました。");
+                    console.log("バックグラウンド同期は成功しました。:" + $Polling.TASKS.DATA_REACTION);
                 }
             }, saveReactionSec); // 60秒おきに実行
         }
@@ -162,8 +164,6 @@ const AppManager = {
             // ユーザ存在チェック
             let isSuccess = await $Data.Access.EnsureLoginUser();
             if (!isSuccess) {
-                // ログイン画面へ
-                $Dialog.ShowLoginDialog();
                 return;
             }
             // システム情報取得

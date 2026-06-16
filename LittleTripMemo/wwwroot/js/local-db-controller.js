@@ -299,7 +299,7 @@ const LocalDbController = {
             return all.filter(item => item.user_id === uid && item.send_flag === 0);
         },
         // サーバーからの生データ（1リアクション＝1レコード）を受け取り、ローカルDBに同期する
-        async ParseAndSaveMyReactions(archiveId, rawReactions, allDetails = []) {
+        async ParseAndSaveMyReactions_2(archiveId, rawReactions, allDetails = []) {
             if (!archiveId) return;
             const targetArchiveId = Number(archiveId);
             const uid = getUserId();
@@ -336,16 +336,68 @@ const LocalDbController = {
             });
             await Promise.all(promises);
         },
+        // local-db-controller.js -> Reaction.ParseAndSaveMyReactions を改修
+        async ParseAndSaveMyReactions(archiveId, rawReactions, allDetails = []) {
+            if (!archiveId) return;
+            const targetArchiveId = Number(archiveId);
+            const uid = getUserId();
+            // 1. ローカルの未送信(send_flag === 0)リストを取得（保護対象）
+            const unsentList = await this.GetUnsentAll();
+            const unsentSeqs = unsentList
+                .filter(r => r.archive_id === targetArchiveId)
+                .map(r => r.seq);
+            // 2. サーバーからの集約済みデータを保持
+            const aggregated = {};
+            rawReactions.forEach(raw => {
+                const seq = Number(raw.seq);
+                aggregated[seq] = {
+                    user_id: uid,
+                    archive_id: targetArchiveId,
+                    seq: seq,
+                    has_funny: !!raw.has_funny,
+                    has_love: !!raw.has_love,
+                    has_surprise: !!raw.has_surprise,
+                    has_sad: !!raw.has_sad,
+                    send_flag: 1 // 同期済み
+                };
+            });
+            // 3. リアクションがない明細についても、空のレコード枠を作成（UIの初期化用）
+            allDetails.forEach(detail => {
+                const seq = Number(detail.seq);
+                if (!aggregated[seq]) {
+                    aggregated[seq] = this._createEmptyReaction(targetArchiveId, seq, 1);
+                }
+            });
+            // 4. 未送信(send_flag=0)があるseqを除外し、一括Upsert
+            const promises = Object.values(aggregated).map(data => {
+                if (unsentSeqs.includes(data.seq)) return Promise.resolve();
+                return this.Save(data);
+            });
+            await Promise.all(promises);
+        },
+        // 共通パーツの定義（has_ への変更を確定）
+        _createEmptyReaction(archiveId, seq, sendFlag = 0) {
+            return {
+                user_id: getUserId(),
+                archive_id: archiveId,
+                seq: seq,
+                has_funny: false,
+                has_love: false,
+                has_surprise: false,
+                has_sad: false,
+                send_flag: sendFlag
+            };
+        },
         // ヘルパー：空のリアクションオブジェクト生成
         _createEmptyReaction(archiveId, seq, sendFlag = 0) {
             return {
                 user_id: getUserId(),
                 archive_id: archiveId,
                 seq: seq,
-                is_funny: false,
-                is_love: false,
-                is_surprise: false,
-                is_sad: false,
+                has_funny: false,
+                has_love: false,
+                has_surprise: false,
+                has_sad: false,
                 send_flag: sendFlag
             };
         }

@@ -7,6 +7,7 @@ window.$Const = {
         VERSION: "1.0.0",
         OFFICIAL_SITE: "https://hinekulemonstudio.web.app/",
         LICENSE: "?????????????",
+        ADMIN_PW: "8855",
     },
     // 画面モード
     SCREEN_MODE: {
@@ -25,10 +26,10 @@ window.$Const = {
     },
     // リアクション種別（ID, 絵文字, DBプロパティ名, ボタンID を統合）
     REACTION_TYPE: {
-        FUNNY:    { id: 1, emoji: '🤣', prop: 'is_funny',    btnId: 'detail-btn-funny' },
-        LOVE:     { id: 2, emoji: '😍', prop: 'is_love',     btnId: 'detail-btn-love' },
-        SURPRISE: { id: 3, emoji: '😮', prop: 'is_surprise', btnId: 'detail-btn-surprise' },
-        SAD:      { id: 4, emoji: '😰', prop: 'is_sad',      btnId: 'detail-btn-sad' },
+        FUNNY:    { id: 1, emoji: '🤣', prop: 'has_funny',    btnId: 'detail-btn-funny' },
+        LOVE:     { id: 2, emoji: '😍', prop: 'has_love',     btnId: 'detail-btn-love' },
+        SURPRISE: { id: 3, emoji: '😮', prop: 'has_surprise', btnId: 'detail-btn-surprise' },
+        SAD:      { id: 4, emoji: '😰', prop: 'has_sad',      btnId: 'detail-btn-sad' },
     },
     // 全体通知種別
     NOTICE_KIND: {

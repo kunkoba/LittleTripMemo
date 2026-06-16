@@ -41,13 +41,17 @@ public class ExceptionHandling
         var errorRes = new ErrorResponse();
         if (ex is BusinessException bEx)
         {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            // エラーコードが AUTH_REQUIRED なら 401、それ以外は 400 をセット
+            context.Response.StatusCode = (bEx.ErrorCode == "AUTH_REQUIRED")
+                ? StatusCodes.Status401Unauthorized
+                : StatusCodes.Status400BadRequest;
+
             errorRes = new ErrorResponse
             {
                 Message = bEx.Message,
                 ErrorCode = bEx.ErrorCode
             };
-            _logger.LogWarning("業務エラーが発生: {Message}", bEx.Message);
+            _logger.LogWarning("業務エラーが発生: {Message} (Code: {ErrorCode})", bEx.Message, bEx.ErrorCode);
         }
         else if (ex is System.Net.Sockets.SocketException ||
              ex.Message.Contains("Failed to connect") ||

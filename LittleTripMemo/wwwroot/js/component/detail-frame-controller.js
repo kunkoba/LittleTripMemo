@@ -309,14 +309,20 @@ const _DetailFrameCore = {
     async renderReactions(detail) {
         if (!detail) return;
         const myLocal = await $LocalDb.Reaction.Get(detail.archive_id, detail.seq) || {};
-        Object.values($Const.REACTION_TYPE).forEach(type => {
+        Object.values($Const.REACTION_TYPE).forEach(type => {            
             const btn = this.reactionButtons[type.id];
-            const emojiSpan = btn.querySelector('span:not(.js-count)');
-            if (emojiSpan) emojiSpan.textContent = type.emoji;
             if (!btn) return;
-            // 数値の計算：サーバー値 + 自分のローカルフラグ
-            const count = (detail[`count_${type.prop.split('_')[1]}`] || 0) + (myLocal[type.prop] ? 1 : 0);
-            $Dom.QuerySelector('.js-count', btn).textContent = count;
+            // 2. 集計ロジック：
+            // [表示数] = [サーバー総数] - [サーバー時の自分の状態(0or1)] + [ローカルの自分の状態(0or1)]
+            const prop = type.prop; // 'has_funny' 等
+            const serverProp = prop.replace('has_', 'server_has_'); // 'server_has_funny'
+            const countProp = prop.replace('has_', 'count_');       // 'count_funny'
+            const serverTotal = Number(detail[countProp] || 0);
+            const serverMe    = detail[serverProp] ? 1 : 0;
+            const localMe     = myLocal[prop] ? 1 : 0;
+            const displayCount = serverTotal - serverMe + localMe;
+            // 3. UI反映
+            $Dom.QuerySelector('.js-count', btn).textContent = displayCount;
             // 自分の選択状態を反映
             const isActive = myLocal[type.prop];
             btn.classList.toggle('text-brand-5', isActive);
@@ -359,7 +365,11 @@ const _DetailFrameCore = {
         if (detail.is_owner) return $Notice.Warn("You cannot react to your own memories.");
         let myLocal = await $LocalDb.Reaction.Get(detail.archive_id, detail.seq);
         if (!myLocal) {
-            myLocal = { archive_id: Number(detail.archive_id), seq: Number(detail.seq) };
+            myLocal = {
+                archive_id: Number(detail.archive_id),
+                seq: Number(detail.seq),
+                has_funny: false, has_love: false, has_surprise: false, has_sad: false
+            };
         }
         // 定数で定義されたプロパティ名を反転
         myLocal[type.prop] = !myLocal[type.prop];

@@ -47,40 +47,4 @@ docker cp C:\Users\Owner\Desktop\backup.sql trip_memo_db:/backup.sql
 docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql
 
 
-バッヂ
-<div class="status-badge inline-flex items-center h-3.5 px-0.5 rounded-full gap-0.5 shrink-0 mt-1">
-    <div class="dot w-2.5 h-2 rounded-full"></div>
-    <div class="dot w-2.5 h-2 rounded-full"></div>
-    <div class="dot w-2.5 h-2 rounded-full"></div>
-</div>
-
-class BadgeModule {
-    constructor() {
-        this.configs = [
-            { bg: 'bg-black' },   // 0: Private
-            { bg: 'bg-gray-400' }, // 1: Close
-            { bg: 'bg-red-500' }   // 2: Open
-        ];
-    }
-
-    /**
-     * ステータスを指定してHTML文字列を生成
-     * @param {number} statusIndex 
-     * @returns {string}
-     */
-    generateHTML(statusIndex) {
-        const config = this.configs[statusIndex];
-        return `
-            <div class="status-badge inline-flex items-center h-3.5 px-0.5 rounded-full ${config.bg} gap-0.5 shrink-0 mt-1">
-                <div class="dot w-2.5 h-2 rounded-full ${statusIndex === 0 ? 'bg-white' : 'bg-transparent'}"></div>
-                <div class="dot w-2.5 h-2 rounded-full ${statusIndex === 1 ? 'bg-white' : 'bg-transparent'}"></div>
-                <div class="dot w-2.5 h-2 rounded-full ${statusIndex === 2 ? 'bg-white' : 'bg-transparent'}"></div>
-            </div>
-        `;
-    }
-}
-
-// 使い方例:
-// const badgeMod = new BadgeModule();
-// container.innerHTML = badgeMod.generateHTML(0); // Privateバッジが出力される
 

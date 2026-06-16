@@ -118,6 +118,9 @@ export default {
         inptTitle.addEventListener('input', () => {
             countTitle.textContent = inptTitle.value.length;
         });
+        $Dom.QuerySelector('#btn-clear-notice-from', el).onclick = () => inptFrom.value = "";
+        $Dom.QuerySelector('#btn-clear-notice-to', el).onclick = () => inptTo.value = "";
+        //
         this._core.open({
             title: isNew ? "NEW NOTICE" : "EDIT NOTICE",
             content: el,
@@ -135,14 +138,17 @@ export default {
                     label: "SAVE",
                     className: "bg-brand-5 text-white shadow-md",
                     handler: async () => {
+                        // 未入力時のデフォルト値判定
+                        const fromVal = inptFrom.value.trim() || $Util.FormatDate(new Date(), 'YYYY-MM-DD');
+                        const toVal   = inptTo.value.trim()   || "2099-12-31";
                         const req = {
                             seq: target.seq,
                             title: inptTitle.value.trim() || "No Title",
                             body: inptBody.value.trim(),
                             link_url: inptUrl.value.trim(),
                             kind: Number(selKind.value),
-                            disp_from: inptFrom.value + "T00:00:00",
-                            disp_to: inptTo.value + "T23:59:59"
+                            disp_from: fromVal + "T00:00:00",
+                            disp_to:   toVal   + "T23:59:59"
                         };
                         const isSuccess = await $Data.Access.UpsertNotification(req);
                         if (!isSuccess) return;

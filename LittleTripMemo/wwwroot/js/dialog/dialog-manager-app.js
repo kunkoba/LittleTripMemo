@@ -15,6 +15,7 @@ export default {
             point:   $Dom.QuerySelector('#btn-app-point', el),
             archiveList: $Dom.QuerySelector('#btn-app-archive-list', el),
             search: $Dom.QuerySelector('#btn-app-search', el),
+            reload: $Dom.QuerySelector('#btn-app-reload', el),
         };
         // 表示制御（取得済みの変数を使用）
         switch (mode) {
@@ -74,6 +75,10 @@ export default {
             this._core.close();
             $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH;
             $App.RefreshScreen();
+        };
+        b.reload.onclick = () => {
+            this._core.close();
+            $Util.ReloadApp();
         };
         //
         this._core.open({
