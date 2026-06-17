@@ -200,6 +200,8 @@ const AppManager = {
         this.ChangeFontSize(this.AppData.Owner.FontSize || '');
         // UI関連
         await this.RefreshScreen();
+        //        
+        throw new Error("XXXXXXXXXX");
     },
     // 画面モード変更
     async RefreshScreen() {
@@ -288,10 +290,11 @@ const AppManager = {
                 return;
             } else {
                 // それ以外のサーバエラー（業務エラー含む）
-                const errData = await response.json();
-                console.error("errData:", errData);
-                const errMsg = errData.Message || errData.message || "同期失敗";
-                const err = new Error(errMsg);
+                const serverErr = await response.json();
+                console.error("serverErr:", serverErr);
+                const err = new Error(serverErr.message);
+                // if (serverErr.errorCode) err.errorCode = serverErr.errorCode
+                // if (serverErr.debugInfo) err.debugInfo = serverErr.debugInfo
                 throw err;
             }
         } else {

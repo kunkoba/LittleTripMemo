@@ -69,21 +69,7 @@ window.$Data = {
                 await $App.HandleServerFailure(response);
                 return false; // 以降の処理（json解析など）を中止
             }
-            // // 結果
-            // if (!response.ok) {
-            //     if (response.status === 401) {
-            //         $App.AppData.Owner.Token = null;
-            //         $App.AppData.Context.IsLoggedIn = false;
-            //         $Dialog.ShowLoginDialog();
-            //         return false;
-            //     }
-            //     const errData = await response.json();
-            //     console.log("errData:", errData);
-            //     const errMsg = errData.Message || errData.message || "同期失敗";
-            //     const err = new Error(errMsg);
-            //     err.debugInfo = errData.debugInfo;
-            //     throw err;
-            // }
+            // 
             $Notice.Loading.Hide();
             const result = await response.json();
             console.log("■ Result:", url, result);
@@ -168,11 +154,16 @@ window.$Data = {
 
 
 
-        async UpsertDetail(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UpsertDetail', params))();
+        async GetArchiveDetails(params) {
+            // const url = isPublic ? "/api/Public/GetArchiveDetails_pub" : "/api/Private/GetArchiveDetails";
+            // return await $Warn.CatchAsync(async () => await this._fetchData('post', url, params))();
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/GetArchiveDetails', params))();
         },
-        async UpdateDetailPub(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UpdateDetailPub', params))();
+        async UpdateDetail(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UpdateDetail', params))();
+        },
+        async UpdateArchive(params = {}) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UpdateArchive', params))();
         },
         async MergeDetails(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/MergeDetails', params))();
@@ -186,18 +177,8 @@ window.$Data = {
         async GetUnMergeDetails(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/GetUnMergeDetails', params))();
         },
-        async GetArchiveDetails(params, isPublic = false) {
-            const url = isPublic ? "/api/GetArchiveDetails_pub" : "/api/Private/GetArchiveDetails";
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', url, params))();
-        },
         async DeleteArchive(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/DeleteArchive', params))();
-        },
-        async UpdateArchive(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UpdateArchive', params))();
-        },
-        async UpdateArchivePub(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UpdateArchivePub', params))();
         },
         async PublishArchive(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/PublishArchive', params))();
@@ -212,7 +193,7 @@ window.$Data = {
 
 
         // ★匿名Get
-        async GetArchiveDetailsPub(params = {}) {
+        async GetArchiveDetailsPub(params) {
             const encodedId = $Util.EncodeId(params.archive_id);
             // 引数 params.archive_id を使用して URL を構築
             const url = `/api/Public/GetArchiveDetailsPub/${encodedId}`;
@@ -220,6 +201,12 @@ window.$Data = {
             return await $Warn.CatchAsync(async () => {
                 return await this._fetchData('get', url, null); 
             })();
+        },
+        async UpdateDetailPub(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/UpdateDetailPub', params))();
+        },
+        async UpdateArchivePub(params = {}) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/UpdateArchivePub', params))();
         },
         async SearchByLocationPub(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/SearchByLocationPub', params))();
@@ -370,7 +357,7 @@ window.$Data = {
         GetMyReactions() {
             return this._myReactions;
         },
-        UpsertDetail(detail) {
+        UpdateDetail(detail) {
             if (!detail) return;
             const list = $Data.Access._rawData.details;
             let idx = -1;

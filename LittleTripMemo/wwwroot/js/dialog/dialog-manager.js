@@ -199,23 +199,34 @@ const DialogController = {
         });
     },
     // 【共通】エラー用ダイアログ
-    ShowError(message) {
-        const el = $Dom.GenerateTemplate('tpl-confirm-base');
-        const msgEl = $Dom.QuerySelector('.js-message', el);
-        msgEl.innerText = message || "問題が発生しました。\nしばらくお待ちください。";
-        msgEl.classList.add("text-red-500");
+    ShowErrorDialog(message) {
+        console.log("ShowErrorDialog:", message);
+        const el = $Dom.GenerateTemplate('tpl-dialog-error');
+        const msgEl = $Dom.QuerySelector('.js-error-message', el);
+        // 補足情報の流し込み
+        msgEl.textContent = message || "通信環境を確認するか、しばらく時間をおいてから再度お試しください。";
         const frame = this._core.open({
             title: "SYSTEM ERROR",
-            isModal: true, // 閉じられない設定
+            isModal: true, // 背景クリックやXボタンで閉じさせない
             content: el,
-            buttons: [[
-                {
-                    label: "RELOAD",
-                    className: "bg-brand-5 text-white w-full",
-                    handler: () => $Util.ReloadApp()
-                }
-            ]]
+            buttons: [[{
+                label: "RELOAD",
+                className: "bg-brand-5 text-white w-full",
+                handler: () => $Util.ReloadApp()
+            }]]
         });
+        // const frame = this._core.open({
+        //     title: "SYSTEM ERROR",
+        //     isModal: true, // 閉じられない設定
+        //     content: el,
+        //     buttons: [[
+        //         {
+        //             label: "RELOAD",
+        //             className: "bg-brand-5 text-white w-full",
+        //             handler: () => $Util.ReloadApp()
+        //         }
+        //     ]]
+        // });
         // ✖ボタンを強制非表示にして閉じられないようにする
         const headerActions = frame.querySelector("#dialog-header-actions");
         if (headerActions && headerActions.lastChild) {

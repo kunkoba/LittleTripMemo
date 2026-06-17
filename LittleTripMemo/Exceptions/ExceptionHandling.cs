@@ -1,4 +1,6 @@
-﻿namespace LittleTripMemo.Exceptions;
+﻿using LittleTripMemo.Common;
+
+namespace LittleTripMemo.Exceptions;
 
 /// <summary>
 /// アプリ全体の例外を1箇所で捕まえる「網」の役割。
@@ -35,58 +37,59 @@ public class ExceptionHandling
     /// <summary>
     /// 例外の種類を判定し、適切なHTTPレスポンスを作成する。
     /// </summary>
-    private async Task HandleExceptionAsync(HttpContext context, Exception ex) 
+    // --- 修正後 (DBエラー部分を抜粋) ---
+    private async Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
         context.Response.ContentType = "application/json";
         var errorRes = new ErrorResponse();
+
         if (ex is BusinessException bEx)
         {
-            // エラーコードが AUTH_REQUIRED なら 401、それ以外は 400 をセット
+            // (既存の BusinessException 処理は一旦そのまま)
             context.Response.StatusCode = (bEx.ErrorCode == "AUTH_REQUIRED")
-                ? StatusCodes.Status401Unauthorized
-                : StatusCodes.Status400BadRequest;
-
-            errorRes = new ErrorResponse
-            {
-                Message = bEx.Message,
-                ErrorCode = bEx.ErrorCode
-            };
-            _logger.LogWarning("業務エラーが発生: {Message} (Code: {ErrorCode})", bEx.Message, bEx.ErrorCode);
-        }
-        else if (ex is System.Net.Sockets.SocketException ||
-             ex.Message.Contains("Failed to connect") ||
-             ex.InnerException?.Message.Contains("Failed to connect") == true)
-        {
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            errorRes = new ErrorResponse
-            {
-                Message = "データベースサーバーに接続できません。システム管理者に連絡してください。",
-                ErrorCode = "DB_CONNECTION_FAILED",
-                DebugInfo = ex.Message
-            };
-            _logger.LogCritical(ex, "データベース接続エラーが発生しました。DBが起動しているか、設定(Port/Host)を確認してください。");
+                ? StatusCodes.Status401Unauthorized : StatusCodes.Status400BadRequest;
+            errorRes = new ErrorResponse { Message = bEx.Message, ErrorCode = bEx.ErrorCode };
+            _logger.LogWarning("業務エラー: {Message}", bEx.Message);
         }
         else if (ex is Npgsql.PostgresException pgEx)
         {
+            // ★ DBエラー (PostgreSQL固有)
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+            // ユーザーには抽象的なメッセージとコードだけ返す
+            errorRes = new ErrorResponse
+            {
+                Message = "データの処理中にエラーが発生しました。時間をおいて再度お試しください。",
+                ErrorCode = pgEx.SqlState == "23505" ? ErrorCodes.DB_CONFLICT_ERROR : ErrorCodes.DB_QUERY_ERROR
+            };
+
+            // 管理者ログには詳細（SqlState, テーブル名, メッセージ）をしっかり残す
+            _logger.LogCritical(pgEx, "DBエラー発生 [State: {SqlState}] [Detail: {Detail}] [Table: {Table}]",
+                pgEx.SqlState, pgEx.MessageText, pgEx.TableName);
+        }
+        else if (ex is System.Net.Sockets.SocketException || ex.Message.Contains("Failed to connect"))
+        {
+            // ★ ネットワーク・接続エラー
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             errorRes = new ErrorResponse
             {
-                Message = "データベース操作に失敗しました。",
-                ErrorCode = $"DB_ERROR_{pgEx.SqlState}",
-                DebugInfo = pgEx.MessageText
+                Message = "サーバーに接続できません。通信状況を確認してください。",
+                ErrorCode = ErrorCodes.DB_CONNECTION_ERROR
             };
-            _logger.LogError(pgEx, "SQLエラーが発生 (State: {SqlState}): {Message}", pgEx.SqlState, pgEx.MessageText);
+            _logger.LogCritical(ex, "DB接続失敗 (SocketException)");
         }
         else
         {
+            // ★ その他予期せぬエラー
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             errorRes = new ErrorResponse
             {
-                Message = "予期せぬシステムエラーが発生しました。",
-                DebugInfo = ex.Message
+                Message = "予期せぬエラーが発生しました。",
+                ErrorCode = ErrorCodes.SYSTEM_ERROR
             };
-            _logger.LogError(ex, "予期せぬ例外をキャッチしました。");
+            _logger.LogError(ex, "予期せぬ例外");
         }
+
         await context.Response.WriteAsJsonAsync(errorRes);
     }
 }

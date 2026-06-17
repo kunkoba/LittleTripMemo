@@ -9,20 +9,18 @@ window.$Const = {
         LICENSE: "?????????????",
         ADMIN_PW: "8855",
     },
+    // 地図設定
+    MAP_CONFIG: {
+        MIN_ZOOM: 8,
+        MAX_ZOOM: 18,
+        DEFAULT_ZOOM: 12
+    },
     // 画面モード
     SCREEN_MODE: {
         CREATE:      'create',       // 新規登録モード
         ARCHIVE:     'archive',      // まとめ参照モード
         ARCHIVE_PUB: 'archive_pub',  // まとめ参照（Public）モード
         SEARCH:      'search',       // 地図検索モード
-    },
-    // FACE絵文字リスト（共通定数）
-    FACE_EMOJIS: ['😀', '🤣', '😍', '🤔', '😋', '😭', '😵‍💫', '😱', '😡', '😮'],
-    // 地点検索並び替え
-    SORT_FIELD: {
-        CREATED: 1, // 登録順
-        UPDATED: 2, // 登録順
-        REACTION: 3, // 登録順
     },
     // リアクション種別（ID, 絵文字, DBプロパティ名, ボタンID を統合）
     REACTION_TYPE: {

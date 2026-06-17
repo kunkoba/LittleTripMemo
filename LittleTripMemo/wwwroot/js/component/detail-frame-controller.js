@@ -141,7 +141,7 @@ const _DetailFrameCore = {
                         // 永続化（完了を待機）
                         await $LocalDb.Detail.Save(detail);
                         // API更新
-                        await $Data.Store.UpsertDetail(detail);
+                        await $Data.Store.UpdateDetail(detail);
                         // 描画更新
                         $Marker.RefreshPointMarker();
                         $Marker.RefreshCurrentLocation();

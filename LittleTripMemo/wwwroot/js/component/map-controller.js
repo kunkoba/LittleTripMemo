@@ -26,6 +26,9 @@ const _MapCore = {
     _initZoomSlider() {
         const slider = $Dom.GetElementById('ui-map-zoom-slider');
         if (!slider) return;
+        // スライダーの最小・最大値を定数から上書き
+        slider.min = $Const.MAP_CONFIG.MIN_ZOOM;
+        slider.max = $Const.MAP_CONFIG.MAX_ZOOM;
         // Leafletによるイベントの横取りを防止（PCのマウス操作対応）
         const container = slider.parentElement;
         L.DomEvent.disableClickPropagation(container);
@@ -47,8 +50,11 @@ const _MapCore = {
     _generateMap(){
         this._map = L.map(this.root, {
             zoomControl: true,
-            attributionControl: false
-        }).setView(this.currentPoint, 12);
+            attributionControl: false,
+            minZoom: $Const.MAP_CONFIG.MIN_ZOOM,
+            maxZoom: $Const.MAP_CONFIG.MAX_ZOOM,
+        }).setView(this.currentPoint, $Const.MAP_CONFIG.DEFAULT_ZOOM);
+        // 生成
         this.setMapStyle($App.AppData.Owner.MapStyle);
     },
     // 地図機能の物理的なロック処理

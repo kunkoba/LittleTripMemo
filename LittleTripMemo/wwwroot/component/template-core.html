@@ -220,3 +220,12 @@
         <div class="dot w-2 h-2 rounded-full transition-all duration-300"></div>
     </div>
 </template>
+
+<!-- 【ダイアログ子】エラー通知用画面 -->
+<template id="tpl-dialog-error">
+    <div class="p-2 text-center flex-1 flex flex-col items-center justify-center">
+        <div class="text-[3rem] mb-4 leading-none">⚠️</div>
+        <h2 class="text-[1.3rem] font-black text-slate-800 tracking-tight mb-3">問題が発生しました</h2>
+        <div class="js-error-message text-[0.75rem] font-bold text-red-500 whitespace-pre-wrap leading-relaxed bg-red-50 p-4 rounded-lg border border-red-100 w-full overflow-auto"></div>
+    </div>
+</template>
