@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -311,6 +312,28 @@ builder.Services
 // ======================================================================
 
 var app = builder.Build();
+
+
+// ■ 起動前設定チェック（フェイルファスト）
+using (var startupScope = app.Services.CreateScope())
+{
+    var settings = startupScope.ServiceProvider.GetRequiredService<IOptions<MyAppSettings>>().Value;
+    if (settings.ReactionCountUpdateIntervalMinutes <= 0 ||
+        settings.SystemMaintenanceIntervalMinutes <= 0 ||
+        settings.MaxTableNum <= 0)
+    {
+        var errorMsg = "【致命的設定エラー】appsettings.json の MyAppSettings セクションが正しく構成されていません。";
+
+        // コンソールに目立つように出力
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("====================================================");
+        Console.WriteLine(errorMsg);
+        Console.WriteLine("====================================================");
+        Console.ResetColor();
+
+        throw new InvalidDataException(errorMsg); // アプリをここで落とす
+    }
+}
 
 
 //// HTTPS 強制（ngrok 使用時は問題になる場合あり）

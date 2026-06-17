@@ -128,7 +128,7 @@ public class DetailRepository : _BaseRepository
     public async Task<IEnumerable<TMemoDetail>> GetUnMergedAsync()
     {
         string sql = $@"
-        S　ELECT * FROM t_memo_detail_{_user.table_id} 
+        SELECT * FROM t_memo_detail_{_user.table_id} 
         WHERE archive_id = 0
           AND user_id    = @user_id 
           AND del_flg    = false 

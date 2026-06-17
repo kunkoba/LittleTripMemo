@@ -77,12 +77,6 @@ const _DialogCore = {
                 headerActions.appendChild(btn);
             });
         }
-        // 最後に「閉じる(✖)」ボタンを必ず追加
-        const btnCloseX = document.createElement("button");
-        btnCloseX.className = `${this.HEADER_BTN_CLASS} text-[0.8rem]`;
-        btnCloseX.textContent = "✖";
-        btnCloseX.onclick = () => this.close();
-        headerActions.appendChild(btnCloseX);
         // ------------------------------------------
         if (content instanceof HTMLElement) {
             contentEl.innerHTML = "";

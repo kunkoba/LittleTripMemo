@@ -136,6 +136,7 @@ const _DetailFrameCore = {
                         label: "OK"
                     });
                     if (!isOk) return;
+                    // 保存処理
                     await $Warn.CatchAsync(async () => {
                         if (detail.seq > 0) {
                             // サーバ保存されている場合は直接APIをキック

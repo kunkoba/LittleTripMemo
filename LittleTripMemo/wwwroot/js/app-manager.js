@@ -72,7 +72,7 @@ const AppManager = {
     _initPollingTasks() {
         const checkSec = 1;
         const gpsTrackingSec = $App.AppData.Owner.GpsTrackingSec; // ★変更
-        const saveDetailSec = 30;
+        const saveDetailSec = 300;
         const saveReactionSec = 30;
         $Polling.Init();
         // オフライン監視
@@ -89,12 +89,6 @@ const AppManager = {
                 $Notice.Offline.Show();
                 $Polling.Stop($Polling.TASKS.DATA_DETAIL);
                 $Polling.Stop($Polling.TASKS.DATA_REACTION);
-                // // 検索モードなら作成モードへ強制移動
-                // if ($App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH) {
-                //     $Notice.Warn("オフライン中は、機能が制限されます。");
-                //     $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                //     $App.RefreshScreen();
-                // }
             }
         }, checkSec);
         // オンライン監視
@@ -269,6 +263,17 @@ const AppManager = {
                 // 不正か？
                 $Dialog.ShowLoginDialog();
                 return;
+        }
+        // ローカル㏈にデータがあれば吸い上げる
+        if (this.AppData.Context.IsLoggedIn && this.AppData.Context.ScreenMode == $Const.SCREEN_MODE.CREATE) {
+            await $Warn.CatchAsync(async () => {
+                const localDetails = await $LocalDb.Detail.GetAll();
+                if (localDetails && localDetails.length > 0) {
+                    localDetails.forEach(d => {
+                        $Data.Store.UpdateDetail(d);
+                    });
+                }
+            })();
         }
         // UIを更新
         $UI.ChangeScreenMode();
