@@ -9,20 +9,20 @@
 public class BusinessException : Exception
 {
     public string? ErrorCode { get; init; }
+    // ★ 追加：管理者・ログ出力用の詳細メッセージ
+    public string? AdminMessage { get; init; }
 
-    public BusinessException(string message, string? errorCode = null)
-        : base(message)
+    // ★ コンストラクタを拡張
+    public BusinessException(string userMessage, string? errorCode = null, string? adminMessage = null)
+        : base(userMessage)
     {
         ErrorCode = errorCode;
+        AdminMessage = adminMessage;
     }
 
-    /// <summary>
-    /// 条件が真の場合に BusinessException をスローする（ガード節）
-    /// </summary>
-    public static void ThrowIf(bool condition, string message, string? errorCode = null)
+    // ★ ガード節も拡張
+    public static void ThrowIf(bool condition, string userMessage, string? errorCode = null, string? adminMessage = null)
     {
-        if (condition) throw new BusinessException(message, errorCode);
+        if (condition) throw new BusinessException(userMessage, errorCode, adminMessage);
     }
 }
-
-

@@ -137,10 +137,27 @@ const _DetailFrameCore = {
                     });
                     if (!isOk) return;
                     await $Warn.CatchAsync(async () => {
-                        // const detail = $DetailContent.GetFormEditData();
-                        // 永続化（完了を待機）
-                        await $LocalDb.Detail.Save(detail);
-                        // API更新
+                        if (detail.seq > 0) {
+                            // サーバ保存されている場合は直接APIをキック
+                            if (!$App.AppData.Context.IsOnline) {
+                                $Notice.Warn("オフライン時は、サーバーに保存済みのデータを編集できません。");
+                                return;
+                            }
+                            const archive = $Data.Store.GetArchive();
+                            const isPublic = detail.is_public || archive?.is_public;
+                            let isSuccess = false;
+                            // 公開データか非公開データかでAPIを分岐
+                            if (isPublic) {
+                                isSuccess = await $Data.Access.UpdateDetailPub(detail);
+                            } else {
+                                isSuccess = await $Data.Access.UpdateDetail(detail);
+                            }
+                            if (!isSuccess) return; // API更新に失敗した場合は中断
+                        } else {
+                            // 未同期（seq = 0）のデータはローカルへ新規更新（バックグラウンドで同期される）
+                            await $LocalDb.Detail.Save(detail);
+                        }
+                        // API更新(メモリの更新)
                         await $Data.Store.UpdateDetail(detail);
                         // 描画更新
                         $Marker.RefreshPointMarker();

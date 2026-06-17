@@ -47,12 +47,18 @@ public abstract class _BaseRepository
         }
         catch (Exception ex)
         {
-            // 障害発生時、後から調査ができるように「誰が」「何をしようとして」「どのデータで」失敗したかをErrorレベルで記録。
-            // {@param} は構造化ログとしてオブジェクトの中身を展開して出力する。
-            _logger.LogError(ex, "SQL実行失敗 [操作者ID:{UserId}] 実行SQL:{sql} パラメータ:{@param}", _user.login_user_id, sql, param);
+            // 1. メッセージから改行以降をカット
+            var cleanMsg = ex.Message.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)[0];
 
-            // 呼び出し元のサービス層でロールバック判定等を行わせるため、例外はそのまま上位へ投げる。
-            throw;
+            // 2. SQL内の改行やタブを半角スペースに置換して1行にする
+            var flatSql = sql.Replace("\r", " ").Replace("\n", " ").Replace("\t", " ");
+            // 連続する空白を1つにまとめるとさらに綺麗（任意）
+            flatSql = System.Text.RegularExpressions.Regex.Replace(flatSql, @"\s+", " ");
+
+            _logger.LogError("【SQL実行失敗】Msg: {msg} | SQL: {sql} | Params: {@param}",
+                cleanMsg, flatSql.Trim(), param);
+
+            throw; // 例外自体はミドルウェアへ投げる
         }
     }
 

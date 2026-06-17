@@ -1,4 +1,5 @@
 ﻿using LittleTripMemo.Common;
+using Serilog.Context;
 
 namespace LittleTripMemo.Exceptions;
 
@@ -22,15 +23,17 @@ public class ExceptionHandling
     /// </summary>
     public async Task InvokeAsync(HttpContext context)
     {
-        try
+        // リクエストごとに一意なID（TraceIdentifier）をコンテキストに押し込む
+        using (LogContext.PushProperty("CorrelationId", context.TraceIdentifier))
         {
-            // 次の処理（サービスやコントローラー）を実行
-            await _next(context);
-        }
-        catch (Exception ex)
-        {
-            // どこでエラーが起きてもここに集約される
-            await HandleExceptionAsync(context, ex);
+            try
+            {
+                await _next(context);
+            }
+            catch (Exception ex)
+            {
+                await HandleExceptionAsync(context, ex);
+            }
         }
     }
 
@@ -49,7 +52,6 @@ public class ExceptionHandling
             context.Response.StatusCode = (bEx.ErrorCode == "AUTH_REQUIRED")
                 ? StatusCodes.Status401Unauthorized : StatusCodes.Status400BadRequest;
             errorRes = new ErrorResponse { Message = bEx.Message, ErrorCode = bEx.ErrorCode };
-            _logger.LogWarning("業務エラー: {Message}", bEx.Message);
         }
         else if (ex is Npgsql.PostgresException pgEx)
         {
@@ -63,9 +65,8 @@ public class ExceptionHandling
                 ErrorCode = pgEx.SqlState == "23505" ? ErrorCodes.DB_CONFLICT_ERROR : ErrorCodes.DB_QUERY_ERROR
             };
 
-            // 管理者ログには詳細（SqlState, テーブル名, メッセージ）をしっかり残す
-            _logger.LogCritical(pgEx, "DBエラー発生 [State: {SqlState}] [Detail: {Detail}] [Table: {Table}]",
-                pgEx.SqlState, pgEx.MessageText, pgEx.TableName);
+            // ★ リポジトリ側で既にSQL詳細を出しているので、ここでは型とメッセージのみ1行で出す
+            _logger.LogError("【DBシステムエラー】{Type}: {Msg}", pgEx.GetType().Name, pgEx.MessageText);
         }
         else if (ex is System.Net.Sockets.SocketException || ex.Message.Contains("Failed to connect"))
         {
@@ -76,7 +77,8 @@ public class ExceptionHandling
                 Message = "サーバーに接続できません。通信状況を確認してください。",
                 ErrorCode = ErrorCodes.DB_CONNECTION_ERROR
             };
-            _logger.LogCritical(ex, "DB接続失敗 (SocketException)");
+            // 第一引数の ex を削除し、メッセージに型と内容を埋め込む
+            _logger.LogCritical("【DB接続失敗】{Type}: {Msg}", ex.GetType().Name, ex.Message);
         }
         else
         {
@@ -87,10 +89,12 @@ public class ExceptionHandling
                 Message = "予期せぬエラーが発生しました。",
                 ErrorCode = ErrorCodes.SYSTEM_ERROR
             };
-            _logger.LogError(ex, "予期せぬ例外");
+            // ★ スタックトレースを省き、エラーの型とメッセージだけを1行で出力
+            _logger.LogError("【予期せぬエラー】{Type}: {Msg}", ex.GetType().Name, ex.Message);
         }
 
         await context.Response.WriteAsJsonAsync(errorRes);
     }
+
 }
 

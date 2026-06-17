@@ -200,8 +200,6 @@ const AppManager = {
         this.ChangeFontSize(this.AppData.Owner.FontSize || '');
         // UI関連
         await this.RefreshScreen();
-        //        
-        throw new Error("XXXXXXXXXX");
     },
     // 画面モード変更
     async RefreshScreen() {

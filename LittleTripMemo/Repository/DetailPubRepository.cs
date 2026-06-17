@@ -170,7 +170,19 @@ public class DetailPubRepository : _BaseRepository
         return await QueryAsync<TMemoDetailPub>(sql, parameters);
     }
 
-    
+    /// <summary>
+    /// 地点検索用（リアクション種別でのソート・0件除外対応版）
+    /// </summary>
+    /// <param name="latMin"></param>
+    /// <param name="latMax"></param>
+    /// <param name="lngMin"></param>
+    /// <param name="lngMax"></param>
+    /// <param name="keyword"></param>
+    /// <param name="sortField"></param>
+    /// <param name="reactionType"></param>
+    /// <param name="loginUserId"></param>
+    /// <param name="limit"></param>
+    /// <returns></returns>
     public async Task<IEnumerable<TMemoDetailPub>> SearchByLocationAsync(
         decimal latMin, decimal latMax, decimal lngMin, decimal lngMax,
         string? keyword, int sortField, int? reactionType, Guid loginUserId, int limit = 20)
@@ -256,5 +268,23 @@ public class DetailPubRepository : _BaseRepository
         await ExecuteAsync(sql, new { archiveId, seqs, user_id = _user.login_user_id });
     }
 
+    /// <summary>
+    /// 【バッチ用】公開明細の全レコードに対し、リアクションテーブルから最新の件数を数え直して上書きする
+    /// </summary>
+    public async Task UpdateAllReactionCountsAsync()
+    {
+        const string sql = @"
+        UPDATE t_memo_detail_pub d
+        SET 
+            count_funny    = (SELECT count(*) FROM t_reaction_pub r WHERE r.archive_id = d.archive_id AND r.seq = d.seq AND r.has_funny = true),
+            count_love     = (SELECT count(*) FROM t_reaction_pub r WHERE r.archive_id = d.archive_id AND r.seq = d.seq AND r.has_love = true),
+            count_surprise = (SELECT count(*) FROM t_reaction_pub r WHERE r.archive_id = d.archive_id AND r.seq = d.seq AND r.has_surprise = true),
+            count_sad      = (SELECT count(*) FROM t_reaction_pub r WHERE r.archive_id = d.archive_id AND r.seq = d.seq AND r.has_sad = true)
+        WHERE EXISTS (
+            SELECT 1 FROM t_reaction_pub r2 WHERE r2.archive_id = d.archive_id AND r2.seq = d.seq
+        )";
+        // ※リアクションが1件もない明細は更新対象から外すことでSQLを効率化しています
 
+        await ExecuteAsync(sql);
+    }
 }

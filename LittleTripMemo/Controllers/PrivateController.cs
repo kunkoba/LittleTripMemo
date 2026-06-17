@@ -19,7 +19,6 @@ public class PrivateController : _BaseController
     private readonly DeleteArchiveService _deleteArchiveService;
     private readonly DeleteStrayDetailsService _deleteStrayDetailsService;
     private readonly DetachDetailsService _detachDetailsService;
-    
     private readonly UpdateDetailService _updateDetailService;
     private readonly BulkSyncDetailsService _bulkSyncDetailsService;
     private readonly PublishArchiveService _publishArchiveService;
@@ -49,6 +48,7 @@ public class PrivateController : _BaseController
         _deleteArchiveService = deleteArchiveService;
         _deleteStrayDetailsService = deleteStrayDetailsService;
         _detachDetailsService = detachDetailsService;
+        _updateDetailService = updateDetailService;
         _bulkSyncDetailsService = bulkSyncDetailsService;
         _publishArchiveService = publishArchiveService;
     }
@@ -93,7 +93,7 @@ public class PrivateController : _BaseController
     public async Task<IActionResult> PublishArchive([FromBody] PublishArchiveService.PublishArchiveReq req)
         => OkWithBase(await _publishArchiveService.ExecuteAsync(req));
 
-    [HttpPost("UpdateDetailPub")]
+    [HttpPost("UpdateDetail")]
     public async Task<IActionResult> UpdateDetail([FromBody] UpdateDetailService.UpdateDetailReq req)
         => OkWithBase(await _updateDetailService.ExecuteAsync(req));
 

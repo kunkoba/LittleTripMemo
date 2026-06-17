@@ -215,6 +215,12 @@ builder.Services.AddControllers(options =>
 });
 
 
+
+// 定期バッチ（Worker）の登録
+builder.Services.AddHostedService<LittleTripMemo.Worker.SystemMaintenanceWorker>();
+
+
+
 // ======================================================================
 // ■ CORS（フロントエンド連携用）
 // ======================================================================

@@ -6,10 +6,8 @@ window.$Err = {
 		console.error("App.Err >> ",err);
         $Notice.Loading.Hide(); // ローディングを消す
         if ($App.AppData.Context.IsLoggedIn) {
-            console.log("AAA");
             $Dialog.ShowErrorDialog(err); // エラー表示画面
         } else {
-            console.log("BBB");
             $Dialog.ShowLoginDialog(); // ログイン画面
         }
         // if (mode === this._errMode) {
