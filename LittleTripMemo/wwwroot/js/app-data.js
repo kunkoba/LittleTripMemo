@@ -182,9 +182,6 @@ window.$Data = {
         async PublishArchive(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/PublishArchive', params))();
         },
-        async UnpublishArchive(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UnpublishArchive', params))();
-        },
         async BulkSyncDetails(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/BulkSyncDetails', params))();
         },
@@ -203,6 +200,9 @@ window.$Data = {
         },
         async UpdateDetailPub(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/UpdateDetailPub', params))();
+        },
+        async UnpublishArchive(params = {}) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/UnpublishArchive', params))();
         },
         async UpdateArchivePub(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/UpdateArchivePub', params))();

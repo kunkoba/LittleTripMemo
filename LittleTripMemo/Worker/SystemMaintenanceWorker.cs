@@ -143,7 +143,7 @@ public class SystemMaintenanceWorker : BackgroundService
     }
 
     /// <summary>
-    /// 論理削除済みの明細データを物理削除する
+    /// 不要な論理削除データの物理削除（ゴミ掃除）を実行する
     /// </summary>
     private async Task TaskGarbageCleanupAsync()
     {
@@ -159,10 +159,14 @@ public class SystemMaintenanceWorker : BackgroundService
             {
                 var repo = scope.ServiceProvider.GetRequiredService<TableStatisticsTaskRepository>();
 
+                // 1. 秘密側（野良メモ限定）の掃除
                 for (int i = 1; i <= settings.MaxTableNum; i++)
                 {
                     await repo.DeleteOldGarbageDetailsAsync(i);
                 }
+
+                // 2. 公開側（アーカイブ・明細）の掃除
+                await repo.DeleteOldGarbagePublicAsync();
             });
 
             // 次回予定を更新

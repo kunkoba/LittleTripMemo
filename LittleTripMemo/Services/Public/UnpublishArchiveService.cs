@@ -53,25 +53,20 @@ public class UnpublishArchiveService : _BaseService
         using var tran = _provider.BeginTransaction();
         try
         {
-            // 0. 所有権の確認（念のため、公開親からデータを取得してチェック）
-            // ※既存の各Repositoryメソッドが内部で _user.UserId をチェックしているため安全ですが、
-            //   リアクションと通報は全ユーザー分を消すため、ここで親の存在を確定させます。
+            // 所有権の確認（公開親からデータを取得してチェック）
             var archive = await _archivePubRepo.GetByKeyAsync(req.archive_id);
-            BusinessException.ThrowIf(archive == null || archive.user_id != _user.login_user_id, "対象のアーカイブが見つからないか、権限がありません。");
+            BusinessException.ThrowIf(archive == null || archive.user_id != _user.login_user_id, 
+                "対象のアーカイブが見つからないか、権限がありません。");
 
-            // ① 公開明細を物理削除（自分の分）
-            await _detailPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
-            // ② 公開アーカイブを物理削除（自分の分）
-            await _archivePubRepo.DeletePhysicalByKeyAsync(req.archive_id);
+            // 公開明細・アーカイブを論理削除
+            await _detailPubRepo.DeleteLogicalByArchiveIdAsync(req.archive_id);
+            await _archivePubRepo.DeleteLogicalByKeyAsync(req.archive_id);
 
-            // ③ ★追加：リアクションを全削除（その記事に対する全ユーザーの反応を消す）
-            await _reactionPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
-            // ④ ★追加：通報データを全削除（その記事に対する全通報を消す）
-            await _reportRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
+            // リアクションも論理削除（1ヶ月保持のため）
+            await _reactionPubRepo.DeleteLogicalByArchiveIdAsync(req.archive_id);
 
-            // ⑤ 秘密アーカイブの論理削除を戻す
+            // 秘密アーカイブ・明細の論理削除を復元
             await _archiveRepo.RestoreByKeyAsync(req.archive_id);
-            // ⑥ 明細の論理削除を戻す
             await _detailRepo.RestoreByKeyAsync(req.archive_id);
 
             tran.Commit();

@@ -72,12 +72,38 @@ public class ArchivePubRepository : _BaseRepository
         return await QuerySingleOrDefaultAsync<TMemoArchivePub>(sql, new { archive_id = archiveId });
     }
 
-    public async Task<int> DeletePhysicalByKeyAsync(int archiveId)
+    /// <summary>
+    /// 秘密データから公開データへUPSERT（存在すれば最新化して復活、なければ挿入）
+    /// </summary>
+    public async Task UpsertFromPrivateAsync(TMemoArchivePub pub)
     {
         const string sql = @"
-        DELETE FROM t_memo_archive_pub
-        WHERE archive_id = @archive_id
-          AND user_id    = @user_id";
+            INSERT INTO t_memo_archive_pub (
+                archive_id, user_id, title, memo, link_url, currency_unit, closed_flg, del_flg, create_tim, update_tim
+            ) VALUES (
+                @archive_id, @user_id, @title, @memo, @link_url, @currency_unit, true, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+            )
+            ON CONFLICT (archive_id) DO UPDATE SET
+                title = EXCLUDED.title,
+                memo = EXCLUDED.memo,
+                link_url = EXCLUDED.link_url,
+                currency_unit = EXCLUDED.currency_unit,
+                del_flg = false, -- 復活
+                update_tim = CURRENT_TIMESTAMP";
+        await ExecuteAsync(sql, pub);
+    }
+
+    /// <summary>
+    /// 論理削除
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <returns></returns>
+    public async Task<int> DeleteLogicalByKeyAsync(int archiveId)
+    {
+        const string sql = @"
+        UPDATE t_memo_archive_pub 
+        SET del_flg = true, update_tim = CURRENT_TIMESTAMP
+        WHERE archive_id = @archive_id AND user_id = @user_id";
         return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
@@ -190,15 +216,5 @@ public class ArchivePubRepository : _BaseRepository
 
         return await QueryAsync<TMemoArchivePub>(sql, new { user_id = _user.login_user_id });
     }
-
-    ///// <summary>
-    ///// アーカイブの更新日時を現在時刻に更新する
-    ///// </summary>
-    //public async Task UpdateTimestampAsync(int archiveId)
-    //{
-    //    // クラス名に合わせてテーブル名を読み替えてください
-    //    const string sql = "UPDATE t_memo_archive SET update_tim = CURRENT_TIMESTAMP WHERE archive_id = @archive_id AND user_id = @user_id";
-    //    await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
-    //}
 
 }

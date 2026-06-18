@@ -14,6 +14,7 @@ public class PublishArchiveService : _BaseService
     private readonly DetailRepository _detailRepo;
     private readonly ArchivePubRepository _archivePubRepo;
     private readonly DetailPubRepository _detailPubRepo;
+    private readonly ReactionPubRepository _reactionPubRepo;
 
     public record PublishArchiveReq(
         [Required] Guid login_user_id,
@@ -28,7 +29,8 @@ public class PublishArchiveService : _BaseService
         ArchiveRepository archiveRepo,
         DetailRepository detailRepo,
         ArchivePubRepository archivePubRepo,
-        DetailPubRepository detailPubRepo)
+        DetailPubRepository detailPubRepo,
+        ReactionPubRepository reactionPubRepo)
         : base(userContext)
     {
         _provider = provider;
@@ -36,6 +38,7 @@ public class PublishArchiveService : _BaseService
         _detailRepo = detailRepo;
         _archivePubRepo = archivePubRepo;
         _detailPubRepo = detailPubRepo;
+        _reactionPubRepo = reactionPubRepo;
     }
 
     public async Task<Response> ExecuteAsync(PublishArchiveReq req)
@@ -45,19 +48,10 @@ public class PublishArchiveService : _BaseService
         using var tran = _provider.BeginTransaction();
         try
         {
-            // ① 秘密アーカイブ取得
             var archive = await _archiveRepo.GetByKeyAsync(req.archive_id);
             BusinessException.ThrowIf(archive == null, "アーカイブが見つかりません");
 
-            // ② 既存の公開データがあれば物理削除
-            var existingPub = await _archivePubRepo.GetByKeyAsync(req.archive_id);
-            if (existingPub != null)
-            {
-                await _archivePubRepo.DeletePhysicalByKeyAsync(req.archive_id);
-                await _detailPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
-            }
-
-            // ③ 公開アーカイブへコピー
+            // 公開アーカイブを UPSERT (復活)
             var pubArchive = new TMemoArchivePub
             {
                 archive_id = archive.archive_id,
@@ -67,12 +61,11 @@ public class PublishArchiveService : _BaseService
                 link_url = archive.link_url,
                 currency_unit = archive.currency_unit,
             };
-            await _archivePubRepo.InsertAsync(pubArchive);
+            await _archivePubRepo.UpsertFromPrivateAsync(pubArchive);
 
-            // ④ 秘密明細取得
             var details = await _detailRepo.GetByArchiveIdAsync(req.archive_id);
 
-            // ⑤ 公開明細へコピー
+            // 公開明細を UPSERT (復活)
             foreach (var detail in details)
             {
                 var pubDetail = new TMemoDetailPub
@@ -90,14 +83,15 @@ public class PublishArchiveService : _BaseService
                     weather_code = detail.weather_code,
                     link_url = detail.link_url,
                     memo_price = detail.memo_price,
-                    //closed_flg = false,     // 初期値はfalse
                 };
-                await _detailPubRepo.InsertAsync(pubDetail);
+                await _detailPubRepo.UpsertFromPrivateAsync(pubDetail);
             }
 
-            // ⑥ 秘密アーカイブを論理削除
-            await _archiveRepo.DeleteByKeyAsync(req.archive_id);
-            // ⑦ 秘密明細を論理削除
+            // 過去のリアクションがあれば、論理削除状態から復活させる
+            await _reactionPubRepo.RestoreLogicalByArchiveIdAsync(req.archive_id);
+
+            // 秘密アーカイブ・明細を論理削除
+            await _archiveRepo.DeleteLogicalByKeyAsync(req.archive_id);
             await _detailRepo.DeleteByArchiveIdAsync(req.archive_id);
 
             // 公開側の件数を反映させる

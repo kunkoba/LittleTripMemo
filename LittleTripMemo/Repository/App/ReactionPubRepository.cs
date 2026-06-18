@@ -21,19 +21,48 @@ public class ReactionPubRepository : _BaseRepository
         const string sql = @"
             INSERT INTO t_reaction_pub (
                 archive_id, seq, user_id, 
-                has_funny, has_love, has_surprise, has_sad
+                has_funny, has_love, has_surprise, has_sad, 
+                del_flg, update_tim
             ) VALUES (
                 @archive_id, @seq, @user_id, 
-                @has_funny, @has_love, @has_surprise, @has_sad
+                @has_funny, @has_love, @has_surprise, @has_sad, 
+                false, CURRENT_TIMESTAMP
             )
-            ON CONFLICT (archive_id, seq, user_id) 
-            DO UPDATE SET
+            ON CONFLICT (archive_id, seq, user_id) DO UPDATE SET
                 has_funny    = EXCLUDED.has_funny,
                 has_love     = EXCLUDED.has_love,
                 has_surprise = EXCLUDED.has_surprise,
-                has_sad      = EXCLUDED.has_sad";
+                has_sad      = EXCLUDED.has_sad,
+                del_flg      = false, 
+                update_tim   = CURRENT_TIMESTAMP";
 
         return await ExecuteAsync(sql, reaction);
+    }
+
+    /// <summary>
+    /// アーカイブに紐づくリアクションを論理削除する
+    /// </summary>
+    public async Task<int> DeleteLogicalByArchiveIdAsync(int archiveId)
+    {
+        const string sql = @"
+            UPDATE t_reaction_pub SET 
+                del_flg = true, 
+                update_tim = CURRENT_TIMESTAMP
+            WHERE archive_id = @archive_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId });
+    }
+
+    /// <summary>
+    /// アーカイブに紐づくリアクションを復元する
+    /// </summary>
+    public async Task<int> RestoreLogicalByArchiveIdAsync(int archiveId)
+    {
+        const string sql = @"
+            UPDATE t_reaction_pub SET 
+                del_flg = false, 
+                update_tim = CURRENT_TIMESTAMP
+            WHERE archive_id = @archive_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId });
     }
 
     /// <summary>

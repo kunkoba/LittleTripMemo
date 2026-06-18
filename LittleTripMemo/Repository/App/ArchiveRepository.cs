@@ -60,9 +60,26 @@ public class ArchiveRepository : _BaseRepository
     }
 
     /// <summary>
+    /// 主キーによる物理削除（まとめの解体時に使用）
+    /// </summary>
+    public async Task<int> DeletePhysicalByKeyAsync(int archiveId)
+    {
+        const string sql = @"
+            DELETE FROM t_memo_archive 
+            WHERE archive_id = @archive_id 
+              AND user_id    = @user_id";
+
+        return await ExecuteAsync(sql, new
+        {
+            archive_id = archiveId,
+            user_id = _user.login_user_id
+        });
+    }
+
+    /// <summary>
     /// 主キー（archive_id）による論理削除。
     /// </summary>
-    public async Task<int> DeleteByKeyAsync(int archiveId)
+    public async Task<int> DeleteLogicalByKeyAsync(int archiveId)
     {
         const string sql = @"
             UPDATE t_memo_archive 
@@ -160,15 +177,5 @@ public class ArchiveRepository : _BaseRepository
 
         return await QueryAsync<TMemoArchive>(sql, new { user_id = _user.login_user_id });
     }
-
-    ///// <summary>
-    ///// アーカイブの更新日時を現在時刻に更新する
-    ///// </summary>
-    //public async Task UpdateTimestampAsync(int archiveId)
-    //{
-    //    // クラス名に合わせてテーブル名を読み替えてください
-    //    const string sql = "UPDATE t_memo_archive SET update_tim = CURRENT_TIMESTAMP WHERE archive_id = @archive_id AND user_id = @user_id";
-    //    await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.user_id });
-    //}
 
 }

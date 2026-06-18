@@ -68,4 +68,30 @@ public class TableStatisticsTaskRepository : _BaseRepository
         await ExecuteAsync(sql);
     }
 
+    /// <summary>
+    /// 公開側の論理削除データ（アーカイブ・明細・リアクション）を掃除する
+    /// </summary>
+    /// <returns></returns>
+    public async Task DeleteOldGarbagePublicAsync()
+    {
+        // 1. 公開アーカイブの掃除
+        const string sqlArchive = @"
+            DELETE FROM t_memo_archive_pub 
+            WHERE del_flg = true AND update_tim < CURRENT_TIMESTAMP - INTERVAL '1 month'";
+
+        // 2. 公開明細の掃除
+        const string sqlDetail = @"
+            DELETE FROM t_memo_detail_pub 
+            WHERE del_flg = true AND update_tim < CURRENT_TIMESTAMP - INTERVAL '1 month'";
+
+        // 3. リアクションの掃除（★追加）
+        const string sqlReaction = @"
+            DELETE FROM t_reaction_pub 
+            WHERE del_flg = true AND update_tim < CURRENT_TIMESTAMP - INTERVAL '1 month'";
+
+        await ExecuteAsync(sqlArchive);
+        await ExecuteAsync(sqlDetail);
+        await ExecuteAsync(sqlReaction);
+    }
+
 }
