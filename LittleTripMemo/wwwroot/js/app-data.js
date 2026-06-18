@@ -133,23 +133,22 @@ window.$Data = {
 
         // --- (既存のアプリアクセスメソッド群省略なし) ---
         async LoginToServer(email) {
-            const url = '/api/Account/LoginFirebase';
             const params = { Email: email };
             return await $Warn.CatchAsync(async () => {
-                await this._fetchData('post', url, params);
+                await this._fetchData('post', '/api/Account/LoginFirebase', params);
                 console.log("Login 成功");
-                // await $App.RefreshScreen();
             })();
         },
         // public record EnsureLoginUserReq(Guid login_user_id)
         async EnsureLoginUser(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/EnsureLoginUser', params))();
         },
-        async GetProfile(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/GetProfile', params))();
-        },
         async UpdateProfile(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/UpdateProfile', params))();
+        },
+        // Guid userId
+        async GetUserProfile(params) {
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/GetUserProfile', params))();
         },
 
 
@@ -219,10 +218,6 @@ window.$Data = {
         },
         async BulkSyncReactions(params = {}) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/BulkSyncReactions', params))();
-        },
-        // Guid userId
-        async GetUserProfile(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/GetUserProfile', params))();
         },
         // [Required(ErrorMessage = "削除対象のseqリストは必須です")] int[] seqs
         async DeleteStrayDetails(params) {

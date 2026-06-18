@@ -23,7 +23,6 @@ public class GetUserProfileService : _BaseService
     public GetUserProfileService(UserContext userContext, AppUserRepository appUserRepository)
         : base(userContext) => _appUserRepo = appUserRepository;
 
-    /// <param name="target_user_id">プロフィールを見たい相手のID</param>
     public async Task<Response> ExecuteAsync(Guid target_user_id)
     {
         await ValidateAsync(target_user_id);
