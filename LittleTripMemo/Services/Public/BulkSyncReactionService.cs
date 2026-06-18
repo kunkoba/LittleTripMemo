@@ -63,7 +63,7 @@ public class BulkSyncReactionService : _BaseService
 
                 // 1件ずつデルタ更新を実行
                 // SQL内で「旧値」と「新値」を比較して +1 / -1 / 0 を自動判定
-                await _reactionRepo.UpsertWithCounterAsync(new TReactionPub
+                await _reactionRepo.UpsertAsync(new TReactionPub
                 {
                     archive_id = item.archive_id,
                     seq = item.seq,

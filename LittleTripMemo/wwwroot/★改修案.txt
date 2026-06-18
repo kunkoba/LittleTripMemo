@@ -37,8 +37,10 @@
 　・特定ユーザとの個別通知（やりとり）を管理したい
 　　・ユーザ画面の受信BOXと送信履歴（管理者
 
-
-					$Marker.FocusToCurrentMarker();
+【ユーザ解析】
+・総移動距離
+・登録数ランキング
+・
             
 
 docker cp C:\Users\Owner\Desktop\backup.sql trip_memo_db:/backup.sql

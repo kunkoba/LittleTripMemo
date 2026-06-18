@@ -28,7 +28,7 @@ public class TableStatisticsTaskRepository : _BaseRepository
         string sql = $@"
             UPDATE mgr_table_statistics 
             SET 
-                record_count = (SELECT count(*) FROM t_memo_detail_{tableId} WHERE del_flg = false),
+                record_count = (SELECT count(*) FROM t_memo_detail_{tableId} ),
                 user_count   = (SELECT count(*) FROM t_app_user WHERE table_id = @tableId),
                 last_count_tim = CURRENT_TIMESTAMP
             WHERE table_id = @tableId";
@@ -62,6 +62,7 @@ public class TableStatisticsTaskRepository : _BaseRepository
         string sql = $@"
             DELETE FROM t_memo_detail_{tableId}
             WHERE del_flg = true 
+              AND archive_id = 0
               AND update_tim < CURRENT_TIMESTAMP - INTERVAL '1 month'";
 
         await ExecuteAsync(sql);
