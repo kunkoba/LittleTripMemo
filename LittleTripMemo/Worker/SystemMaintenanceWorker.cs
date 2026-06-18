@@ -1,6 +1,7 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.Configs;
-using LittleTripMemo.Repository;
+using LittleTripMemo.Repository.App;
+using LittleTripMemo.Repository.Batch;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 
@@ -10,59 +11,53 @@ public class SystemMaintenanceWorker : BackgroundService
 {
     private readonly ILogger<SystemMaintenanceWorker> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly MyAppSettings _settings;
+    // ★ IOptions ではなく IOptionsMonitor を使用（リアルタイム監視用）
+    private readonly IOptionsMonitor<MyAppSettings> _optionsMonitor;
 
-    // 各タスクの「次回実行予定時刻」を保持する変数
     private DateTime _nextReactionUpdateTime;
     private DateTime _nextMaintenanceTime;
 
     public SystemMaintenanceWorker(
         ILogger<SystemMaintenanceWorker> logger,
         IServiceScopeFactory scopeFactory,
-        IOptions<MyAppSettings> settings)
+        IOptionsMonitor<MyAppSettings> optionsMonitor)
     {
         _logger = logger;
         _scopeFactory = scopeFactory;
-        _settings = settings.Value;
+        _optionsMonitor = optionsMonitor;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("--- システムメンテナンス・バッチを起動しました ---");
+        _logger.LogInformation("--- システムメンテナンス・バッチを稼働中 ---");
 
-        try
+        // 初回実行予定を現在時刻にセット
+        _nextReactionUpdateTime = DateTime.Now;
+        _nextMaintenanceTime = DateTime.Now;
+
+        while (!stoppingToken.IsCancellationRequested)
         {
-            // 次回実行時刻の初期化（起動直後に1回目が動くように設定）
-            _nextReactionUpdateTime = DateTime.Now;
-            _nextMaintenanceTime = DateTime.Now;
-
-            // アプリ終了まで 1分間隔のループ（ハートビート）を開始
-            while (!stoppingToken.IsCancellationRequested)
+            using (LogContext.PushProperty("CorrelationId", Guid.NewGuid().ToString()[..8]))
             {
-                // サイクルごとに相関IDを発番
-                using (LogContext.PushProperty("CorrelationId", Guid.NewGuid().ToString()[..8]))
-                {
-                    // 関数を呼ぶだけ（判定も更新も関数内で完結）
-                    await TaskUpdateReactionCountsAsync();
-                    await TaskSystemMaintenanceAsync();
-                }
-
-                // 1分間待機（心拍）
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                // リアクション件数の再集計
+                await TaskUpdateReactionCountsAsync();
+                // テーブル統計の集計と管理テーブルの更新
+                await TaskUpdateTableStatisticsAsync();
             }
-        }
-        catch (Exception ex)
-        {
-            // 設定エラーや致命的なクラッシュ時にここを通る
-            _logger.LogCritical(ex, "【致命的エラー】メンテナンス・バッチが異常終了しました。");
-        }
 
-        _logger.LogInformation("--- システムメンテナンス・バッチを終了しました ---");
+            // 心拍（1分待機）
+            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+        }
     }
 
+#region "共通基盤"
+
     /// <summary>
-    /// 窓口の生成とログ・エラー管理の共通枠
+    /// タスク実行
     /// </summary>
+    /// <param name="taskName"></param>
+    /// <param name="action"></param>
+    /// <returns></returns>
     private async Task RunWithScopeAsync(string taskName, Func<IServiceScope, Task> action)
     {
         try
@@ -81,11 +76,24 @@ public class SystemMaintenanceWorker : BackgroundService
         }
     }
 
+#endregion
+
+#region "各タスクの判定・実行・更新"
+
     /// <summary>
-    /// リアクション集計タスクの実行判定と実行
+    /// リアクション数の再集計タスク
     /// </summary>
+    /// <returns></returns>
     private async Task TaskUpdateReactionCountsAsync()
     {
+        // 都度、設定値をチェック
+        var settings = _optionsMonitor.CurrentValue;
+        if (settings.ReactionCountUpdateIntervalMinutes <= 0)
+        {
+            _logger.LogWarning("【設定警告】ReactionCountUpdateIntervalMinutes が不正なためスキップします。");
+            return;
+        }
+
         var now = DateTime.Now;
 
         if (now >= _nextReactionUpdateTime)
@@ -96,29 +104,41 @@ public class SystemMaintenanceWorker : BackgroundService
                 await repo.UpdateAllReactionCountsAsync();
             });
 
-            // 実行後に次回予定を更新
-            _nextReactionUpdateTime = now.AddMinutes(_settings.ReactionCountUpdateIntervalMinutes);
+            // 3. 次回予定の計算（この時点の最新設定値を使って AddMinutes する）
+            _nextReactionUpdateTime = now.AddMinutes(settings.ReactionCountUpdateIntervalMinutes);
         }
     }
 
     /// <summary>
-    /// システムメンテナンス（ゴミ掃除など）の実行判定と実行
+    /// 各テーブルのレコード数・ユーザー数を集計して管理テーブルを更新する
     /// </summary>
-    private async Task TaskSystemMaintenanceAsync()
+    private async Task TaskUpdateTableStatisticsAsync()
     {
+        var settings = _optionsMonitor.CurrentValue;
         var now = DateTime.Now;
+
+        // 設定値チェック
+        if (settings.SystemMaintenanceIntervalMinutes <= 0 || settings.MaxTableNum <= 0) return;
 
         if (now >= _nextMaintenanceTime)
         {
-            await RunWithScopeAsync("システムメンテナンス", async (scope) =>
+            await RunWithScopeAsync("テーブル統計集計", async (scope) =>
             {
-                _logger.LogInformation("（ダミー処理）論理削除データのクリーンアップ等実行中...");
-                await Task.CompletedTask;
-            });
+                var repo = scope.ServiceProvider.GetRequiredService<TableStatisticsTaskRepository>();
 
-            // 実行後に次回予定を更新
-            _nextMaintenanceTime = now.AddMinutes(_settings.SystemMaintenanceIntervalMinutes);
+                // 設定されている最大テーブル数分、ループして集計を実行
+                for (int i = 1; i <= settings.MaxTableNum; i++)
+                {
+                    // レコードがなければ作成、あれば更新
+                    await repo.EnsureManagerRecordExistsAsync(i);
+                    await repo.SyncStatisticsAsync(i);
+                }
+            });
+            // 次回予定を更新
+            _nextMaintenanceTime = now.AddMinutes(settings.SystemMaintenanceIntervalMinutes);
         }
     }
+
+#endregion
 
 }

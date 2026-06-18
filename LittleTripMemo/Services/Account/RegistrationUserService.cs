@@ -1,31 +1,41 @@
 ﻿using LittleTripMemo.Configs;
 using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
-using LittleTripMemo.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using LittleTripMemo.Common;
+using LittleTripMemo.Repository.Sys;
 
 namespace LittleTripMemo.Services.Account;
 
 public class RegistrationUserService
 {
     private readonly UserManager<MyAppUser> _userManager;
-    private readonly AppUserRepository _appUserRepo; // AppUserRepositoryを使用
+    private readonly AppUserRepository _appUserRepo;
+    private readonly TableStatisticsRepository _statsRepo;
     private readonly JwtService _jwtService;
     private readonly MyAppSettings _settings;
 
     public record FirebaseLoginRequest(string Email);
-    public record Response(bool is_success, string message, string? token = null, Guid? userId = null, string? plan = null);
+    public record Response(
+        bool is_success, 
+        string message, 
+        string? token = null, 
+        Guid? userId = null, 
+        string? plan = null
+        );
 
     public RegistrationUserService(
         UserManager<MyAppUser> userManager,
         AppUserRepository appUserRepo,
+        TableStatisticsRepository statsRepo,
         IOptions<MyAppSettings> settings,
-        JwtService jwtService)
+        JwtService jwtService
+        )
     {
         _userManager = userManager;
         _appUserRepo = appUserRepo;
+        _statsRepo = statsRepo;
         _settings = settings.Value;
         _jwtService = jwtService;
     }
@@ -77,15 +87,29 @@ public class RegistrationUserService
         return new Response(true, "成功");
     }
 
+    /// <summary>
+    /// テーブルIDの選択ロジック
+    /// </summary>
+    /// <returns></returns>
     private async Task<int> SelectTableIdAsync()
     {
-        var tableCounts = new List<(int id, long count)>();
-        for (int i = 1; i <= _settings.MaxTableNum; i++)
+        // 1. 管理テーブルから最新の集計済みレコード数を取得（超高速）
+        var stats = await _statsRepo.GetAllStatsAsync();
+
+        if (!stats.Any())
         {
-            var count = await _appUserRepo.GetTableCountAsync(i);
-            tableCounts.Add((i, count));
+            // まだバッチが一度も動いていない場合の安全策
+            return 1;
         }
-        return tableCounts.OrderBy(x => x.count).ThenBy(x => x.id).First().id;
+
+        // 2. record_count が最も少ないものを選択。同じなら ID が若い方を優先。
+        // (dynamicで受けているので、プロパティ名で並び替え)
+        var target = stats
+            .OrderBy(x => (long)x.record_count)
+            .ThenBy(x => (int)x.table_id)
+            .First();
+
+        return (int)target.table_id;
     }
 
 }
