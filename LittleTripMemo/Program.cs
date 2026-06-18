@@ -7,6 +7,7 @@ using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Repository.App;
+using LittleTripMemo.Repository.Batch;
 using LittleTripMemo.Repository.Sys;
 using LittleTripMemo.Services;
 using LittleTripMemo.Services.Account;
@@ -123,9 +124,11 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<JwtService>();
 
+
+
 // ---- Repository（DBアクセス層） ----
 
-// Service からのみ使用され、Controller からは直接触らせない
+// ---- App / Infrastructure Repository ----
 builder.Services.AddScoped<AppUserRepository>();
 builder.Services.AddScoped<ArchiveRepository>();
 builder.Services.AddScoped<DetailRepository>();
@@ -137,6 +140,10 @@ builder.Services.AddScoped<SysFeedbackRepository>();
 builder.Services.AddScoped<SysNotificationRepository>();
 builder.Services.AddScoped<SysReportRepository>();
 builder.Services.AddScoped<SysUserNotificationRepository>();
+builder.Services.AddScoped<TableStatisticsRepository>();
+// ---- Batch / Infrastructure Repository ----
+builder.Services.AddScoped<TableStatisticsTaskRepository>();
+
 
 // ---- Service（業務ロジック層） ----
 // ---- Account ----
@@ -320,10 +327,14 @@ var app = builder.Build();
 using (var startupScope = app.Services.CreateScope())
 {
     var settings = startupScope.ServiceProvider.GetRequiredService<IOptions<MyAppSettings>>().Value;
-    if (settings.ReactionCountUpdateIntervalMinutes <= 0 ||
-        settings.TableStatsUpdateIntervalMinutes <= 0 ||
-        settings.GarbageCleanupIntervalMinutes <= 0 ||
-        settings.MaxTableNum <= 0)
+    
+    bool isInvalid = false;
+    isInvalid |= settings.MaxTableNum <= 0;
+    isInvalid |= settings.ReactionCountUpdateIntervalMinutes <= 0;
+    isInvalid |= settings.TableStatsUpdateIntervalMinutes <= 0;
+    isInvalid |= settings.GarbageCleanupIntervalMinutes <= 0;
+
+    if (isInvalid)
     {
         var errorMsg = "【致命的設定エラー】appsettings.json の MyAppSettings セクションが正しく構成されていません。";
 
@@ -331,6 +342,10 @@ using (var startupScope = app.Services.CreateScope())
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("====================================================");
         Console.WriteLine(errorMsg);
+        Console.WriteLine($"MaxTableNum: {settings.MaxTableNum}");
+        Console.WriteLine($"ReactionInterval: {settings.ReactionCountUpdateIntervalMinutes}");
+        Console.WriteLine($"TableStatsInterval: {settings.TableStatsUpdateIntervalMinutes}");
+        Console.WriteLine($"GarbageInterval: {settings.GarbageCleanupIntervalMinutes}");
         Console.WriteLine("====================================================");
         Console.ResetColor();
 

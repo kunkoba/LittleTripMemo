@@ -34,6 +34,7 @@ public class SystemMaintenanceWorker : BackgroundService
         // 初回実行予定を現在時刻にセット
         _nextReactionUpdateTime = DateTime.Now;
         _nextTableStatsUpdateTime = DateTime.Now;
+        _nextGarbageCleanupTime = DateTime.Now;
 
         while (!stoppingToken.IsCancellationRequested)
         {
