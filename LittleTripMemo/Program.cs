@@ -6,6 +6,8 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
+using LittleTripMemo.Repository.App;
+using LittleTripMemo.Repository.Sys;
 using LittleTripMemo.Services;
 using LittleTripMemo.Services.Account;
 using LittleTripMemo.Services.Admin;
@@ -319,7 +321,8 @@ using (var startupScope = app.Services.CreateScope())
 {
     var settings = startupScope.ServiceProvider.GetRequiredService<IOptions<MyAppSettings>>().Value;
     if (settings.ReactionCountUpdateIntervalMinutes <= 0 ||
-        settings.SystemMaintenanceIntervalMinutes <= 0 ||
+        settings.TableStatsUpdateIntervalMinutes <= 0 ||
+        settings.GarbageCleanupIntervalMinutes <= 0 ||
         settings.MaxTableNum <= 0)
     {
         var errorMsg = "【致命的設定エラー】appsettings.json の MyAppSettings セクションが正しく構成されていません。";

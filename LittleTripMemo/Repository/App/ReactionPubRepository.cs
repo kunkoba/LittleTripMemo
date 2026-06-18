@@ -1,7 +1,7 @@
 ﻿using LittleTripMemo.Models;
 using LittleTripMemo.Common;
 
-namespace LittleTripMemo.Repository;
+namespace LittleTripMemo.Repository.App;
 
 public class ReactionPubRepository : _BaseRepository
 {
@@ -50,7 +50,7 @@ public class ReactionPubRepository : _BaseRepository
             WHERE archive_id = @archiveId 
               AND user_id    = @user_id";
 
-        return await QueryAsync<TReactionPub>(sql, new { archiveId = archiveId, user_id = _user.login_user_id });
+        return await QueryAsync<TReactionPub>(sql, new { archiveId, user_id = _user.login_user_id });
     }
 
     /// <summary>

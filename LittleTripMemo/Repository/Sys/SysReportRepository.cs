@@ -2,7 +2,7 @@
 using LittleTripMemo.Models;
 using System.Collections.Generic;
 
-namespace LittleTripMemo.Repository;
+namespace LittleTripMemo.Repository.Sys;
 
 public class SysReportRepository : _BaseRepository
 {

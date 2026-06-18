@@ -1,6 +1,6 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
-using LittleTripMemo.Repository;
+using LittleTripMemo.Repository.Sys;
 using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Sys;

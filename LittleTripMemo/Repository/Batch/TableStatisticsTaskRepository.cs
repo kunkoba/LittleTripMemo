@@ -52,4 +52,19 @@ public class TableStatisticsTaskRepository : _BaseRepository
             tableName = $"t_memo_detail_{tableId}"
         });
     }
+
+    /// <summary>
+    /// 論理削除から1ヶ月以上経過した明細を物理削除する
+    /// </summary>
+    public async Task DeleteOldGarbageDetailsAsync(int tableId)
+    {
+        // del_flgがtrue かつ update_tim（削除日時）から1ヶ月以上経過したものを削除
+        string sql = $@"
+            DELETE FROM t_memo_detail_{tableId}
+            WHERE del_flg = true 
+              AND update_tim < CURRENT_TIMESTAMP - INTERVAL '1 month'";
+
+        await ExecuteAsync(sql);
+    }
+
 }

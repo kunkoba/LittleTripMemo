@@ -2,6 +2,7 @@
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
+using LittleTripMemo.Repository.App;
 using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Public;

@@ -4,6 +4,7 @@ using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
+using LittleTripMemo.Repository.Sys;
 
 namespace LittleTripMemo.Services.Sys;
 

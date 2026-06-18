@@ -2,6 +2,8 @@
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
+using LittleTripMemo.Repository.App;
+using LittleTripMemo.Repository.Sys;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 

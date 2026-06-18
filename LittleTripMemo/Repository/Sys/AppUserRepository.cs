@@ -2,7 +2,7 @@
 using LittleTripMemo.Models;
 using System.Collections.Generic;
 
-namespace LittleTripMemo.Repository;
+namespace LittleTripMemo.Repository.Sys;
 
 /// <summary>
 /// アプリ専用ユーザ情報（t_app_user）および

@@ -14,7 +14,8 @@ public class MyAppSettings
 
     // バッチの実行間隔（分）
     public int ReactionCountUpdateIntervalMinutes { get; set; } = -1; // リアクション集計
-    public int SystemMaintenanceIntervalMinutes { get; set; } = -1;   // ゴミ掃除など（1440分 = 24時間）
+    public int TableStatsUpdateIntervalMinutes { get; set; } = -1;   // テーブル件数集計
+    public int GarbageCleanupIntervalMinutes { get; set; } = -1;    // 明細のゴミ掃除
 
 }
 

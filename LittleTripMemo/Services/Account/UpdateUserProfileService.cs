@@ -3,7 +3,7 @@
 using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
-using LittleTripMemo.Repository;
+using LittleTripMemo.Repository.Sys;
 using Microsoft.AspNetCore.Identity;
 
 namespace LittleTripMemo.Services.Account;

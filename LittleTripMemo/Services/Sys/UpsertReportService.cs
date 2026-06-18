@@ -1,7 +1,7 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
-using LittleTripMemo.Repository;
+using LittleTripMemo.Repository.Sys;
 using LittleTripMemo.Services;
 using System.ComponentModel.DataAnnotations;
 

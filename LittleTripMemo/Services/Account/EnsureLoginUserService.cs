@@ -1,6 +1,6 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.Models;
-using LittleTripMemo.Repository;
+using LittleTripMemo.Repository.Sys;
 
 namespace LittleTripMemo.Services.Account;
 

@@ -10,12 +10,12 @@ namespace LittleTripMemo.Worker;
 public class SystemMaintenanceWorker : BackgroundService
 {
     private readonly ILogger<SystemMaintenanceWorker> _logger;
-    private readonly IServiceScopeFactory _scopeFactory;
-    // ★ IOptions ではなく IOptionsMonitor を使用（リアルタイム監視用）
-    private readonly IOptionsMonitor<MyAppSettings> _optionsMonitor;
+    private readonly IServiceScopeFactory _scopeFactory;    
+    private readonly IOptionsMonitor<MyAppSettings> _optionsMonitor;    // ★ IOptions ではなく IOptionsMonitor を使用（リアルタイム監視用）
 
     private DateTime _nextReactionUpdateTime;
-    private DateTime _nextMaintenanceTime;
+    private DateTime _nextTableStatsUpdateTime;
+    private DateTime _nextGarbageCleanupTime;
 
     public SystemMaintenanceWorker(
         ILogger<SystemMaintenanceWorker> logger,
@@ -33,7 +33,7 @@ public class SystemMaintenanceWorker : BackgroundService
 
         // 初回実行予定を現在時刻にセット
         _nextReactionUpdateTime = DateTime.Now;
-        _nextMaintenanceTime = DateTime.Now;
+        _nextTableStatsUpdateTime = DateTime.Now;
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -43,6 +43,8 @@ public class SystemMaintenanceWorker : BackgroundService
                 await TaskUpdateReactionCountsAsync();
                 // テーブル統計の集計と管理テーブルの更新
                 await TaskUpdateTableStatisticsAsync();
+                // 明細データのゴミ掃除（削除済みデータの物理削除）
+                await TaskGarbageCleanupAsync();
             }
 
             // 心拍（1分待機）
@@ -50,7 +52,7 @@ public class SystemMaintenanceWorker : BackgroundService
         }
     }
 
-#region "共通基盤"
+    #region "共通基盤"
 
     /// <summary>
     /// タスク実行
@@ -76,9 +78,9 @@ public class SystemMaintenanceWorker : BackgroundService
         }
     }
 
-#endregion
+    #endregion
 
-#region "各タスクの判定・実行・更新"
+    #region "各タスクの判定・実行・更新"
 
     /// <summary>
     /// リアクション数の再集計タスク
@@ -118,9 +120,9 @@ public class SystemMaintenanceWorker : BackgroundService
         var now = DateTime.Now;
 
         // 設定値チェック
-        if (settings.SystemMaintenanceIntervalMinutes <= 0 || settings.MaxTableNum <= 0) return;
+        if (settings.TableStatsUpdateIntervalMinutes <= 0 || settings.MaxTableNum <= 0) return;
 
-        if (now >= _nextMaintenanceTime)
+        if (now >= _nextTableStatsUpdateTime)
         {
             await RunWithScopeAsync("テーブル統計集計", async (scope) =>
             {
@@ -135,10 +137,38 @@ public class SystemMaintenanceWorker : BackgroundService
                 }
             });
             // 次回予定を更新
-            _nextMaintenanceTime = now.AddMinutes(settings.SystemMaintenanceIntervalMinutes);
+            _nextTableStatsUpdateTime = now.AddMinutes(settings.TableStatsUpdateIntervalMinutes);
         }
     }
 
-#endregion
+    /// <summary>
+    /// 論理削除済みの明細データを物理削除する
+    /// </summary>
+    private async Task TaskGarbageCleanupAsync()
+    {
+        var settings = _optionsMonitor.CurrentValue;
+        var now = DateTime.Now;
+
+        // 設定値チェック
+        if (settings.GarbageCleanupIntervalMinutes <= 0) return;
+
+        if (now >= _nextGarbageCleanupTime)
+        {
+            await RunWithScopeAsync("論理削除済みの明細データを物理削除", async (scope) =>
+            {
+                var repo = scope.ServiceProvider.GetRequiredService<TableStatisticsTaskRepository>();
+
+                for (int i = 1; i <= settings.MaxTableNum; i++)
+                {
+                    await repo.DeleteOldGarbageDetailsAsync(i);
+                }
+            });
+
+            // 次回予定を更新
+            _nextGarbageCleanupTime = now.AddMinutes(settings.GarbageCleanupIntervalMinutes);
+        }
+    }
+
+    #endregion
 
 }

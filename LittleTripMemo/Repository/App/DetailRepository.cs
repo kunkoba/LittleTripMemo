@@ -2,7 +2,7 @@
 using LittleTripMemo.Models;
 using Npgsql;
 
-namespace LittleTripMemo.Repository;
+namespace LittleTripMemo.Repository.App;
 
 /// <summary>
 /// 旅の詳細履歴（t_memo_detail_n）用リポジトリ。

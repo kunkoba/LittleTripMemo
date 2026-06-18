@@ -1,7 +1,7 @@
 ﻿using LittleTripMemo.Models;
 using LittleTripMemo.Common;
 
-namespace LittleTripMemo.Repository;
+namespace LittleTripMemo.Repository.Sys;
 
 public class SysFeedbackRepository : _BaseRepository
 {

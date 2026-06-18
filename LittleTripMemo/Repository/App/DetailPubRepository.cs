@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using LittleTripMemo.Common;
 using LittleTripMemo.Models;
-namespace LittleTripMemo.Repository;
+namespace LittleTripMemo.Repository.App;
 
 public class DetailPubRepository : _BaseRepository
 {

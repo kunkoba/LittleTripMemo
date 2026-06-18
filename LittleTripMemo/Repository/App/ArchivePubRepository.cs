@@ -1,6 +1,7 @@
 ﻿using LittleTripMemo.Models;
 using LittleTripMemo.Common;
-namespace LittleTripMemo.Repository;
+
+namespace LittleTripMemo.Repository.App;
 
 public class ArchivePubRepository : _BaseRepository
 {
