@@ -7,7 +7,14 @@ window.$Const = {
         VERSION: "1.0.0",
         OFFICIAL_SITE: "https://hinekulemonstudio.web.app/",
         LICENSE: "?????????????",
+    },
+    // アプリ設定
+    APP_CONFIG: {
         ADMIN_PW: "8855",
+        SAVE_DETAIL_SEC: 300,
+        SAVE_REACTION_SEC: 300,
+        // const saveDetailSec = 300;
+        // const saveReactionSec = 300;
     },
     // 地図設定
     MAP_CONFIG: {

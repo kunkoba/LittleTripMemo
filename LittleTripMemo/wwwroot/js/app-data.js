@@ -442,10 +442,13 @@ window.$Data = {
             const archive = $Data.Store.GetArchive();
             if (!archive) return;
             const archiveId = archive.archive_id;
-            const details = $Data.Store.GetDetails();
-            const rawReactions = $Data.Store.GetMyReactions(); // サーバーから取得した生リスト
             // ローカルDBの ParseAndSaveMyReactions を呼び出す
             await $Warn.CatchAsync(async () => {
+                // --- 追加：保存前にゴミ掃除を実行 ---
+                await $LocalDb.Reaction.Cleanup(archiveId);
+                // 
+                const details = $Data.Store.GetDetails();
+                const rawReactions = $Data.Store.GetMyReactions(); // サーバーから取得した生リスト
                 await $LocalDb.Reaction.ParseAndSaveMyReactions(archiveId, rawReactions, details);
             })();
         },

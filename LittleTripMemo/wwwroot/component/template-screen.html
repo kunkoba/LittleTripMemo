@@ -173,14 +173,18 @@
 
 <template id="tpl-view-profile">
 	<div class="relative min-h-full flex flex-col bg-white px-1">
+        <!-- アイコン・ニックネーム -->
 		<div class="flex items-center gap-4 mb-3">
 			<div id="view-profile-icon" class="text-[4rem] drop-shadow-md shrink-0"></div>
 			<div class="flex flex-col flex-1 min-w-0"><h1 id="view-profile-nickname" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight"></h1></div>
 		</div>
-		<div id="view-profile-description"
-            class="flex-1 bg-brand-1 rounded-lg p-2 text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words min-h-[200px] overflow-y-auto">
+        <!-- 本文・リンク -->
+        <div class="bg-brand-1 overflow-y-auto ">
+            <div id="view-profile-description"
+                class="flex-1 min-h-[200px] p-2 text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words">
+            </div>
+            <div id="view-profile-links" class="gap-3 flex m-2"></div>
         </div>
-		<div id="view-profile-links" class="gap-3 flex py-2"></div>
 	</div>
 </template>
 
@@ -277,17 +281,28 @@
 			<h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight border-l-4 border-brand-3 pl-3 my-4"></h1>
 		</div>
 		<!-- 本文 -->
-		<div id="view-mem-body" class="flex-1 bg-brand-1 rounded-lg p-3 text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words mb-3 min-h-[100px] overflow-y-auto">
-		</div>
-		<!-- 金額とリンク -->
-		<div class="pb-3 flex items-end justify-between border-b border-slate-100">
+        <div class="flex-1 overflow-y-auto mb-3 pr-1 bg-brand-1 ">
+            <div id="view-mem-body" class="p-3 min-h-[200px] text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words">
+            </div>
+            <!-- URLリンクをここへ移動 -->
+            <div id="view-mem-url-wrapper" class="flex justify-end_ px-1 hidden">
+                <a id="view-mem-url" href="" target="_blank" 
+                    class="m-2 shrink-0 w-12 h-12 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50 outline-none">
+                </a>
+            </div>
+        </div>
+        <!-- 金額と距離（フッター固定領域） -->
+        <div class="pb-3 flex items-end justify-between border-b border-slate-100">
+            <!-- 左：金額 -->
             <div class="pl-3 flex items-baseline italic border-b-2 border-brand-3 pb-0.5">
                 <span id="mem-stat-price" class="text-[1.2rem] font-black italic leading-none"></span>
                 <span id="view-mem-price-unit" class="text-[0.7rem] font-bold text-slate-400 ml-1.5 uppercase leading-none"></span>
             </div>
-			<a id="view-mem-url" href="" target="_blank" class="shrink-0 w-12 h-12 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50 outline-none">
-			</a>
-		</div>
+            <!-- 右：距離表示を新設 -->
+            <div class="pr-2 flex flex-col items-end border-b-2 border-brand-3 pb-0.5">
+                <span id="mem-stat-distance" class="text-[1.2rem] font-black italic text-slate-800 leading-none"></span>
+            </div>
+        </div>
         <!-- ========================================== -->
         <!-- ▼ 状態変更の4連ボタン（最下段に固定） -->
         <!-- ========================================== -->
@@ -364,13 +379,16 @@
             <h1 id="view-notice-title" class="text-[1.2rem] font-black text-slate-800 break-words"></h1>
         </div>
 		<!-- 3. 本文（ で統一） -->
-		<div id="view-notice-body" class="flex-1 bg-brand-1 rounded-lg p-2 text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words pt-2 min-h-[200px] overflow-y-auto pr-2"></div>
-        <!-- 4. リンク表示エリア -->
-		<div id="view-notice-url-wrapper" class="hidden mt-auto flex py-1">
-            <button id="view-notice-url" type="button" 
-                class="shrink-0 w-12 h-12 shadow-lg rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
-                <!-- ここにアイコンが挿入される -->
-        </button>
+        <div class="bg-brand-1 overflow-y-auto pr-2">
+            <div id="view-notice-body" 
+                class="flex-1 p-2 min-h-[200px] text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words pt-2"></div>
+            <!-- 4. リンク表示エリア -->
+            <div id="view-notice-url-wrapper" class="hidden mt-auto flex m-2">
+                <button id="view-notice-url" type="button" 
+                    class="shrink-0 w-12 h-12 shadow-lg rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
+                    <!-- ここにアイコンが挿入される -->
+            </button>
+            </div>
         </div>
 	</div>
 </template>

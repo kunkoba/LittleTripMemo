@@ -124,10 +124,8 @@ export default {
         };
         b.admin.onclick = async () => {
             // メニューを開く前に一括取得を実行
-            if (await $Util.CheckAdminAuth()) {
-                const isSuccess = await $Data.Access.GetAdminAllInfo();
-                if (isSuccess) this.ShowAdminMenu();
-            }
+            const isSuccess = await $Data.Access.GetAdminAllInfo();
+            if (isSuccess) this.ShowAdminMenu();
         };
         this._core.open({
             title: "SYSTEM MENU",
@@ -410,9 +408,9 @@ export default {
             const pIcon = profile.icon || "👤";
             const pName = profile.nick_name || "No Name";
             const pDesc  = profile.description || "";
-            const pL1   = profile.link1 || "";
-            const pL2   = profile.link2 || "";
-            const pL3   = profile.link3 || "";
+            const pL1   = profile.link_1 || "";
+            const pL2   = profile.link_2 || "";
+            const pL3   = profile.link_3 || "";
             $Dom.QuerySelector('#view-profile-icon', el).textContent = pIcon;
             $Dom.QuerySelector('#view-profile-nickname', el).textContent = pName;
             $Dom.QuerySelector('#view-profile-description', el).textContent = pDesc;

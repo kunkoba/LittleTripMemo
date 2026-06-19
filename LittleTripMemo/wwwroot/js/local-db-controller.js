@@ -400,7 +400,18 @@ const LocalDbController = {
                 has_sad: false,
                 send_flag: sendFlag
             };
-        }
+        },
+        // 不要なデータを削除
+        async Cleanup(currentArchiveId) {
+            const uid = getUserId();
+            const targetId = Number(currentArchiveId);
+            // 「自分以外のまとめ」かつ「送信済み(send_flag != 0)」のデータを削除
+            return await _LocalDbCore.deleteByFilter(this.storeName, (item) => {
+                return item.user_id === uid && 
+                    item.archive_id !== targetId && 
+                    item.send_flag !== 0;
+            });
+        },
     },
     // システム通知の既読履歴管理
     Notice: {

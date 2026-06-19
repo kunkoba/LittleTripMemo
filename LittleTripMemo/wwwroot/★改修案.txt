@@ -1,3 +1,7 @@
+
+docker cp C:\Users\Owner\Desktop\backup.sql trip_memo_db:/backup.sql
+docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql
+
 ★Dockerコンポーズ
 ? LittleTripMemo (ソリューションルート)
  ├── ? docker-compose.yml
@@ -8,6 +12,7 @@
        ├── ? Program.cs  (★ココ！完璧です)
        ├── ? LittleTripMemo.csproj
        └── ? wwwroot
+
 
 ★改修案
 ・まとめ一覧画面のフィルタ
@@ -21,28 +26,69 @@
 ・バック同期後のマーカー再生成は作成モードのみ
 ・まとめリストのメモ数表示
 ・誰からのメールか分からない
-・ローカル?からマーカー生成（サーバ保存されていないデータも出力させる）
 ・ローカル?のゴミ掃除
 
 サーバ処理
 ・ユーザ情報に「BANフラグ」を持たせる（一生公開できないようにする）
 ・最終ログイン日時の保持
 
+【ユーザ情報を充実させたい】
+・総移動距離（これは無理か）
+・総まとめ数（公開、非公開）
+・総メモ数
+・総金額
+
 【管理者機能】
-　・あるユーザに対し、公開データを他者に見られなくする機能
+　・管理者機能と分かるように見た目を変える
+　・送信ボタン押下時にパスワードを聞く
+　・通知更新後に最新の通知データ（管理者情報）を取得する
+　・特定ユーザに対し、公開データを他者に見られなくする機能
+　・特定ユーザが通報した回数、通報された回数
 　・特定ユーザとの個別通知（やりとり）を管理したい
 　　・ユーザ画面の受信BOXと送信履歴（管理者
 　・強制非公開にした履歴を残す（ユーザID、archiveID、日付、区分（警告、停止））
 　
 
-【ユーザ解析】
-・総移動距離
-・登録数ランキング
-・
             
 
-docker cp C:\Users\Owner\Desktop\backup.sql trip_memo_db:/backup.sql
-docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql
-
-
+			// パスワード制御
+            if (await $Util.CheckAdminAuth()) {
+                const isSuccess = await $Data.Access.GetAdminAllInfo();
+                if (isSuccess) this.ShowAdminMenu();
+            }
+            
+	        // --- 管理者専用ボタン ---
+	        const dialogButtons = [];
+	        if (isAdmin && archive.is_public && !archive.is_owner) {
+	            if (!archive.closed_flg) {
+	                dialogButtons.push([{
+	                    label: "【ADMIN】強制 Close",
+	                    className: "bg-red-500 text-white shadow-md",
+	                    handler: async () => {
+	                        const isOk = await this.ShowConfirm({ title: "ADMIN: CLOSE", help: "", message: "【注意】\n強制的にClose状態にしますか？" });
+	                        if (!isOk) return;
+	                        const isSuccess = await $Data.Access.AdminCloseArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
+	                        if (!isSuccess) return;
+	                        $Notice.Info("強制的にCloseしました");
+	                        this._core.closeAll();
+	                        $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+	                        await $App.RefreshScreen();
+	                    }
+	                }]);
+	            }
+	            dialogButtons.push([{
+	                label: "【ADMIN】強制 Privateに戻す",
+	                className: "bg-white text-red-600 border-2 border-red-500 shadow-sm",
+	                handler: async () => {
+	                    const isOk = await this.ShowConfirm({ title: "ADMIN: UNPUBLISH", help: "", message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？" });
+	                    if (!isOk) return;
+	                    const isSuccess = await $Data.Access.AdminUnpublishArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
+	                    if (!isSuccess) return;
+	                    $Notice.Info("強制的にPrivateに戻しました");
+	                    this._core.closeAll();
+	                    $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+	                    await $App.RefreshScreen();
+	                }
+	            }]);
+	        }
 

@@ -70,10 +70,10 @@ const AppManager = {
     },
     // 定期タスクの定義と開始
     _initPollingTasks() {
-        const checkSec = 1;
+        const checkSec = 10;
         const gpsTrackingSec = $App.AppData.Owner.GpsTrackingSec; // ★変更
-        const saveDetailSec = 300;
-        const saveReactionSec = 300;
+        const saveDetailSec = $Const.APP_CONFIG.SAVE_DETAIL_SEC;
+        const saveReactionSec = $Const.APP_CONFIG.SAVE_REACTION_SEC;
         $Polling.Init();
         // オフライン監視
         $Polling.Add($Polling.TASKS.OFFLINE_CHECK, () => {
@@ -111,8 +111,9 @@ const AppManager = {
                     // 最新データをサーバーから再取得し、マーカーを再描画する
                     await this.RefreshScreen(); 
                     // 通知
-                    $Notice.Info("バックグラウンド同期は成功しました。");
-                    console.log("バックグラウンド同期は成功しました。:" + $Polling.TASKS.DATA_DETAIL);
+                    const msg = "バックグラウンド同期は成功しました：明細メモ"
+                    $Notice.Info(msg);
+                    console.log(msg);
                 }
             }, saveDetailSec);
             // リアクションデータ送信処理（秒）
@@ -124,8 +125,9 @@ const AppManager = {
                 const isSuccess = await $Data.LocalDb.BulkSendReactions();
                 if (isSuccess) {
                     // 通知
-                    $Notice.Info("バックグラウンド同期は成功しました。");
-                    console.log("バックグラウンド同期は成功しました。:" + $Polling.TASKS.DATA_REACTION);
+                    const msg = "バックグラウンド同期は成功しました：リアクション"
+                    $Notice.Info(msg);
+                    console.log(msg);
                 }
             }, saveReactionSec); // 60秒おきに実行
         }

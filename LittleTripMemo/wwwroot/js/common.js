@@ -333,10 +333,22 @@ window.$Util = {
             message: "管理者パスワードを入力してください" 
         });
         if (pass === null) return false;
-        if (pass !== $Const.APP_INFO.ADMIN_PW) {
+        if (pass !== $Const.APP_CONFIG.ADMIN_PW) {
             $Notice.Error("パスワードが違います");
             return false;
         }
         return true;
+    },
+    // 地点データ群から総移動距離を算出する
+    GetTotalDistance(details) {
+        if (!details || details.length < 2) return 0;
+        let totalMeters = 0;
+        for (let i = 0; i < details.length - 1; i++) {
+            const p1 = L.latLng(details[i].latitude, details[i].longitude);
+            const p2 = L.latLng(details[i + 1].latitude, details[i + 1].longitude);
+            totalMeters += p1.distanceTo(p2);
+        }
+        // メートルをkmに変換して返却
+        return totalMeters / 1000;
     },
 };

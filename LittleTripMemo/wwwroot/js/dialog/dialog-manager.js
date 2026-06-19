@@ -45,7 +45,7 @@ const _DialogCore = {
     },
     // 1. _DialogCore の create メソッド修正
     create({ title = "", content = "", buttons = [], headerButtons = [], 
-         help = null, onClose = null, theme = null, isFooterFixed = true, isModal = false }) {
+            help = null, onClose = null, theme = null, isFooterFixed = true, isModal = false }) {
         const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
         frame._isModal = isModal; // フラグ保持
         const titleEl = $Dom.QuerySelector("#dialog-title", frame);
@@ -125,10 +125,8 @@ const _DialogCore = {
                     };
                     rowDiv.appendChild(btn);
                 });
-                // btnContainer.appendChild(rowDiv);
                 targetContainer.appendChild(rowDiv);
             });
-            // btnContainer.classList.remove("hidden");
             if (isFooterFixed !== false) {
                 btnContainer.classList.remove("hidden");
             }
@@ -209,18 +207,6 @@ const DialogController = {
                 handler: () => $Util.ReloadApp()
             }]]
         });
-        // const frame = this._core.open({
-        //     title: "SYSTEM ERROR",
-        //     isModal: true, // 閉じられない設定
-        //     content: el,
-        //     buttons: [[
-        //         {
-        //             label: "RELOAD",
-        //             className: "bg-brand-5 text-white w-full",
-        //             handler: () => $Util.ReloadApp()
-        //         }
-        //     ]]
-        // });
         // ✖ボタンを強制非表示にして閉じられないようにする
         const headerActions = frame.querySelector("#dialog-header-actions");
         if (headerActions && headerActions.lastChild) {

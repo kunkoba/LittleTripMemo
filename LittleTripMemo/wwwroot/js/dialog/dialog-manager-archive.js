@@ -373,31 +373,36 @@ export default {
                 // アイテムの生成
                 list.forEach(item => {
                     const child = $Dom.GenerateTemplate("tpl-list-child-archive");
+                    // 要素取得
                     $Dom.QuerySelector(".js-title", child).textContent = item.title;
                     $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
                     $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
                     $Dom.QuerySelector(".js-count", child).textContent = item.detail_count || "0";
                     const leftBorder = $Dom.QuerySelector(".js-item-border", child);
+                    const countBadge = $Dom.QuerySelector(".js-count-badge", child);
+                    // 
                     if (isPublicGroup) {
                         if (item.closed_flg) {
-                            // Publicデータ（CLOSE）
-                            // leftBorder.className = "absolute left-0 top-0 bottom-0 w-1 bg-slate-200";
-                            leftBorder.className += " bg-slate-200";
+                            // CLOSE (灰)
+                            leftBorder.classList.add("bg-slate-400");
+                            countBadge.classList.add("bg-slate-400");
                         } else {
-                            // Publicデータ（OPEN）
-                            leftBorder.className += " bg-brand-5";
+                            // OPEN (テーマカラー)
+                            leftBorder.classList.add("bg-brand-5");
+                            countBadge.classList.add("bg-brand-5");
                         }
                     } else {
-                        // 内部データ（PRIVATE）
-                        leftBorder.className += " bg-slate-800";
+                        // PRIVATE (黒)
+                        leftBorder.classList.add("bg-slate-800");
+                        countBadge.classList.add("bg-slate-800");
                     }
-                    // バッヂ適用
-                    const badgeContainer = $Dom.QuerySelector(".js-badge", child);
-                    let sIdx = 0; // Private
-                    if (item.is_public) {
-                        sIdx = item.closed_flg ? 1 : 2; // 1:Close, 2:Open
-                    }
-                    $Util.ApplyBadge(badgeContainer, sIdx);
+                    // // バッヂ適用
+                    // const badgeContainer = $Dom.QuerySelector(".js-badge", child);
+                    // let sIdx = 0; // Private
+                    // if (item.is_public) {
+                    //     sIdx = item.closed_flg ? 1 : 2; // 1:Close, 2:Open
+                    // }
+                    // $Util.ApplyBadge(badgeContainer, sIdx);
                     child.onclick = () => {
                         this._core.closeAll();
                         $App.AppData.Context.ScreenMode = isPublicGroup
@@ -577,8 +582,8 @@ export default {
             buttons: [[
                 {
                     id: "btn-ms-merge",
-                    label: "⇄　MERGE",
-                    className: "disabled:opacity-50 flex items-center justify-center gap-2",
+                    label: "⇄ MERGE",
+                    className: "disabled:opacity-50",
                     handler: async () => {
                         const seqs = Array.from(selectedSeqs);
                         const isOk = await this.ShowConfirm({
@@ -602,7 +607,7 @@ export default {
                 {
                     id: "btn-ms-add",
                     label: "＋ ADD",
-                    className: "disabled:opacity-50 flex items-center justify-center gap-2",
+                    className: "disabled:opacity-50",
                     handler: () => {
                         const seqs = Array.from(selectedSeqs);
                         // 新しく作った専用メソッドを呼び出す
@@ -611,9 +616,9 @@ export default {
                 },
                 {
                     id: "btn-ms-delete",
-                    label: "🗑　DELETE",
+                    label: "DELETE",
                     // 危険な操作なので赤枠・赤文字でデザイン
-                    className: "disabled:opacity-50 flex items-center justify-center gap-2",
+                    className: "disabled:opacity-50 border-2 border-red-200 !bg-white !text-red-500",
                     handler: async () => {
                         const seqs = Array.from(selectedSeqs);
                         const isOk = await this.ShowConfirm({
@@ -933,20 +938,19 @@ export default {
                 // オーナー以外は非表示
                 $Dom.ToggleShow(statusBar, false);
             }
-            // ==========================================
-
             // タイトルと本文の反映
             $Dom.QuerySelector('#view-mem-title', el).textContent = currentArchive.title || "";
             $Dom.QuerySelector('#view-mem-body', el).textContent = currentArchive.memo || "";
-            // リンクの反映
+            // --- URLリンクの反映（スクロール領域内） ---
             const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
+            const urlWrapper = $Dom.QuerySelector('#view-mem-url-wrapper', el);
             if (currentArchive.link_url) {
                 const iconHtml = $Util.GetUrlIconHtml(currentArchive.link_url, 28);
                 viewUrl.href = currentArchive.link_url;
                 viewUrl.innerHTML = iconHtml;
-                $Dom.ToggleShow(viewUrl, true);
+                $Dom.ToggleShow(urlWrapper, true);
             } else {
-                $Dom.ToggleShow(viewUrl, false);
+                $Dom.ToggleShow(urlWrapper, false);
             }
             // 件数の反映
             const details = $Data.Store.GetDetails() || [];
@@ -954,6 +958,11 @@ export default {
             $Dom.QuerySelector('#btn-view-mem-timeline', el).onclick = () => {
                 this.ShowDetailsTimeLine();
             };
+            // --- 距離の計算と表示 ---
+            const totalKm = $Util.GetTotalDistance(details);
+            const distVal = $Dom.QuerySelector('#mem-stat-distance', el);
+            // 1km未満なら小数点第2位まで、1km以上なら小数点第1位くらいが見やすい
+            distVal.textContent = totalKm < 1 ? totalKm.toFixed(2) + ' km' : totalKm.toFixed(1) + ' km';
             // 金額の反映
             const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
             const priceVal = $Dom.QuerySelector('#mem-stat-price', el);
@@ -1002,40 +1011,40 @@ export default {
                 handler: () => this.ShowReportPost(archive)
             });
         }
-        // --- 管理者専用ボタン ---
         const dialogButtons = [];
-        if (isAdmin && archive.is_public && !archive.is_owner) {
-            if (!archive.closed_flg) {
-                dialogButtons.push([{
-                    label: "【ADMIN】強制 Close",
-                    className: "bg-red-500 text-white shadow-md",
-                    handler: async () => {
-                        const isOk = await this.ShowConfirm({ title: "ADMIN: CLOSE", help: "", message: "【注意】\n強制的にClose状態にしますか？" });
-                        if (!isOk) return;
-                        const isSuccess = await $Data.Access.AdminCloseArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
-                        if (!isSuccess) return;
-                        $Notice.Info("強制的にCloseしました");
-                        this._core.closeAll();
-                        $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                        await $App.RefreshScreen();
-                    }
-                }]);
-            }
-            dialogButtons.push([{
-                label: "【ADMIN】強制 Privateに戻す",
-                className: "bg-white text-red-600 border-2 border-red-500 shadow-sm",
-                handler: async () => {
-                    const isOk = await this.ShowConfirm({ title: "ADMIN: UNPUBLISH", help: "", message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？" });
-                    if (!isOk) return;
-                    const isSuccess = await $Data.Access.AdminUnpublishArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
-                    if (!isSuccess) return;
-                    $Notice.Info("強制的にPrivateに戻しました");
-                    this._core.closeAll();
-                    $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    await $App.RefreshScreen();
-                }
-            }]);
-        }
+        // // --- 管理者専用ボタン ---
+        // if (isAdmin && archive.is_public && !archive.is_owner) {
+        //     if (!archive.closed_flg) {
+        //         dialogButtons.push([{
+        //             label: "【ADMIN】強制 Close",
+        //             className: "bg-red-500 text-white shadow-md",
+        //             handler: async () => {
+        //                 const isOk = await this.ShowConfirm({ title: "ADMIN: CLOSE", help: "", message: "【注意】\n強制的にClose状態にしますか？" });
+        //                 if (!isOk) return;
+        //                 const isSuccess = await $Data.Access.AdminCloseArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
+        //                 if (!isSuccess) return;
+        //                 $Notice.Info("強制的にCloseしました");
+        //                 this._core.closeAll();
+        //                 $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+        //                 await $App.RefreshScreen();
+        //             }
+        //         }]);
+        //     }
+        //     dialogButtons.push([{
+        //         label: "【ADMIN】強制 Privateに戻す",
+        //         className: "bg-white text-red-600 border-2 border-red-500 shadow-sm",
+        //         handler: async () => {
+        //             const isOk = await this.ShowConfirm({ title: "ADMIN: UNPUBLISH", help: "", message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？" });
+        //             if (!isOk) return;
+        //             const isSuccess = await $Data.Access.AdminUnpublishArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
+        //             if (!isSuccess) return;
+        //             $Notice.Info("強制的にPrivateに戻しました");
+        //             this._core.closeAll();
+        //             $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+        //             await $App.RefreshScreen();
+        //         }
+        //     }]);
+        // }
         this._core.open({
             title: "Archive info",
             content: el,

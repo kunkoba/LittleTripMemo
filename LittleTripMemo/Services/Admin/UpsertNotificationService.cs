@@ -12,7 +12,7 @@ public class UpsertNotificationService : _BaseService
     private readonly SysNotificationRepository _repo;
 
     public record UpsertNotificationReq(
-        [Required] Guid login_user_id, // ★ 追加
+        [Required] Guid login_user_id,
         long seq,
         string title,
         string body,
@@ -20,7 +20,7 @@ public class UpsertNotificationService : _BaseService
         short kind,
         DateTime disp_from,
         DateTime disp_to
-    ) : ILoginUserRequest; // ★ インターフェースを実装
+    ) : ILoginUserRequest;
 
     public record Response(bool is_success);
 
