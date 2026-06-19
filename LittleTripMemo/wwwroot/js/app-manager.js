@@ -17,6 +17,7 @@ const AppManager = {
             Currency_unit: 'JPY',
             SystemInfo: null,
             FontSize: 'standard',
+            LastLoginDate: null,
         },
         Admin: {
             notifications:[],
@@ -34,6 +35,7 @@ const AppManager = {
             token: this.AppData.Owner.Token,
             currency_unit: this.AppData.Owner.Currency_unit,
             fontSize: this.AppData.Owner.FontSize,
+            lastLoginDate: this.AppData.Owner.LastLoginDate,
         }));
         // console.log("_saveSettings:", this.AppData.Owner);
     },
@@ -46,6 +48,7 @@ const AppManager = {
         if (saved.token) this.AppData.Owner.Token = saved.token;
         if (saved.currency_unit) this.AppData.Owner.Currency_unit = saved.currency_unit;
         if (saved.fontSize) this.AppData.Owner.FontSize = saved.fontSize;
+        if (saved.lastLoginDate) this.AppData.Owner.LastLoginDate = saved.lastLoginDate;
         // console.log("_loadSettings:", this.AppData.Owner);
     },
     // iPhoneのキーボード対策（入力中を考慮）
@@ -71,9 +74,10 @@ const AppManager = {
     // 定期タスクの定義と開始
     _initPollingTasks() {
         const checkSec = 10;
-        const gpsTrackingSec = $App.AppData.Owner.GpsTrackingSec; // ★変更
+        const gpsTrackingSec = $App.AppData.Owner.GpsTrackingSec;
         const saveDetailSec = $Const.APP_CONFIG.SAVE_DETAIL_SEC;
         const saveReactionSec = $Const.APP_CONFIG.SAVE_REACTION_SEC;
+        const activityCheckSec = 300;
         $Polling.Init();
         // オフライン監視
         $Polling.Add($Polling.TASKS.OFFLINE_CHECK, () => {
@@ -84,11 +88,13 @@ const AppManager = {
                 $Notice.Offline.Hide();
                 $Polling.Start($Polling.TASKS.DATA_DETAIL);
                 $Polling.Start($Polling.TASKS.DATA_REACTION);
+                $Polling.Start($Polling.TASKS.SYNC_ACTIVITY);
             } else {
                 // オフライン
                 $Notice.Offline.Show();
                 $Polling.Stop($Polling.TASKS.DATA_DETAIL);
                 $Polling.Stop($Polling.TASKS.DATA_REACTION);
+                $Polling.Stop($Polling.TASKS.SYNC_ACTIVITY);
             }
         }, checkSec);
         // オンライン監視
@@ -101,7 +107,7 @@ const AppManager = {
                 }, gpsTrackingSec);
                 $Polling.Start($Polling.TASKS.GPS_FOLLOW);
             }
-            // データ送信処理（秒）
+            // データ送信処理
             $Polling.Add($Polling.TASKS.DATA_DETAIL, async () => {
                 if (!$App.AppData.Context.IsLoggedIn) return;
                 if (await $LocalDb.Detail.GetCount() === 0) return;
@@ -116,7 +122,7 @@ const AppManager = {
                     console.log(msg);
                 }
             }, saveDetailSec);
-            // リアクションデータ送信処理（秒）
+            // リアクションデータ送信処理
             $Polling.Add($Polling.TASKS.DATA_REACTION, async () => {
                 if (!$App.AppData.Context.IsLoggedIn) return;
                 const unsent = await $LocalDb.Reaction.GetUnsentAll();
@@ -129,25 +135,52 @@ const AppManager = {
                     $Notice.Info(msg);
                     console.log(msg);
                 }
-            }, saveReactionSec); // 60秒おきに実行
+            }, saveReactionSec);
+            // ログインチェック
+            $Polling.Add($Polling.TASKS.SYNC_ACTIVITY, () => {
+                this.SyncActivityLog();
+            }, activityCheckSec);
         }
         // 定期タスク開始-----
         $Polling.Start($Polling.TASKS.OFFLINE_CHECK);
     },
-    // ログインフロー内に追加
-    async ExecuteLoginFlow() {
-        return await $Warn.CatchAsync(async () => {
-            $Notice.Info("ログイン中...");
-            const email = await $Auth.GetVerifiedEmailByGoogle();
-            const ret = await $Data.Access.LoginToServer(email);
-            if (ret) {
-                this.AppData.Context.IsLoggedIn = true;
-                this._saveSettings();
-                $Notice.Info("ログインに成功しました！");
-                return true;
-            }
-            return false;
-        })();
+    // 【ユーザ設定】カラーテーマ変更
+    ChangeTheme(theme){
+        this.AppData.Owner.Theme = theme;
+        this._saveSettings(); // 保存実行
+        $UI.ChangeTheme(theme);
+    },
+    // 【ユーザ設定】カラーテーマ変更
+    ChangeMapStyle(style){
+        this.AppData.Owner.MapStyle = style;
+        this._saveSettings(); // 保存実行
+        $Map.SetMapStyle(style);
+    },
+    // 【ユーザ設定】追従設定の変更メソッド
+    ChangeGpsTracking(sec) {
+        const targetSec = parseInt(sec || 0);
+        this.AppData.Owner.GpsTrackingSec = targetSec;
+        // 一旦既存のタスクを停止
+        $Polling.Stop($Polling.TASKS.GPS_FOLLOW);
+        // 秒数が1以上かつオンラインなら新しくタスクを開始
+        if (targetSec > 0 && this.AppData.Context.IsOnline) {
+            $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
+                $Marker.RefreshCurrentLocation();
+            }, targetSec);
+            $Polling.Start($Polling.TASKS.GPS_FOLLOW);
+        }
+        this._saveSettings(); // ローカルストレージに永続化
+    },
+    // 【ユーザ設定】通貨単位の変更メソッド
+    ChangeCurrency(unit) {
+        this.AppData.Owner.Currency_unit = unit;
+        this._saveSettings(); // 保存実行
+    },
+    // 【ユーザ設定】フォントサイズの変更メソッド
+    ChangeFontSize(size) {
+        this.AppData.Owner.FontSize = size;
+        this._saveSettings(); // 保存実行
+        $UI.ChangeFontSize(size);
     },
     // アプリ起動時フロー
     async Init() {
@@ -158,7 +191,7 @@ const AppManager = {
         if (this.AppData.Owner.Token) {
             this.AppData.Context.IsLoggedIn = true;
             // ユーザ存在チェック
-            let isSuccess = await $Data.Access.EnsureLoginUser();
+            let isSuccess = await this.SyncActivityLog();
             if (!isSuccess) {
                 return;
             }
@@ -314,6 +347,21 @@ const AppManager = {
             }
         }
     },
+    // ログイン処理
+    async ExecuteLoginFlow() {
+        return await $Warn.CatchAsync(async () => {
+            $Notice.Info("ログイン中...");
+            const email = await $Auth.GetVerifiedEmailByGoogle();
+            const isSuccess = await $Data.Access.LoginToServer(email);
+            if (isSuccess) {
+                this.AppData.Context.IsLoggedIn = true;
+                this._saveSettings();
+                $Notice.Info("ログインに成功しました！");
+                return true;
+            }
+            return false;
+        })();
+    },
     // ログアウト処理
     async Logout() {
         if (firebase.apps.length) {
@@ -327,43 +375,28 @@ const AppManager = {
         // 3. 必要であればIndexedDBのキャッシュ等も消すが、基本は上記2つで次回の自動ログインは防げます。
         console.log("Token destroyed and logged out.");
     },
-    // カラーテーマ変更
-    ChangeTheme(theme){
-        this.AppData.Owner.Theme = theme;
-        this._saveSettings(); // 保存実行
-        $UI.ChangeTheme(theme);
-    },
-    // カラーテーマ変更
-    ChangeMapStyle(style){
-        this.AppData.Owner.MapStyle = style;
-        this._saveSettings(); // 保存実行
-        $Map.SetMapStyle(style);
-    },
-    // 追従設定の変更メソッド
-    ChangeGpsTracking(sec) {
-        const targetSec = parseInt(sec || 0);
-        this.AppData.Owner.GpsTrackingSec = targetSec;
-        // 一旦既存のタスクを停止
-        $Polling.Stop($Polling.TASKS.GPS_FOLLOW);
-        // 秒数が1以上かつオンラインなら新しくタスクを開始
-        if (targetSec > 0 && this.AppData.Context.IsOnline) {
-            $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
-                $Marker.RefreshCurrentLocation();
-            }, targetSec);
-            $Polling.Start($Polling.TASKS.GPS_FOLLOW);
+    // 最終利用日をチェックし、必要があればサーバーへ通知する
+    async SyncActivityLog() {
+        // 未ログインまたはオフラインなら処理しない
+        if (!this.AppData.Context.IsLoggedIn || !this.AppData.Context.IsOnline) return;
+        //
+        // 1. 今日の日付（時刻00:00:00）のミリ秒を取得
+        const today = new Date().setHours(0, 0, 0, 0);
+        // 2. 前回の保存日を取得し、Dateに変換（nullなら 0 = 1970年扱いにする）
+        // これにより初回起動時も「今日 > 前回」が成立し、エラーにならず同期へ進む
+        const lastStr = this.AppData.Context.LastLoginDate;
+        const last = lastStr ? new Date(lastStr).setHours(0, 0, 0, 0) : 0;
+        // 3. 今日が保存日より後でなければ同期不要（すでに今日実行済み）
+        if (today <= last) return true;
+        // サーバー更新（ユーザチェックとログイン処理を同時にする）
+        const isSuccess = await $Data.Access.EnsureLoginUser();
+        if (isSuccess) {
+            // 成功時にローカルに保存することで、ローカルとサーバの最終更新日が一致する
+            this.AppData.Context.LastLoginDate = $Util.FormatDate(today, 'YYYY-MM-DD');
+            this._saveSettings(); // ローカルストレージへ永続化
+            return true;
         }
-        this._saveSettings(); // ローカルストレージに永続化
-    },
-    // 通貨単位の変更メソッド
-    ChangeCurrency(unit) {
-        this.AppData.Owner.Currency_unit = unit;
-        this._saveSettings(); // 保存実行
-    },
-    // フォントサイズの変更メソッド
-    ChangeFontSize(size) {
-        this.AppData.Owner.FontSize = size;
-        this._saveSettings(); // 保存実行
-        $UI.ChangeFontSize(size);
+        return false;
     },
 };
 

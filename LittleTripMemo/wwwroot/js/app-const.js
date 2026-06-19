@@ -13,8 +13,6 @@ window.$Const = {
         ADMIN_PW: "8855",
         SAVE_DETAIL_SEC: 300,
         SAVE_REACTION_SEC: 300,
-        // const saveDetailSec = 300;
-        // const saveReactionSec = 300;
     },
     // 地図設定
     MAP_CONFIG: {

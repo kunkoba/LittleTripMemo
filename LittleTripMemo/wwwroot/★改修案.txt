@@ -13,6 +13,10 @@ docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql
        ├── ? LittleTripMemo.csproj
        └── ? wwwroot
 
+★コンセプト
+　あなたの旅行コンテンツを一箇所にまとめられます
+　YouTube・Instagram・ブログへの回遊を作れます
+　
 
 ★改修案
 ・まとめ一覧画面のフィルタ
@@ -24,9 +28,14 @@ docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql
 ・ダイアログのサイズを変えたい
 ・管理者通報管理画面で、まとめが生きているか確認したい
 ・バック同期後のマーカー再生成は作成モードのみ
-・まとめリストのメモ数表示
 ・誰からのメールか分からない
-・ローカル?のゴミ掃除
+・限定公開フラグ（地図検索で出さない）
+・各メモのURLをクリックした数をカウントしたい
+・ユーザフォロー機能
+・まとめお気に入り登録機能
+・まとめ（旅行記）、メモ（スポット）
+・まとめをカテゴライズ（ドライブ、散歩、買い物、ほか）
+
 
 サーバ処理
 ・ユーザ情報に「BANフラグ」を持たせる（一生公開できないようにする）

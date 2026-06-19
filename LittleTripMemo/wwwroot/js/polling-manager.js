@@ -33,6 +33,7 @@ const PollingManager = {
         OFFLINE_CHECK: "network_check",
         DATA_DETAIL: "data_detail",
         DATA_REACTION: "data_reaction",
+        SYNC_ACTIVITY: "sync_activity", // ログインチェック
     },
     // 初期化
     Init(){
