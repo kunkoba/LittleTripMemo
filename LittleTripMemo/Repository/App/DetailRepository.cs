@@ -189,21 +189,19 @@ public class DetailRepository : _BaseRepository
         return await ExecuteAsync(sql, new { archive_id = archiveId, target_user_id = targetUserId });
     }
 
-    // Repository/DetailRepository.cs に追加
-
     /// <summary>
     /// 指定された seq リスト（未まとめ明細のみ）を論理削除する
     /// </summary>
     public async Task<int> DeleteStrayBySeqsAsync(int[] seqs)
     {
         string sql = $@"
-        UPDATE t_memo_detail_{_user.table_id} SET
-            del_flg    = true,
-            update_tim = CURRENT_TIMESTAMP
-        WHERE 
-            seq        = ANY(@seqs)
-            AND archive_id = 0
-            AND user_id    = @user_id";
+            UPDATE t_memo_detail_{_user.table_id} SET
+                del_flg    = true,
+                update_tim = CURRENT_TIMESTAMP
+            WHERE 
+                seq        = ANY(@seqs)
+                AND archive_id = 0
+                AND user_id    = @user_id";
 
         return await ExecuteAsync(sql, new { seqs, user_id = _user.login_user_id });
     }
@@ -214,15 +212,30 @@ public class DetailRepository : _BaseRepository
     public async Task<int> DetachBySeqsAsync(int[] seqs)
     {
         string sql = $@"
-        UPDATE t_memo_detail_{_user.table_id} SET
-            archive_id = 0,
-            update_tim = CURRENT_TIMESTAMP
-        WHERE 
-            seq        = ANY(@seqs)
-            AND archive_id > 0
-            AND user_id    = @user_id";
+            UPDATE t_memo_detail_{_user.table_id} SET
+                archive_id = 0,
+                update_tim = CURRENT_TIMESTAMP
+            WHERE 
+                seq        = ANY(@seqs)
+                AND archive_id > 0
+                AND user_id    = @user_id";
 
         return await ExecuteAsync(sql, new { seqs, user_id = _user.login_user_id });
+    }
+
+    /// <summary>
+    /// 公開済み明細取得（論理削除済みも含む）
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<TMemoDetail>> GetByArchiveIdWithDeletedAsync(int archiveId)
+    {
+        string sql = $@"
+            SELECT * 
+            FROM t_memo_detail_{_user.table_id} 
+            WHERE archive_id = @archive_id 
+            AND user_id = @user_id";
+        return await QueryAsync<TMemoDetail>(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
 }

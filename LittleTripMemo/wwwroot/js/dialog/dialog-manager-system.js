@@ -475,9 +475,9 @@ export default {
         editNicknameCount.textContent = (profile.nick_name || "").length;
         editDesc.value = profile.description || "";
         editDescCount.textContent = (profile.description || "").length;
-        editLink1.value = profile.link1 || "";
-        editLink2.value = profile.link2 || "";
-        editLink3.value = profile.link3 || "";
+        editLink1.value = profile.link_1 || "";
+        editLink2.value = profile.link_2 || "";
+        editLink3.value = profile.link_3 || "";
         editDesc.addEventListener('input', () => editDescCount.textContent = editDesc.value.length);
         editNickname.addEventListener('input', () => editNicknameCount.textContent = editNickname.value.length);
         $Dom.QuerySelector('#btn-profile-icon-trigger', el).onclick = () => {

@@ -178,4 +178,20 @@ public class ArchiveRepository : _BaseRepository
         return await QueryAsync<TMemoArchive>(sql, new { user_id = _user.login_user_id });
     }
 
+    /// <summary>
+    /// 公開済み明細取得
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <returns></returns>
+    public async Task<TMemoArchive?> GetByKeyWithDeletedAsync(int archiveId)
+    {
+        const string sql = @"
+            SELECT * 
+            FROM t_memo_archive 
+            WHERE archive_id = @archive_id 
+            AND user_id = @user_id
+            AND del_flg = true";
+        return await QuerySingleOrDefaultAsync<TMemoArchive>(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
+    }
+
 }

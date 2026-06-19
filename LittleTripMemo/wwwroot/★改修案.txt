@@ -37,6 +37,8 @@ docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql
 ・総まとめ数（公開、非公開）
 ・総メモ数
 ・総金額
+・登録日時
+・最終更新日時
 
 【管理者機能】
 　・管理者機能と分かるように見た目を変える
@@ -50,7 +52,8 @@ docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql
 　
 
             
-
+ bg-white text-red-500 border-2 border-red-200
+ 
 			// パスワード制御
             if (await $Util.CheckAdminAuth()) {
                 const isSuccess = await $Data.Access.GetAdminAllInfo();

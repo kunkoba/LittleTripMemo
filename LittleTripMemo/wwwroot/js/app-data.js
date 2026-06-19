@@ -1,6 +1,6 @@
 // ホスティングサーバ
-// const BaseUrl = "https://localhost:7292";
-const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
+const BaseUrl = "https://localhost:7292";
+// const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
 // const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
 
 // データ管理（通信・保持）を統合したオブジェクト

@@ -7,7 +7,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Private;
 
-public class PublishArchiveService : _BaseService
+/// <summary>
+/// 公開済みデータを完全に消去し、秘密側の最新状態で作り直すサービス
+/// </summary>
+public class RecreatePublicArchiveService : _BaseService
 {
     private readonly ITransactionProvider _provider;
     private readonly ArchiveRepository _archiveRepo;
@@ -16,14 +19,14 @@ public class PublishArchiveService : _BaseService
     private readonly DetailPubRepository _detailPubRepo;
     private readonly ReactionPubRepository _reactionPubRepo;
 
-    public record PublishArchiveReq(
+    public record RecreatePublicArchiveReq(
         [Required] Guid login_user_id,
         int archive_id
     ) : ILoginUserRequest;
 
     public record Response(int archiveId);
 
-    public PublishArchiveService(
+    public RecreatePublicArchiveService(
         UserContext userContext,
         ITransactionProvider provider,
         ArchiveRepository archiveRepo,
@@ -41,17 +44,26 @@ public class PublishArchiveService : _BaseService
         _reactionPubRepo = reactionPubRepo;
     }
 
-    public async Task<Response> ExecuteAsync(PublishArchiveReq req)
+    public async Task<Response> ExecuteAsync(RecreatePublicArchiveReq req)
     {
         await ValidateAsync(req);
 
         using var tran = _provider.BeginTransaction();
         try
         {
-            var archive = await _archiveRepo.GetByKeyAsync(req.archive_id);
-            BusinessException.ThrowIf(archive == null, "アーカイブが見つかりません");
+            // 1. 秘密アーカイブ取得（マスターデータ）
+            // ※公開済み（del_flg=true）のものを取得するため、専用の取得かフラグ無視の取得が必要
+            var archive = await _archiveRepo.GetByKeyWithDeletedAsync(req.archive_id);
+            BusinessException.ThrowIf(archive == null, "元データが見つかりません");
 
-            // 公開アーカイブを UPSERT (復活)
+            // 2. 既存の公開データを「物理削除」してリセット
+            await _detailPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
+            await _archivePubRepo.DeletePhysicalByKeyAsync(req.archive_id);
+
+            // 3. リアクションもリセット（古い構成のデータのため）
+            await _reactionPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
+
+            // 4. 公開アーカイブへ新規コピー（UpsertFromPrivateAsync を使用）
             var pubArchive = new TMemoArchivePub
             {
                 archive_id = archive.archive_id,
@@ -63,9 +75,10 @@ public class PublishArchiveService : _BaseService
             };
             await _archivePubRepo.RestoreArchiveAsync(pubArchive);
 
-            var details = await _detailRepo.GetByArchiveIdAsync(req.archive_id);
+            // 5. 秘密明細取得（del_flg=true のものも含めて取得）
+            var details = await _detailRepo.GetByArchiveIdWithDeletedAsync(req.archive_id);
 
-            // 公開明細を UPSERT (復活)
+            // 6. 公開明細へ新規コピー
             foreach (var detail in details)
             {
                 var pubDetail = new TMemoDetailPub
@@ -87,14 +100,7 @@ public class PublishArchiveService : _BaseService
                 await _detailPubRepo.RestoreDetailAsync(pubDetail);
             }
 
-            // 過去のリアクションがあれば、論理削除状態から復活させる
-            await _reactionPubRepo.RestoreLogicalByArchiveIdAsync(req.archive_id);
-
-            // 秘密アーカイブ・明細を論理削除
-            await _archiveRepo.DeleteLogicalByKeyAsync(req.archive_id);
-            await _detailRepo.DeleteByArchiveIdAsync(req.archive_id);
-
-            // 公開側の件数を反映させる
+            // 7. 公開側の件数を最新にする
             await _archivePubRepo.UpdateDetailCountAsync(req.archive_id);
 
             tran.Commit();
@@ -106,11 +112,11 @@ public class PublishArchiveService : _BaseService
         }
     }
 
-    private async Task ValidateAsync(PublishArchiveReq req)
+    private async Task ValidateAsync(RecreatePublicArchiveReq req)
     {
-        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
         BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
         BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが無効です");
         await Task.CompletedTask;
     }
+
 }

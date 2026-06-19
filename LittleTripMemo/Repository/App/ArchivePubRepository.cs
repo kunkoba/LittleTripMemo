@@ -75,7 +75,7 @@ public class ArchivePubRepository : _BaseRepository
     /// <summary>
     /// 秘密データから公開データへUPSERT（存在すれば最新化して復活、なければ挿入）
     /// </summary>
-    public async Task UpsertFromPrivateAsync(TMemoArchivePub pub)
+    public async Task RestoreArchiveAsync(TMemoArchivePub pub)
     {
         const string sql = @"
             INSERT INTO t_memo_archive_pub (
@@ -84,11 +84,8 @@ public class ArchivePubRepository : _BaseRepository
                 @archive_id, @user_id, @title, @memo, @link_url, @currency_unit, true, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
             )
             ON CONFLICT (archive_id) DO UPDATE SET
-                title = EXCLUDED.title,
-                memo = EXCLUDED.memo,
-                link_url = EXCLUDED.link_url,
-                currency_unit = EXCLUDED.currency_unit,
-                del_flg = false, -- 復活
+                del_flg = false, 
+                closed_flg = true, 
                 update_tim = CURRENT_TIMESTAMP";
         await ExecuteAsync(sql, pub);
     }
@@ -101,12 +98,31 @@ public class ArchivePubRepository : _BaseRepository
     public async Task<int> DeleteLogicalByKeyAsync(int archiveId)
     {
         const string sql = @"
-        UPDATE t_memo_archive_pub 
-        SET del_flg = true, update_tim = CURRENT_TIMESTAMP
-        WHERE archive_id = @archive_id AND user_id = @user_id";
+            UPDATE t_memo_archive_pub SET 
+                del_flg = true, 
+                update_tim = CURRENT_TIMESTAMP
+            WHERE archive_id = @archive_id 
+            AND user_id = @user_id";
         return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
+    /// <summary>
+    /// 主キーによる物理削除（再作成時などに使用）
+    /// </summary>
+    public async Task<int> DeletePhysicalByKeyAsync(int archiveId)
+    {
+        const string sql = @"
+            DELETE FROM t_memo_archive_pub
+            WHERE archive_id = @archive_id
+              AND user_id    = @user_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
+    }
+
+    /// <summary>
+    /// 公開（open）化
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <returns></returns>
     public async Task<int> OpenByKeyAsync(int archiveId)
     {
         const string sql = @"
@@ -118,6 +134,11 @@ public class ArchivePubRepository : _BaseRepository
         return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
+    /// <summary>
+    /// 公開解除（close）化
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <returns></returns>
     public async Task<int> CloseByKeyAsync(int archiveId)
     {
         const string sql = @"

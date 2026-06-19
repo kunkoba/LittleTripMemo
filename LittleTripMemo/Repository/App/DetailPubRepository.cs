@@ -74,7 +74,7 @@ public class DetailPubRepository : _BaseRepository
     /// <summary>
     /// 秘密データから公開データへUPSERT（存在すれば最新化して復活、なければ挿入）
     /// </summary>
-    public async Task UpsertFromPrivateAsync(TMemoDetailPub detail)
+    public async Task RestoreDetailAsync(TMemoDetailPub detail)
     {
         const string sql = @"
             INSERT INTO t_memo_detail_pub (
@@ -87,17 +87,7 @@ public class DetailPubRepository : _BaseRepository
                 @memo_price, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
             )
             ON CONFLICT (archive_id, seq) DO UPDATE SET
-                latitude = EXCLUDED.latitude,
-                longitude = EXCLUDED.longitude,
-                title = EXCLUDED.title,
-                body = EXCLUDED.body,
-                memo_date = EXCLUDED.memo_date,
-                memo_time = EXCLUDED.memo_time,
-                face_emoji = EXCLUDED.face_emoji,
-                weather_code = EXCLUDED.weather_code,
-                link_url = EXCLUDED.link_url,
-                memo_price = EXCLUDED.memo_price,
-                del_flg = false, -- 復活
+                del_flg = false,
                 update_tim = CURRENT_TIMESTAMP";
         await ExecuteAsync(sql, detail);
     }
@@ -110,9 +100,23 @@ public class DetailPubRepository : _BaseRepository
     public async Task<int> DeleteLogicalByArchiveIdAsync(int archiveId)
     {
         const string sql = @"
-        UPDATE t_memo_detail_pub 
-        SET del_flg = true, update_tim = CURRENT_TIMESTAMP
-        WHERE archive_id = @archive_id AND user_id = @user_id";
+            UPDATE t_memo_detail_pub SET 
+                del_flg = true, 
+                update_tim = CURRENT_TIMESTAMP
+            WHERE archive_id = @archive_id 
+            AND user_id = @user_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
+    }
+
+    /// <summary>
+    /// アーカイブIDに紐づく明細の物理削除（再作成時などに使用）
+    /// </summary>
+    public async Task<int> DeletePhysicalByArchiveIdAsync(int archiveId)
+    {
+        const string sql = @"
+            DELETE FROM t_memo_detail_pub
+            WHERE archive_id = @archive_id
+              AND user_id    = @user_id";
         return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
