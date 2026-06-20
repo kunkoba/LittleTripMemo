@@ -17,7 +17,8 @@ public class GetUserProfileService : _BaseService
         string? nick_name,
         string? description,
         string? link_1, string? link_2, string? link_3,
-        bool is_owner
+        bool is_owner,
+        Dictionary<string, ClickCountData> click_stats
     );
 
     public GetUserProfileService(UserContext userContext, AppUserRepository appUserRepository)
@@ -42,7 +43,8 @@ public class GetUserProfileService : _BaseService
             targetUser.link_1,
             targetUser.link_2,
             targetUser.link_3,
-            is_owner
+            is_owner,
+            targetUser.click_stats
         );
     }
 

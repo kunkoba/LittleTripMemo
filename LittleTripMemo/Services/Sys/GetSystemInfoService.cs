@@ -71,7 +71,8 @@ public class GetSystemInfoService : _BaseService
                     user.nick_name,
                     user.description,
                     user.link_1, user.link_2, user.link_3,
-                    is_owner: true // 自分の情報なので常にtrue
+                    is_owner: true,
+                    user.click_stats
                 );
             }
 

@@ -1,4 +1,5 @@
-﻿using LittleTripMemo.Common;
+﻿using Dapper;
+using LittleTripMemo.Common;
 using LittleTripMemo.Configs;
 using LittleTripMemo.DataAccess;
 using LittleTripMemo.DbContext;
@@ -9,7 +10,6 @@ using LittleTripMemo.Repository;
 using LittleTripMemo.Repository.App;
 using LittleTripMemo.Repository.Batch;
 using LittleTripMemo.Repository.Sys;
-using LittleTripMemo.Services;
 using LittleTripMemo.Services.Account;
 using LittleTripMemo.Services.Admin;
 using LittleTripMemo.Services.Private;
@@ -42,6 +42,13 @@ var builder = WebApplication.CreateBuilder(args);
 // DB接続文字列（appsettings.json から自動取得）
 var connectionString =
     builder.Configuration.GetConnectionString("LittleTripMemoConnStr");
+
+
+
+// --- Dapperのカスタム型マッピング登録 ---
+// click_stats で使用している Dictionary 型を JSONB として扱うように設定
+SqlMapper.AddTypeHandler(new JsonbTypeHandler<Dictionary<string, ClickCountData>>());
+
 
 
 // ======================================================================

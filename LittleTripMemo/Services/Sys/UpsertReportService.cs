@@ -10,11 +10,11 @@ public class UpsertReportService : _BaseService
     private readonly SysReportRepository _repo;
 
     public record UpsertReportReq(
-        [Required] Guid login_user_id, // ★ 追加
+        [Required] Guid login_user_id,
         Guid target_user_id, 
         long archive_id, 
         string? body
-    ) : ILoginUserRequest; // ★ インターフェースを実装
+    ) : ILoginUserRequest;
 
     public record Response(bool is_success);
 

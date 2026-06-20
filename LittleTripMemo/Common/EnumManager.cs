@@ -16,3 +16,11 @@ public enum UserNotificationKind : short
     Caution = 8,  // 注意（強制クローズ：t_memo_archive_pub.closed_flg = true）
     Warning = 9,  // 警告（強制公開停止：データが秘密側へ戻された）
 }
+
+// クリック統計の対象種別
+public enum ClickTargetType : short
+{
+    User = 1,
+    Archive = 2,
+    Detail = 3
+}

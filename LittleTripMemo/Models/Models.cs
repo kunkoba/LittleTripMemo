@@ -303,12 +303,13 @@ public class DtoMyReportDetail
 /// ユーザープロフィールの共通DTO
 /// </summary>
 public record DtoUserProfile(
-Guid user_id,
-string? icon,
-string? nick_name,
-string? description,
-string? link_1, string? link_2, string? link_3,
-bool is_owner
+    Guid user_id,
+    string? icon,
+    string? nick_name,
+    string? description,
+    string? link_1, string? link_2, string? link_3,
+    bool is_owner,
+    Dictionary<string, ClickCountData> click_stats
 );
 
 /// <summary>
@@ -319,6 +320,20 @@ public class ClickCountData
     public long t { get; set; } = 0; // total: 総クリック数
     public long u { get; set; } = 0; // user: ログインユーザー
     public long g { get; set; } = 0; // guest: ゲスト
+}
+
+/// <summary>
+/// クリックキューテーブル (tmp_click_queue) のエンティティ
+/// </summary>
+public class TClickQueue
+{
+    public ClickTargetType target_type { get; set; }
+    public Guid target_user_id { get; set; }
+    public int? archive_id { get; set; }
+    public long? seq { get; set; }
+    public string item_name { get; set; } = string.Empty;
+    public Guid? viewer_user_id { get; set; }
+    public DateTime create_tim { get; set; }
 }
 
 #endregion

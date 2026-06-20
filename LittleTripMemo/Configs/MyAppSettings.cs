@@ -17,6 +17,8 @@ public class MyAppSettings
     public int TableStatsUpdateIntervalMinutes { get; set; } = -1;   // テーブル件数集計
     public int GarbageCleanupIntervalMinutes { get; set; } = -1;    // 明細のゴミ掃除
     public int ClickAggregateIntervalMinutes { get; set; } = -1;    // クリック数の集計
+    public string DailyMaintenanceTime { get; set; } = "00:00";     // 日次メンテナンスの実行時刻（HH:mm形式）
+
 
 }
 

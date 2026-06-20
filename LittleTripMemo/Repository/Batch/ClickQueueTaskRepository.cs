@@ -23,9 +23,9 @@ public class ClickQueueTaskRepository : _BaseRepository
     {
         string sql = targetType switch
         {
-            1 => "SELECT click_stats FROM t_app_user WHERE user_id = @userId",
+            1 => "SELECT click_stats FROM t_app_user         WHERE user_id = @userId",
             2 => "SELECT click_stats FROM t_memo_archive_pub WHERE archive_id = @archiveId",
-            3 => "SELECT click_stats FROM t_memo_detail_pub WHERE archive_id = @archiveId AND seq = @seq",
+            3 => "SELECT click_stats FROM t_memo_detail_pub  WHERE archive_id = @archiveId AND seq = @seq",
             _ => throw new ArgumentException("Invalid targetType")
         };
         return await ExecuteScalarAsync<string>(sql, new { userId, archiveId, seq });
@@ -36,15 +36,15 @@ public class ClickQueueTaskRepository : _BaseRepository
     /// </summary>
     public async Task UpdateStatsJsonAsync(int targetType, Guid? userId, int? archiveId, long? seq, string json)
     {
-        var jsonb = JsonDocument.Parse(json).RootElement; // 確実にJSONとして渡す
+        //var jsonb = JsonDocument.Parse(json).RootElement; // 確実にJSONとして渡す
         string sql = targetType switch
         {
-            1 => "UPDATE t_app_user SET click_stats = @jsonb::jsonb WHERE user_id = @userId",
-            2 => "UPDATE t_memo_archive_pub SET click_stats = @jsonb::jsonb WHERE archive_id = @archiveId",
-            3 => "UPDATE t_memo_detail_pub SET click_stats = @jsonb::jsonb WHERE archive_id = @archiveId AND seq = @seq",
+            1 => "UPDATE t_app_user         SET click_stats = @json::jsonb WHERE user_id = @userId",
+            2 => "UPDATE t_memo_archive_pub SET click_stats = @json::jsonb WHERE archive_id = @archiveId",
+            3 => "UPDATE t_memo_detail_pub  SET click_stats = @json::jsonb WHERE archive_id = @archiveId AND seq = @seq",
             _ => throw new ArgumentException("Invalid targetType")
         };
-        await ExecuteAsync(sql, new { userId, archiveId, seq, jsonb });
+        await ExecuteAsync(sql, new { userId, archiveId, seq, json });
     }
 
     /// <summary>

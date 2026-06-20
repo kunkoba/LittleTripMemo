@@ -73,7 +73,8 @@ public class GetArchiveDetailsPubService : _BaseService
             user.nick_name,
             user.description,
             user.link_1, user.link_2, user.link_3,
-            is_owner: (user.user_id == _user.login_user_id)
+            is_owner: (user.user_id == _user.login_user_id),
+            user.click_stats
         );
 
         return new Response(archive, details, reactions, profile);

@@ -59,10 +59,7 @@ public class PublicController : _BaseController
     [AllowAnonymous]
     [HttpPost("AddClick")]
     public async Task<IActionResult> AddClick([FromBody] AddClickQueueService.AddClickReq req)
-    {
-        await _addClickQueueService.ExecuteAsync(req);
-        return Ok(); // 統計なので、レスポンスデータは不要
-    }
+        => OkWithBase(await _addClickQueueService.ExecuteAsync(req));
 
     #endregion
 

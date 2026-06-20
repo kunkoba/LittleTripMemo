@@ -194,14 +194,22 @@ const _DetailContentCore = {
         // URLの表示制御
         if (detail.link_url) {
             $Dom.ToggleShow(this.displayUrlWrapper, true);
-            // コンテナをクリアして新設ボタンを追加
-            this.displayUrlWrapper.innerHTML = "";
-            const params = { archive_id: detail.archive_id, seq: detail.seq, is_owner: detail.is_owner };
-            const btn = $UI.Generator.LinkButton(detail.link_url, params);
+            this.displayUrlWrapper.innerHTML = ""; // コンテナをクリア
+            // サーバー送信用パラメータ (AddClickReq 形式)
+            const params = {
+                target_type: 3, // ClickTargetType.Detail
+                target_user_id: detail.user_id,
+                archive_id: detail.archive_id,
+                seq: detail.seq,
+                item_name: "link_url"
+            };
+            // 第3引数に is_owner を渡し、Generator側でログ送信を判定
+            const btn = $UI.Generator.LinkButton(detail.link_url, params, detail.is_owner);
             if (btn) this.displayUrlWrapper.appendChild(btn);
         } else {
             $Dom.ToggleShow(this.displayUrlWrapper, false);
         }
+        // 絵文字
         this.displayFaceEmoji.textContent = detail.face_emoji || '😀';
         this.displayFaceEmojiBg.textContent = detail.face_emoji || '😀';
         this.displayWeatherEmoji.textContent = detail.weather_code || '0000';

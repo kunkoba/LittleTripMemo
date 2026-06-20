@@ -415,16 +415,26 @@ export default {
             $Dom.QuerySelector('#view-profile-nickname', el).textContent = pName;
             $Dom.QuerySelector('#view-profile-description', el).textContent = pDesc;
             const viewLinks = $Dom.QuerySelector('#view-profile-links', el);
-            viewLinks.innerHTML = "";
-            const links =[pL1, pL2, pL3].filter(l => l && l.trim() !== "");
-            links.forEach(l => {
-                // プロフィールリンクもトラッキング対象外（is_owner: true 扱いでログをスキップ）
-                const btn = $UI.Generator.LinkButton(l, { is_owner: true });
+            // 項目名と値のペアで定義し、入力があるもののみループ
+            [
+                { val: pL1, key: "link_1" },
+                { val: pL2, key: "link_2" },
+                { val: pL3, key: "link_3" }
+            ].forEach(item => {
+                if (!item.val || item.val.trim() === "") return;
+                // サーバー送信用パラメータ (AddClickReq 形式)
+                const params = {
+                    target_type: 1, // ClickTargetType.User
+                    target_user_id: profile.user_id,
+                    item_name: item.key
+                };
+                // ジェネレータでボタンを生成（第3引数は ShowUserProfile の引数 isOwner を使用）
+                const btn = $UI.Generator.LinkButton(item.val, params, isOwner);
                 if (btn) {
-                    btn.title = l; // ホバー時にURLを表示
+                    btn.title = item.val;
                     viewLinks.appendChild(btn);
                 }
-			});
+            });
         };
         renderView();
 		const headerButtons = [];

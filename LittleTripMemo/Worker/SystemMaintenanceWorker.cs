@@ -12,13 +12,15 @@ namespace LittleTripMemo.Worker;
 public class SystemMaintenanceWorker : BackgroundService
 {
     private readonly ILogger<SystemMaintenanceWorker> _logger;
-    private readonly IServiceScopeFactory _scopeFactory;    
-    private readonly IOptionsMonitor<MyAppSettings> _optionsMonitor;    // ★ IOptions ではなく IOptionsMonitor を使用（リアルタイム監視用）
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IOptionsMonitor<MyAppSettings> _optionsMonitor;
 
+    // 各タスクの次回予定時刻
     private DateTime _nextReactionUpdateTime;
     private DateTime _nextTableStatsUpdateTime;
     private DateTime _nextGarbageCleanupTime;
     private DateTime _nextClickAggregateTime;
+    private DateTime _nextDailyMaintenanceTime;
 
     public SystemMaintenanceWorker(
         ILogger<SystemMaintenanceWorker> logger,
@@ -34,24 +36,28 @@ public class SystemMaintenanceWorker : BackgroundService
     {
         _logger.LogInformation("--- システムメンテナンス・バッチを稼働中 ---");
 
-        // 初回実行予定を現在時刻にセット
+        // 初期設定の取得
+        var settings = _optionsMonitor.CurrentValue;
+
+        // 初回実行予定をセット
         _nextReactionUpdateTime = DateTime.Now;
         _nextTableStatsUpdateTime = DateTime.Now;
         _nextGarbageCleanupTime = DateTime.Now;
         _nextClickAggregateTime = DateTime.Now;
 
+        // 定時実行の初回予定計算
+        _nextDailyMaintenanceTime = CalculateNextRunTime(settings.DailyMaintenanceTime);
+
         while (!stoppingToken.IsCancellationRequested)
         {
             using (LogContext.PushProperty("CorrelationId", Guid.NewGuid().ToString()[..8]))
             {
-                // リアクション件数の再集計
+                // 各タスクの呼び出し（内部で判定と次回更新を行う）
                 await TaskUpdateReactionCountsAsync();
-                // テーブル統計の集計と管理テーブルの更新
                 await TaskUpdateTableStatisticsAsync();
-                // 明細データのゴミ掃除（削除済みデータの物理削除）
                 await TaskGarbageCleanupAsync();
-                // クリック数の集計と管理テーブルの更新
                 await TaskAggregateClickQueueAsync();
+                await TaskDailyMaintenanceAsync();
             }
 
             // 心拍（1分待機）
@@ -61,12 +67,6 @@ public class SystemMaintenanceWorker : BackgroundService
 
     #region "共通基盤"
 
-    /// <summary>
-    /// タスク実行
-    /// </summary>
-    /// <param name="taskName"></param>
-    /// <param name="action"></param>
-    /// <returns></returns>
     private async Task RunWithScopeAsync(string taskName, Func<IServiceScope, Task> action)
     {
         try
@@ -87,23 +87,14 @@ public class SystemMaintenanceWorker : BackgroundService
 
     #endregion
 
-    #region "各タスクの判定・実行・更新"
+    #region "間隔実行タスク"
 
-    /// <summary>
-    /// リアクション数の再集計タスク
-    /// </summary>
-    /// <returns></returns>
     private async Task TaskUpdateReactionCountsAsync()
     {
-        // 都度、設定値をチェック
         var settings = _optionsMonitor.CurrentValue;
-        if (settings.ReactionCountUpdateIntervalMinutes <= 0)
-        {
-            _logger.LogWarning("【設定警告】ReactionCountUpdateIntervalMinutes が不正なためスキップします。");
-            return;
-        }
-
         var now = DateTime.Now;
+
+        if (settings.ReactionCountUpdateIntervalMinutes <= 0) return;
 
         if (now >= _nextReactionUpdateTime)
         {
@@ -112,21 +103,15 @@ public class SystemMaintenanceWorker : BackgroundService
                 var repo = scope.ServiceProvider.GetRequiredService<DetailPubRepository>();
                 await repo.UpdateAllReactionCountsAsync();
             });
-
-            // 3. 次回予定の計算（この時点の最新設定値を使って AddMinutes する）
             _nextReactionUpdateTime = now.AddMinutes(settings.ReactionCountUpdateIntervalMinutes);
         }
     }
 
-    /// <summary>
-    /// 各テーブルのレコード数・ユーザー数を集計して管理テーブルを更新する
-    /// </summary>
     private async Task TaskUpdateTableStatisticsAsync()
     {
         var settings = _optionsMonitor.CurrentValue;
         var now = DateTime.Now;
 
-        // 設定値チェック
         if (settings.TableStatsUpdateIntervalMinutes <= 0 || settings.MaxTableNum <= 0) return;
 
         if (now >= _nextTableStatsUpdateTime)
@@ -134,59 +119,44 @@ public class SystemMaintenanceWorker : BackgroundService
             await RunWithScopeAsync("テーブル統計集計", async (scope) =>
             {
                 var repo = scope.ServiceProvider.GetRequiredService<TableStatisticsTaskRepository>();
-
-                // 設定されている最大テーブル数分、ループして集計を実行
                 for (int i = 1; i <= settings.MaxTableNum; i++)
                 {
-                    // レコードがなければ作成、あれば更新
                     await repo.EnsureManagerRecordExistsAsync(i);
                     await repo.SyncStatisticsAsync(i);
                 }
             });
-            // 次回予定を更新
             _nextTableStatsUpdateTime = now.AddMinutes(settings.TableStatsUpdateIntervalMinutes);
         }
     }
 
-    /// <summary>
-    /// 不要な論理削除データの物理削除（ゴミ掃除）を実行する
-    /// </summary>
     private async Task TaskGarbageCleanupAsync()
     {
         var settings = _optionsMonitor.CurrentValue;
         var now = DateTime.Now;
 
-        // 設定値チェック
         if (settings.GarbageCleanupIntervalMinutes <= 0) return;
 
         if (now >= _nextGarbageCleanupTime)
         {
-            await RunWithScopeAsync("論理削除済みの明細データを物理削除", async (scope) =>
+            await RunWithScopeAsync("論理削除データの物理削除", async (scope) =>
             {
                 var repo = scope.ServiceProvider.GetRequiredService<TableStatisticsTaskRepository>();
-
-                // 1. 秘密側（野良メモ限定）の掃除
                 for (int i = 1; i <= settings.MaxTableNum; i++)
                 {
                     await repo.DeleteOldGarbageDetailsAsync(i);
                 }
-
-                // 2. 公開側（アーカイブ・明細）の掃除
                 await repo.DeleteOldGarbagePublicAsync();
             });
-
-            // 次回予定を更新
             _nextGarbageCleanupTime = now.AddMinutes(settings.GarbageCleanupIntervalMinutes);
         }
     }
 
-    /// <summary>
-    /// クリックキューを集計して各テーブルの JSONB カラムに反映する
-    /// </summary>
     private async Task TaskAggregateClickQueueAsync()
     {
         var settings = _optionsMonitor.CurrentValue;
         var now = DateTime.Now;
+
+        if (settings.ClickAggregateIntervalMinutes <= 0) return;
 
         if (now >= _nextClickAggregateTime)
         {
@@ -197,49 +167,72 @@ public class SystemMaintenanceWorker : BackgroundService
                 if (!queueItems.Any()) return;
 
                 var lastProcessTime = DateTime.MinValue;
+                var targetGroups = queueItems.GroupBy(q => new { t = (int)q.target_type, u = (Guid?)q.target_user_id, a = (int?)q.archive_id, s = (long?)q.seq });
 
-                // 1. キューを「ターゲットごと」にグループ化して集計
-                var grouped = queueItems.GroupBy(q => new {
-                    t = (int)q.target_type,
-                    u = (Guid?)q.target_user_id,
-                    a = (int?)q.archive_id,
-                    s = (long?)q.seq
-                });
-
-                foreach (var group in grouped)
+                foreach (var targetGroup in targetGroups)
                 {
-                    // 現在の JSON を取得
-                    var currentJson = await repo.GetCurrentStatsJsonAsync(group.Key.t, group.Key.u, group.Key.a, group.Key.s);
-                    var statsMap = string.IsNullOrEmpty(currentJson)
-                        ? new Dictionary<string, ClickCountData>()
-                        : JsonSerializer.Deserialize<Dictionary<string, ClickCountData>>(currentJson) ?? new();
+                    var currentJson = await repo.GetCurrentStatsJsonAsync(targetGroup.Key.t, targetGroup.Key.u, targetGroup.Key.a, targetGroup.Key.s);
+                    var statsMap = string.IsNullOrEmpty(currentJson) ? new Dictionary<string, ClickCountData>() : JsonSerializer.Deserialize<Dictionary<string, ClickCountData>>(currentJson) ?? new();
 
-                    // このグループ内のクリックを加算
-                    foreach (var item in group)
+                    foreach (var itemGroup in targetGroup.GroupBy(i => (string)i.item_name))
                     {
-                        string key = item.item_name;
+                        string key = itemGroup.Key;
                         if (!statsMap.ContainsKey(key)) statsMap[key] = new ClickCountData();
-
-                        statsMap[key].t++; // 総数
-                        if (item.viewer_user_id != null) statsMap[key].u++; // ユーザー
-                        else statsMap[key].g++; // ゲスト
-
-                        if ((DateTime)item.create_tim > lastProcessTime) lastProcessTime = (DateTime)item.create_tim;
+                        statsMap[key].t += itemGroup.Count();
+                        statsMap[key].u += itemGroup.Where(x => x.viewer_user_id != null).Select(x => (Guid)x.viewer_user_id).Distinct().Count();
+                        statsMap[key].g += itemGroup.Count(x => x.viewer_user_id == null);
                     }
 
-                    // 更新
-                    var updatedJson = JsonSerializer.Serialize(statsMap);
-                    await repo.UpdateStatsJsonAsync(group.Key.t, group.Key.u, group.Key.a, group.Key.s, updatedJson);
-                }
+                    var maxTime = targetGroup.Max(x => (DateTime)x.create_tim);
+                    if (maxTime > lastProcessTime) lastProcessTime = maxTime;
 
-                // 2. 処理済みの時刻までキューを削除
-                if (lastProcessTime > DateTime.MinValue)
-                {
-                    await repo.DeleteProcessedQueueAsync(lastProcessTime);
+                    await repo.UpdateStatsJsonAsync(targetGroup.Key.t, targetGroup.Key.u, targetGroup.Key.a, targetGroup.Key.s, JsonSerializer.Serialize(statsMap));
                 }
+                if (lastProcessTime > DateTime.MinValue) await repo.DeleteProcessedQueueAsync(lastProcessTime);
+            });
+            _nextClickAggregateTime = now.AddMinutes(settings.ClickAggregateIntervalMinutes);
+        }
+    }
+
+    #endregion
+
+    #region "定時実行タスク"
+
+    /// <summary>
+    /// 次回の実行時刻を計算する
+    /// </summary>
+    /// 
+    private DateTime CalculateNextRunTime(string timeStr)
+    {
+        if (!TimeSpan.TryParse(timeStr, out var timeOfDay))
+        {
+            _logger.LogWarning("【時刻設定エラー】{TimeStr} の形式が不正です。00:00 を使用します。", timeStr);
+            timeOfDay = TimeSpan.Zero;
+        }
+
+        var now = DateTime.Now;
+        var nextRun = now.Date.Add(timeOfDay);
+
+        if (now >= nextRun) nextRun = nextRun.AddDays(1);
+
+        return nextRun;
+    }
+
+    private async Task TaskDailyMaintenanceAsync()
+    {
+        var now = DateTime.Now;
+
+        if (now >= _nextDailyMaintenanceTime)
+        {
+            await RunWithScopeAsync("日次メンテナンス", async (scope) =>
+            {
+                _logger.LogInformation("日次バッチ処理（0時等の定刻処理）を実行します...");
+                // 今後、日次でやりたい処理（古いログの圧縮など）をここに追加
+                await Task.CompletedTask;
             });
 
-            _nextClickAggregateTime = now.AddMinutes(settings.ClickAggregateIntervalMinutes);
+            // 実行後、最新の設定値に基づいて「明日の同時刻」を再計算
+            _nextDailyMaintenanceTime = CalculateNextRunTime(_optionsMonitor.CurrentValue.DailyMaintenanceTime);
         }
     }
 

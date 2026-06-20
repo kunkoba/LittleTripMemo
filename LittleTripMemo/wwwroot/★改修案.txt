@@ -76,6 +76,7 @@ docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql
 　　・特定ユーザとの個別通知（やりとり）を管理したい
 　　・ユーザ画面の受信BOXと送信履歴（管理者
 　　・強制非公開にした履歴を残す（ユーザID、archiveID、日付、区分（警告、停止））
+　・フィードバック１～５まで、一括区分分けで取得）
 
             
  bg-white text-red-500 border-2 border-red-200

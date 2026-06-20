@@ -1026,14 +1026,19 @@ export default {
             $Dom.QuerySelector('#view-mem-title', el).textContent = currentArchive.title || "";
             $Dom.QuerySelector('#view-mem-body', el).textContent = currentArchive.memo || "";
             // --- URLリンクの反映（スクロール領域内） ---
-            // const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
             const urlWrapper = $Dom.QuerySelector('#view-mem-url-wrapper', el);
             if (currentArchive.link_url) {
                 $Dom.ToggleShow(urlWrapper, true);
-                urlWrapper.innerHTML = "";
-                // 親アーカイブ単位のクリックとして送信（seqなし）
-                const params = { archive_id: currentArchive.archive_id, is_owner: currentArchive.is_owner };
-                const btn = $UI.Generator.LinkButton(currentArchive.link_url, params);
+                urlWrapper.innerHTML = ""; // コンテナをクリア
+                // サーバー送信用パラメータ (AddClickReq 形式)
+                const params = {
+                    target_type: 2, // ClickTargetType.Archive
+                    target_user_id: currentArchive.user_id,
+                    archive_id: currentArchive.archive_id,
+                    item_name: "link_url"
+                };
+                // ジェネレータでボタンを生成（第3引数に is_owner を渡す）
+                const btn = $UI.Generator.LinkButton(currentArchive.link_url, params, currentArchive.is_owner);
                 if (btn) urlWrapper.appendChild(btn);
             } else {
                 $Dom.ToggleShow(urlWrapper, false);

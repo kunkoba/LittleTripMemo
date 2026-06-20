@@ -31,7 +31,8 @@ const UI_Manager = {
     // パーツ生成を担うジェネレータ
     Generator: {
         // 安全なドメインのホワイトリスト
-        SAFE_DOMAINS: ['youtube.com', 'youtu.be', 'twitter.com', 'x.com', 'instagram.com', 'facebook.com', 'tiktok.com', 'github.com', 'google.com', 'google.co.jp', 'maps.app.goo.gl'],
+        SAFE_DOMAINS: ['youtube.com', 'youtu.be', 'twitter.com', 'x.com', 'instagram.com', 
+			'facebook.com', 'tiktok.com', 'github.com', 'google.com', 'google.co.jp', 'maps.app.goo.gl'],
         // URLの安全判定
         IsSafeUrl(url) {
             try {
@@ -39,34 +40,39 @@ const UI_Manager = {
                 return this.SAFE_DOMAINS.some(domain => hostname === domain || hostname.endsWith('.' + domain));
             } catch (e) { return false; }
         },
-        // URLリンクボタンの生成
-        LinkButton(url, params = null) {
+        // URLリンクボタンの生成（安全確認とトラッキング機能を内包）
+        LinkButton(url, params = null, isOwner = false) {
             if (!url) return null;
-            // テンプレートからボタン生成
+            // テンプレートからボタンDOMを生成
             const btn = $Dom.GenerateTemplate("tpl-link-button", "ui-template-root");
-            // アイコン注入（サイズは28px固定）
+            // アイコンの注入（サイズは28px固定）
             btn.innerHTML = $Util.GetUrlIconHtml(url, 28);
-            // クリックイベントの定義
+            // クリック時の振る舞いを定義
             btn.onclick = async (e) => {
                 e.stopPropagation();
-                // 1. オンラインチェック
+                // 1. 通信状態の確認
                 if (!$App.AppData.Context.IsOnline) {
                     $Notice.Warn("オフライン中は、外部リンクを開けません。");
                     return;
                 }
-                // 2. 安全確認（移設したメソッドを呼び出し）
+                // 2. ホワイトリストによる安全性の判定
                 const isSafe = this.IsSafeUrl(url);
                 const title = isSafe ? "外部サイトを開く" : "セキュリティ警告";
-                const message = isSafe ? `次のリンクを開きます。よろしいですか？\n\n${url}` : `安全性が確認されていないURLです。\n移動にはご注意ください。\n\n${url}`;
-                // 3. 確認ダイアログ
+                // 信頼できないURLの場合はGoogle検索を経由する旨をユーザーに通知
+                const message = isSafe 
+                    ? `次のリンクを開きます。よろしいですか？\n\n${url}`
+                    : `安全性が確認されていないURLのため、Google検索結果を経由して開きます。\n\n${url}`;
+                // 3. ユーザーの最終確認
                 const isOk = await $Dialog.ShowConfirm({ title, message });
                 if (!isOk) return;
-                // 4. クリックログ送信（自分のデータでない場合のみ）
-                if (params && !params.is_owner) {
-                    $Data.Access.AddClick({ ...params, link_url: url });
+                // 4. クリック統計の送信（他人のデータ、かつパラメータがある場合のみ実行）
+                if (params && !isOwner) {
+                    $Data.Access.LogLinkClick(params);
                 }
-                // 5. 遷移
-                window.open(url, '_blank', 'noopener,noreferrer');
+                // 5. 遷移先の決定と実行
+                // 安全なら直接URLへ、不審ならGoogle検索クエリとして構築
+                const finalUrl = isSafe ? url : `https://www.google.com/search?q=${encodeURIComponent(url)}`;
+                window.open(finalUrl, '_blank', 'noopener,noreferrer');
             };
             return btn;
         },
