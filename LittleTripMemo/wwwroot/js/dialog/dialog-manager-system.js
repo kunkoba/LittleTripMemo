@@ -87,7 +87,7 @@ export default {
         }
         // 4. 各ボタンのイベント登録
         b.profile.onclick = async () => {
-            this._core.close();
+            // this._core.close();
             this.ShowUserProfile($App.AppData.Owner.SystemInfo.ownerProfile, true)
         };
         b.config.onclick = () => {
@@ -95,7 +95,7 @@ export default {
             this.ShowUserSettingsMenu()
         };
         b.notice.onclick = () => {
-            this._core.close();
+            // this._core.close();
             this.ShowNoticeList()
         };
         b.version.onclick = () => {

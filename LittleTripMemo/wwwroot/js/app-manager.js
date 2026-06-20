@@ -137,8 +137,14 @@ const AppManager = {
                 }
             }, saveReactionSec);
             // ログインチェック
-            $Polling.Add($Polling.TASKS.SYNC_ACTIVITY, () => {
-                this.SyncActivityLog();
+            $Polling.Add($Polling.TASKS.SYNC_ACTIVITY, async () => {
+                console.log("$Polling.TASKS.SYNC_ACTIVITY");
+                // ユーザ存在チェック＆最終ログイン日時設定
+                let isSuccess = await this.SyncActivityLog();
+                if (!isSuccess) {
+                    $Dialog.ShowLoginDialog();
+                    return;
+                }
             }, activityCheckSec);
         }
         // 定期タスク開始-----
@@ -190,9 +196,10 @@ const AppManager = {
         // 最初に設定をロードし、トークンがあればログイン状態にしておく
         if (this.AppData.Owner.Token) {
             this.AppData.Context.IsLoggedIn = true;
-            // ユーザ存在チェック
+            // ユーザ存在チェック＆最終ログイン日時設定
             let isSuccess = await this.SyncActivityLog();
             if (!isSuccess) {
+                $Dialog.ShowLoginDialog();
                 return;
             }
             // システム情報取得
@@ -314,6 +321,8 @@ const AppManager = {
         $UI.ChangeScreenMode();
         // マーカー更新
         $Marker.ChangeScreenMode();
+        // // 不要になったらクリア
+        // this.AppData.Context.TargetArchiveId = 0;
     },
     // サーバエラー処理
     async HandleServerFailure(response) {
@@ -394,6 +403,7 @@ const AppManager = {
             // 成功時にローカルに保存することで、ローカルとサーバの最終更新日が一致する
             this.AppData.Context.LastLoginDate = $Util.FormatDate(today, 'YYYY-MM-DD');
             this._saveSettings(); // ローカルストレージへ永続化
+            $Notice.Info("最終ログイン日時は更新されました。");
             return true;
         }
         return false;

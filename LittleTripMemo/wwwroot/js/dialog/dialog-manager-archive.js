@@ -666,14 +666,14 @@ export default {
             buttons: [[
                 {
                     id: "btn-ms-merge",
-                    label: "⇄ MERGE",
+                    label: "create",
                     className: "disabled:opacity-50",
                     handler: async () => {
                         const seqs = Array.from(selectedSeqs);
                         const isOk = await this.ShowConfirm({
                             title: "MERGE",
                             help: "",
-                            message: `${seqs.length}件のアイテムを\n新しいまとめにしますか？`
+                            message: `${seqs.length}件のメモから\n新しいまとめを作成しますか？`
                         });
                         if (!isOk) return;
                         const isSuccess = await $Data.Access.MergeDetails({

@@ -290,6 +290,7 @@ const MarkerController = {
                 const seq = $App.AppData.Context.TargetSeq;
                 if (seq > 0) {
                     $Marker.FocusBySeq(seq);
+                    $App.AppData.Context.TargetSeq = -1;    // 不要になったらクリア
                 } else {
                     this.FocusFirst();
                 }
@@ -383,8 +384,6 @@ const MarkerController = {
         if (index !== -1) {
             // 見つかったら既存の選択メソッドを実行（移動・強調・ポップアップが走る）
             this.SelectMarker(index);
-        } else {
-            console.warn(`Marker with seq ${seq} not found.`);
         }
     },
 };

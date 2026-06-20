@@ -6,6 +6,7 @@ using LittleTripMemo.Repository.Batch;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 using System.Text.Json;
+using static Dapper.SqlMapper;
 
 namespace LittleTripMemo.Worker;
 
@@ -21,6 +22,7 @@ public class SystemMaintenanceWorker : BackgroundService
     private DateTime _nextGarbageCleanupTime;
     private DateTime _nextClickAggregateTime;
     private DateTime _nextDailyMaintenanceTime;
+    private string _lastDailyMaintenanceTimeSetting;
 
     public SystemMaintenanceWorker(
         ILogger<SystemMaintenanceWorker> logger,
@@ -47,6 +49,7 @@ public class SystemMaintenanceWorker : BackgroundService
 
         // 定時実行の初回予定計算
         _nextDailyMaintenanceTime = CalculateNextRunTime(settings.DailyMaintenanceTime);
+        _lastDailyMaintenanceTimeSetting = settings.DailyMaintenanceTime;
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -220,7 +223,16 @@ public class SystemMaintenanceWorker : BackgroundService
 
     private async Task TaskDailyMaintenanceAsync()
     {
+        var settings = _optionsMonitor.CurrentValue;
         var now = DateTime.Now;
+
+        // 設定ファイル（文字列）が変更されていたら、即座に次回予定を再計算する
+        if (settings.DailyMaintenanceTime != _lastDailyMaintenanceTimeSetting)
+        {
+            _nextDailyMaintenanceTime = CalculateNextRunTime(settings.DailyMaintenanceTime);
+            _lastDailyMaintenanceTimeSetting = settings.DailyMaintenanceTime;
+            _logger.LogInformation("【時刻設定変更検知】次回の実行予定を {Time} に更新しました。", _nextDailyMaintenanceTime.ToString("yyyy/MM/dd HH:mm"));
+        }
 
         if (now >= _nextDailyMaintenanceTime)
         {

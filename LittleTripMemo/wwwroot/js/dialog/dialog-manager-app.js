@@ -78,7 +78,8 @@ export default {
         };
         b.reload.onclick = () => {
             this._core.close();
-            $Util.ReloadApp();
+            // $Util.ReloadApp();
+            $App.RefreshScreen();
         };
         //
         this._core.open({
