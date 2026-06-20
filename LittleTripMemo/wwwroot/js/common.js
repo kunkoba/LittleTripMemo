@@ -95,12 +95,6 @@ window.$Dom = {
 
 // 汎用処理
 window.$Util = {
-    SAFE_DOMAINS: [
-        'youtube.com', 'youtu.be', 'twitter.com', 'x.com',
-        'instagram.com', 'facebook.com', 'tiktok.com', 'github.com',
-        'google.com', 'google.co.jp', 'maps.app.goo.gl',
-        // window.location.hostname // 自サイト
-    ],
     // 日付オブジェクトを文字列に変換（デフォルトをハイフン区切りに変更）
     FormatDate(dateObj = new Date(), format = 'YYYY-MM-DD　HH:mm') {
         dateObj = new Date(dateObj);
@@ -260,43 +254,6 @@ window.$Util = {
             return parseInt(atob(b64));
         } catch (e) {
             return 0;
-        }
-    },
-    // 安全なURLかホワイトリストチェック
-    IsSafeUrl(url) {
-        try {
-            const hostname = new URL(url).hostname.toLowerCase();
-            return this.SAFE_DOMAINS.some(domain => hostname === domain || hostname.endsWith('.' + domain));
-        } catch (e) {
-            return false;
-        }
-    },
-    // 遷移用のアクション関数
-    async OpenSafeUrl(url) {
-        if (!url) return;
-        if (!$App.AppData.Context.IsOnline) {
-            $Notice.Warn("オフライン中は、機能が制限されます。");
-            return;
-        }
-        const isSafe = this.IsSafeUrl(url);
-        // ダイアログのメッセージとボタン名を変える
-        const title = isSafe ? "外部アプリ/サイトを開く" : "セキュリティ警告";
-        const message = isSafe 
-            ? `次のリンクを開きます。よろしいですか？\n\n${url}`
-            : `安全性が確認されていないURLなので\ngoogle検索結果からリンクしてください。\n\n${url}`;
-        // 必ず確認ダイアログを出す
-        const isOk = await $Dialog.ShowConfirm({
-            title: title,
-            message: message,
-        });
-        if (!isOk) return; // キャンセルなら何もしない
-        if (isSafe) {
-            // ホワイトリストならそのまま飛ぶ（アプリ連動）
-            window.open(url, '_blank', 'noopener,noreferrer');
-        } else {
-            // ホワイトリスト外ならGoogle検索へ
-            const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(url)}`;
-            window.open(searchUrl, '_blank', 'noopener,noreferrer');
         }
     },
     // ステータス用バッヂ制御（UI）

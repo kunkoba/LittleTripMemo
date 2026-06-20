@@ -19,6 +19,7 @@ public class PublicController : _BaseController
     private readonly UpdateArchivePubService _updateArchivePubService;
     private readonly UpdateDetailPubService _updateDetailPubService;
     private readonly BulkSyncReactionService _bulkSyncReactionService;
+    private readonly AddClickQueueService _addClickQueueService;
 
     public PublicController(
         UserContext userContext,
@@ -29,7 +30,8 @@ public class PublicController : _BaseController
         CloseArchiveService closeArchiveService,
         UpdateArchivePubService updateArchivePubService,
         UpdateDetailPubService updateDetailPubService,
-        BulkSyncReactionService bulkSyncReactionService
+        BulkSyncReactionService bulkSyncReactionService,
+        AddClickQueueService addClickQueueService
     ) : base(userContext)
     {
         _getArchiveDetailsPubService = getArchiveDetailsPubService;
@@ -40,7 +42,10 @@ public class PublicController : _BaseController
         _updateArchivePubService = updateArchivePubService;
         _updateDetailPubService = updateDetailPubService;
         _bulkSyncReactionService = bulkSyncReactionService;
+        _addClickQueueService = addClickQueueService;
     }
+
+    #region "未ログイン"
 
     [AllowAnonymous]
     [HttpGet("GetArchiveDetailsPub/{encodedId}")]
@@ -50,6 +55,18 @@ public class PublicController : _BaseController
         if (archiveId <= 0) return NotFound();
         return OkWithBase(await _getArchiveDetailsPubService.ExecuteAsync(new(archiveId)));
     }
+
+    [AllowAnonymous]
+    [HttpPost("AddClick")]
+    public async Task<IActionResult> AddClick([FromBody] AddClickQueueService.AddClickReq req)
+    {
+        await _addClickQueueService.ExecuteAsync(req);
+        return Ok(); // 統計なので、レスポンスデータは不要
+    }
+
+    #endregion
+
+    #region "ログイン前提"
 
     [HttpPost("SearchByLocationPub")]
     public async Task<IActionResult> SearchByLocationPub([FromBody] SearchByLocationPubService.SearchByLocationPubReq req)
@@ -78,5 +95,7 @@ public class PublicController : _BaseController
     [HttpPost("BulkSyncReactions")]
     public async Task<IActionResult> BulkSyncReactions([FromBody] BulkSyncReactionService.BulkSyncReactionReq req)
         => OkWithBase(await _bulkSyncReactionService.ExecuteAsync(req));
+
+    #endregion
 
 }

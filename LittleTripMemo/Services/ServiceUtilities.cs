@@ -77,59 +77,59 @@ public static class ServiceUtilities
     /// </summary>
     /// <param name="origin">元の文字列</param>
     /// <returns>エンコード済み文字列</returns>
-    public static string EncodeBase64_2(string origin)
-    {
-        if (string.IsNullOrEmpty(origin))
-            return string.Empty;
+    //public static string EncodeBase64_2(string origin)
+    //{
+    //    if (string.IsNullOrEmpty(origin))
+    //        return string.Empty;
 
-        var bytes = System.Text.Encoding.UTF8.GetBytes(origin);
-        var base64 = Convert.ToBase64String(bytes);
+    //    var bytes = System.Text.Encoding.UTF8.GetBytes(origin);
+    //    var base64 = Convert.ToBase64String(bytes);
 
-        var chars = base64.TrimEnd('=').ToCharArray();
-        Array.Reverse(chars);
+    //    var chars = base64.TrimEnd('=').ToCharArray();
+    //    Array.Reverse(chars);
 
-        return new string(chars);
-    }
+    //    return new string(chars);
+    //}
 
     /// <summary>
     /// EncodeBase64 でエンコードされた文字列を元に戻します。
     /// </summary>
     /// <param name="encoded">エンコード済み文字列</param>
     /// <returns>復号後の文字列</returns>
-    public static string DecodeBase64_2(string encoded)
-    {
-        if (string.IsNullOrEmpty(encoded))
-            return string.Empty;
+    //public static string DecodeBase64_2(string encoded)
+    //{
+    //    if (string.IsNullOrEmpty(encoded))
+    //        return string.Empty;
 
-        // 逆順に戻す
-        var chars = encoded.ToCharArray();
-        Array.Reverse(chars);
+    //    // 逆順に戻す
+    //    var chars = encoded.ToCharArray();
+    //    Array.Reverse(chars);
 
-        var reversed = new string(chars);
+    //    var reversed = new string(chars);
 
-        // Base64の長さを4の倍数に調整
-        while (reversed.Length % 4 != 0)
-            reversed += "=";
+    //    // Base64の長さを4の倍数に調整
+    //    while (reversed.Length % 4 != 0)
+    //        reversed += "=";
 
-        var bytes = Convert.FromBase64String(reversed);
-        return System.Text.Encoding.UTF8.GetString(bytes);
-    }
+    //    var bytes = Convert.FromBase64String(reversed);
+    //    return System.Text.Encoding.UTF8.GetString(bytes);
+    //}
 
     /// <summary>
     /// 暗号化
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public static string EncodeId(int id)
-    {
-        string origin = id.ToString();
-        var bytes = System.Text.Encoding.UTF8.GetBytes(origin);
-        var base64 = Convert.ToBase64String(bytes).TrimEnd('='); // パディング削除
+    //public static string EncodeId(int id)
+    //{
+    //    string origin = id.ToString();
+    //    var bytes = System.Text.Encoding.UTF8.GetBytes(origin);
+    //    var base64 = Convert.ToBase64String(bytes).TrimEnd('='); // パディング削除
 
-        var chars = base64.ToCharArray();
-        Array.Reverse(chars); // 文字列反転
-        return new string(chars);
-    }
+    //    var chars = base64.ToCharArray();
+    //    Array.Reverse(chars); // 文字列反転
+    //    return new string(chars);
+    //}
 
     /// <summary>
     /// 復号化

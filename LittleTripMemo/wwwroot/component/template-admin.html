@@ -111,7 +111,7 @@
     </div>
 </template>
 
-<!-- 【ダイアログ子】管理者通報詳細 (修正) -->
+<!-- 【ダイアログ子】管理者通報詳細 -->
 <template id="tpl-admin-report-detail_2">
     <div class="w-full text-black-5 flex flex-col h-full overflow-hidden">
         <div class="shrink-0 p-4 border-b border-brand-2 bg-slate-50 relative mb-3 gap-2">
@@ -132,7 +132,6 @@
         </div>
     </div>
 </template>
-<!-- template-admin.html -> tpl-admin-report-detail -->
 <template id="tpl-admin-report-detail">
     <div class="w-full text-black-5 flex flex-col h-full overflow-hidden">
         <div class="shrink-0 p-4 border-b border-brand-2 bg-slate-50 relative mb-3">
@@ -142,10 +141,6 @@
             <!-- ユーザ情報アイコン -->
             <div class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-1">Target User</div>
             <div id="view-report-target-user-wrapper">
-                <button id="btn-report-target-profile" class="border border-slate-100 rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
-                    <span id="view-report-target-icon" class="text-[1.4rem] drop-shadow-md">👤</span>
-                    <span id="view-report-target-name" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
-                </button>
             </div>
             <!-- 追加：管理者用アクションボタン -->
             <div class="flex gap-2 mt-4">
@@ -183,11 +178,8 @@
             <div class="absolute top-0 right-2 text-[1.5rem] font-black">
                 <span class="js-emoji mr-2"></span>
             </div>
-            <!-- 宛先表示をアイコン＋ニックネームに変更 -->
-            <div class="w-[200px] flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 shadow-sm">
-                <span class="js-target-icon text-[0.8rem]"></span>
-                <span class="js-target-user text-[9px] font-black line-clamp-1 text-slate-500"></span>
-            </div>
+            <!-- 宛先表示（Generator注入用コンテナ） -->
+            <div class="js-user-wrapper mt-2"></div>
             <div class="text-[0.7rem] text-black-3 line-clamp-1 js-body mt-2"></div>
         </div>
     </div>
@@ -283,9 +275,7 @@
             </div>
         </div>
         <!-- 宛先表示をアイコン＋ニックネームに変更 -->
-        <div class="w-[200px] flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 shadow-sm">
-            <span class="flex js-target text-[0.8rem] font-bold text-black-5 truncate"></span>
-        </div>
+        <div class="js-target-wrapper mt-1"></div>
         <div class="text-[0.7rem] text-slate-500 line-clamp-1 mt-2">
             <span class="js-body"></span>
         </div>

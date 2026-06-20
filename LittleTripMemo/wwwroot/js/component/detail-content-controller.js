@@ -20,7 +20,7 @@ const _DetailContentCore = {
                     this.displayBody = $Dom.GetElementById("detail-display-body");
                     this.displayPrice = $Dom.GetElementById("detail-display-memo_price");
                     this.displayPriceUnit = $Dom.GetElementById("detail-display-price-unit");
-                    this.displayUrlText = $Dom.GetElementById("detail-display-link_url");
+                    // this.displayUrlText = $Dom.GetElementById("detail-display-link_url");
                     // 追加：表示制御用ラッパー
                     this.displayPriceWrapper = $Dom.GetElementById("detail-display-price-wrapper");
                     // this.displayPriceLabel = $Dom.GetElementById("detail-display-price-label");
@@ -194,15 +194,11 @@ const _DetailContentCore = {
         // URLの表示制御
         if (detail.link_url) {
             $Dom.ToggleShow(this.displayUrlWrapper, true);
-            // 共通メソッドを使用してアイコンを生成（サイズ 28px）
-            const iconHtml = $Util.GetUrlIconHtml(detail.link_url, 28);
-            // aタグ（displayUrlText）に情報を反映
-            // this.displayUrlText.href = detail.link_url;
-            this.displayUrlText.onclick = () => $Util.OpenSafeUrl(detail.link_url);
-            this.displayUrlText.innerHTML = iconHtml;
-            // ラッパーのクリックイベント（検索URLへ飛ばす処理）は、
-            // 直接リンク（aタグ）として機能させるため削除または null にリセット
-            this.displayUrlWrapper.onclick = null; 
+            // コンテナをクリアして新設ボタンを追加
+            this.displayUrlWrapper.innerHTML = "";
+            const params = { archive_id: detail.archive_id, seq: detail.seq, is_owner: detail.is_owner };
+            const btn = $UI.Generator.LinkButton(detail.link_url, params);
+            if (btn) this.displayUrlWrapper.appendChild(btn);
         } else {
             $Dom.ToggleShow(this.displayUrlWrapper, false);
         }

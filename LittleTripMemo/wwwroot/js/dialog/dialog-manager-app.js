@@ -143,7 +143,7 @@ export default {
         });
     },
     // 環境コード選択ダイアログ
-    ShowAtmospherePicker(currentCode, onOk) {
+    ShowAtmospherePicker_2(currentCode, onOk) {
         const el = $Dom.GenerateTemplate('tpl-setting-weather');
         const rngWind = $Dom.QuerySelector('#atm-wind', el);
         const rngDensity = $Dom.QuerySelector('#atm-density', el);
@@ -242,6 +242,101 @@ export default {
                     }
                 ]
             ]
+        });
+    },
+    ShowAtmospherePicker(currentCode, onOk) {
+        const el = $Dom.GenerateTemplate('tpl-setting-weather');
+        const rngWind = $Dom.QuerySelector('#atm-wind', el);
+        const rngDensity = $Dom.QuerySelector('#atm-density', el);
+        const rngDarkness = $Dom.QuerySelector('#atm-darkness', el);
+        const weatherBtns = $Dom.QuerySelectorAll('.atm-w-btn', el);
+        const txtWindVal = $Dom.QuerySelector('#atm-wind-val', el);
+        const txtDensityVal = $Dom.QuerySelector('#atm-density-val', el);
+        const txtDarknessVal = $Dom.QuerySelector('#atm-darkness-val', el);
+        const txtCode = $Dom.QuerySelector('#atm-code-preview', el);
+        // 初期値の適用
+        let codeStr = String(currentCode || "0000").padStart(4, '0');
+        let currentW = codeStr[0];
+        rngWind.value = codeStr[1];
+        rngDensity.value = codeStr[2];
+        rngDarkness.value = codeStr[3];
+        // エフェクト更新処理
+        const applyEffect = () => {
+            const w = rngWind.value;
+            const d = rngDensity.value;
+            const a = rngDarkness.value;
+            txtWindVal.textContent = w;
+            txtDensityVal.textContent = d;
+            txtDarknessVal.textContent = a;
+            const code = `${currentW}${w}${d}${a}`;
+            txtCode.textContent = code;
+            if (typeof Atmosphere !== 'undefined') {
+                if (Atmosphere.canvas) Atmosphere.canvas.style.zIndex = '9999';
+                Atmosphere.show(code);
+            }
+        };
+        // ＋ーボタンのイベント登録ヘルパー
+        const bindStepper = (minusId, plusId, slider) => {
+            $Dom.QuerySelector(minusId, el).onclick = () => {
+                slider.value = Math.max(0, parseInt(slider.value) - 1);
+                applyEffect();
+            };
+            $Dom.QuerySelector(plusId, el).onclick = () => {
+                slider.value = Math.min(9, parseInt(slider.value) + 1);
+                applyEffect();
+            };
+        };
+        // 各ボタンへのバインド
+        bindStepper('#btn-wind-minus', '#btn-wind-plus', rngWind);
+        bindStepper('#btn-density-minus', '#btn-density-plus', rngDensity);
+        bindStepper('#btn-dark-minus', '#btn-dark-plus', rngDarkness);
+        // スライダー直接操作時のイベント
+        rngWind.addEventListener('input', applyEffect);
+        rngDensity.addEventListener('input', applyEffect);
+        rngDarkness.addEventListener('input', applyEffect);
+        // 天候ボタンのクリックイベント
+        weatherBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const clickedVal = btn.dataset.val;
+                weatherBtns.forEach(b => {
+                    b.classList.remove('bg-brand-5', 'text-white', 'border-brand-5');
+                    b.classList.add('bg-white', 'text-brand-5', 'border-brand-2');
+                });
+                if (clickedVal === "0") {
+                    // Clear時はリセット
+                    rngWind.value = 0; rngDensity.value = 0; rngDarkness.value = 0;
+                    currentW = "0";
+                } else {
+                    btn.classList.remove('bg-white', 'text-brand-5', 'border-brand-2');
+                    btn.classList.add('bg-brand-5', 'text-white', 'border-brand-5');
+                    currentW = clickedVal;
+                    if (parseInt(rngDensity.value) === 0) rngDensity.value = 1;
+                }
+                applyEffect();
+            });
+        });
+        // 初期描画
+        applyEffect();
+        // 天候ボタンの初期選択状態を反映
+        weatherBtns.forEach(b => {
+            if (b.dataset.val === currentW && currentW !== "0") {
+                b.classList.remove('bg-white', 'text-brand-5', 'border-brand-2');
+                b.classList.add('bg-brand-5', 'text-white', 'border-brand-5');
+            }
+        });
+        this._core.open({
+            title: "ATMOSPHERE SETTING",
+            content: el,
+            onClose: () => {
+                if (typeof Atmosphere !== 'undefined') {
+                    Atmosphere.hide();
+                    if (Atmosphere.canvas) Atmosphere.canvas.style.zIndex = '0';
+                }
+            },
+            buttons: [[
+                { label: "CANCEL", className: "bg-slate-400 text-white shadow-md", handler: () => this._core.close() },
+                { label: "OK", handler: () => { if (onOk) onOk(txtCode.textContent); this._core.close(); } }
+            ]]
         });
     },
 };

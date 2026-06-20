@@ -155,11 +155,10 @@ export default {
         const urlWrapper = $Dom.QuerySelector('#view-notice-url-wrapper', el);
         if (notice.link_url && notice.link_url.trim() !== "") {
             $Dom.ToggleShow(urlWrapper, true);
-            const urlLink = $Dom.QuerySelector('#view-notice-url', el);
-            // aタグのhrefを設定し、中身に共通アイコンHTMLを注入
-            // urlLink.href = notice.link_url;
-            urlLink.onclick = () => $Util.OpenSafeUrl(notice.link_url);
-            urlLink.innerHTML = $Util.GetUrlIconHtml(notice.link_url, 28);
+            urlWrapper.innerHTML = "";
+            // システム通知の場合はトラッキング不要（paramsなし）
+            const btn = $UI.Generator.LinkButton(notice.link_url);
+            if (btn) urlWrapper.appendChild(btn);
         } else {
             $Dom.ToggleShow(urlWrapper, false);
         }

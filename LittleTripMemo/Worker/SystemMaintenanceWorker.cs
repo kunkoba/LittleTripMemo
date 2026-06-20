@@ -1,9 +1,11 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.Configs;
+using LittleTripMemo.Models;
 using LittleTripMemo.Repository.App;
 using LittleTripMemo.Repository.Batch;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
+using System.Text.Json;
 
 namespace LittleTripMemo.Worker;
 
@@ -16,6 +18,7 @@ public class SystemMaintenanceWorker : BackgroundService
     private DateTime _nextReactionUpdateTime;
     private DateTime _nextTableStatsUpdateTime;
     private DateTime _nextGarbageCleanupTime;
+    private DateTime _nextClickAggregateTime;
 
     public SystemMaintenanceWorker(
         ILogger<SystemMaintenanceWorker> logger,
@@ -35,6 +38,7 @@ public class SystemMaintenanceWorker : BackgroundService
         _nextReactionUpdateTime = DateTime.Now;
         _nextTableStatsUpdateTime = DateTime.Now;
         _nextGarbageCleanupTime = DateTime.Now;
+        _nextClickAggregateTime = DateTime.Now;
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -46,6 +50,8 @@ public class SystemMaintenanceWorker : BackgroundService
                 await TaskUpdateTableStatisticsAsync();
                 // 明細データのゴミ掃除（削除済みデータの物理削除）
                 await TaskGarbageCleanupAsync();
+                // クリック数の集計と管理テーブルの更新
+                await TaskAggregateClickQueueAsync();
             }
 
             // 心拍（1分待機）
@@ -171,6 +177,69 @@ public class SystemMaintenanceWorker : BackgroundService
 
             // 次回予定を更新
             _nextGarbageCleanupTime = now.AddMinutes(settings.GarbageCleanupIntervalMinutes);
+        }
+    }
+
+    /// <summary>
+    /// クリックキューを集計して各テーブルの JSONB カラムに反映する
+    /// </summary>
+    private async Task TaskAggregateClickQueueAsync()
+    {
+        var settings = _optionsMonitor.CurrentValue;
+        var now = DateTime.Now;
+
+        if (now >= _nextClickAggregateTime)
+        {
+            await RunWithScopeAsync("クリック数集計", async (scope) =>
+            {
+                var repo = scope.ServiceProvider.GetRequiredService<ClickQueueTaskRepository>();
+                var queueItems = await repo.GetQueueAllAsync();
+                if (!queueItems.Any()) return;
+
+                var lastProcessTime = DateTime.MinValue;
+
+                // 1. キューを「ターゲットごと」にグループ化して集計
+                var grouped = queueItems.GroupBy(q => new {
+                    t = (int)q.target_type,
+                    u = (Guid?)q.target_user_id,
+                    a = (int?)q.archive_id,
+                    s = (long?)q.seq
+                });
+
+                foreach (var group in grouped)
+                {
+                    // 現在の JSON を取得
+                    var currentJson = await repo.GetCurrentStatsJsonAsync(group.Key.t, group.Key.u, group.Key.a, group.Key.s);
+                    var statsMap = string.IsNullOrEmpty(currentJson)
+                        ? new Dictionary<string, ClickCountData>()
+                        : JsonSerializer.Deserialize<Dictionary<string, ClickCountData>>(currentJson) ?? new();
+
+                    // このグループ内のクリックを加算
+                    foreach (var item in group)
+                    {
+                        string key = item.item_name;
+                        if (!statsMap.ContainsKey(key)) statsMap[key] = new ClickCountData();
+
+                        statsMap[key].t++; // 総数
+                        if (item.viewer_user_id != null) statsMap[key].u++; // ユーザー
+                        else statsMap[key].g++; // ゲスト
+
+                        if ((DateTime)item.create_tim > lastProcessTime) lastProcessTime = (DateTime)item.create_tim;
+                    }
+
+                    // 更新
+                    var updatedJson = JsonSerializer.Serialize(statsMap);
+                    await repo.UpdateStatsJsonAsync(group.Key.t, group.Key.u, group.Key.a, group.Key.s, updatedJson);
+                }
+
+                // 2. 処理済みの時刻までキューを削除
+                if (lastProcessTime > DateTime.MinValue)
+                {
+                    await repo.DeleteProcessedQueueAsync(lastProcessTime);
+                }
+            });
+
+            _nextClickAggregateTime = now.AddMinutes(settings.ClickAggregateIntervalMinutes);
         }
     }
 

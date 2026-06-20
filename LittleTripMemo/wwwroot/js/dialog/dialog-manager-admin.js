@@ -211,17 +211,12 @@ export default {
         // アーカイブタイトルの反映
         $Dom.QuerySelector(".js-archive-title", el).textContent = summaryItem.archive_title || "Unknown Title";
         // --- ターゲットユーザーボタンの設定 ---
-        const targetIcon = $Dom.QuerySelector("#view-report-target-icon", el);
-        const targetName = $Dom.QuerySelector("#view-report-target-name", el);
-        const btnTarget = $Dom.QuerySelector("#btn-report-target-profile", el);
+        const userWrapper = $Dom.QuerySelector("#view-report-target-user-wrapper", el);
+        userWrapper.innerHTML = "";
         const profile = $Data.resData.target_userProfile;
         if (profile) {
-            targetIcon.textContent = profile.icon || "👤";
-            targetName.textContent = profile.nick_name || "Unknown User";
-            // ボタンクリックでターゲットユーザーのプロフィールを表示
-            btnTarget.onclick = async () => {
-                this.ShowUserProfile(profile, false);
-            };
+            const userBtn = $UI.Generator.UserBadge(profile, { type: 'button', isOwner: false });
+            if (userBtn) userWrapper.appendChild(userBtn);
         }
         // 1. 各種ボタンの取得
         const btnOpen    = $Dom.QuerySelector("#btn-admin-report-open", el);
@@ -454,8 +449,16 @@ export default {
             mails.forEach(item => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-user-mail");
                 $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim);
-                $Dom.QuerySelector(".js-target-icon", child).textContent = item.icon || "👤";
-                $Dom.QuerySelector(".js-target-user", child).textContent = item.nick_name || item.user_id.slice(0,8);
+                // --- 宛先ユーザー表示（Generator: badgeモードを使用） ---
+                const userWrapper = $Dom.QuerySelector(".js-user-wrapper", child);
+                userWrapper.innerHTML = ""; // コンテナをクリア
+                const badge = $UI.Generator.UserBadge({
+                    icon: item.icon,
+                    nick_name: item.nick_name || item.user_id.slice(0, 8),
+                    user_id: item.user_id
+                }, { type: 'badge' });
+                if (badge) userWrapper.appendChild(badge);
+                // 
                 const kindObj = Object.values($Const.USER_NOTICE_KIND).find(k => k.id === item.kind) || $Const.USER_NOTICE_KIND.INFO;
                 $Dom.QuerySelector(".js-emoji", child).textContent = kindObj.emoji; // リスト時
                 $Dom.QuerySelector(".js-body", child).textContent = item.body;
@@ -474,24 +477,16 @@ export default {
         const el = $Dom.GenerateTemplate('tpl-view-notice');
         // --- 2. ユーザー情報ボタンを表示・設定する ---
         const userWrapper = $Dom.QuerySelector('#view-notice-user-wrapper', el);
-        const userIcon = $Dom.QuerySelector('#view-notice-user-icon', el);
-        const userId = $Dom.QuerySelector('#view-notice-user-id', el);
-        const btnUser = $Dom.QuerySelector('#btn-notice-user-profile', el);
+        userWrapper.innerHTML = ""; // コンテナをクリア
         $Dom.ToggleShow(userWrapper, true);
         $Dom.ToggleShow($Dom.QuerySelector('#view-notice-title-area', el), false);
-        userIcon.textContent = item.icon || "👤";
-        userId.textContent = item.nick_name || item.user_id.slice(0, 8);
-        // ボタンクリックでユーザー詳細を表示
-        btnUser.onclick = async () => {
-            // API経由で対象ユーザーのフルプロフィールを取得
-            const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: item.user_id });
-            if (isSuccess) {
-                // 最新のプロフィールデータを$Data.resDataから取得
-                const profile = $Data.resData;
-                // 第2引数 isOwner を false にして編集不可モードで開く
-                this.ShowUserProfile(profile, false);
-            }
-        };
+        // --- 差出人表示（Generator: buttonモードを使用） ---
+        const userBtn = $UI.Generator.UserBadge({
+            icon: item.icon,
+            nick_name: item.nick_name || item.user_id.slice(0, 8),
+            user_id: item.user_id
+        }, { type: 'button', isOwner: false });
+        if (userBtn) userWrapper.appendChild(userBtn);
         // 右上のメール（封筒）アイコンなど
         const kindObj = Object.values($Const.USER_NOTICE_KIND).find(k => k.id === item.kind) || $Const.USER_NOTICE_KIND.INFO;
         $Dom.QuerySelector('#view-notice-icon', el).textContent = kindObj.emoji; // 詳細時

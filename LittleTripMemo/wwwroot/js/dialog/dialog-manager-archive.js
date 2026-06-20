@@ -335,7 +335,7 @@ export default {
         });
     },
     // まとめ親一覧選択
-    ShowArchiveList() {
+    ShowArchiveList_2() {
         $Warn.CatchAsync(async () => {
             const isSuccess = await $Data.Access.GetArchiveList();
             if (!isSuccess) return;
@@ -424,6 +424,90 @@ export default {
                 buttons: []
             });
         })();
+    },
+    async ShowArchiveList() {
+        const isSuccess = await $Data.Access.GetArchiveList();
+        if (!isSuccess) return;
+        const archives = $Data.Store.GetArchiveList() || [];
+        if (archives.length == 0) {
+            $Notice.Warn("データはありません");
+            return;
+        }
+        const root = document.createElement("div");
+        root.className = "w-full flex flex-col";
+        const searchBar = $Dom.GenerateTemplate("tpl-dialog-search-bar", "ui-template-root", false);
+        const input = $Dom.QuerySelector(".js-input", searchBar);
+        const clearBtn = $Dom.QuerySelector(".js-clear", searchBar);
+        root.appendChild(searchBar);
+        const listContainer = document.createElement("div");
+        root.appendChild(listContainer);
+        const render = (filterText = "") => {
+            listContainer.innerHTML = "";
+            const query = filterText.toLowerCase().trim();
+            const filtered = archives.filter(item => {
+                const target = (item.title || "") + (item.memo || "");
+                return target.toLowerCase().includes(query);
+            });
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-10">合致するまとめがありません</div>`;
+                return;
+            }
+            const pvt = filtered.filter(item => !item.is_public);
+            const pub = filtered.filter(item => item.is_public);
+            const draw = (title, list, isPub) => {
+                if (list.length === 0) return;
+                const header = $Dom.GenerateTemplate("tpl-list-group-header");
+                const badge = $Dom.QuerySelector(".js-header-badge", header);
+                $Dom.QuerySelector(".js-header-title", header).textContent = title;
+                if (isPub) {
+                    badge.classList.add("bg-brand-5");
+                    $Dom.QuerySelector(".js-header-icon", header).textContent = "◎";
+                } else {
+                    badge.classList.add("bg-slate-800");
+                    $Dom.QuerySelector(".js-header-icon", header).textContent = "🔒";
+                }
+                listContainer.appendChild(header);
+                list.forEach(item => {
+                    const child = $Dom.GenerateTemplate("tpl-list-child-archive");
+                    $Dom.QuerySelector(".js-title", child).textContent = item.title;
+                    $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
+                    $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
+                    $Dom.QuerySelector(".js-count", child).textContent = item.detail_count || "0";
+                    const border = $Dom.QuerySelector(".js-item-border", child);
+                    const countBadge = $Dom.QuerySelector(".js-count-badge", child);
+                    if (isPub) {
+                        const isCls = !!item.closed_flg;
+                        border.classList.add(isCls ? "bg-slate-400" : "bg-brand-5");
+                        countBadge.classList.add(isCls ? "bg-slate-400" : "bg-brand-5");
+                    } else {
+                        border.classList.add("bg-slate-800");
+                        countBadge.classList.add("bg-slate-800");
+                    }
+                    child.onclick = () => {
+                        this._core.closeAll();
+                        $App.AppData.Context.ScreenMode = isPub ? $Const.SCREEN_MODE.ARCHIVE_PUB : $Const.SCREEN_MODE.ARCHIVE;
+                        $App.AppData.Context.TargetArchiveId = item.archive_id;
+                        $App.RefreshScreen();
+                    };
+                    listContainer.appendChild(child);
+                });
+            };
+            draw("PRIVATE ARCHIVE", pvt, false);
+            draw("PUBLIC ARCHIVE", pub, true);
+        };
+        input.oninput = (e) => {
+            const val = e.target.value;
+            $Dom.ToggleShow(clearBtn, val.length > 0);
+            render(val);
+        };
+        clearBtn.onclick = () => {
+            input.value = "";
+            $Dom.ToggleShow(clearBtn, false);
+            render("");
+            input.focus();
+        };
+        render("");
+        this._core.open({ title: "ARCHIVE LIST", content: root, help: "上部の入力欄から検索できます。" });
     },
     // 既存まとめへの追加先選択ダイアログ
     SelectArchiveForAdd(seqs) {
@@ -680,7 +764,7 @@ export default {
             $Dom.QuerySelector('#view-mem-title', el).textContent = currentArchive.title || "";
             $Dom.QuerySelector('#view-mem-body', el).textContent = currentArchive.memo || "";
             // ③ リンクの反映（すべて currentArchive を参照するように統一）
-            const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
+            // const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
             if (currentArchive.link_url) {
                 const iconHtml = $Util.GetUrlIconHtml(currentArchive.link_url, 28);
                 // viewUrl.href = currentArchive.link_url;
@@ -942,13 +1026,15 @@ export default {
             $Dom.QuerySelector('#view-mem-title', el).textContent = currentArchive.title || "";
             $Dom.QuerySelector('#view-mem-body', el).textContent = currentArchive.memo || "";
             // --- URLリンクの反映（スクロール領域内） ---
-            const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
+            // const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
             const urlWrapper = $Dom.QuerySelector('#view-mem-url-wrapper', el);
             if (currentArchive.link_url) {
-                const iconHtml = $Util.GetUrlIconHtml(currentArchive.link_url, 28);
-                viewUrl.href = currentArchive.link_url;
-                viewUrl.innerHTML = iconHtml;
                 $Dom.ToggleShow(urlWrapper, true);
+                urlWrapper.innerHTML = "";
+                // 親アーカイブ単位のクリックとして送信（seqなし）
+                const params = { archive_id: currentArchive.archive_id, is_owner: currentArchive.is_owner };
+                const btn = $UI.Generator.LinkButton(currentArchive.link_url, params);
+                if (btn) urlWrapper.appendChild(btn);
             } else {
                 $Dom.ToggleShow(urlWrapper, false);
             }
@@ -982,14 +1068,16 @@ export default {
         };
         // 初期描画の実行
         renderView();
-        const btnUserProfile = $Dom.QuerySelector('#btn-mem-user-profile', el);
+        // --- ユーザー情報の表示設定（Generatorによる部品注入へ置換） ---
+        const userWrapper = $Dom.QuerySelector('#view-mem-user-wrapper', el);
+        userWrapper.innerHTML = ""; // コンテナをクリア
         const profile = $Data.Store.GetUserProfile();
         if (profile) {
-            $Dom.QuerySelector('#view-mem-user-icon', el).textContent = profile.icon || "😀";
-            $Dom.QuerySelector('#view-mem-user-id', el).textContent = profile.nick_name;
-            btnUserProfile.onclick = () => this.ShowUserProfile(profile, archive.is_owner);
+            // ジェネレータでプロフィールボタンを生成して追加
+            const userBtn = $UI.Generator.UserBadge(profile, { type: 'button', isOwner: archive.is_owner });
+            if (userBtn) userWrapper.appendChild(userBtn);
         } else {
-            $Dom.ToggleShow(btnUserProfile, false);
+            $Dom.ToggleShow(userWrapper, false);
         }
         // --- ヘッダーボタンの定義 ---
         const headerButtons = [];

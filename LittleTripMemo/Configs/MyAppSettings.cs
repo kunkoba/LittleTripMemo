@@ -16,6 +16,7 @@ public class MyAppSettings
     public int ReactionCountUpdateIntervalMinutes { get; set; } = -1; // リアクション集計
     public int TableStatsUpdateIntervalMinutes { get; set; } = -1;   // テーブル件数集計
     public int GarbageCleanupIntervalMinutes { get; set; } = -1;    // 明細のゴミ掃除
+    public int ClickAggregateIntervalMinutes { get; set; } = -1;    // クリック数の集計
 
 }
 

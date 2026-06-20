@@ -418,13 +418,12 @@ export default {
             viewLinks.innerHTML = "";
             const links =[pL1, pL2, pL3].filter(l => l && l.trim() !== "");
             links.forEach(l => {
-				const btn = document.createElement("button");
-                btn.type = "button";
-				btn.onclick = () => $Util.OpenSafeUrl(l);
-				btn.className = "w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-md active:scale-90 transition-transform overflow-hidden";
-				btn.innerHTML = $Util.GetUrlIconHtml(l, 24);
-				btn.title = l;
-				viewLinks.appendChild(btn);
+                // プロフィールリンクもトラッキング対象外（is_owner: true 扱いでログをスキップ）
+                const btn = $UI.Generator.LinkButton(l, { is_owner: true });
+                if (btn) {
+                    btn.title = l; // ホバー時にURLを表示
+                    viewLinks.appendChild(btn);
+                }
 			});
         };
         renderView();
@@ -536,8 +535,14 @@ export default {
         [...reports].sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(item => {
             const child = $Dom.GenerateTemplate("tpl-list-child-my-report");
             $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.report_tim);
-            $Dom.QuerySelector(".js-target", child).textContent = `${item.target_icon} ${item.target_nick_name}`;
             $Dom.QuerySelector(".js-body", child).textContent = item.body;
+            // --- ターゲットユーザー表示（Generator: badgeモードを使用） ---
+            const targetWrapper = $Dom.QuerySelector(".js-target-wrapper", child);
+            const badge = $UI.Generator.UserBadge({
+                nick_name: item.target_nick_name,
+                icon: item.target_icon
+            }, { type: 'badge' });
+            if (badge) targetWrapper.appendChild(badge);
             // ステータスバッジの表示
             if (item.is_deleted) {
                 $Dom.ToggleShow($Dom.QuerySelector(".js-badge-deleted", child), true);
@@ -571,16 +576,15 @@ export default {
         // 基本反映
         $Dom.QuerySelector(".js-report-tim", el).textContent = $Util.FormatDate(report.report_tim);
         $Dom.QuerySelector("#view-report-body", el).textContent = report.body;
-        // $Dom.QuerySelector("#view-report-archive-title", el).textContent = report.archive_title || "(No Title)";
-        // ターゲットユーザーボタン
-        const userIcon = $Dom.QuerySelector("#view-report-target-icon", el);
-        const userName = $Dom.QuerySelector("#view-report-target-name", el);
-        userIcon.textContent = report.target_icon || "👤";
-        userName.textContent = report.target_nick_name || "Unknown";
-        $Dom.QuerySelector("#btn-report-target-profile", el).onclick = async () => {
-            const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: report.target_user_id });
-            if (isSuccess) this.ShowUserProfile($Data.resData, false);
-        };
+        // ターゲットユーザーボタン（Generatorによる注入へ置換）
+        const userWrapper = $Dom.QuerySelector("#view-report-target-user-wrapper", el);
+        userWrapper.innerHTML = "";
+        const userBtn = $UI.Generator.UserBadge({
+            user_id: report.target_user_id,
+            nick_name: report.target_nick_name,
+            icon: report.target_icon
+        }, { type: 'button', isOwner: false });
+        if (userBtn) userWrapper.appendChild(userBtn);
         // アーカイブジャンプボタン
         const btnJump = $Dom.QuerySelector("#btn-report-jump-archive", el);
         if (report.is_deleted || report.is_closed) {

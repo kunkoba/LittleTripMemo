@@ -162,11 +162,11 @@
                     </div>
                 </div>
                 <!-- 詳細パネルの内容 (スクロールエリア) -->
-                <div id="ui-detail-content-id" class="flex-1 overflow-y-auto p-6">
+                <div id="ui-detail-content-id" class="flex-1 overflow-y-auto p-4">
                     <!-- ■ 参照用（表示モード）：縦並び・左揃え・1rem 統一版 -->
-                    <div id="detail-display" class="hidden relative min-h-full flex flex-col bg-white">
+                    <div id="detail-display" class="hidden relative _min-h-full flex flex-col bg-white">
                         <!-- 右上の正円インデックスバッジ -->
-                        <div class="js-index-badge absolute -top-3 -right-3 w-10 h-10 rounded-full bg-brand-4 text-white font-black text-[1.2rem] flex items-center justify-center shadow-md z-20">
+                        <div class="js-index-badge absolute top-0 right-0 w-10 h-10 rounded-full bg-brand-4 text-white font-black text-[1.2rem] flex items-center justify-center shadow-md z-20">
                         </div>
                         <!-- 背景用の巨大顔文字：上部に固定（スクロールしても動かない） -->
                         <div class="sticky top-[100px] w-full h-0 pointer-events-none z-0 flex justify-center">
@@ -195,15 +195,11 @@
                                 <span id="detail-display-price-unit" class="text-[1rem] font-bold text-slate-400 ml-3 uppercase"></span>
                             </div>
                             <!-- 5. 本文（左揃え・1rem以下） -->
-                            <div id="detail-display-body" class="flex-1 rounded-lg p-2 text-[1rem] text-slate-800 whitespace-pre-wrap break-words leading-[2]"></div>
+                            <div id="detail-display-body" class="w-full rounded-lg p-2 text-[1rem] text-slate-800 whitespace-pre-wrap break-words leading-[2]"></div>
                             <!-- 隠し項目 -->
                             <span id="detail-display-weather_code" class="hidden"></span>
                             <!-- 下部：Locationカード風のURLリンク -->
                             <div id="detail-display-url-wrapper" class="hidden w-full mt-2">
-                                <button id="detail-display-link_url" type="button" 
-                                    class="shrink-0 w-12 h-12 shadow-md rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50">
-                                    <!-- ここに $Util.GetUrlIconHtml が挿入される -->
-                                </button>
                             </div>
                         </div>
                     </div>

@@ -32,6 +32,11 @@ window.$Data = {
         // サーバー通信の基礎
         async _fetchData(method, url, params, isDebug = false) {
             console.log("▼ Access:", BaseUrl + url, params);
+            // オフラインチェック
+            if (!$App.AppData.Context.IsOnline) {
+                $Notice.Warn("オフライン中は、機能が制限されます。");
+                return false;
+            }
             // メイン処理
             const token = $App.AppData.Owner.Token;
             const options = {
@@ -188,8 +193,8 @@ window.$Data = {
 
 
 
-        // ★匿名Get
-        async GetArchiveDetailsPub(params) {
+        // ★匿名
+        async GetArchiveDetailsPub(params = {}) {
             const encodedId = $Util.EncodeId(params.archive_id);
             // 引数 params.archive_id を使用して URL を構築
             const url = `/api/Public/GetArchiveDetailsPub/${encodedId}`;
@@ -198,6 +203,20 @@ window.$Data = {
                 return await this._fetchData('get', url, null); 
             })();
         },
+        // ★匿名
+        async AddClick(params) {
+            // public record AddClickReq(
+            //     int target_type,
+            //     Guid target_user_id,
+            //     int? archive_id,
+            //     long? seq,
+            //     string item_name
+            // );
+            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/AddClick', params))();
+        },
+
+
+
         async UpdateDetailPub(params) {
             return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/UpdateDetailPub', params))();
         },

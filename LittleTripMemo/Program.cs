@@ -135,6 +135,7 @@ builder.Services.AddScoped<DetailRepository>();
 builder.Services.AddScoped<ArchivePubRepository>();
 builder.Services.AddScoped<DetailPubRepository>();
 builder.Services.AddScoped<ReactionPubRepository>();
+builder.Services.AddScoped<ClickQueueRepository>();
 // ---- Sys / Infrastructure Repository ----
 builder.Services.AddScoped<SysFeedbackRepository>();
 builder.Services.AddScoped<SysNotificationRepository>();
@@ -143,6 +144,7 @@ builder.Services.AddScoped<SysUserNotificationRepository>();
 builder.Services.AddScoped<TableStatisticsRepository>();
 // ---- Batch / Infrastructure Repository ----
 builder.Services.AddScoped<TableStatisticsTaskRepository>();
+builder.Services.AddScoped<ClickQueueTaskRepository>();
 
 
 // ---- Service（業務ロジック層） ----
@@ -171,8 +173,9 @@ builder.Services.AddScoped<UnpublishArchiveService>();
 builder.Services.AddScoped<OpenArchiveService>();
 builder.Services.AddScoped<CloseArchiveService>();
 builder.Services.AddScoped<UpdateArchivePubService>();
-builder.Services.AddScoped<UpdateDetailPubService>(); // 復活分
+builder.Services.AddScoped<UpdateDetailPubService>();
 builder.Services.AddScoped<BulkSyncReactionService>();
+builder.Services.AddScoped<AddClickQueueService>();
 // ---- Sys ----
 builder.Services.AddScoped<GetSystemInfoService>();
 builder.Services.AddScoped<UpsertFeedbackService>();

@@ -16,30 +16,12 @@ public class ArchivePubRepository : _BaseRepository
         archive.user_id = _user.login_user_id;
         const string sql = @"
             INSERT INTO t_memo_archive_pub (
-                archive_id,
-                user_id,
-                title,
-                memo,
-                link_url,
-                currency_unit,
-                closed_flg,
-                del_flg,
-                create_tim,
-                update_tim
-            )
-            VALUES (
-                @archive_id,
-                @user_id,
-                @title,
-                @memo,
-                @link_url,
-                @currency_unit,
-                TRUE,
-                FALSE,
-                CURRENT_TIMESTAMP,
-                CURRENT_TIMESTAMP
-            );
-        ";
+                archive_id, user_id, title, memo, link_url, currency_unit,
+                closed_flg, limited_open_flg, del_flg, create_tim, update_tim
+            ) VALUES (
+                @archive_id, @user_id, @title, @memo, @link_url, @currency_unit,
+                TRUE, @limited_open_flg, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+            );";
         return await ExecuteAsync(sql, archive);
     }
 
@@ -53,11 +35,11 @@ public class ArchivePubRepository : _BaseRepository
                 memo       = @memo,
                 link_url   = @link_url,
                 currency_unit = @currency_unit,
+                limited_open_flg = @limited_open_flg, 
                 update_tim = CURRENT_TIMESTAMP
             WHERE
                 archive_id = @archive_id
                 AND user_id = @user_id
-                AND closed_flg = @closed_flg
                 AND del_flg    = false";
         
         return await ExecuteAsync(sql, archive);
@@ -79,9 +61,9 @@ public class ArchivePubRepository : _BaseRepository
     {
         const string sql = @"
             INSERT INTO t_memo_archive_pub (
-                archive_id, user_id, title, memo, link_url, currency_unit, closed_flg, del_flg, create_tim, update_tim
+                archive_id, user_id, title, memo, link_url, currency_unit
             ) VALUES (
-                @archive_id, @user_id, @title, @memo, @link_url, @currency_unit, true, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+                @archive_id, @user_id, @title, @memo, @link_url, @currency_unit
             )
             ON CONFLICT (archive_id) DO UPDATE SET
                 del_flg = false, 

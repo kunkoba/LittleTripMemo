@@ -18,12 +18,10 @@ public class DetailPubRepository : _BaseRepository
         const string sql = @"
             INSERT INTO t_memo_detail_pub (
                 archive_id, seq, user_id, latitude, longitude, title, body,
-                memo_date, memo_time, face_emoji, weather_code, link_url,
-                memo_price, del_flg, create_tim, update_tim
+                memo_date, memo_time, face_emoji, weather_code, link_url, memo_price
             ) VALUES (
                 @archive_id, @seq, @user_id, @latitude, @longitude, @title, @body,
-                @memo_date, @memo_time, @face_emoji, @weather_code, @link_url,
-                @memo_price, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+                @memo_date, @memo_time, @face_emoji, @weather_code, @link_url, @memo_price
             )";
         return await ExecuteAsync(sql, detail);
     }
@@ -79,12 +77,10 @@ public class DetailPubRepository : _BaseRepository
         const string sql = @"
             INSERT INTO t_memo_detail_pub (
                 archive_id, seq, user_id, latitude, longitude, title, body,
-                memo_date, memo_time, face_emoji, weather_code, link_url,
-                memo_price, del_flg, create_tim, update_tim
+                memo_date, memo_time, face_emoji, weather_code, link_url, memo_price
             ) VALUES (
                 @archive_id, @seq, @user_id, @latitude, @longitude, @title, @body,
-                @memo_date, @memo_time, @face_emoji, @weather_code, @link_url,
-                @memo_price, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+                @memo_date, @memo_time, @face_emoji, @weather_code, @link_url, @memo_price
             )
             ON CONFLICT (archive_id, seq) DO UPDATE SET
                 del_flg = false,
@@ -149,7 +145,7 @@ public class DetailPubRepository : _BaseRepository
     /// <param name="loginUserId"></param>
     /// <param name="limit"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<TMemoDetailPub>> SearchByLocationAsync(
+    public async Task<IEnumerable<TMemoDetailPub>> SearchByLocationAsync_2(
         decimal latMin, decimal latMax, decimal lngMin, decimal lngMax,
         string? keyword, int sortField, int? reactionType, Guid loginUserId, int limit = 20)
     {
@@ -166,8 +162,11 @@ public class DetailPubRepository : _BaseRepository
             WHERE d.latitude  BETWEEN @lat_min AND @lat_max
               AND d.longitude BETWEEN @lng_min AND @lng_max
               AND d.user_id   <> @login_user_id
-              AND d.del_flg   = false
-              AND a.closed_flg = false";
+              AND d.del_flg    = false
+              AND a.closed_flg = false
+              AND a.limited_open_flg = false
+              AND u.ban_flg    = false
+            ";
 
         // 2. ソート順と「0件除外」条件の決定
         string orderBy = "d.create_tim DESC";
@@ -208,6 +207,72 @@ public class DetailPubRepository : _BaseRepository
                 a.currency_unit
             FROM t_memo_detail_pub d
             INNER JOIN t_memo_archive_pub a ON d.archive_id = a.archive_id
+            INNER JOIN t_app_user u ON d.user_id = u.user_id
+            {whereClause}
+            ORDER BY {orderBy}, d.seq DESC
+            LIMIT @limit";
+
+        return await QueryAsync<TMemoDetailPub>(sql, parameters);
+    }
+
+    public async Task<IEnumerable<TMemoDetailPub>> SearchByLocationAsync(
+        decimal latMin, decimal latMax, decimal lngMin, decimal lngMax,
+        string? keyword, int sortField, int? reactionType, Guid loginUserId, int limit = 20)
+    {
+        var parameters = new DynamicParameters();
+        parameters.Add("lng_min", lngMin);
+        parameters.Add("lat_min", latMin);
+        parameters.Add("lng_max", lngMax);
+        parameters.Add("lat_max", latMax);
+        parameters.Add("login_user_id", loginUserId);
+        parameters.Add("limit", limit);
+
+        // 1. 空間演算子を使ったWHERE句に書き換え
+        // point(lng, lat) <@ box(point(lng_min, lat_min), point(lng_max, lat_max))
+        // これにより GiSTインデックスが効き、2次元エリアで爆速検索されます
+        string whereClause = @"
+            WHERE point(d.longitude, d.latitude) <@ box(point(@lng_min, @lat_min), point(@lng_max, @lat_max))
+              AND d.user_id   <> @login_user_id
+              AND d.del_flg   = false
+              AND a.closed_flg = false
+              AND a.limited_open_flg = false
+              AND u.ban_flg = false";
+
+        // 2. ソート順と条件の決定（変更なし）
+        string orderBy = "d.create_tim DESC";
+        if (sortField == 2)
+        {
+            orderBy = "d.update_tim DESC";
+        }
+        else if (sortField == 3)
+        {
+            var (colName, orderQuery) = reactionType switch
+            {
+                1 => ("count_funny", "d.count_funny DESC"),
+                2 => ("count_love", "d.count_love DESC"),
+                3 => ("count_surprise", "d.count_surprise DESC"),
+                4 => ("count_sad", "d.count_sad DESC"),
+                _ => ("count_funny", "d.count_funny DESC")
+            };
+            orderBy = orderQuery;
+            whereClause += $" AND d.{colName} > 0";
+        }
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            whereClause += " AND (d.body ILIKE @keyword OR d.title ILIKE @keyword)";
+            parameters.Add("keyword", $"%{keyword}%");
+        }
+
+        // 3. SQL組み立て（JOIN含む）
+        var sql = $@"
+            SELECT 
+                d.*, 
+                a.title AS a_title, 
+                a.currency_unit
+            FROM t_memo_detail_pub d
+            INNER JOIN t_memo_archive_pub a ON d.archive_id = a.archive_id
+            INNER JOIN t_app_user u ON d.user_id = u.user_id
             {whereClause}
             ORDER BY {orderBy}, d.seq DESC
             LIMIT @limit";

@@ -94,4 +94,45 @@ public class AppUserRepository : _BaseRepository
         return await ExecuteScalarAsync<long>(sql, new { table_name });
     }
 
+    /// <summary>
+    /// 最終ログイン日時のみを現在時刻に更新する
+    /// </summary>
+    public async Task<int> UpdateLastLoginTimeAsync(Guid userId)
+    {
+        const string sql = @"
+            UPDATE t_app_user 
+            SET last_login_tim = CURRENT_TIMESTAMP 
+            WHERE user_id = @userId";
+
+        return await ExecuteAsync(sql, new { userId });
+    }
+
+    /// <summary>
+    /// ユーザーのBAN状態を更新する（管理者用）
+    /// </summary>
+    public async Task<int> UpdateBanStatusAsync(Guid userId, bool isBanned)
+    {
+        const string sql = @"
+            UPDATE t_app_user SET 
+                ban_flg    = @isBanned, 
+                update_tim = CURRENT_TIMESTAMP 
+            WHERE user_id  = @userId";
+
+        return await ExecuteAsync(sql, new { userId, isBanned });
+    }
+
+    /// <summary>
+    /// ユーザーの退会状態（論理削除）を更新する
+    /// </summary>
+    public async Task<int> UpdateDeleteStatusAsync(Guid userId, bool isDeleted)
+    {
+        const string sql = @"
+            UPDATE t_app_user SET 
+                del_flg    = @isDeleted, 
+                update_tim = CURRENT_TIMESTAMP 
+            WHERE user_id  = @userId";
+
+        return await ExecuteAsync(sql, new { userId, isDeleted });
+    }
+
 }

@@ -63,7 +63,7 @@ public class RecreatePublicArchiveService : _BaseService
             // 3. リアクションもリセット（古い構成のデータのため）
             await _reactionPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
 
-            // 4. 公開アーカイブへ新規コピー（UpsertFromPrivateAsync を使用）
+            // 4. 公開アーカイブへ新規コピー（RestoreArchiveAsync を使用）
             var pubArchive = new TMemoArchivePub
             {
                 archive_id = archive.archive_id,
