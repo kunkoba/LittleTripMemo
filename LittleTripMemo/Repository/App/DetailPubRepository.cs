@@ -11,21 +11,6 @@ public class DetailPubRepository : _BaseRepository
         UserContext user
     ) : base(provider, logger, user) { }
 
-    public async Task<int> InsertAsync(TMemoDetailPub detail)
-    {
-        detail.user_id = _user.login_user_id;
-
-        const string sql = @"
-            INSERT INTO t_memo_detail_pub (
-                archive_id, seq, user_id, latitude, longitude, title, body,
-                memo_date, memo_time, face_emoji, weather_code, link_url, memo_price
-            ) VALUES (
-                @archive_id, @seq, @user_id, @latitude, @longitude, @title, @body,
-                @memo_date, @memo_time, @face_emoji, @weather_code, @link_url, @memo_price
-            )";
-        return await ExecuteAsync(sql, detail);
-    }
-
     public async Task<int> UpdateByKeyAsync(TMemoDetailPub detail)
     {
         detail.user_id = _user.login_user_id;

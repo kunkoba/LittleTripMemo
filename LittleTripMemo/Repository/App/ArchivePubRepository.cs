@@ -79,6 +79,7 @@ public class ArchivePubRepository : _BaseRepository
                 del_flg = false, 
                 closed_flg = true, 
                 update_tim = CURRENT_TIMESTAMP";
+
         await ExecuteAsync(sql, pub);
     }
 

@@ -103,6 +103,25 @@ const UI_Manager = {
 			}
 			return el;
 		},
+		// 新規バッヂ生成
+		ApplyNewBadge(targetEl, count, type = 'dot') {
+			if (!targetEl) return;
+			let badge = targetEl.querySelector('.js-unread-badge');
+			const isShow = count > 0;
+			if (isShow && !badge) {
+				badge = document.createElement('span');
+				badge.className = 'js-unread-badge bg-red-500 text-white font-black flex items-center justify-center pointer-events-none shadow-sm ';
+				if (type === 'dot') {
+					badge.className += 'absolute w-3 h-3 rounded-full top-1 right-1 border-2 border-brand-1';
+					targetEl.classList.add('relative');
+				} else {
+					badge.className += 'ml-4 text-[9px] px-2 py-0.5 rounded-full mt-0.5';
+					badge.textContent = 'NEW';
+				}
+				targetEl.appendChild(badge);
+			}
+			if (badge) $Dom.ToggleShow(badge, isShow);
+		},
     },
 	// 初期化
 	Init(){

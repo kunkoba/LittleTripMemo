@@ -1,7 +1,67 @@
-// ホスティングサーバ
+// const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
 // const BaseUrl = "https://localhost:7292";
 const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
-// const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
+
+// APIエンドポイントの定義リスト（アクション名: { method, url }）
+const API_ENDPOINTS = {
+    // Account
+    LoginFirebase:          { method: 'post', url: '/api/Account/LoginFirebase' },
+    EnsureLoginUser:        { method: 'post', url: '/api/Account/EnsureLoginUser' },
+    UpdateProfile:          { method: 'post', url: '/api/Account/UpdateProfile' },
+    GetUserProfile:         { method: 'post', url: '/api/Account/GetUserProfile' },
+    Withdrawal:             { method: 'post', url: '/api/Account/Withdrawal' }, // 未使用
+    // Private
+    GetArchiveDetails:      { method: 'post', url: '/api/Private/GetArchiveDetails' },
+    UpdateDetail:           { method: 'post', url: '/api/Private/UpdateDetail' },
+    UpdateArchive:          { method: 'post', url: '/api/Private/UpdateArchive' },
+    MergeDetails:           { method: 'post', url: '/api/Private/MergeDetails' },
+    AddDetails:             { method: 'post', url: '/api/Private/AddDetails' },
+    GetArchiveList:         { method: 'post', url: '/api/Private/GetArchiveList' },
+    GetUnMergeDetails:      { method: 'post', url: '/api/Private/GetUnMergeDetails' },
+    DeleteArchive:          { method: 'post', url: '/api/Private/DeleteArchive' },
+    PublishArchive:         { method: 'post', url: '/api/Private/PublishArchive' },
+    BulkSyncDetails:        { method: 'post', url: '/api/Private/BulkSyncDetails' },
+    DeleteStrayDetails:     { method: 'post', url: '/api/Private/DeleteStrayDetails' },
+    DetachDetails:          { method: 'post', url: '/api/Private/DetachDetails' },
+    RecreatePublicArchive:  { method: 'post', url: '/api/Private/RecreatePublicArchive' },  // 未使用
+    // Public
+    AddClick:               { method: 'post', url: '/api/Public/AddClick' },
+    UpdateDetailPub:        { method: 'post', url: '/api/Public/UpdateDetailPub' },
+    UnpublishArchive:       { method: 'post', url: '/api/Public/UnpublishArchive' },
+    UpdateArchivePub:       { method: 'post', url: '/api/Public/UpdateArchivePub' },
+    SearchByLocationPub:    { method: 'post', url: '/api/Public/SearchByLocationPub' },
+    OpenArchive:            { method: 'post', url: '/api/Public/OpenArchive' },
+    CloseArchive:           { method: 'post', url: '/api/Public/CloseArchive' },
+    BulkSyncReactions:      { method: 'post', url: '/api/Public/BulkSyncReactions' },
+    // Sys
+    UpsertFeedback:         { method: 'post', url: '/api/Sys/UpsertFeedback' },
+    UpsertReport:           { method: 'post', url: '/api/Sys/UpsertReport' },
+    GetMyFeedback:          { method: 'post', url: '/api/Sys/GetMyFeedback' },
+    GetMyReport:            { method: 'post', url: '/api/Sys/GetMyReport' },
+    DeleteMyReport:         { method: 'post', url: '/api/Sys/DeleteMyReport' },
+    GetSystemInfo:          { method: 'post', url: '/api/Sys/GetSystemInfo' },
+    GetMyUserNotifications: { method: 'post', url: '/api/Sys/GetMyUserNotifications' },
+    // Admin
+    UpsertNotification:     { method: 'post', url: '/api/Admin/UpsertNotification' },
+    GetReportDetails:       { method: 'post', url: '/api/Admin/GetReportDetails' },
+    AdminCloseArchive:      { method: 'post', url: '/api/Admin/AdminCloseArchive' },
+    AdminUnpublishArchive:  { method: 'post', url: '/api/Admin/AdminUnpublishArchive' },
+    SendUserNotification:   { method: 'post', url: '/api/Admin/SendUserNotification' },
+    GetAllFeedback:         { method: 'post', url: '/api/Admin/GetAllFeedback' },
+    GetAdminAllInfo:        { method: 'post', url: '/api/Admin/GetAdminAllInfo' },
+    UpdateUserBanStatus:    { method: 'post', url: '/api/Admin/UpdateUserBanStatus' },  // 未使用
+    // Core
+    GetCoreConfig:          { method: 'post', url: '/api/Core/GetCoreConfig' },     // 未使用
+    UpdateCoreConfig:       { method: 'post', url: '/api/Core/UpdateCoreConfig' },  // 未使用
+};
+
+// APIメソッドの自動生成
+const ApiModule = {};
+Object.entries(API_ENDPOINTS).forEach(([methodName, config]) => {
+    ApiModule[methodName] = async function(params = {}) {
+        return await $Warn.CatchAsync(async () => await this._fetchData(config.method, config.url, params))();
+    };
+});
 
 // データ管理（通信・保持）を統合したオブジェクト
 window.$Data = {
@@ -9,15 +69,12 @@ window.$Data = {
     resData: null,
     // データの完全初期化
     Clear() {
-        // ① resData もクリアする
         this.resData = null;
-        // ② "archives" ではなく "archive"（単数形）にし、初期値を null にする
         this.Access._rawData.archive = null; 
         this.Access._rawData.details = [];
         this.Access._rawData.myReactions = [];
         this.Access._rawData.archiveList = [];
         this.Access._rawData.userProfile = null;
-        // ③ Restore() でも良いですが、Store内に既に Clear() があるのでそちらを呼ぶとより確実です
         this.Store.Restore(); 
     },
     // 通信関連のメソッド群
@@ -84,7 +141,8 @@ window.$Data = {
             $App.AppData.Context.IsLoggedIn = result.is_logged_in ?? false;
             $App.AppData.Owner.plan = result.plan;
             // 取得データを内部に保持
-            this._setData(data); // ← 切り出し
+            this._setData(data);
+            
             // ベース情報をStoreに保持
             $Data.Store.Restore();
             return true;
@@ -92,11 +150,9 @@ window.$Data = {
         // 取得データを内部に保持
         _setData(data) {
             $Data.resData = data;
-            // console.log(">>$Data.resData:", $Data.resData);
             if (data.archiveId) $App.AppData.Context.TargetArchiveId = data.archiveId;
             // アプリ基幹のデータ
             if (data.archive) this._rawData.archive = data.archive;
-            // if (data.details) this._rawData.details = data.details;
             if (data.myReactions) this._rawData.myReactions = data.myReactions;
             if (data.details) {
                 // 各明細に「取得時点の自分の状態」を紐付けて、後の計算（差分抽出）に備える
@@ -132,67 +188,9 @@ window.$Data = {
             if (data.userMailList) $App.AppData.Admin.userMailList = data.userMailList;
             console.log(">>$App.AppData:", $App.AppData);
         },
-
-
-
-        // --- (既存のアプリアクセスメソッド群省略なし) ---
-        async LoginFirebase(email) {
-            const params = { Email: email };
-            return await $Warn.CatchAsync(async () => {
-                await this._fetchData('post', '/api/Account/LoginFirebase', params);
-                console.log("Login 成功");
-            })();
-        },
-        // public record EnsureLoginUserReq(Guid login_user_id)
-        async EnsureLoginUser(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/EnsureLoginUser', params))();
-        },
-        async UpdateProfile(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/UpdateProfile', params))();
-        },
-        // Guid userId
-        async GetUserProfile(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Account/GetUserProfile', params))();
-        },
-
-
-
-        async GetArchiveDetails(params) {
-            // const url = isPublic ? "/api/Public/GetArchiveDetails_pub" : "/api/Private/GetArchiveDetails";
-            // return await $Warn.CatchAsync(async () => await this._fetchData('post', url, params))();
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/GetArchiveDetails', params))();
-        },
-        async UpdateDetail(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UpdateDetail', params))();
-        },
-        async UpdateArchive(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/UpdateArchive', params))();
-        },
-        async MergeDetails(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/MergeDetails', params))();
-        },
-        async AddDetails(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/AddDetails', params))();
-        },
-        async GetArchiveList(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/GetArchiveList', params))();
-        },
-        async GetUnMergeDetails(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/GetUnMergeDetails', params))();
-        },
-        async DeleteArchive(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/DeleteArchive', params))();
-        },
-        async PublishArchive(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/PublishArchive', params))();
-        },
-        async BulkSyncDetails(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Private/BulkSyncDetails', params))();
-        },
-
-
-
-        // ★匿名
+        // 定形APIの展開（自動生成モジュールのマージ）
+        ...ApiModule,
+        // 個別実装（パスパラメータ等を含む特殊なAPI）
         async GetArchiveDetailsPub(params = {}) {
             const encodedId = $Util.EncodeId(params.archive_id);
             // 引数 params.archive_id を使用して URL を構築
@@ -201,111 +199,6 @@ window.$Data = {
             return await $Warn.CatchAsync(async () => {
                 return await this._fetchData('get', url, null); 
             })();
-        },
-        // ★匿名
-        async AddClick(params) {
-            // public record AddClickReq(
-            //     int target_type,
-            //     Guid target_user_id,
-            //     int? archive_id,
-            //     long? seq,
-            //     string item_name
-            // );
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/AddClick', params))();
-        },
-
-
-
-        async UpdateDetailPub(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/UpdateDetailPub', params))();
-        },
-        async UnpublishArchive(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/UnpublishArchive', params))();
-        },
-        async UpdateArchivePub(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/UpdateArchivePub', params))();
-        },
-        async SearchByLocationPub(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/SearchByLocationPub', params))();
-        },
-        async OpenArchive(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/OpenArchive', params))();
-        },
-        async CloseArchive(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/CloseArchive', params))();
-        },
-        async BulkSyncReactions(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/BulkSyncReactions', params))();
-        },
-        // [Required(ErrorMessage = "削除対象のseqリストは必須です")] int[] seqs
-        async DeleteStrayDetails(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/DeleteStrayDetails', params))();
-        },
-        // [Required(ErrorMessage = "解除対象のseqリストは必須です")] int[] seqs
-        async DetachDetails(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Public/DetachDetails', params))();
-        },
-
-
-
-        // public record UpsertFeedbackReq(string? body, int score);
-        async UpsertFeedback(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertFeedback', params))();
-        },
-        // public record UpsertReportReq(Guid target_user_id, long archive_id, string? body);
-        async UpsertReport(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/UpsertReport', params))();
-        },
-        async GetMyFeedback(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyFeedback', params))();
-        },
-        // public record GetMyReportReq(long archive_id);
-        async GetMyReport(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyReport', params))();
-        },
-        // public record DeleteMyReportReq(long archive_id);
-        async DeleteMyReport(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/DeleteMyReport', params))();
-        },
-        async GetSystemInfo(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetSystemInfo', params))();
-        },
-        async GetMyUserNotifications(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Sys/GetMyUserNotifications', params))();
-        },
-
-
-
-        // public record UpsertNotificationReq(long seq, string title, string body, short kind, DateTime disp_from, DateTime disp_to);
-        async UpsertNotification(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/UpsertNotification', params))();
-        },
-        // public record GetReportDetailsReq(Guid target_user_id, long archive_id);
-        async GetReportDetails(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/GetReportDetails', params))();
-            // console.warn("TEST: GetMockData(REPORT_DETAIL) を使用します");
-            // $Data.resData.reports = $Const.GetMockData('REPORT_DETAIL', 50);
-            // $Data.resData.target_userProfile = null;
-            // return true;
-        },
-        // public record Request(int archive_id, Guid target_user_id);
-        async AdminCloseArchive(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/AdminCloseArchive', params))();
-        },
-        // public record Request(int archive_id, Guid target_user_id);
-        async AdminUnpublishArchive(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/AdminUnpublishArchive', params))();
-        },
-        // public record Request(Guid target_user_id, string emoji, string body);
-        async SendUserNotification(params) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/SendUserNotification', params))();
-        },
-        // public record GetAllFeedbackReq(int score = 0);
-        async GetAllFeedback(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/GetAllFeedback', params))();
-        },
-        async GetAdminAllInfo(params = {}) {
-            return await $Warn.CatchAsync(async () => await this._fetchData('post', '/api/Admin/GetAdminAllInfo', params))();
         },
     },
     // データ操作・取得のメソッド群
@@ -325,7 +218,7 @@ window.$Data = {
             if (archiveId == null && seq == null) return list;
             const hit = list.find(x => {
                 if (seq > 0) return x.archive_id === Number(archiveId) && x.seq === Number(seq);
-                return x.dbid === Number(detail.dbid);
+                return x.dbid === Number(detail.dbid); // ※bug: detail is undefined
             });
             return hit ? [hit] :[];
         },
@@ -352,7 +245,6 @@ window.$Data = {
                 const dbidB = Number(b.dbid || 0);
                 return dbidA - dbidB;
             });
-
             return list;
         },
         GetDetails() {
@@ -495,7 +387,6 @@ window.$Data = {
             const isSuccess = await $Data.Access.BulkSyncReactions(payload);
             if (isSuccess) {
                 // 送信成功時：フラグ1のまま保持（同期済みデータとしてローカルDBに残す）
-                // console.log(`リアクション ${list.length}件の同期が完了しました。`);
                 return true;
             } else {
                 // 送信失敗時：環境が回復するまで待機するため、フラグを未送信(0)に戻す
