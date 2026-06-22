@@ -58,22 +58,22 @@ export default {
         authLabel.textContent = isLoggedIn ? "LOGOUT" : "LOGIN";
         // 新着通知
         const unreadCount = $App.AppData.Context.UnreadNoticeCount || 0;
-        if (unreadCount > 0) {
-            const labelSpan = $Dom.QuerySelector('span:last-child', b.notice);
-            labelSpan.classList.add("flex", "items-center", "gap-2");
-            if (!labelSpan.querySelector('.badge-new')) {
-                labelSpan.insertAdjacentHTML('beforeend', `<span class="badge-new ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full tracking-wider mt-0.5">NEW</span>`);
-            }
-        }
+        // if (unreadCount > 0) {
+        //     const labelSpan = $Dom.QuerySelector('span:last-child', b.notice);
+        //     labelSpan.classList.add("flex", "items-center", "gap-2");
+        //     if (!labelSpan.querySelector('.badge-new')) {
+        //         labelSpan.insertAdjacentHTML('beforeend', `<span class="badge-new ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full tracking-wider mt-0.5">NEW</span>`);
+        //     }
+        // }
         // 新着メール
         const unreadMail = $App.AppData.Context.UnreadMailCount || 0;
-        if (unreadMail > 0) {
-            const labelSpan = $Dom.QuerySelector('span:last-child', b.profile);
-            labelSpan.classList.add("flex", "items-center", "gap-2");
-            if (!labelSpan.querySelector('.badge-new')) {
-                labelSpan.insertAdjacentHTML('beforeend', `<span class="badge-new ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full tracking-wider mt-0.5">NEW</span>`);
-            }
-        }
+        // if (unreadMail > 0) {
+        //     const labelSpan = $Dom.QuerySelector('span:last-child', b.profile);
+        //     labelSpan.classList.add("flex", "items-center", "gap-2");
+        //     if (!labelSpan.querySelector('.badge-new')) {
+        //         labelSpan.insertAdjacentHTML('beforeend', `<span class="badge-new ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full tracking-wider mt-0.5">NEW</span>`);
+        //     }
+        // }
         // 4. 各ボタンのイベント登録
         b.profile.onclick = async () => {
             // this._core.close();
@@ -550,8 +550,6 @@ export default {
             help: "",
 			headerButtons: headerButtons
 		});
-        // バッジを反映
-        setTimeout(() => this._updateProfileMailBadge(), 10);
     },
     // プロフィール編集（上にスタックされる）
     ShowEditProfile(profile, onUpdate) {

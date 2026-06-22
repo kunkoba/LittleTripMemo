@@ -12,20 +12,24 @@ public class AccountController : _BaseController
     private readonly UpdateUserProfileService _updateUserProfileService;
     private readonly EnsureLoginUserService _ensureLoginUserService;
     private readonly GetUserProfileService _getUserProfileService;
+    private readonly WithdrawalUserService _withdrawalUserService;
 
     public AccountController(
         UserContext userContext,
         RegistrationUserService accountService,
         UpdateUserProfileService updateUserProfileService,
         EnsureLoginUserService ensureLoginUserService,
-        GetUserProfileService getUserProfileService
+        GetUserProfileService getUserProfileService,
+        WithdrawalUserService withdrawalUserService
     ) : base(userContext)
     {
         _accountService = accountService;
         _updateUserProfileService = updateUserProfileService;
         _ensureLoginUserService = ensureLoginUserService;
         _getUserProfileService = getUserProfileService;
+        _withdrawalUserService = withdrawalUserService;
     }
+
     /// <summary>
     /// Firebase認証後のログイン／新規登録処理
     /// </summary>
@@ -71,4 +75,18 @@ public class AccountController : _BaseController
         var result = await _getUserProfileService.ExecuteAsync(req.target_user_id);
         return OkWithBase(result);
     }
+
+    /// <summary>
+    /// ユーザー退会処理
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("Withdrawal")]
+    [CustomAuthorize] // ログイン状態であること
+    public async Task<IActionResult> Withdrawal([FromBody] WithdrawalUserService.WithdrawalReq req)
+    {
+        var result = await _withdrawalUserService.ExecuteAsync(req);
+        return OkWithBase(result);
+    }
+
 }

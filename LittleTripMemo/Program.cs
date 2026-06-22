@@ -171,6 +171,7 @@ builder.Services.AddScoped<RegistrationUserService>();
 builder.Services.AddScoped<UpdateUserProfileService>();
 builder.Services.AddScoped<GetUserProfileService>();
 builder.Services.AddScoped<EnsureLoginUserService>();
+builder.Services.AddScoped<WithdrawalUserService>();
 // Private
 builder.Services.AddScoped<GetUnMergeDetailsService>();
 builder.Services.AddScoped<GetArchiveDetailsService>();

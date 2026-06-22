@@ -121,8 +121,6 @@ window.$Data = {
                 $Warn.CatchAsync(async () => {
                     await $Data.LocalDb.CheckUnreadNotices();
                     await $Data.LocalDb.CheckUnreadMails();
-                    // チェック完了後にUI側の更新を1回呼ぶ
-                    $UI.UpdateNoticeBadge();
                 })();
             }
             if (data.myFeedback) $App.AppData.Owner.myFeedback = data.myFeedback;
@@ -138,7 +136,7 @@ window.$Data = {
 
 
         // --- (既存のアプリアクセスメソッド群省略なし) ---
-        async LoginToServer(email) {
+        async LoginFirebase(email) {
             const params = { Email: email };
             return await $Warn.CatchAsync(async () => {
                 await this._fetchData('post', '/api/Account/LoginFirebase', params);
@@ -531,9 +529,6 @@ window.$Data = {
             }
             // 4. 未読件数を Context に保存し、UIを更新
             $App.AppData.Context.UnreadNoticeCount = unreadCount;
-            // console.log(`[Notice] 未読件数: ${unreadCount}件`);
-            // メニューアイコンの赤丸を更新
-            $UI.UpdateNoticeBadge(unreadCount);
         },
         // 通知の未読判定（個別メッセージ版）
         async CheckUnreadMails() {

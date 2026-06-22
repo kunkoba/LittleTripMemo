@@ -209,7 +209,6 @@ export default {
                     setNoticeStyle(child, false);
                     if ($App.AppData.Context.UnreadNoticeCount > 0) {
                         $App.AppData.Context.UnreadNoticeCount--;
-                        $UI.UpdateNoticeBadge($App.AppData.Context.UnreadNoticeCount);
                     }
                 }
                 this.ShowNoticeDetail(item);
@@ -337,9 +336,6 @@ export default {
                     setMailStyle(child, false);
                     if ($App.AppData.Context.UnreadMailCount > 0) {
                         $App.AppData.Context.UnreadMailCount--;
-                        // プロフィール内のバッジと、システムメニューの赤丸の両方を更新
-                        this._updateProfileMailBadge();
-                        $UI.UpdateNoticeBadge(); // これを追加
                     }
                 }
                 // ③ 詳細画面へ
@@ -352,8 +348,6 @@ export default {
             content: root,
             help: "",
         });
-        // バッジを反映
-        setTimeout(() => this._updateProfileMailBadge(), 10);
     },
     // ③ ユーザあて通知詳細画面
     ShowUserMailDetail(item) {
@@ -373,19 +367,5 @@ export default {
             help: "",
             buttons: []
         });
-    },
-    // ユーザあて通知の赤丸バッジ更新
-    _updateProfileMailBadge() {
-        const count = $App.AppData.Context.UnreadMailCount || 0;
-        const btn = document.getElementById("btn-header-mail");
-        if (!btn) return;
-        const oldBadge = btn.querySelector(".js-unread-badge");
-        if (oldBadge) oldBadge.remove();
-        if (count > 0) {
-            btn.classList.add("relative");
-            btn.insertAdjacentHTML('beforeend', 
-                `<span class="js-unread-badge absolute top-0 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-white pointer-events-none shadow-sm"></span>`
-            );
-        }
     },
 };

@@ -167,10 +167,6 @@ const UI_Manager = {
 		$TopBar.ToggleRoot(isShow);
 		$BotBar.ToggleRoot(isShow);
 	},
-	// 通知バッジの更新
-	UpdateNoticeBadge(count){
-		$BotBar.UpdateNoticeBadge(count);
-	},
 	// フォントサイズの変更
 	ChangeFontSize(size){
         // const sizes = { small: '14px', standard: '16px', large: '18px' };
