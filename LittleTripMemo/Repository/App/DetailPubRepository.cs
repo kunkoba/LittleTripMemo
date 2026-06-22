@@ -85,6 +85,7 @@ public class DetailPubRepository : _BaseRepository
             ON CONFLICT (archive_id, seq) DO UPDATE SET
                 del_flg = false,
                 update_tim = CURRENT_TIMESTAMP";
+
         await ExecuteAsync(sql, detail);
     }
 

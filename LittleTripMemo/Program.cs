@@ -9,9 +9,11 @@ using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Repository.App;
 using LittleTripMemo.Repository.Batch;
+using LittleTripMemo.Repository.Core;
 using LittleTripMemo.Repository.Sys;
 using LittleTripMemo.Services.Account;
 using LittleTripMemo.Services.Admin;
+using LittleTripMemo.Services.Core;
 using LittleTripMemo.Services.Private;
 using LittleTripMemo.Services.Public;
 using LittleTripMemo.Services.Sys;
@@ -27,12 +29,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json;
 
-
-// ★ これを一番上（builderの前）に追加
+// builder生成前に設定（Npgsqlのタイムスタンプ挙動を旧仕様に固定）
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 
+
 var builder = WebApplication.CreateBuilder(args);
+
 
 
 // ======================================================================
@@ -43,9 +46,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString =
     builder.Configuration.GetConnectionString("LittleTripMemoConnStr");
 
-
-
-// --- Dapperのカスタム型マッピング登録 ---
+// Dapperのカスタム型マッピング登録
 // click_stats で使用している Dictionary 型を JSONB として扱うように設定
 SqlMapper.AddTypeHandler(new JsonbTypeHandler<Dictionary<string, ClickCountData>>());
 
@@ -64,6 +65,7 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 
+
 // ======================================================================
 // ■ DIコンテナ登録（アプリの構成部品）
 //    ※ ここでは「生成ルール」だけを定義する
@@ -71,11 +73,12 @@ builder.Host.UseSerilog();
 
 // ---- インフラ層 ----
 
-// DBトランザクション管理
-// 1リクエスト = 1 TransactionProvider
+// DBトランザクション管理（1リクエスト = 1 TransactionProvider）
 builder.Services.AddScoped<ITransactionProvider>(
     _ => new TransactionProvider(connectionString!)
 );
+
+
 
 // ---- 共通コンテキスト ----
 
@@ -84,6 +87,10 @@ builder.Services.AddScoped<UserContext>();
 
 // HttpContext 参照用（UserContext 等で使用）
 builder.Services.AddHttpContextAccessor();
+
+// アプリ起動中ずっと保持されるシステム状態（シングルトン）
+builder.Services.AddSingleton<SystemStatus>();
+
 
 
 // ---- DB / Identity ----
@@ -98,7 +105,9 @@ builder.Services.AddIdentity<MyAppUser, IdentityRole<Guid>>()
     .AddDefaultTokenProviders();
 
 
+
 // ---- Swaggerの有効化 ----
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -126,16 +135,14 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-
 // ---- Infrastructure / Cross-cutting ----
-
 builder.Services.AddScoped<JwtService>();
 
 
 
 // ---- Repository（DBアクセス層） ----
 
-// ---- App / Infrastructure Repository ----
+// App / Infrastructure Repository
 builder.Services.AddScoped<AppUserRepository>();
 builder.Services.AddScoped<ArchiveRepository>();
 builder.Services.AddScoped<DetailRepository>();
@@ -143,24 +150,28 @@ builder.Services.AddScoped<ArchivePubRepository>();
 builder.Services.AddScoped<DetailPubRepository>();
 builder.Services.AddScoped<ReactionPubRepository>();
 builder.Services.AddScoped<ClickQueueRepository>();
-// ---- Sys / Infrastructure Repository ----
+// Sys / Infrastructure Repository
 builder.Services.AddScoped<SysFeedbackRepository>();
 builder.Services.AddScoped<SysNotificationRepository>();
 builder.Services.AddScoped<SysReportRepository>();
 builder.Services.AddScoped<SysUserNotificationRepository>();
 builder.Services.AddScoped<TableStatisticsRepository>();
-// ---- Batch / Infrastructure Repository ----
+// Batch / Infrastructure Repository
 builder.Services.AddScoped<TableStatisticsTaskRepository>();
 builder.Services.AddScoped<ClickQueueTaskRepository>();
+// Core / Infrastructure Repository
+builder.Services.AddScoped<CoreConfigRepository>();
+
 
 
 // ---- Service（業務ロジック層） ----
-// ---- Account ----
+
+// Account
 builder.Services.AddScoped<RegistrationUserService>();
 builder.Services.AddScoped<UpdateUserProfileService>();
 builder.Services.AddScoped<GetUserProfileService>();
 builder.Services.AddScoped<EnsureLoginUserService>();
-// ---- Private ----
+// Private
 builder.Services.AddScoped<GetUnMergeDetailsService>();
 builder.Services.AddScoped<GetArchiveDetailsService>();
 builder.Services.AddScoped<GetArchiveListService>();
@@ -173,7 +184,7 @@ builder.Services.AddScoped<DetachDetailsService>();
 builder.Services.AddScoped<BulkSyncDetailsService>();
 builder.Services.AddScoped<PublishArchiveService>();
 builder.Services.AddScoped<UpdateDetailService>();
-// ---- Public ----
+// Public
 builder.Services.AddScoped<GetArchiveDetailsPubService>();
 builder.Services.AddScoped<SearchByLocationPubService>();
 builder.Services.AddScoped<UnpublishArchiveService>();
@@ -183,7 +194,7 @@ builder.Services.AddScoped<UpdateArchivePubService>();
 builder.Services.AddScoped<UpdateDetailPubService>();
 builder.Services.AddScoped<BulkSyncReactionService>();
 builder.Services.AddScoped<AddClickQueueService>();
-// ---- Sys ----
+// Sys
 builder.Services.AddScoped<GetSystemInfoService>();
 builder.Services.AddScoped<UpsertFeedbackService>();
 builder.Services.AddScoped<GetMyFeedbackService>();
@@ -194,11 +205,16 @@ builder.Services.AddScoped<GetMyUserNotificationsService>();
 builder.Services.AddScoped<GetReportDetailsService>();
 builder.Services.AddScoped<AdminCloseArchivePubService>();
 builder.Services.AddScoped<AdminUnpublishArchiveService>();
-// ---- Admin ----
+// Admin
 builder.Services.AddScoped<GetAdminAllInfoService>();
 builder.Services.AddScoped<GetAllFeedbackService>();
 builder.Services.AddScoped<UpsertNotificationService>();
 builder.Services.AddScoped<SendUserNotificationService>();
+builder.Services.AddScoped<UpdateUserBanStatusService>();
+// ---- Core Service ----
+builder.Services.AddScoped<GetCoreConfigService>();
+builder.Services.AddScoped<UpdateCoreConfigService>();
+
 
 
 // ======================================================================
@@ -208,7 +224,7 @@ builder.Services.AddScoped<SendUserNotificationService>();
 // Controller 有効化 + JSON の既定ルール設定
 builder.Services.AddControllers(options =>
 {
-    // ★ これを追加：すべてのAPIで UserValidationFilter が自動的に実行される
+    // すべてのAPIで UserValidationFilter が自動的に実行される
     options.Filters.Add<UserValidationFilter>();
 })
 .AddJsonOptions(options =>
@@ -264,11 +280,13 @@ builder.Services.AddCors(options =>
     //});
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()   // すべてのドメインを許可(ngrok使用時だけの特例）
+        // すべてのドメインを許可（ngrok使用時だけの特例）
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
+
 
 
 // ======================================================================
@@ -280,6 +298,7 @@ builder.Services.Configure<MyAppSettings>(
 
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection(JwtSettings.SectionName));
+
 
 
 // ======================================================================
@@ -311,7 +330,7 @@ builder.Services
                     Encoding.UTF8.GetBytes(jwt.SecretKey))
         };
 
-        // ✅ これを追加
+        // 認証失敗時のレスポンスをJSON形式で統一
         options.Events = new JwtBearerEvents
         {
             OnChallenge = context =>
@@ -324,25 +343,27 @@ builder.Services
         };
     });
 
+
+
 // ======================================================================
-// 
 // ■ アプリ生成
-// 
 // ======================================================================
 
 var app = builder.Build();
+
 
 
 // ■ 起動前設定チェック（フェイルファスト）
 using (var startupScope = app.Services.CreateScope())
 {
     var settings = startupScope.ServiceProvider.GetRequiredService<IOptions<MyAppSettings>>().Value;
-    
+
     bool isInvalid = false;
     isInvalid |= settings.MaxTableNum <= 0;
     isInvalid |= settings.ReactionCountUpdateIntervalMinutes <= 0;
     isInvalid |= settings.TableStatsUpdateIntervalMinutes <= 0;
     isInvalid |= settings.GarbageCleanupIntervalMinutes <= 0;
+    isInvalid |= settings.ClickAggregateIntervalMinutes <= 0;
 
     if (isInvalid)
     {
@@ -356,6 +377,7 @@ using (var startupScope = app.Services.CreateScope())
         Console.WriteLine($"ReactionInterval: {settings.ReactionCountUpdateIntervalMinutes}");
         Console.WriteLine($"TableStatsInterval: {settings.TableStatsUpdateIntervalMinutes}");
         Console.WriteLine($"GarbageInterval: {settings.GarbageCleanupIntervalMinutes}");
+        Console.WriteLine($"ClickInterval: {settings.ClickAggregateIntervalMinutes}");
         Console.WriteLine("====================================================");
         Console.ResetColor();
 
@@ -364,37 +386,35 @@ using (var startupScope = app.Services.CreateScope())
 }
 
 
-//// HTTPS 強制（ngrok 使用時は問題になる場合あり）
+
+// HTTPS 強制（ngrok 使用時は問題になる場合あり）
 //app.UseHttpsRedirection();
 
 // CORS 設定を有効化（フロントエンドからの別オリジン通信を許可）
-app.UseRouting(); // これを明示的に追加
+app.UseRouting();
 app.UseCors();
 
-// 全体例外を JSON レスポンスに変換
+
+
+// 1. 全体例外（一番外側で全てをキャッチ）
 app.UseMiddleware<ExceptionHandling>();
 
-
-
-// Swagger UIの表示（開発環境のみ）
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-
-
-// JWTミドルウェア実行
+// 2. JWT認証（ここで UserContext.login_user_id や plan_type がセットされる）
 app.UseMiddleware<JwtMiddleware>();
 
-// 認可ミドルウェア
-// [Authorize] 属性などを基に、アクセス可否を判定
+// 3. システム管理（管理者プランかどうかを見てメンテをスルーさせるため）
+app.UseMiddleware<LittleTripMemo.Middleware.SystemManagementMiddleware>();
+
+// 4. 標準の認可（[Authorize]属性の評価）
 app.UseAuthorization();
 
-// Controller ルーティング有効化
 app.MapControllers();
 
-// 起動
 app.Run();
 

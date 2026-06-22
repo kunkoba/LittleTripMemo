@@ -2,100 +2,85 @@
 const _BottomCore = {
     _elementId: "ui-bottom-bar",
     // 初期化
-    init() {
+	init() {
 		if (!this.root) {
-			// 要素取得
-			{
-				this.root = $Dom.GetElementById(this._elementId);
-				this.btnCreate = $Dom.GetElementById('btn-create');
-				this.btnSearch = $Dom.GetElementById('btn-search');
-				this.btnAppMenu = $Dom.GetElementById('btn-app-menu');
-				this.groupMove = $Dom.GetElementById('bot-group-move');
-				this.btnFirst = $Dom.GetElementById('btn-bot-move-first');
-				this.btnPrev = $Dom.GetElementById('btn-bot-move-prev');
-				this.btnOpen = $Dom.GetElementById('btn-bot-move-open');
-				this.btnNext = $Dom.GetElementById('btn-bot-move-next');
-				this.btnLast = $Dom.GetElementById('btn-bot-move-last');
-                this.badgeSysMenu = $Dom.GetElementById('badge-sys-menu');
-			}
-			// イベント登録
-			{
-				this.btnAppMenu.addEventListener('click', (e) => {
-					// アプリメニュー
-					$Dialog.ShowAppMenu();
-				});
-				this.btnCreate.addEventListener('click', () => {
-					$Marker.RefreshCurrentArrow();
-                    // まず現在地を画面中央にする
-                    $Marker.FocusToLocationMarker();
-                    // 50ミリ秒待ってから詳細画面を開く
-                    setTimeout(() => {
-						$DetailFrame.Open();
-                    }, 50);
-				});
-				this.btnSearch.addEventListener('click', async () => {
-					// 検索範囲（緯度経度）を取得
-					const range = $Map.GetSearchRange(0.8);
-					// TopBar から新しい構造のソート設定を取得
-					const sortSetting = $TopBar.GetSortSetting();
-					// ▼ 修正: C# 側の引数名に合わせて searchWord をパラメータに追加
-					const params = {
-						...range,
-						sortField: sortSetting.sortField,
-						reactionType: sortSetting.reactionType,
-						keyword: sortSetting.keyword,
-						limit: 20
-					};
-					// データをクリア
-					$Data.Clear();
-					// 通信処理（Public と Private でエンドポイントを分岐）
-					const isSuccess = await $Data.Access.SearchByLocationPub(params);
-					if (!isSuccess) return;
-					// 検索結果のリスト表示、またはマーカーの再描画
+			this.root = $Dom.GetElementById(this._elementId);
+			
+			// --- 1. 要素取得 (メニューボタン 4種) ---
+			this.btnSysMenu  = $Dom.GetElementById('btn-sys-menu');
+			this.btnUserMenu = $Dom.GetElementById('btn-user-menu');
+			this.btnDataMenu = $Dom.GetElementById('btn-data-menu');
+			this.btnAppMenu  = $Dom.GetElementById('btn-app-menu');
+
+			// --- 2. 要素取得 (動的エリア・バッジ) ---
+			this.btnCreate     = $Dom.GetElementById('btn-create');
+			this.btnSearch     = $Dom.GetElementById('btn-search');
+			this.groupMove     = $Dom.GetElementById('bot-group-move');
+			this.badgeSysMenu  = $Dom.GetElementById('badge-sys-menu');
+			this.badgeUserMenu = $Dom.GetElementById('badge-user-menu');
+
+			// --- 3. 要素取得 (移動ボタン群：既存維持) ---
+			this.btnFirst = $Dom.GetElementById('btn-bot-move-first');
+			this.btnPrev  = $Dom.GetElementById('btn-bot-move-prev');
+			this.btnOpen  = $Dom.GetElementById('btn-bot-move-open');
+			this.btnNext  = $Dom.GetElementById('btn-bot-move-next');
+			this.btnLast  = $Dom.GetElementById('btn-bot-move-last');
+
+			// --- 4. イベント登録 (4つのメニュー) ---
+			this.btnSysMenu.addEventListener('click',  () => $Dialog.ShowSystemMenu());
+			this.btnUserMenu.addEventListener('click', () => $Dialog.ShowUserMenu());
+			this.btnDataMenu.addEventListener('click', () => $Dialog.ShowDataMenu());
+			this.btnAppMenu.addEventListener('click',  () => $Dialog.ShowActionMenu());
+
+			// --- 5. イベント登録 (メインアクション・移動ボタン：既存維持) ---
+			this.btnCreate.addEventListener('click', () => {
+				$Marker.RefreshCurrentArrow();
+				$Marker.FocusToLocationMarker();
+				setTimeout(() => $DetailFrame.Open(), 50);
+			});
+
+			this.btnSearch.addEventListener('click', async () => {
+				const range = $Map.GetSearchRange(0.8);
+				const sortSetting = $TopBar.GetSortSetting();
+				const params = { ...range, ...sortSetting, limit: 20 };
+				$Data.Clear();
+				if (await $Data.Access.SearchByLocationPub(params)) {
 					$Marker.RefreshPointMarker();
-					// 検索結果が0件だった場合の通知（任意）
-					const details = $Data.Store.GetDetails();
-					if (details.length === 0) {
-						$Notice.Info("条件に一致するメモが見つかりませんでした。");
-					}
-				});
-				// 移動ボタン
-				this.btnFirst.addEventListener('click', () => { $Marker.FocusFirst(); });
-				this.btnPrev.addEventListener('click',  () => { $Marker.FocusPrev();  });
-				this.btnNext.addEventListener('click',  () => { $Marker.FocusNext();  });
-				this.btnLast.addEventListener('click',  () => { $Marker.FocusLast();  });
-				this.btnOpen.addEventListener('click',  () => {
-                    const detail = $Marker.GetDataWithCurrentIndex();
-					$DetailFrame.Open(detail);
-					// $Marker.FocusToCurrentMarker();
-				});
-			}
+				}
+			});
+
+			this.btnFirst.onclick = () => $Marker.FocusFirst();
+			this.btnPrev.onclick  = () => $Marker.FocusPrev();
+			this.btnNext.onclick  = () => $Marker.FocusNext();
+			this.btnLast.onclick  = () => $Marker.FocusLast();
+			this.btnOpen.onclick  = () => {
+				const detail = $Marker.GetDataWithCurrentIndex();
+				$DetailFrame.Open(detail);
+			};
 		}
-    },
-    // 画面モード変更時
-    changeScreenMode(){
-		// 初期化
+	},
+	changeScreenMode() {
+		const mode = $App.AppData.Context.ScreenMode;
+
+		// 上段の動的要素を一旦すべて隠す
+		$Dom.ToggleShow(this.groupMove, false);
 		$Dom.ToggleShow(this.btnCreate, false);
 		$Dom.ToggleShow(this.btnSearch, false);
-		$Dom.ToggleShow(this.groupMove, false);
-		switch ($App.AppData.Context.ScreenMode) {
+
+		// 画面モードに応じて必要なものだけ表示
+		switch (mode) {
 			case $Const.SCREEN_MODE.CREATE:
-				// 新規登録
 				$Dom.ToggleShow(this.btnCreate, true);
+				break;
+			case $Const.SCREEN_MODE.SEARCH:
+				$Dom.ToggleShow(this.btnSearch, true);
 				break;
 			case $Const.SCREEN_MODE.ARCHIVE:
 			case $Const.SCREEN_MODE.ARCHIVE_PUB:
-				// まとめ参照
 				$Dom.ToggleShow(this.groupMove, true);
 				break;
-			case $Const.SCREEN_MODE.SEARCH:
-				// 地図検索
-				$Dom.ToggleShow(this.btnSearch, true);
-				break;
-				// どれにも当てはまらないとき
-				break;
 		}
-    },
+	},
     // アイコンバーの表示切替
     toggleRoot(isOpen){
         $Dom.ToggleShow(this.root, isOpen);
@@ -109,15 +94,19 @@ const _BottomCore = {
         if (isHidden) $Dom.ToggleShow(el, true);
     },
     // 通知の未読バッジ（赤丸）をシステムアイコンに付ける
-    updateNoticeBadge(count) {
-        if (this.badgeSysMenu) {
-            // システム通知 と 個人メッセージ の未読数を合算
-            const totalUnread = ($App.AppData.Context.UnreadNoticeCount || 0) + 
-                                ($App.AppData.Context.UnreadMailCount || 0);
-            // 合計が 1 以上なら赤丸を表示
-            $Dom.ToggleShow(this.badgeSysMenu, totalUnread > 0);
-        }
-    },
+	updateNoticeBadge() {
+		// システム通知の未読数
+		const unreadNotice = $App.AppData.Context.UnreadNoticeCount || 0;
+		// 個人メッセージの未読数
+		const unreadMail = $App.AppData.Context.UnreadMailCount || 0;
+		
+		if (this.badgeSysMenu) {
+			$Dom.ToggleShow(this.badgeSysMenu, unreadNotice > 0);
+		}
+		if (this.badgeUserMenu) {
+			$Dom.ToggleShow(this.badgeUserMenu, unreadMail > 0);
+		}
+	}
 };
 
 // 窓口

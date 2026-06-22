@@ -86,15 +86,9 @@
             <span class="text-[1rem] font-black text-slate-400 tracking-wider js-date italic"></span>
             <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
         </div>
-        <!-- User IDテキストを、標準ユーザーボタンに変更 -->
+        <!-- ▼ 修正：ジェネレータ用の空のラッパーに変更 -->
         <div class="mb-4">
-            <div id="view-feedback-user-wrapper">
-                <button id="btn-feedback-user-profile" 
-                    class="rounded-full pl-2 pr-4 h-10 max-w-[200px] min-w-[100px] border-4 border-slate-100 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
-                    <span id="view-feedback-user-icon" class="text-[1.4rem] drop-shadow-md">👤</span>
-                    <span id="view-feedback-user-name" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
-                </button>
-            </div>
+            <div id="view-feedback-user-wrapper"></div>
         </div>
         <div class="bg-brand-1 rounded-lg p-2">
             <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-words js-body mt-2 h-[200px] overflow-y-auto pr-2"></div>
@@ -186,7 +180,7 @@
 </template>
 
 <!-- 【ダイアログ子】管理者：ユーザー個別通知送信 (完全改修版) -->
-<template id="tpl-admin-send-user-notification">
+<template id="tpl-admin-send-user-notification_2">
     <div class="w-full text-black-5 space-y-6 pt-2 px-2">
         <!-- 1. 宛先ユーザー情報 (固定表示) -->
         <div class="px-1">
@@ -221,6 +215,88 @@
         </div>
     </div>
 </template>
+<template id="tpl-admin-send-user-notification">
+    <div class="w-full text-black-5 space-y-6 pt-2 px-2">
+        <!-- ▼ 修正：ジェネレータ用の空のラッパーに変更 -->
+        <div class="px-1">
+            <label class="block font-black text-black-3 text-[0.6rem] mb-2 uppercase tracking-widest">To Recipient</label>
+            <div id="admin-send-target-user-wrapper"></div>
+        </div>
+        <!-- 2. メッセージアイコン入力 (明細画面の MARKER レイアウト) -->
+        <div class="px-1 w-[50%]">
+            <label class="block font-black text-black-3 text-[0.6rem] mb-1 uppercase tracking-wider">Message Icon</label>
+            <div class="flex items-center justify-between pb-1">
+                <button id="btn-admin-send-emoji-trigger" type="button" 
+                    class="h-[36px] w-full text-left text-[1.8rem] outline-none active:scale-95">
+                    <span id="admin-send-emoji-preview">✉️️</span>
+                    <input type="hidden" id="admin-send-emoji-val" value="✉️️">
+                </button>
+            </div>
+        </div>
+        <!-- 3. メッセージ本文 -->
+        <div>
+            <div class="flex justify-between items-end mb-1">
+                <label class="block text-[0.7rem] font-bold uppercase text-slate-400">Message Body</label>
+                <span class="text-[0.6rem] font-bold text-slate-300"><span id="admin-send-body-count">0</span>/300</span>
+            </div>
+            <textarea id="admin-send-body" maxlength="300" placeholder="ユーザーへのメッセージを入力してください" 
+                class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none leading-relaxed"></textarea>
+        </div>
+    </div>
+</template>
+
+
+<!-- 【ダイアログ子】管理者フィードバック詳細 -->
+<template id="tpl-admin-feedback-detail">
+    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <span class="text-[1rem] font-black text-slate-400 tracking-wider js-date italic"></span>
+            <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
+        </div>
+        
+        <!-- ▼ 修正：ジェネレータ用の空のラッパーに変更 -->
+        <div class="mb-4">
+            <div id="view-feedback-user-wrapper"></div>
+        </div>
+
+        <div class="bg-brand-1 rounded-lg p-2">
+            <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-words js-body mt-2 h-[200px] overflow-y-auto pr-2"></div>
+        </div>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】管理者：ユーザー個別通知送信 (完全改修版) -->
+<template id="tpl-admin-send-user-notification">
+    <div class="w-full text-black-5 space-y-6 pt-2 px-2">
+        
+        <!-- ▼ 修正：ジェネレータ用の空のラッパーに変更 -->
+        <div class="px-1">
+            <label class="block font-black text-black-3 text-[0.6rem] mb-2 uppercase tracking-widest">To Recipient</label>
+            <div id="admin-send-target-user-wrapper"></div>
+        </div>
+
+        <!-- 2. メッセージアイコン入力 (明細画面の MARKER レイアウト) -->
+        <div class="px-1 w-[50%]">
+            <label class="block font-black text-black-3 text-[0.6rem] mb-1 uppercase tracking-wider">Message Icon</label>
+            <div class="flex items-center justify-between pb-1">
+                <button id="btn-admin-send-emoji-trigger" type="button" 
+                    class="h-[36px] w-full text-left text-[1.8rem] outline-none active:scale-95">
+                    <span id="admin-send-emoji-preview">✉️️</span>
+                    <input type="hidden" id="admin-send-emoji-val" value="✉️️">
+                </button>
+            </div>
+        </div>
+        <!-- 3. メッセージ本文 -->
+        <div>
+            <div class="flex justify-between items-end mb-1">
+                <label class="block text-[0.7rem] font-bold uppercase text-slate-400">Message Body</label>
+                <span class="text-[0.6rem] font-bold text-slate-300"><span id="admin-send-body-count">0</span>/300</span>
+            </div>
+            <textarea id="admin-send-body" maxlength="300" placeholder="ユーザーへのメッセージを入力してください" 
+                class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none leading-relaxed"></textarea>
+        </div>
+    </div>
+</template>
 
 <!-- 【ダイアログ子】管理者：通報内容の全文詳細 -->
 <template id="tpl-admin-report-item-detail">
@@ -228,15 +304,9 @@
         <div class="flex justify-between items-center pb-2">
             <span class="text-[1rem] font-black text-slate-400 tracking-wider js-report-tim italic"></span>
         </div>
+        <!-- ▼ 修正：ジェネレータ用の空のラッパーに変更 -->
         <div class="mb-4 px-2">
-            <!-- ID表示から、標準の「アイコン＋ニックネーム」ボタンに変更 -->
-            <div id="view-report-user-wrapper" class="mt-1">
-                <button id="btn-report-reporter-profile" 
-                    class="border border-slate-100 rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border-4 shadow-md flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
-                    <span id="view-report-user-icon" class="text-[1.4rem] drop-shadow-md">👤</span>
-                    <span id="view-report-user-name" class="text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-black"></span>
-                </button>
-            </div>
+            <div id="view-report-user-wrapper" class="mt-1"></div>
         </div>
         <div class="flex-1 bg-brand-1 rounded-lg p-2 h-[200px] overflow-y-auto">
             <div class="text-[1rem] text-slate-700 leading-[2] whitespace-pre-wrap break-words js-report-body mt-2"></div>

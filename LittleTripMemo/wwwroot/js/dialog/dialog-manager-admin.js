@@ -285,24 +285,34 @@ export default {
         // 1. 日時と本文の反映
         $Dom.QuerySelector(".js-report-tim", el).textContent = $Util.FormatDate(rep.report_tim);
         $Dom.QuerySelector(".js-report-body", el).textContent = rep.body || "（内容なし）";
-        // 2. ユーザーボタンの反映（アイコン＋ニックネーム）
-        const userIcon = $Dom.QuerySelector("#view-report-user-icon", el);
-        const userName = $Dom.QuerySelector("#view-report-user-name", el);
-        const btnUser = $Dom.QuerySelector("#btn-report-reporter-profile", el);
-        // サーバーから渡されている通報者の情報を反映
-        userIcon.textContent = rep.icon || "👤";
-        userName.textContent = rep.nick_name || "Unknown User";
-        // ボタンクリック時のアクション
-        btnUser.onclick = async () => {
-            // APIで対象ユーザーのフルプロフィールを取得
-            const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: rep.reporter_user_id });
-            if (isSuccess) {
-                // $Data.resData (最新レスポンス) から、先ほど取得したプロフィールを抽出
-                const profile = $Data.resData;
-                // 標準のプロフィール画面を表示 (編集不可モード)
-                this.ShowUserProfile(profile, false);
-            }
-        };
+        // // 2. ユーザーボタンの反映（アイコン＋ニックネーム）
+        // const userIcon = $Dom.QuerySelector("#view-report-user-icon", el);
+        // const userName = $Dom.QuerySelector("#view-report-user-name", el);
+        // const btnUser = $Dom.QuerySelector("#btn-report-reporter-profile", el);
+        // // サーバーから渡されている通報者の情報を反映
+        // userIcon.textContent = rep.icon || "👤";
+        // userName.textContent = rep.nick_name || "Unknown User";
+        // ▼ 修正：共通のUIジェネレータでボタンを生成して追加
+        // （※通報者のIDは reporter_user_id というプロパティ名に注意）
+        const userWrapper = $Dom.QuerySelector("#view-report-user-wrapper", el);
+        userWrapper.innerHTML = "";
+        const userBtn = $UI.Generator.UserBadge({
+            icon: rep.icon,
+            nick_name: rep.nick_name,
+            user_id: rep.reporter_user_id
+        }, { type: 'button', isOwner: false });
+        if (userBtn) userWrapper.appendChild(userBtn);
+        // // ボタンクリック時のアクション
+        // btnUser.onclick = async () => {
+        //     // APIで対象ユーザーのフルプロフィールを取得
+        //     const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: rep.reporter_user_id });
+        //     if (isSuccess) {
+        //         // $Data.resData (最新レスポンス) から、先ほど取得したプロフィールを抽出
+        //         const profile = $Data.resData;
+        //         // 標準のプロフィール画面を表示 (編集不可モード)
+        //         this.ShowUserProfile(profile, false);
+        //     }
+        // };
         this._core.open({
             title: "REPORT CONTENT",
             content: el,
@@ -359,19 +369,27 @@ export default {
         $Dom.QuerySelector(".js-score", el).textContent = "★".repeat(item.score) + "☆".repeat(5 - item.score);
         $Dom.QuerySelector(".js-body", el).textContent = item.body || "（内容なし）";
         // --- ユーザーボタンへの反映 ---
-        const userIcon = $Dom.QuerySelector("#view-feedback-user-icon", el);
-        const userName = $Dom.QuerySelector("#view-feedback-user-name", el);
-        const btnUser = $Dom.QuerySelector("#btn-feedback-user-profile", el);
-        userIcon.textContent = item.icon || "👤";
-        userName.textContent = item.nick_name || "Unknown User";
-        btnUser.onclick = async () => {
-            const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: item.user_id });
-            if (isSuccess) {
-                const profile = $Data.resData;
-                // $Data.resData から取得したプロフィールを表示
-                this.ShowUserProfile(profile, false);
-            }
-        };
+        // const userIcon = $Dom.QuerySelector("#view-feedback-user-icon", el);
+        // const userName = $Dom.QuerySelector("#view-feedback-user-name", el);
+        // const btnUser = $Dom.QuerySelector("#btn-feedback-user-profile", el);
+        // userIcon.textContent = item.icon || "👤";
+        // userName.textContent = item.nick_name || "Unknown User";
+        const userWrapper = $Dom.QuerySelector("#view-feedback-user-wrapper", el);
+        userWrapper.innerHTML = "";
+        const userBtn = $UI.Generator.UserBadge({
+            icon: item.icon,
+            nick_name: item.nick_name,
+            user_id: item.user_id
+        }, { type: 'button', isOwner: false });
+        if (userBtn) userWrapper.appendChild(userBtn);
+        // btnUser.onclick = async () => {
+        //     const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: item.user_id });
+        //     if (isSuccess) {
+        //         const profile = $Data.resData;
+        //         // $Data.resData から取得したプロフィールを表示
+        //         this.ShowUserProfile(profile, false);
+        //     }
+        // };
         this._core.open({
             title: "FEEDBACK DETAILS",
             content: el,
@@ -384,8 +402,18 @@ export default {
         if (!profile) return $Notice.Warn("ユーザー情報が不明です");
         const el = $Dom.GenerateTemplate("tpl-admin-send-user-notification");
         // --- 1. 宛先ユーザー情報の反映 ---
-        $Dom.QuerySelector('#admin-send-target-icon', el).textContent = profile.icon;
-        $Dom.QuerySelector('#admin-send-target-name', el).textContent = profile.nick_name;
+        // $Dom.QuerySelector('#admin-send-target-icon', el).textContent = profile.icon;
+        // $Dom.QuerySelector('#admin-send-target-name', el).textContent = profile.nick_name;
+        // ▼ 修正：宛先としてバッジタイプのUI部品を生成して追加
+        // （メッセージ作成中にプロフィール画面に飛ぶと不自然なので、ここは 'badge' 形式を指定します）
+        const userWrapper = $Dom.QuerySelector('#admin-send-target-user-wrapper', el);
+        userWrapper.innerHTML = "";
+        const userBadge = $UI.Generator.UserBadge({
+            icon: profile.icon,
+            nick_name: profile.nick_name,
+            user_id: profile.user_id
+        }, { type: 'badge' });
+        if (userBadge) userWrapper.appendChild(userBadge);
         // --- 2. メッセージ用アイコン選択 (明細入力風) ---
         const previewEmoji = $Dom.QuerySelector('#admin-send-emoji-preview', el);
         const inputKind = $Dom.QuerySelector('#admin-send-emoji-val', el); // 内部的に ID は reuse

@@ -1,15 +1,4 @@
 export default {
-    // 以下のメソッドを移動してきてください。
-    // - ShowLoginDialog()
-    // - ShowSystemMenu()
-    // - ShowUserSettingsMenu()
-    // - ShowThemeConfig()
-    // - ShowMapStyleConfig()
-    // - ShowCurrencyConfig()
-    // - ShowGpsFollowConfig()
-    // - ShowUserProfile()
-    // - ShowEditProfile()
-    
     // ログイン処理
     ShowLoginDialog() {
         const el = $Dom.GenerateTemplate("tpl-login");
@@ -35,11 +24,11 @@ export default {
         });
     },
     // 【基幹】システムメニューを表示
-    ShowSystemMenu() {
+    ShowSystemMenu_2() {
         const el = $Dom.GenerateTemplate('tpl-menu-system');
         const isLoggedIn = $App.AppData.Context.IsLoggedIn;
         const isAdmin = isLoggedIn && $App.AppData.Owner.plan === "Admin";
-        // 1. ShowAppMenuと同様、まとめてボタン変数にする
+        // 1. ShowActionMenuと同様、まとめてボタン変数にする
         const b = {
             profile: $Dom.QuerySelector('#btn-sys-user-profile', el),
             config:  $Dom.QuerySelector('#btn-sys-user-config', el),
@@ -132,6 +121,110 @@ export default {
             content: el,
             help: "システムメニュー\nシステムメニュー",
         });
+    },
+    // 【⚙️ システムメニュー】
+    ShowSystemMenu() {
+        const el = $Dom.GenerateTemplate('tpl-menu-sys');
+        const isLoggedIn = $App.AppData.Context.IsLoggedIn;
+        const isAdmin = isLoggedIn && $App.AppData.Owner.plan === "Admin";
+        const b = {
+            notice:  $Dom.QuerySelector('#btn-sys-notice', el),
+            version: $Dom.QuerySelector('#btn-sys-version', el),
+            auth:    $Dom.QuerySelector('#btn-sys-auth', el),
+            admin:   $Dom.QuerySelector('#btn-sys-admin', el),
+        };
+        // 表示制御
+        $Dom.ToggleShow(b.admin, isAdmin);
+        const authLabel = $Dom.QuerySelector('span:last-child', b.auth);
+        authLabel.textContent = isLoggedIn ? "LOGOUT" : "LOGIN";
+        // 新着通知バッジ（📢）
+        const unreadCount = $App.AppData.Context.UnreadNoticeCount || 0;
+        if (unreadCount > 0) {
+            const labelSpan = $Dom.QuerySelector('span:last-child', b.notice);
+            labelSpan.insertAdjacentHTML('beforeend', `<span class="ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full mt-0.5">NEW</span>`);
+        }
+        // イベント
+        b.notice.onclick = () => this.ShowNoticeList();
+        b.version.onclick = () => this.ShowAppInfo();
+        b.auth.onclick = async () => {
+            if (isLoggedIn) {
+                if (await this.ShowConfirm({ title: "LOGOUT", message: "ログアウトしますか？" })) {
+                    this._core.closeAll();
+                    $App.Logout();
+                    setTimeout(() => location.reload(), 500);
+                }
+            } else {
+                this.ShowLoginDialog();
+            }
+        };
+        b.admin.onclick = async () => {
+            if (await $Data.Access.GetAdminAllInfo()) this.ShowAdminMenu();
+        };
+        this._core.open({ title: "SYSTEM", content: el });
+    },
+    // 【👤 ユーザーメニュー】
+    ShowUserMenu() {
+        const el = $Dom.GenerateTemplate('tpl-menu-user');
+        if (!$App.AppData.Context.IsLoggedIn) return this.ShowLoginDialog();
+        const b = {
+            profile: $Dom.QuerySelector('#btn-sys-user-profile', el),
+            mail:    $Dom.QuerySelector('#btn-user-mail', el),
+            config:  $Dom.QuerySelector('#btn-sys-user-config', el),
+            reports: $Dom.QuerySelector('#btn-sys-my-report', el),
+        };
+        if (($App.AppData.Context.UnreadMailCount || 0) > 0) {
+            const labelSpan = $Dom.QuerySelector('span:last-child', b.mail);
+            labelSpan.insertAdjacentHTML('beforeend', `<span class="ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full mt-0.5">NEW</span>`);
+        }
+        b.profile.onclick = () => this.ShowUserProfile($App.AppData.Owner.SystemInfo.ownerProfile, true);
+        b.mail.onclick    = () => this.ShowUserMailList();
+        b.config.onclick  = () => this.ShowUserSettingsMenu();
+        b.reports.onclick = () => this.ShowMyReportList();
+        this._core.open({ title: "USER MENU", content: el });
+    },
+    // 【🗺️ データメニュー】
+    ShowDataMenu() {
+        const isLoggedIn = $App.AppData.Context.IsLoggedIn;
+        if (!isLoggedIn) return this.ShowLoginDialog();
+        const el = $Dom.GenerateTemplate('tpl-menu-data');
+        const b = {
+            archiveList: $Dom.QuerySelector('#btn-app-archive-list', el),
+            archiveInfo: $Dom.QuerySelector('#btn-app-info', el),
+            pointList:   $Dom.QuerySelector('#btn-app-point-list', el),
+            batch:       $Dom.QuerySelector('#btn-app-batch', el),
+        };
+        const mode = $App.AppData.Context.ScreenMode;
+        const isArchive = (mode === $Const.SCREEN_MODE.ARCHIVE || mode === $Const.SCREEN_MODE.ARCHIVE_PUB);
+        $Dom.ToggleShow(b.archiveInfo, isArchive);
+        b.archiveList.onclick = () => this.ShowArchiveList();
+        b.archiveInfo.onclick = () => this.ShowArchiveInfo();
+        b.pointList.onclick = () => (mode === $Const.SCREEN_MODE.SEARCH) ? this.ShowDetailsSearchResult() : this.ShowDetailsTimeLine();
+        b.batch.onclick = () => this.ShowMultiSelectTimeline();
+        this._core.open({ title: "DATA MENU", content: el });
+    },
+    // 【⋯ アクションメニュー】
+    ShowActionMenu() {
+        const el = $Dom.GenerateTemplate('tpl-menu-action');
+        const isLoggedIn = $App.AppData.Context.IsLoggedIn;
+        const b = {
+            reload:  $Dom.QuerySelector('#btn-app-reload', el),
+            current: $Dom.QuerySelector('#btn-app-current', el),
+            restore: $Dom.QuerySelector('#btn-app-restore', el),
+            search:  $Dom.QuerySelector('#btn-app-search', el),
+            point:   $Dom.QuerySelector('#btn-app-point-search', el),
+            create:  $Dom.QuerySelector('#btn-app-create', el),
+        };
+        const mode = $App.AppData.Context.ScreenMode;
+        $Dom.ToggleShow(b.search, isLoggedIn && mode !== $Const.SCREEN_MODE.SEARCH);
+        $Dom.ToggleShow(b.point, mode === $Const.SCREEN_MODE.SEARCH);
+        $Dom.ToggleShow(b.create, isLoggedIn && mode !== $Const.SCREEN_MODE.CREATE);
+        b.reload.onclick = () => { this._core.close(); $App.RefreshScreen(); };
+        b.current.onclick = () => { this._core.close(); $Marker.RefreshCurrentLocation(); $Marker.FocusToLocationMarker(1000); };
+        b.restore.onclick = () => { this._core.close(); $Marker.RestoreMarkers(); };
+        b.search.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH; $App.RefreshScreen(); };
+        b.point.onclick = () => this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18));
+        b.create.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; $App.RefreshScreen(); };
+        this._core.open({ title: "ACTIONS", content: el });
     },
     // （ユーザ設定）ユーザー設定メニュー（第2階層）
     ShowUserSettingsMenu() {
@@ -440,12 +533,6 @@ export default {
 		const headerButtons = [];
         const isAdmin = $App.AppData.Owner.plan === "Admin"; // 管理者判定
         if (isOwner) {
-            // 【自分のプロフ】受信箱ボタン ＋ 編集ボタン
-            headerButtons.push({
-                label: "📩",
-                id: "btn-header-mail",
-                handler: () => this.ShowUserMailList()
-            });
             headerButtons.push({
                 label: "✏️",
                 handler: () => this.ShowEditProfile(profile, renderView)

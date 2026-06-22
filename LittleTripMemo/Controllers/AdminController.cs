@@ -17,6 +17,7 @@ public class AdminController : _BaseController
     private readonly SendUserNotificationService _sendUserNotificationService;
     private readonly UpsertNotificationService _upsertNotificationService;
     private readonly GetAllFeedbackService _getAllFeedbackService;
+    private readonly UpdateUserBanStatusService _updateUserBanStatusService;
 
     public AdminController(
         UserContext userContext,
@@ -26,7 +27,8 @@ public class AdminController : _BaseController
         AdminUnpublishArchiveService adminUnpublishArchiveService,
         SendUserNotificationService sendUserNotificationService,
         UpsertNotificationService upsertNotificationService,
-        GetAllFeedbackService getAllFeedbackService
+        GetAllFeedbackService getAllFeedbackService,
+        UpdateUserBanStatusService updateUserBanStatusService
     ) : base(userContext)
     {
         _getAdminAllInfoService = getAdminAllInfoService;
@@ -36,6 +38,7 @@ public class AdminController : _BaseController
         _sendUserNotificationService = sendUserNotificationService;
         _upsertNotificationService = upsertNotificationService;
         _getAllFeedbackService = getAllFeedbackService;
+        _updateUserBanStatusService = updateUserBanStatusService;
     }
 
     [HttpPost("GetAdminAllInfo")]
@@ -65,4 +68,12 @@ public class AdminController : _BaseController
     [HttpPost("GetAllFeedback")]
     public async Task<IActionResult> GetAllFeedback([FromBody] GetAllFeedbackService.GetAllFeedbackReq req)
         => OkWithBase(await _getAllFeedbackService.ExecuteAsync(req));
+
+    /// <summary>
+    /// ユーザーのBAN状態を更新（実行・解除）する
+    /// </summary>
+    [HttpPost("UpdateUserBanStatus")]
+    public async Task<IActionResult> UpdateUserBanStatus([FromBody] UpdateUserBanStatusService.UpdateUserBanStatusReq req)
+        => OkWithBase(await _updateUserBanStatusService.ExecuteAsync(req));
+
 }

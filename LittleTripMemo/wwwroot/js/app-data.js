@@ -1,6 +1,6 @@
 // ホスティングサーバ
-const BaseUrl = "https://localhost:7292";
-// const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
+// const BaseUrl = "https://localhost:7292";
+const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
 // const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
 
 // データ管理（通信・保持）を統合したオブジェクト
@@ -43,6 +43,7 @@ window.$Data = {
                 method: method.toUpperCase(),
                 headers: {
                     "ngrok-skip-browser-warning": "69420", // ngrok対応
+                    "X-App-Version": $Const.APP_INFO.VERSION // ★これを追加。すべてのリクエストに載せる
                 }
             };
             // トークンがある場合のみヘッダーに追加（空文字を送らない）

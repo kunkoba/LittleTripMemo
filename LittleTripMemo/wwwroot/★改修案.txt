@@ -13,6 +13,15 @@ docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql
        ├── ? LittleTripMemo.csproj
        └── ? wwwroot
 
+
+
+ファイル群を提供する
+トークンの無駄遣いをするな
+ソースの出力は許可なく行うな
+指示を待て
+
+
+
 ★コンセプト
 　あなたの旅行コンテンツを一箇所にまとめられます
 　YouTube・Instagram・ブログへの回遊を作れます

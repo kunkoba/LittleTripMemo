@@ -3,6 +3,7 @@ using LittleTripMemo.Configs;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository.App;
 using LittleTripMemo.Repository.Batch;
+using LittleTripMemo.Repository.Core;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 using System.Text.Json;
@@ -15,6 +16,7 @@ public class SystemMaintenanceWorker : BackgroundService
     private readonly ILogger<SystemMaintenanceWorker> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IOptionsMonitor<MyAppSettings> _optionsMonitor;
+    private readonly SystemStatus _systemStatus; // シングルトンの参照保持
 
     // 各タスクの次回予定時刻
     private DateTime _nextReactionUpdateTime;
@@ -27,11 +29,13 @@ public class SystemMaintenanceWorker : BackgroundService
     public SystemMaintenanceWorker(
         ILogger<SystemMaintenanceWorker> logger,
         IServiceScopeFactory scopeFactory,
-        IOptionsMonitor<MyAppSettings> optionsMonitor)
+        IOptionsMonitor<MyAppSettings> optionsMonitor,
+        SystemStatus systemStatus)
     {
         _logger = logger;
         _scopeFactory = scopeFactory;
         _optionsMonitor = optionsMonitor;
+        _systemStatus = systemStatus;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -55,6 +59,8 @@ public class SystemMaintenanceWorker : BackgroundService
         {
             using (LogContext.PushProperty("CorrelationId", Guid.NewGuid().ToString()[..8]))
             {
+                // ★ 最優先タスク：システムステータスの同期
+                await TaskSyncSystemStatusAsync();
                 // 各タスクの呼び出し（内部で判定と次回更新を行う）
                 await TaskUpdateReactionCountsAsync();
                 await TaskUpdateTableStatisticsAsync();
@@ -92,6 +98,46 @@ public class SystemMaintenanceWorker : BackgroundService
 
     #region "間隔実行タスク"
 
+    /// <summary>
+    /// DBの設定値をメモリ上のSystemStatusクラスに同期する
+    /// </summary>
+    private async Task TaskSyncSystemStatusAsync()
+    {
+        // 毎回実行（1分ごとの心拍で実行）
+        await RunWithScopeAsync("システムステータス同期", async (scope) =>
+        {
+            var repo = scope.ServiceProvider.GetRequiredService<CoreConfigRepository>();
+            var configs = await repo.GetConfigsByCategoryAsync("SYSTEM");
+
+            foreach (var cfg in configs)
+            {
+                string key = cfg.key;
+                string val = cfg.value;
+
+                switch (key)
+                {
+                    case "MaintenanceMode":
+                        _systemStatus.IsMaintenanceMode = (val.ToLower() == "true");
+                        break;
+                    case "MaintenanceMsg":
+                        _systemStatus.MaintenanceMessage = val;
+                        break;
+                    case "MinAppVersion":
+                        _systemStatus.MinAppVersion = val;
+                        break;
+                    case "LatestAppVersion":
+                        _systemStatus.LatestAppVersion = val;
+                        break;
+                }
+            }
+            _systemStatus.LastSyncTime = DateTime.Now;
+        });
+    }
+
+    /// <summary>
+    /// リアクション数の再集計を行うタスク
+    /// </summary>
+    /// <returns></returns>
     private async Task TaskUpdateReactionCountsAsync()
     {
         var settings = _optionsMonitor.CurrentValue;
@@ -110,6 +156,10 @@ public class SystemMaintenanceWorker : BackgroundService
         }
     }
 
+    /// <summary>
+    /// テーブル統計情報の更新を行うタスク
+    /// </summary>
+    /// <returns></returns>
     private async Task TaskUpdateTableStatisticsAsync()
     {
         var settings = _optionsMonitor.CurrentValue;
@@ -132,6 +182,10 @@ public class SystemMaintenanceWorker : BackgroundService
         }
     }
 
+    /// <summary>
+    /// 論理削除済みデータの物理削除を行うタスク
+    /// </summary>
+    /// <returns></returns>
     private async Task TaskGarbageCleanupAsync()
     {
         var settings = _optionsMonitor.CurrentValue;
@@ -154,6 +208,10 @@ public class SystemMaintenanceWorker : BackgroundService
         }
     }
 
+    /// <summary>
+    /// クリック数集計キューの処理を行うタスク
+    /// </summary>
+    /// <returns></returns>
     private async Task TaskAggregateClickQueueAsync()
     {
         var settings = _optionsMonitor.CurrentValue;
@@ -221,6 +279,10 @@ public class SystemMaintenanceWorker : BackgroundService
         return nextRun;
     }
 
+    /// <summary>
+    /// 定刻（例：毎日0時）に実行するタスク。今はダミー処理だが、将来的に日次でやりたい処理をここに追加していく。
+    /// </summary>
+    /// <returns></returns>
     private async Task TaskDailyMaintenanceAsync()
     {
         var settings = _optionsMonitor.CurrentValue;

@@ -11,37 +11,47 @@ public class ArchivePubRepository : _BaseRepository
         UserContext user
     ) : base(provider, logger, user) { }
 
+    /// <summary>
+    /// 新規公開処理
+    /// </summary>
     public async Task<int> InsertAsync(TMemoArchivePub archive)
     {
         archive.user_id = _user.login_user_id;
+
         const string sql = @"
             INSERT INTO t_memo_archive_pub (
                 archive_id, user_id, title, memo, link_url, currency_unit,
-                closed_flg, limited_open_flg, del_flg, create_tim, update_tim
-            ) VALUES (
+                closed_flg, limited_open_flg, del_flg
+            )
+            VALUES (
                 @archive_id, @user_id, @title, @memo, @link_url, @currency_unit,
-                TRUE, @limited_open_flg, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-            );";
+                TRUE, @limited_open_flg, FALSE
+            );
+        ";
+
         return await ExecuteAsync(sql, archive);
     }
 
+    /// <summary>
+    /// 公開情報の更新（限定公開フラグの変更を含む）
+    /// </summary>
     public async Task<int> UpdateByKeyAsync(TMemoArchivePub archive)
     {
         archive.user_id = _user.login_user_id;
 
         const string sql = @"
             UPDATE t_memo_archive_pub SET
-                title      = @title,
-                memo       = @memo,
-                link_url   = @link_url,
-                currency_unit = @currency_unit,
-                limited_open_flg = @limited_open_flg, 
-                update_tim = CURRENT_TIMESTAMP
+                title            = @title,
+                memo             = @memo,
+                link_url         = @link_url,
+                currency_unit    = @currency_unit,
+                limited_open_flg = @limited_open_flg,
+                update_tim       = CURRENT_TIMESTAMP
             WHERE
                 archive_id = @archive_id
                 AND user_id = @user_id
-                AND del_flg    = false";
-        
+                AND del_flg = false";
+
         return await ExecuteAsync(sql, archive);
     }
 

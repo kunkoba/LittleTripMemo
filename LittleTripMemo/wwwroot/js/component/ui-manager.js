@@ -67,7 +67,7 @@ const UI_Manager = {
                 if (!isOk) return;
                 // 4. クリック統計の送信（他人のデータ、かつパラメータがある場合のみ実行）
                 if (params && !isOwner) {
-                    $Data.Access.LogLinkClick(params);
+                    $Data.Access.AddClick(params);
                 }
                 // 5. 遷移先の決定と実行
                 // 安全なら直接URLへ、不審ならGoogle検索クエリとして構築

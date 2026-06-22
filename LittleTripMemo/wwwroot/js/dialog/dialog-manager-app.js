@@ -1,44 +1,38 @@
 export default {
     // 【基幹】アプリメニューを表示
-    ShowAppMenu() {
+    ShowActionMenu() {
         const isLoggedIn = $App.AppData.Context.IsLoggedIn;
         const mode = $App.AppData.Context.ScreenMode;
-        const el = $Dom.GenerateTemplate('tpl-menu-app');
+        const el = $Dom.GenerateTemplate('tpl-menu-action');
         // 各ボタンを一度だけ取得してオブジェクトに格納
         const b = {
             create: $Dom.QuerySelector('#btn-app-create', el),
             current: $Dom.QuerySelector('#btn-app-current', el),
             restore: $Dom.QuerySelector('#btn-app-restore', el),
-            archiveInfo: $Dom.QuerySelector('#btn-app-info', el),
-            detailList: $Dom.QuerySelector('#btn-app-pointlist', el),
-            batch:   $Dom.QuerySelector('#btn-app-batch', el),
-            point:   $Dom.QuerySelector('#btn-app-point', el),
-            archiveList: $Dom.QuerySelector('#btn-app-archive-list', el),
+            pointSearch:   $Dom.QuerySelector('#btn-app-point-search', el),
             search: $Dom.QuerySelector('#btn-app-search', el),
             reload: $Dom.QuerySelector('#btn-app-reload', el),
         };
         // 表示制御（取得済みの変数を使用）
         switch (mode) {
             case $Const.SCREEN_MODE.CREATE:
-                $Dom.ToggleShow(b.batch, true);
                 $Dom.ToggleShow(b.search, true);
+                $Dom.ToggleShow(b.pointSearch, false);
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
                 case $Const.SCREEN_MODE.ARCHIVE_PUB:
                 $Dom.ToggleShow(b.create, true);
                 $Dom.ToggleShow(b.search, true);
-                $Dom.ToggleShow(b.archiveInfo, true);
+                $Dom.ToggleShow(b.pointSearch, false);
                 break;
             case $Const.SCREEN_MODE.SEARCH:
                 $Dom.ToggleShow(b.create, true);
-                $Dom.ToggleShow(b.point, true);
+                $Dom.ToggleShow(b.pointSearch, true);
                 break;
         }
         // 未ログインなら
         if (!isLoggedIn) {
             $Dom.ToggleShow(b.create, false);
-            $Dom.ToggleShow(b.archiveList, false);
-            $Dom.ToggleShow(b.batch, false);
             $Dom.ToggleShow(b.search, false);
         }
         // イベント登録（取得済みの変数を使用）
@@ -56,20 +50,8 @@ export default {
             this._core.close();
             $Marker.RestoreMarkers();
         };
-        b.archiveInfo.onclick = () => {
-            this.ShowArchiveInfo();
-        }
-        b.detailList.onclick = () => {
-            mode === $Const.SCREEN_MODE.SEARCH ? this.ShowDetailsSearchResult() : this.ShowDetailsTimeLine();
-        }
-        b.batch.onclick = () => {
-            this.ShowMultiSelectTimeline({ onOk: (l) => console.log(l) });
-        };
-        b.point.onclick = () => {
+        b.pointSearch.onclick = () => {
             this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18));
-        };
-        b.archiveList.onclick = () => {
-            this.ShowArchiveList();
         };
         b.search.onclick = () => {
             this._core.close();
