@@ -209,6 +209,8 @@ export default {
                     setNoticeStyle(child, false);
                     if ($App.AppData.Context.UnreadNoticeCount > 0) {
                         $App.AppData.Context.UnreadNoticeCount--;
+                        // 新着バッヂ更新
+                        $UI.UpdateNoticeBadge();
                     }
                 }
                 this.ShowNoticeDetail(item);
@@ -336,6 +338,8 @@ export default {
                     setMailStyle(child, false);
                     if ($App.AppData.Context.UnreadMailCount > 0) {
                         $App.AppData.Context.UnreadMailCount--;
+                        // 新着バッヂ更新
+                        $UI.UpdateNoticeBadge();
                     }
                 }
                 // ③ 詳細画面へ

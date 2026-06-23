@@ -2,7 +2,7 @@
 window.$Const = {
     // アプリ情報
     APP_INFO: {
-        NAME: "Little Trip Memoあああ",
+        NAME: "Little Trip Memo（まとめも）",
         DEVELOPER: "kunkoba",
         VERSION: "1.0.0",
         OFFICIAL_SITE: "https://hinekulemonstudio.web.app/",

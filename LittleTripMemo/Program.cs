@@ -1,321 +1,61 @@
-﻿using Dapper;
-using LittleTripMemo.Common;
+﻿using LittleTripMemo.Common;
 using LittleTripMemo.Configs;
 using LittleTripMemo.DataAccess;
 using LittleTripMemo.DbContext;
 using LittleTripMemo.Exceptions;
+using LittleTripMemo.Extensions; // 拡張メソッド用
 using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
-using LittleTripMemo.Repository.App;
-using LittleTripMemo.Repository.Batch;
-using LittleTripMemo.Repository.Core;
-using LittleTripMemo.Repository.Sys;
-using LittleTripMemo.Services.Account;
-using LittleTripMemo.Services.Admin;
-using LittleTripMemo.Services.Core;
-using LittleTripMemo.Services.Private;
-using LittleTripMemo.Services.Public;
-using LittleTripMemo.Services.Sys;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using System.Text.Json;
+using Dapper;
 
-// builder生成前に設定（Npgsqlのタイムスタンプ挙動を旧仕様に固定）
+// 1. 起動前設定（Npgsql タイムスタンプ挙動の固定）
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
-// ======================================================================
-// ■ 基本設定（アプリ起動時に一度だけ決まるもの）
-// ======================================================================
-
-// DB接続文字列（appsettings.json から自動取得）
-var connectionString =
-    builder.Configuration.GetConnectionString("LittleTripMemoConnStr");
-
-// Dapperのカスタム型マッピング登録
-// click_stats で使用している Dictionary 型を JSONB として扱うように設定
+// Dapper の型変換ハンドラーを登録（click_stats の解析に必須）
 SqlMapper.AddTypeHandler(new JsonbTypeHandler<Dictionary<string, ClickCountData>>());
 
-
-
-// ======================================================================
-// ■ ログ・例外などの横断的インフラ設定
-// ======================================================================
-
-// Serilog を標準ロガーとして使用する設定
-// appsettings.json 側で出力先・レベルを制御する
+// 2. ログ設定 (Serilog)
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
-
 builder.Host.UseSerilog();
 
+// 3. DB / Identity 設定
+var connectionString = builder.Configuration.GetConnectionString("LittleTripMemoConnStr")!;
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddScoped<ITransactionProvider>(_ => new TransactionProvider(connectionString));
 
-
-// ======================================================================
-// ■ DIコンテナ登録（アプリの構成部品）
-//    ※ ここでは「生成ルール」だけを定義する
-// ======================================================================
-
-// ---- インフラ層 ----
-
-// DBトランザクション管理（1リクエスト = 1 TransactionProvider）
-builder.Services.AddScoped<ITransactionProvider>(
-    _ => new TransactionProvider(connectionString!)
-);
-
-
-
-// ---- 共通コンテキスト ----
-
-// ログインユーザー情報などをリクエスト単位で保持
-builder.Services.AddScoped<UserContext>();
-
-// HttpContext 参照用（UserContext 等で使用）
-builder.Services.AddHttpContextAccessor();
-
-// アプリ起動中ずっと保持されるシステム状態（シングルトン）
-builder.Services.AddSingleton<SystemStatus>();
-
-
-
-// ---- DB / Identity ----
-
-// EF Core の DbContext（PostgreSQL）
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
-
-// ASP.NET Identity（ユーザー管理・認証基盤）
 builder.Services.AddIdentity<MyAppUser, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+// 4. アプリケーションサービス登録 (Extensions/ServiceExtensions.cs に集約)
+builder.Services.AddAppInfrastructure();
+builder.Services.AddAppBusinessServices();
 
-
-// ---- Swaggerの有効化 ----
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "LittleTripMemo API", Version = "v1" });
-
-    // JWT認証をSwagger上で試せるようにする設定
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = "Authorizationヘッダに 'Bearer {token}' の形式で入力してください",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-            },
-            Array.Empty<string>()
-        }
-    });
-});
-
-
-// ---- Infrastructure / Cross-cutting ----
+// 5. 共通コンテキスト / セキュリティ
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<UserContext>();
+builder.Services.AddSingleton<SystemStatus>();
 builder.Services.AddScoped<JwtService>();
 
+// 6. 設定値のバインド
+builder.Services.Configure<MyAppSettings>(builder.Configuration.GetSection(MyAppSettings.SectionName));
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
 
-
-// ---- Repository（DBアクセス層） ----
-
-// App / Infrastructure Repository
-builder.Services.AddScoped<AppUserRepository>();
-builder.Services.AddScoped<ArchiveRepository>();
-builder.Services.AddScoped<DetailRepository>();
-builder.Services.AddScoped<ArchivePubRepository>();
-builder.Services.AddScoped<DetailPubRepository>();
-builder.Services.AddScoped<ReactionPubRepository>();
-builder.Services.AddScoped<ClickQueueRepository>();
-// Sys / Infrastructure Repository
-builder.Services.AddScoped<SysFeedbackRepository>();
-builder.Services.AddScoped<SysNotificationRepository>();
-builder.Services.AddScoped<SysReportRepository>();
-builder.Services.AddScoped<SysUserNotificationRepository>();
-builder.Services.AddScoped<TableStatisticsRepository>();
-// Batch / Infrastructure Repository
-builder.Services.AddScoped<TableStatisticsTaskRepository>();
-builder.Services.AddScoped<ClickQueueTaskRepository>();
-// Core / Infrastructure Repository
-builder.Services.AddScoped<CoreConfigRepository>();
-
-
-
-// ---- Service（業務ロジック層） ----
-
-// Account
-builder.Services.AddScoped<RegistrationUserService>();
-builder.Services.AddScoped<UpdateUserProfileService>();
-builder.Services.AddScoped<GetUserProfileService>();
-builder.Services.AddScoped<EnsureLoginUserService>();
-builder.Services.AddScoped<WithdrawalUserService>();
-// Private
-builder.Services.AddScoped<GetUnMergeDetailsService>();
-builder.Services.AddScoped<GetArchiveDetailsService>();
-builder.Services.AddScoped<GetArchiveListService>();
-builder.Services.AddScoped<MergeDetailsService>();
-builder.Services.AddScoped<AddDetailsService>();
-builder.Services.AddScoped<UpdateArchiveService>();
-builder.Services.AddScoped<DeleteArchiveService>();
-builder.Services.AddScoped<DeleteStrayDetailsService>();
-builder.Services.AddScoped<DetachDetailsService>();
-builder.Services.AddScoped<BulkSyncDetailsService>();
-builder.Services.AddScoped<PublishArchiveService>();
-builder.Services.AddScoped<UpdateDetailService>();
-// Public
-builder.Services.AddScoped<GetArchiveDetailsPubService>();
-builder.Services.AddScoped<SearchByLocationPubService>();
-builder.Services.AddScoped<UnpublishArchiveService>();
-builder.Services.AddScoped<OpenArchiveService>();
-builder.Services.AddScoped<CloseArchiveService>();
-builder.Services.AddScoped<UpdateArchivePubService>();
-builder.Services.AddScoped<UpdateDetailPubService>();
-builder.Services.AddScoped<BulkSyncReactionService>();
-builder.Services.AddScoped<AddClickQueueService>();
-// Sys
-builder.Services.AddScoped<GetSystemInfoService>();
-builder.Services.AddScoped<UpsertFeedbackService>();
-builder.Services.AddScoped<GetMyFeedbackService>();
-builder.Services.AddScoped<UpsertReportService>();
-builder.Services.AddScoped<GetMyReportService>();
-builder.Services.AddScoped<DeleteMyReportService>();
-builder.Services.AddScoped<GetMyUserNotificationsService>();
-builder.Services.AddScoped<GetReportDetailsService>();
-builder.Services.AddScoped<AdminCloseArchivePubService>();
-builder.Services.AddScoped<AdminUnpublishArchiveService>();
-// Admin
-builder.Services.AddScoped<GetAdminAllInfoService>();
-builder.Services.AddScoped<GetAllFeedbackService>();
-builder.Services.AddScoped<UpsertNotificationService>();
-builder.Services.AddScoped<SendUserNotificationService>();
-builder.Services.AddScoped<UpdateUserBanStatusService>();
-// ---- Core Service ----
-builder.Services.AddScoped<GetCoreConfigService>();
-builder.Services.AddScoped<UpdateCoreConfigService>();
-
-
-
-// ======================================================================
-// ■ Controller / API 振る舞い設定
-// ======================================================================
-
-// Controller 有効化 + JSON の既定ルール設定
-builder.Services.AddControllers(options =>
-{
-    // すべてのAPIで UserValidationFilter が自動的に実行される
-    options.Filters.Add<UserValidationFilter>();
-})
-.AddJsonOptions(options =>
-{
-    // JSON プロパティ名を camelCase に統一
-    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-})
-.ConfigureApiBehaviorOptions(options =>
-{
-    // モデルバリデーションエラーを共通フォーマットで返す
-    options.InvalidModelStateResponseFactory = context =>
-    {
-        var msg = string.Join(" / ",
-            context.ModelState.Values
-                .SelectMany(v => v.Errors)
-                .Select(e => e.ErrorMessage));
-
-        return new BadRequestObjectResult(new ErrorResponse
-        {
-            Message = msg,
-            ErrorCode = "VALIDATION_ERROR"
-        });
-    };
-});
-
-
-
-// 定期バッチ（Worker）の登録
-builder.Services.AddHostedService<LittleTripMemo.Worker.SystemMaintenanceWorker>();
-
-
-
-// ======================================================================
-// ■ CORS（フロントエンド連携用）
-// ======================================================================
-
-builder.Services.AddCors(options =>
-{
-    //options.AddDefaultPolicy(policy =>
-    //{
-    //    policy.WithOrigins(
-    //            "https://littletripmemomock-31477.web.app",    // firebase hosting でのホスト名
-    //            "http://localhost:8080",
-    //            "http://127.0.0.1:8080", // これも追加
-    //            "http://localhost:5000",
-    //            "http://127.0.0.1:5000", // これも念のため
-    //            "http://localhost:5500",
-    //            "http://127.0.0.1:5500",
-    //            "http://localhost:5501",
-    //            "http://127.0.0.1:5501")
-    //          .AllowAnyHeader()
-    //          .AllowAnyMethod();
-    //});
-    options.AddDefaultPolicy(policy =>
-    {
-        // すべてのドメインを許可（ngrok使用時だけの特例）
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
-
-
-
-// ======================================================================
-// ■ AppSettings（設定値を型安全に扱うためのバインド）
-// ======================================================================
-
-builder.Services.Configure<MyAppSettings>(
-    builder.Configuration.GetSection(MyAppSettings.SectionName));
-
-builder.Services.Configure<JwtSettings>(
-    builder.Configuration.GetSection(JwtSettings.SectionName));
-
-
-
-// ======================================================================
-// ■ JWT 認証設定（認証方式の中核）
-// ======================================================================
-
-// Claim 型の自動変換を無効化
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
-// JWT 設定読み込み
-var jwt = builder.Configuration
-    .GetSection(JwtSettings.SectionName)
-    .Get<JwtSettings>()!;
-
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+// 7. 認証 (JWT Bearer) 設定
+var jwt = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()!;
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -326,79 +66,35 @@ builder.Services
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwt.Issuer,
             ValidAudience = jwt.Audience,
-            IssuerSigningKey =
-                new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(jwt.SecretKey))
-        };
-
-        // 認証失敗時のレスポンスをJSON形式で統一
-        options.Events = new JwtBearerEvents
-        {
-            OnChallenge = context =>
-            {
-                context.HandleResponse();
-                context.Response.StatusCode = 401;
-                context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync("{\"message\":\"Unauthorized\"}");
-            }
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SecretKey))
         };
     });
 
+// 8. API / CORS / Swagger 設定
+builder.Services.AddControllers(options => options.Filters.Add<UserValidationFilter>());
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "LittleTripMemo API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        In = ParameterLocation.Header
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement { { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, Array.Empty<string>() } });
+});
 
+builder.Services.AddCors(options => options.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
-// ======================================================================
-// ■ アプリ生成
-// ======================================================================
+// 9. 定期バッチ実行
+builder.Services.AddHostedService<LittleTripMemo.Worker.SystemMaintenanceWorker>();
 
 var app = builder.Build();
 
-
-
-// ■ 起動前設定チェック（フェイルファスト）
-using (var startupScope = app.Services.CreateScope())
-{
-    var settings = startupScope.ServiceProvider.GetRequiredService<IOptions<MyAppSettings>>().Value;
-
-    bool isInvalid = false;
-    isInvalid |= settings.MaxTableNum <= 0;
-    isInvalid |= settings.ReactionCountUpdateIntervalMinutes <= 0;
-    isInvalid |= settings.TableStatsUpdateIntervalMinutes <= 0;
-    isInvalid |= settings.GarbageCleanupIntervalMinutes <= 0;
-    isInvalid |= settings.ClickAggregateIntervalMinutes <= 0;
-
-    if (isInvalid)
-    {
-        var errorMsg = "【致命的設定エラー】appsettings.json の MyAppSettings セクションが正しく構成されていません。";
-
-        // コンソールに目立つように出力
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("====================================================");
-        Console.WriteLine(errorMsg);
-        Console.WriteLine($"MaxTableNum: {settings.MaxTableNum}");
-        Console.WriteLine($"ReactionInterval: {settings.ReactionCountUpdateIntervalMinutes}");
-        Console.WriteLine($"TableStatsInterval: {settings.TableStatsUpdateIntervalMinutes}");
-        Console.WriteLine($"GarbageInterval: {settings.GarbageCleanupIntervalMinutes}");
-        Console.WriteLine($"ClickInterval: {settings.ClickAggregateIntervalMinutes}");
-        Console.WriteLine("====================================================");
-        Console.ResetColor();
-
-        throw new InvalidDataException(errorMsg); // アプリをここで落とす
-    }
-}
-
-
-
-// HTTPS 強制（ngrok 使用時は問題になる場合あり）
-//app.UseHttpsRedirection();
-
-// CORS 設定を有効化（フロントエンドからの別オリジン通信を許可）
-app.UseRouting();
-app.UseCors();
-
-
-
-// 1. 全体例外（一番外側で全てをキャッチ）
-app.UseMiddleware<ExceptionHandling>();
+// 10. ミドルウェア・パイプライン
+app.UseMiddleware<ExceptionHandling>(); // 最外周で例外をキャッチ
 
 if (app.Environment.IsDevelopment())
 {
@@ -406,13 +102,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// 2. JWT認証（ここで UserContext.login_user_id や plan_type がセットされる）
-app.UseMiddleware<JwtMiddleware>();
+app.UseRouting();
+app.UseCors();
 
-// 3. システム管理（管理者プランかどうかを見てメンテをスルーさせるため）
-app.UseMiddleware<LittleTripMemo.Middleware.SystemManagementMiddleware>();
+app.UseMiddleware<JwtMiddleware>(); // 認証情報の抽出
+app.UseMiddleware<LittleTripMemo.Middleware.SystemManagementMiddleware>(); // メンテナンス・バージョンチェック
 
-// 4. 標準の認可（[Authorize]属性の評価）
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

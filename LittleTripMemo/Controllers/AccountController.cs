@@ -4,89 +4,66 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LittleTripMemo.Controllers;
 
+/// <summary>
+/// ユーザーのアカウント管理、プロフィール操作、認証連携を行うコントローラー
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AccountController : _BaseController
+public class AccountController(
+    UserContext userContext,
+    RegistrationUserService registrationUserService,
+    UpdateUserProfileService updateUserProfileService,
+    EnsureLoginUserService ensureLoginUserService,
+    GetUserProfileService getUserProfileService,
+    WithdrawalUserService withdrawalUserService
+) : _BaseController(userContext)
 {
-    private readonly RegistrationUserService _accountService;
-    private readonly UpdateUserProfileService _updateUserProfileService;
-    private readonly EnsureLoginUserService _ensureLoginUserService;
-    private readonly GetUserProfileService _getUserProfileService;
-    private readonly WithdrawalUserService _withdrawalUserService;
-
-    public AccountController(
-        UserContext userContext,
-        RegistrationUserService accountService,
-        UpdateUserProfileService updateUserProfileService,
-        EnsureLoginUserService ensureLoginUserService,
-        GetUserProfileService getUserProfileService,
-        WithdrawalUserService withdrawalUserService
-    ) : base(userContext)
-    {
-        _accountService = accountService;
-        _updateUserProfileService = updateUserProfileService;
-        _ensureLoginUserService = ensureLoginUserService;
-        _getUserProfileService = getUserProfileService;
-        _withdrawalUserService = withdrawalUserService;
-    }
-
     /// <summary>
-    /// Firebase認証後のログイン／新規登録処理
+    /// Firebase認証の結果を受け取り、アプリ側へのログインまたは新規登録を行う
     /// </summary>
     [HttpPost("LoginFirebase")]
     public async Task<IActionResult> FirebaseLogin([FromBody] RegistrationUserService.FirebaseLoginRequest req)
     {
-        var result = await _accountService.LoginOrRegisterAsync(req);
+        var result = await registrationUserService.LoginOrRegisterAsync(req);
 
         if (!result.is_success) return BadRequest(new { result.message });
 
+        // コンテキストに情報を一時セット（レスポンス生成用）
         _user.login_user_id = result.userId ?? Guid.Empty;
         _user.plan_type = result.plan ?? PlanType.Free.ToString();
 
-        return OkWithBase(new { token = result.token, is_owner = false, is_public = false });
+        return OkWithBase(new { token = result.token });
     }
 
     /// <summary>
-    /// ユーザー情報更新
+    /// ログイン中のユーザーのプロフィール（ニックネームやアイコン等）を更新する
     /// </summary>
     [HttpPost("UpdateProfile")]
+    [CustomAuthorize]
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileService.UpdateUserReq req)
-    {
-        var result = await _updateUserProfileService.ExecuteAsync(req);
-        return OkWithBase(result);
-    }
+        => OkWithBase(await updateUserProfileService.ExecuteAsync(req));
 
     /// <summary>
-    /// ユーザ存在チェック
+    /// ログイン中のユーザーの状態を確認し、最新のユーザー情報を取得する
     /// </summary>
     [HttpPost("EnsureLoginUser")]
+    [CustomAuthorize]
     public async Task<IActionResult> EnsureLoginUser([FromBody] EnsureLoginUserService.EnsureLoginUserReq req)
-    {
-        var result = await _ensureLoginUserService.ExecuteAsync(req);
-        return OkWithBase(result);
-    }
+        => OkWithBase(await ensureLoginUserService.ExecuteAsync(req));
 
     /// <summary>
-    /// 指定されたユーザーの公開プロフィールを取得
+    /// 指定されたユーザーの公開プロフィール情報を取得する
     /// </summary>
     [HttpPost("GetUserProfile")]
     public async Task<IActionResult> GetUserProfile([FromBody] GetUserProfileService.GetUserProfileReq req)
-    {
-        var result = await _getUserProfileService.ExecuteAsync(req.target_user_id);
-        return OkWithBase(result);
-    }
+        => OkWithBase(await getUserProfileService.ExecuteAsync(req.target_user_id));
 
     /// <summary>
-    /// ユーザー退会処理
+    /// ユーザーの退会処理を行い、データを論理削除する
     /// </summary>
-    /// <param name="req"></param>
-    /// <returns></returns>
     [HttpPost("Withdrawal")]
-    [CustomAuthorize] // ログイン状態であること
+    [CustomAuthorize]
     public async Task<IActionResult> Withdrawal([FromBody] WithdrawalUserService.WithdrawalReq req)
-    {
-        var result = await _withdrawalUserService.ExecuteAsync(req);
-        return OkWithBase(result);
-    }
+        => OkWithBase(await withdrawalUserService.ExecuteAsync(req));
 
 }

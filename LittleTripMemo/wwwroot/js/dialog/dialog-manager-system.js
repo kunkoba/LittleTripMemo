@@ -112,9 +112,10 @@ export default {
             }
         };
         b.admin.onclick = async () => {
-            // メニューを開く前に一括取得を実行
-            const isSuccess = await $Data.Access.GetAdminAllInfo();
-            if (isSuccess) this.ShowAdminMenu();
+            // // メニューを開く前に一括取得を実行
+            // const isSuccess = await $Data.Access.GetAdminAllInfo();
+            // if (isSuccess) this.ShowAdminMenu();
+            this.ShowAdminMenu();
         };
         this._core.open({
             title: "SYSTEM MENU",
@@ -137,13 +138,9 @@ export default {
         $Dom.ToggleShow(b.admin, isAdmin);
         const authLabel = $Dom.QuerySelector('span:last-child', b.auth);
         authLabel.textContent = isLoggedIn ? "LOGOUT" : "LOGIN";
-        // 新着通知バッジ（📢）
-        const unreadCount = $App.AppData.Context.UnreadNoticeCount || 0;
-        if (unreadCount > 0) {
-            const labelSpan = $Dom.QuerySelector('span:last-child', b.notice);
-            labelSpan.insertAdjacentHTML('beforeend', `<span class="ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full mt-0.5">NEW</span>`);
-        }
-        // イベント
+        // 新着バッジ更新
+        $UI.Generator.ApplyNewBadge(b.notice, $App.AppData.Context.UnreadNoticeCount, 'label');
+        // 各種イベント
         b.notice.onclick = () => this.ShowNoticeList();
         b.version.onclick = () => this.ShowAppInfo();
         b.auth.onclick = async () => {
@@ -158,7 +155,8 @@ export default {
             }
         };
         b.admin.onclick = async () => {
-            if (await $Data.Access.GetAdminAllInfo()) this.ShowAdminMenu();
+            // if (await $Data.Access.GetAdminAllInfo()) this.ShowAdminMenu();
+            this.ShowAdminMenu();
         };
         this._core.open({ title: "SYSTEM", content: el });
     },
@@ -172,10 +170,9 @@ export default {
             config:  $Dom.QuerySelector('#btn-sys-user-config', el),
             reports: $Dom.QuerySelector('#btn-sys-my-report', el),
         };
-        if (($App.AppData.Context.UnreadMailCount || 0) > 0) {
-            const labelSpan = $Dom.QuerySelector('span:last-child', b.mail);
-            labelSpan.insertAdjacentHTML('beforeend', `<span class="ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full mt-0.5">NEW</span>`);
-        }
+        // 新着バッヂ更新
+        $UI.Generator.ApplyNewBadge(b.mail, $App.AppData.Context.UnreadMailCount, 'label');
+        // 各種イベント
         b.profile.onclick = () => this.ShowUserProfile($App.AppData.Owner.SystemInfo.ownerProfile, true);
         b.mail.onclick    = () => this.ShowUserMailList();
         b.config.onclick  = () => this.ShowUserSettingsMenu();

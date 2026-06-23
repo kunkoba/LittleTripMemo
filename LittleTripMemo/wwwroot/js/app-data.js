@@ -1,8 +1,6 @@
+const BaseUrl = "https://localhost:7292";
+// const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
 // const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
-// const BaseUrl = "https://localhost:7292";
-const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
-
-// APIエンドポイントの定義リスト（アクション名: { method, url }）
 const API_ENDPOINTS = {
     // Account
     LoginFirebase:          { method: 'post', url: '/api/Account/LoginFirebase' },
@@ -24,8 +22,10 @@ const API_ENDPOINTS = {
     DeleteStrayDetails:     { method: 'post', url: '/api/Private/DeleteStrayDetails' },
     DetachDetails:          { method: 'post', url: '/api/Private/DetachDetails' },
     RecreatePublicArchive:  { method: 'post', url: '/api/Private/RecreatePublicArchive' },  // 未使用
-    // Public
+    // Public (Anonymous)
+    GetArchiveDetailsPub:   { method: 'get',  url: '/api/Public/GetArchiveDetailsPub/{encodedId}' },
     AddClick:               { method: 'post', url: '/api/Public/AddClick' },
+    // Public
     UpdateDetailPub:        { method: 'post', url: '/api/Public/UpdateDetailPub' },
     UnpublishArchive:       { method: 'post', url: '/api/Public/UnpublishArchive' },
     UpdateArchivePub:       { method: 'post', url: '/api/Public/UpdateArchivePub' },
@@ -42,19 +42,21 @@ const API_ENDPOINTS = {
     GetSystemInfo:          { method: 'post', url: '/api/Sys/GetSystemInfo' },
     GetMyUserNotifications: { method: 'post', url: '/api/Sys/GetMyUserNotifications' },
     // Admin
+    GetAdminAllInfo:        { method: 'post', url: '/api/Admin/GetAdminAllInfo' },
     UpsertNotification:     { method: 'post', url: '/api/Admin/UpsertNotification' },
     GetReportDetails:       { method: 'post', url: '/api/Admin/GetReportDetails' },
     AdminCloseArchive:      { method: 'post', url: '/api/Admin/AdminCloseArchive' },
     AdminUnpublishArchive:  { method: 'post', url: '/api/Admin/AdminUnpublishArchive' },
     SendUserNotification:   { method: 'post', url: '/api/Admin/SendUserNotification' },
     GetAllFeedback:         { method: 'post', url: '/api/Admin/GetAllFeedback' },
-    GetAdminAllInfo:        { method: 'post', url: '/api/Admin/GetAdminAllInfo' },
+    GetReportSummary:       { method: 'post', url: '/api/Admin/GetReportSummary' },
+    GetAdminNotifications:  { method: 'post', url: '/api/Admin/GetAdminNotifications' },
+    GetSentUserMailList:    { method: 'post', url: '/api/Admin/GetSentUserMailList' },  // 未使用
     UpdateUserBanStatus:    { method: 'post', url: '/api/Admin/UpdateUserBanStatus' },  // 未使用
     // Core
     GetCoreConfig:          { method: 'post', url: '/api/Core/GetCoreConfig' },     // 未使用
     UpdateCoreConfig:       { method: 'post', url: '/api/Core/UpdateCoreConfig' },  // 未使用
 };
-
 // APIメソッドの自動生成
 const ApiModule = {};
 Object.entries(API_ENDPOINTS).forEach(([methodName, config]) => {
@@ -62,7 +64,6 @@ Object.entries(API_ENDPOINTS).forEach(([methodName, config]) => {
         return await $Warn.CatchAsync(async () => await this._fetchData(config.method, config.url, params))();
     };
 });
-
 // データ管理（通信・保持）を統合したオブジェクト
 window.$Data = {
     // 取得したデータを保持する（常に上書き）
@@ -193,11 +194,15 @@ window.$Data = {
         // 個別実装（パスパラメータ等を含む特殊なAPI）
         async GetArchiveDetailsPub(params = {}) {
             const encodedId = $Util.EncodeId(params.archive_id);
-            // 引数 params.archive_id を使用して URL を構築
-            const url = `/api/Public/GetArchiveDetailsPub/${encodedId}`;
+            // // 引数 params.archive_id を使用して URL を構築
+            // const url = `/api/Public/GetArchiveDetailsPub/${encodedId}`;
+            // 共通定数リストから取得
+            const { method, url } = API_ENDPOINTS["GetArchiveDetailsPub"];
+            const finalUrl = url.replace('{encodedId}', encodedId);
             // GET リクエストとして実行 (_fetchData の method 引数を 'get' に)
             return await $Warn.CatchAsync(async () => {
-                return await this._fetchData('get', url, null); 
+                // return await this._fetchData('get', url, null); 
+                return await this._fetchData(method, finalUrl, null); 
             })();
         },
     },
@@ -420,6 +425,8 @@ window.$Data = {
             }
             // 4. 未読件数を Context に保存し、UIを更新
             $App.AppData.Context.UnreadNoticeCount = unreadCount;
+            // 新着バッヂ更新
+            $UI.UpdateNoticeBadge(unreadCount);
         },
         // 通知の未読判定（個別メッセージ版）
         async CheckUnreadMails() {
@@ -439,6 +446,8 @@ window.$Data = {
                 }
             }
             $App.AppData.Context.UnreadMailCount = unreadCount;
+            // 新着バッヂ更新
+            $UI.UpdateNoticeBadge(unreadCount);
         },
     },
 };

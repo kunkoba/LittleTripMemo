@@ -69,23 +69,44 @@ public class SysFeedbackRepository : _BaseRepository
     /// </summary>
     public async Task<IEnumerable<DtoFeedbackDetail>> GetAllFeedbacksAsync(int score)
     {
-        // 1. 絞り込み条件
-        var whereClause = score > 0 ? "WHERE f.score = @score" : "";
+        const int LIMIT = 100;
 
-        // 2. SQL（最新100件固定）
-        var sql = $@"
-            SELECT 
-                f.*,
-                u.icon,      
-                u.nick_name  
-            FROM t_sys_feedbacks f
-            LEFT JOIN t_app_user u ON f.user_id = u.user_id 
-            {whereClause}
-            ORDER BY f.update_tim DESC 
-            LIMIT 100";
+        string sql;
 
-        // 取得系ラッパーを使用。戻り値は単一のリスト。
+        if (score == 0)
+        {
+            sql = $"""
+                WITH RankedFeedbacks AS (
+                    SELECT 
+                        f.*,
+                        u.icon,      
+                        u.nick_name,
+                        ROW_NUMBER() OVER(PARTITION BY f.score ORDER BY f.update_tim DESC) as row_num
+                    FROM t_sys_feedbacks f
+                    LEFT JOIN t_app_user u ON f.user_id = u.user_id 
+                )
+                SELECT * FROM RankedFeedbacks
+                WHERE row_num <= {LIMIT}
+                ORDER BY update_tim DESC
+                """;
+        }
+        else
+        {
+            sql = $"""
+                SELECT 
+                    f.*,
+                    u.icon,      
+                    u.nick_name  
+                FROM t_sys_feedbacks f
+                LEFT JOIN t_app_user u ON f.user_id = u.user_id 
+                WHERE f.score = @score
+                ORDER BY f.update_tim DESC 
+                LIMIT {LIMIT}
+                """;
+        }
+
         return await QueryAsync<DtoFeedbackDetail>(sql, new { score });
+
     }
 
 }

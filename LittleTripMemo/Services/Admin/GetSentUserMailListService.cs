@@ -1,18 +1,16 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
-using LittleTripMemo.Repository;
-using LittleTripMemo.Repository.Sys;
 
 namespace LittleTripMemo.Services.Admin;
 
-public class GetReportSummaryService : _BaseService
+public class GetSentUserMailListService : _BaseService
 {
-    private readonly SysReportRepository _repo;
+    private readonly SysUserNotificationRepository _repo;
 
-    public record Response(IEnumerable<DtoReportSummary> reportSummary);
+    public record Response(IEnumerable<DtoUserNotification> userMailList);
 
-    public GetReportSummaryService(UserContext u, SysReportRepository r) : base(u) => _repo = r;
+    public GetSentUserMailListService(UserContext u, SysUserNotificationRepository r) : base(u) => _repo = r;
 
     public async Task<Response> ExecuteAsync()
     {
@@ -20,7 +18,7 @@ public class GetReportSummaryService : _BaseService
         await ValidateAsync();
 
         // 2. 実行
-        var list = await _repo.GetReportSummaryAsync();
+        var list = await _repo.GetAllAsync(100);
         return new Response(list);
     }
 

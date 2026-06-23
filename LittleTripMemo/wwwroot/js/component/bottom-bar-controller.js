@@ -16,7 +16,7 @@ const _BottomCore = {
 			this.btnCreate     = $Dom.GetElementById('btn-create');
 			this.btnSearch     = $Dom.GetElementById('btn-search');
 			this.groupMove     = $Dom.GetElementById('bot-group-move');
-			this.badgeSysMenu  = $Dom.GetElementById('badge-sys-menu');
+			// this.badgeSysMenu  = $Dom.GetElementById('badge-sys-menu');
 
 			// --- 3. 要素取得 (移動ボタン群：既存維持) ---
 			this.btnFirst = $Dom.GetElementById('btn-bot-move-first');
@@ -58,6 +58,7 @@ const _BottomCore = {
 			};
 		}
 	},
+	// 画面モード変更
 	changeScreenMode() {
 		const mode = $App.AppData.Context.ScreenMode;
 
@@ -84,14 +85,13 @@ const _BottomCore = {
     toggleRoot(isOpen){
         $Dom.ToggleShow(this.root, isOpen);
     },
-    // 小さなポップアップ（テーマ/レイヤー）の開閉
-    togglePopList(el) {
-        // 今そのポップが隠れているかどうか
-        const isHidden = el.classList.contains('hidden');
-        $UI.CloseAllPop();
-        // 元々隠れていた場合のみ開く（トグル動作）
-        if (isHidden) $Dom.ToggleShow(el, true);
-    },
+	// 新着バッヂ更新
+	updateNoticeBadge() {
+		const unreadNotice = $App.AppData.Context.UnreadNoticeCount || 0;
+		$UI.Generator.ApplyNewBadge(this.btnSysMenu, unreadNotice, 'dot');
+		const unreadMail = $App.AppData.Context.UnreadMailCount || 0;
+		$UI.Generator.ApplyNewBadge(this.btnUserMenu, unreadMail, 'dot');
+	},
 };
 
 // 窓口
@@ -108,6 +108,10 @@ const BottomBarController = {
     ToggleRoot(isOpen){
         _BottomCore.toggleRoot(isOpen);
     },
+	// 新着バッヂ更新
+	UpdateNoticeBadge(count) {
+		_BottomCore.updateNoticeBadge();
+	},
 };
 
 // Public

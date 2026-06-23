@@ -132,15 +132,7 @@ const _TopCore = {
     toggleRoot(isOpen){
         $Dom.ToggleShow(this.root, isOpen);
     },
-    // 小さなポップアップ（テーマ/レイヤー）の開閉
-    togglePopList(el) {
-        // 今そのポップが隠れているかどうか
-        const isHidden = el.classList.contains('hidden');
-        $UI.CloseAllPop();
-        // 元々隠れていた場合のみ開く（トグル動作）
-        if (isHidden) $Dom.ToggleShow(el, true);
-    },
-    // ▼修正：並び順取得ロジック（サーバー側のAPI仕様に合わせる）
+    // 並び順取得ロジック（サーバー側のAPI仕様に合わせる）
     getSortSetting(){
         const sortField = this._getSelectedValue("sort-field"); 
         let reactionType = null;

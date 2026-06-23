@@ -9,12 +9,8 @@ const _UI_Core = {
 	setTheme(theme){
         document.documentElement.setAttribute('data-theme', theme);
 	},
-	// すべてのポップメニューを閉じる
-	closeAllPop(){
-        document.querySelectorAll('[id^="pop-"]').forEach(el => el.classList.add('hidden'));
-	},
 	// 通知領域テキスト表示
-	noticeUpdate(word){
+	updateNoticeBarText(word){
 		this.noticeText.textContent = word;
 	}
 };
@@ -109,13 +105,13 @@ const UI_Manager = {
 			let badge = targetEl.querySelector('.js-unread-badge');
 			const isShow = count > 0;
 			if (isShow && !badge) {
+				targetEl.classList.add('relative');
 				badge = document.createElement('span');
-				badge.className = 'js-unread-badge bg-red-500 text-white font-black flex items-center justify-center pointer-events-none shadow-sm ';
+				badge.className = 'js-unread-badge absolute bg-red-500 text-white font-black flex items-center justify-center pointer-events-none shadow-sm whitespace-nowrap ';
 				if (type === 'dot') {
-					badge.className += 'absolute w-3 h-3 rounded-full top-1 right-1 border-2 border-brand-1';
-					targetEl.classList.add('relative');
+					badge.className += 'w-3 h-3 rounded-full top-1 right-1 border-2 border-brand-1';
 				} else {
-					badge.className += 'ml-4 text-[9px] px-2 py-0.5 rounded-full mt-0.5';
+					badge.className += 'text-[9px] px-2 py-0.5 rounded-full top-1/2 -translate-y-1/2 right-4';
 					badge.textContent = 'NEW';
 				}
 				targetEl.appendChild(badge);
@@ -144,16 +140,16 @@ const UI_Manager = {
         // 通知バー
         switch (mode) {
             case $Const.SCREEN_MODE.CREATE:
-                $UI.NoticeUpdate("「＋」ボタンで地点メモを作成することができます");
+                $UI.UpdateNoticeBarText("「＋」ボタンで地点メモを作成することができます");
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
-                $UI.NoticeUpdate("画面下部の「操作ボタン」で各メモを移動できます");
+                $UI.UpdateNoticeBarText("画面下部の「操作ボタン」で各メモを移動できます");
                 break;
             case $Const.SCREEN_MODE.ARCHIVE_PUB:
-                $UI.NoticeUpdate("公開データは「Open」にしないと公開されません");
+                $UI.UpdateNoticeBarText("公開データは「Open」にしないと公開されません");
                 break;
             case $Const.SCREEN_MODE.SEARCH:
-                $UI.NoticeUpdate("画面範囲内のメモを検索できます");
+                $UI.UpdateNoticeBarText("画面範囲内のメモを検索できます");
                 break;
             default:
 				$Dialog.ShowLoginDialog();
@@ -173,13 +169,9 @@ const UI_Manager = {
 	ChangeTheme(theme){
         _UI_Core.setTheme(theme);
 	},
-	// すべてのポップメニューを閉じる
-	CloseAllPop(){
-        _UI_Core.closeAllPop();
-	},
 	// 通知領域テキスト表示
-	NoticeUpdate(word){
-		_UI_Core.noticeUpdate(word);
+	UpdateNoticeBarText(word){
+		_UI_Core.updateNoticeBarText(word);
 	},
 	// アイコンバーの開閉
 	ToggleIconBar(isShow){
@@ -191,6 +183,10 @@ const UI_Manager = {
         // const sizes = { small: '14px', standard: '16px', large: '18px' };
         // document.documentElement.style.fontSize = sizes[size] || sizes.standard;
 		document.documentElement.setAttribute('data-font-size', size || 'standard');
+	},
+	// 通知バッヂの更新
+	UpdateNoticeBadge(count) {
+		$BotBar.UpdateNoticeBadge(count);
 	},
 };
 

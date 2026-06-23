@@ -6,13 +6,13 @@ using LittleTripMemo.Repository.Sys;
 
 namespace LittleTripMemo.Services.Admin;
 
-public class GetReportSummaryService : _BaseService
+public class GetAdminNotificationsService : _BaseService
 {
-    private readonly SysReportRepository _repo;
+    private readonly SysNotificationRepository _repo;
 
-    public record Response(IEnumerable<DtoReportSummary> reportSummary);
+    public record Response(IEnumerable<TSysNotification> notifications);
 
-    public GetReportSummaryService(UserContext u, SysReportRepository r) : base(u) => _repo = r;
+    public GetAdminNotificationsService(UserContext u, SysNotificationRepository r) : base(u) => _repo = r;
 
     public async Task<Response> ExecuteAsync()
     {
@@ -20,7 +20,7 @@ public class GetReportSummaryService : _BaseService
         await ValidateAsync();
 
         // 2. 実行
-        var list = await _repo.GetReportSummaryAsync();
+        var list = await _repo.GetAllNotificationsAsync(100);
         return new Response(list);
     }
 

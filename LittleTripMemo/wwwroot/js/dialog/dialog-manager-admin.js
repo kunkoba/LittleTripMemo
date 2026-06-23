@@ -14,6 +14,8 @@ export default {
     },
     // 通知管理リスト（API通信化）
     async ShowAdminNoticeList() {
+        const isSuccess = await $Data.Access.GetAdminNotifications();
+        if (!isSuccess) return;
         const notices = $App.AppData.Admin.notifications ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         // root.className = "w-full text-black-3 mb-2 px-1";
@@ -173,6 +175,8 @@ export default {
     },
     // 通報集計一覧（API通信化）
     async ShowAdminReportList() {
+        const isSuccess = await $Data.Access.GetReportSummary();
+        if (!isSuccess) return;
         const reportSummary = $App.AppData.Admin.reportSummary ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         // root.className = "w-full text-black-3 mb-2 px-1";
@@ -321,7 +325,7 @@ export default {
         });
     },
     // 【管理者機能】フィードバックリスト
-    async ShowAdminFeedbackList(currentScore = 0) {
+    async ShowAdminFeedbackList_2(currentScore = 0) {
         const isSuccess = await $Data.Access.GetAllFeedback({ score: currentScore });
         if (!isSuccess) return;
         // 新設した「検索バー付き」テンプレートを使用
@@ -362,6 +366,105 @@ export default {
             help: "",
         });
     },
+    // 【管理者機能】フィードバックリスト
+    async ShowAdminFeedbackList() {
+        // 初回のみ全件取得
+        const isSuccess = await $Data.Access.GetAllFeedback({ score: 0 });
+        if (!isSuccess) return;
+        const frame = $Dom.GenerateTemplate("tpl-admin-feedback-list-parent");
+        const listContainer = $Dom.QuerySelector("#feedback-list-container", frame);
+        const scoreButtons = $Dom.QuerySelectorAll(".js-score-btn", frame);
+        // 検索バーの追加
+        const searchBar = $Dom.GenerateTemplate("tpl-dialog-search-bar", "ui-template-root", false);
+        const input = $Dom.QuerySelector(".js-input", searchBar);
+        const clearBtn = $Dom.QuerySelector(".js-clear", searchBar);
+        // スコアフィルタバーの前に検索バーを挿入
+        const filterBar = $Dom.QuerySelector(".sticky", frame);
+        filterBar.insertBefore(searchBar, filterBar.firstChild);
+        // データと状態の初期化
+        const allData = $App.AppData.Admin.feedbackList || [];
+        let currentScore = 0;
+        let filterText = "";
+        // ★数の集計（件数計算）
+        const counts = [0, 0, 0, 0, 0, 0];
+        allData.forEach(item => {
+            const score = item.score || 0;
+            if (score >= 1 && score <= 5) counts[score]++;
+            counts[0]++; // ALL
+        });
+        // ボタンに集計件数を反映（1行で表示）
+        scoreButtons.forEach(btn => {
+            const score = parseInt(btn.dataset.score);
+            btn.textContent = score === 0 ? `ALL(${counts[0]})` : `${score}(${counts[score]})`;
+        });
+        const renderList = () => {
+            // ボタンのスタイル更新
+            scoreButtons.forEach(btn => {
+                const score = parseInt(btn.dataset.score);
+                if (score === currentScore) {
+                    btn.classList.add("bg-brand-5", "text-white", "shadow-md");
+                    btn.classList.remove("text-slate-400");
+                } else {
+                    btn.classList.add("text-slate-400");
+                    btn.classList.remove("bg-brand-5", "text-white", "shadow-md");
+                }
+            });
+            // フィルタリング処理（★数 ＆ ワード）
+            const query = filterText.toLowerCase().trim();
+            const filtered = allData.filter(item => {
+                // スコアフィルタ
+                if (currentScore > 0 && item.score !== currentScore) return false;
+                // ワードフィルタ (本文に合致するか)
+                if (query.length > 0) {
+                    const target = item.body || "";
+                    if (!target.toLowerCase().includes(query)) return false;
+                }
+                return true;
+            });
+            // リスト再描画
+            listContainer.innerHTML = "";
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-10">合致するデータはありません。</div>`;
+                return;
+            }
+            filtered.forEach(item => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim);
+                $Dom.QuerySelector(".js-score", child).textContent = "★".repeat(item.score) + "☆".repeat(5 - item.score);
+                $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
+                // クリックで詳細画面へ
+                child.onclick = () => this.ShowAdminFeedbackDetail(item);
+                listContainer.appendChild(child);
+            });
+        };
+        // スコアボタンのイベント設定
+        scoreButtons.forEach(btn => {
+            btn.onclick = () => {
+                currentScore = parseInt(btn.dataset.score);
+                renderList();
+            };
+        });
+        // 検索バーのイベント設定
+        input.oninput = (e) => {
+            filterText = e.target.value;
+            $Dom.ToggleShow(clearBtn, filterText.length > 0);
+            renderList();
+        };
+        clearBtn.onclick = () => {
+            input.value = "";
+            filterText = "";
+            $Dom.ToggleShow(clearBtn, false);
+            renderList();
+            input.focus();
+        };
+        // 初回描画の実行
+        renderList();
+        this._core.open({
+            title: "FEEDBACK Mgmt",
+            content: frame,
+            help: "★の数やワードでフィードバックの絞り込みができます。",
+        });
+    },
     // 【管理者機能】フィードバック詳細
     ShowAdminFeedbackDetail(item) {
         const el = $Dom.GenerateTemplate("tpl-admin-feedback-detail");
@@ -398,7 +501,7 @@ export default {
         });
     },
     // 【管理者機能】個別通知送信ダイアログ
-    ShowAdminSendUserNotification(profile) {
+    async ShowAdminSendUserNotification(profile) {
         if (!profile) return $Notice.Warn("ユーザー情報が不明です");
         const el = $Dom.GenerateTemplate("tpl-admin-send-user-notification");
         // --- 1. 宛先ユーザー情報の反映 ---
@@ -469,6 +572,8 @@ export default {
     },
     // 【管理者機能】ユーザーメール一覧
     async ShowAdminUserMailList() {
+        const isSuccess = await $Data.Access.GetSentUserMailList();
+        if (!isSuccess) return;
         const mails = $App.AppData.Admin.userMailList  || []; // API側で notifications に格納される想定
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         if (mails.length === 0) {

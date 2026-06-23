@@ -361,7 +361,8 @@ const AppManager = {
         return await $Warn.CatchAsync(async () => {
             $Notice.Info("ログイン中...");
             const email = await $Auth.GetVerifiedEmailByGoogle();
-            const isSuccess = await $Data.Access.LoginFirebase(email);
+            // const isSuccess = await $Data.Access.LoginFirebase(email);
+            const isSuccess = await $Data.Access.LoginFirebase({Email: email});
             if (isSuccess) {
                 this.AppData.Context.IsLoggedIn = true;
                 this._saveSettings();
