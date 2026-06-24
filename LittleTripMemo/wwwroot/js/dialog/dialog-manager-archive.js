@@ -136,10 +136,11 @@ export default {
         // 公開まとめモード（ARCHIVE_PUB）かどうかを判定
         const isPub = $App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.ARCHIVE_PUB;
         // まとめ内のユニークな日付リストを古い順に取得（○dayの算出用）
-        const dateList = $Util.GetUniqueDateList(details);
-        const isMultiDay = dateList.length > 1;
+        // const dateList = $Util.GetUniqueDateList(details);
+        // const isMultiDay = dateList.length > 1;
         // 開始日の時期（例：4月下旬）を取得。2日目以降もこの「旬」を基準とする
-        const baseMask = isPub ? $Util.GetMaskedDate(dateList[0]) : "";
+        // const baseMask = isPub ? $Util.GetMaskedDate(dateList[0]) : "";
+        const baseMask = isPub ? details[0] : "";
         // --- 2. 各種フラグ・テンプレート準備 ---
         const archive = $Data.Store.GetArchive();
         const canDetach = archive && !archive.is_public && archive.is_owner;
@@ -154,15 +155,16 @@ export default {
                 const header = $Dom.GenerateTemplate("tpl-timeline-date");
                 const textEl = $Dom.QuerySelector(".js-date-text", header);
                 if (isPub) {
-                    // 公開時：何日目かを取得（0開始なので+1）
-                    const dIdx = dateList.indexOf(dateStr);
-                    if (dIdx === 0) {
-                        // 1日目：時期（4月下旬等）を表示。2日以上あるまとめなら「1day」を付与
-                        textEl.textContent = isMultiDay ? `${baseMask} 1day` : baseMask;
-                    } else {
-                        // 2日目以降：カウントアップのみを表示（例：2day）
-                        textEl.textContent = `${dIdx + 1}day`;
-                    }
+                    // // 公開時：何日目かを取得（0開始なので+1）
+                    // const dIdx = dateList.indexOf(dateStr);
+                    // if (dIdx === 0) {
+                    //     // 1日目：時期（4月下旬等）を表示。2日以上あるまとめなら「1day」を付与
+                    //     textEl.textContent = isMultiDay ? `${baseMask} 1day` : baseMask;
+                    // } else {
+                    //     // 2日目以降：カウントアップのみを表示（例：2day）
+                    //     textEl.textContent = `${dIdx + 1}day`;
+                    // }
+                    textEl.textContent = item.memo_date;
                 } else {
                     // 自分用（Private）：正確な日付をそのまま表示
                     textEl.textContent = dateStr;
@@ -302,8 +304,8 @@ export default {
             $Dom.QuerySelector(".js-body", child).textContent = (item.body || "").replace(/\r?\n/g, ' ');
             // --- 2. 日時情報の反映（日付マスク適用） ---
             // 公開検索結果のため、正確な作成日ではなく「訪問時期（マスク済み）」を表示する
-            const maskedDate = $Util.GetMaskedDate(item.memo_date);
-            $Dom.QuerySelector(".js-create-tim", child).textContent = `${maskedDate} ${item.memo_time || ""}`;
+            // const maskedDate = $Util.GetMaskedDate(item.memo_date);
+            $Dom.QuerySelector(".js-create-tim", child).textContent = `${item.memo_date} ${item.memo_time || ""}`;
             $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
             // --- 3. リアクション統計の反映 ---
             $Dom.QuerySelector(".js-icon-funny", child).textContent = rt.FUNNY.emoji;

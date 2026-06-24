@@ -113,23 +113,23 @@ window.$Util = {
         // return format.replace(/YYYY|MM|M|DD|D/g, (match) => parts[match]);
         return format.replace(/YYYY|MM|M|DD|D|HH|mm|ss/g, (match) => parts[match]);
     },
-    // GetMaskedDate: 日付を「M月[上/中/下]旬」に変換
-    GetMaskedDate(dateStr) {
-        if (!dateStr) return "";
-        const d = new Date(dateStr);
-        const m = d.getMonth() + 1;
-        const day = d.getDate();
-        let term = "下旬";
-        if (day <= 10) term = "上旬";
-        else if (day <= 20) term = "中旬";
-        return `${m}月${term}`;
-    },
-    // GetUniqueDateList: 明細リストから重複なし・ソート済みの全日程リストを取得
-    GetUniqueDateList(details) {
-        if (!details || details.length === 0) return [];
-        const dates = details.map(d => d.memo_date).filter(d => d);
-        return [...new Set(dates)].sort();
-    },
+    // // GetMaskedDate: 日付を「M月[上/中/下]旬」に変換
+    // GetMaskedDate(dateStr) {
+    //     if (!dateStr) return "";
+    //     const d = new Date(dateStr);
+    //     const m = d.getMonth() + 1;
+    //     const day = d.getDate();
+    //     let term = "下旬";
+    //     if (day <= 10) term = "上旬";
+    //     else if (day <= 20) term = "中旬";
+    //     return `${m}月${term}`;
+    // },
+    // // GetUniqueDateList: 明細リストから重複なし・ソート済みの全日程リストを取得
+    // GetUniqueDateList(details) {
+    //     if (!details || details.length === 0) return [];
+    //     const dates = details.map(d => d.memo_date).filter(d => d);
+    //     return [...new Set(dates)].sort();
+    // },
     // GPSから現在地を取得する（純粋な座標取得のみ）
     async GetCurrentPosition() {
         return new Promise((resolve, reject) => {

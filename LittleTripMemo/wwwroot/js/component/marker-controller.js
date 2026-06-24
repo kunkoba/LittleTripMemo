@@ -228,7 +228,8 @@ const _MarkerCore = {
             const mode = $App.AppData.Context.ScreenMode;
             // 公開まとめ参照、または地図検索モードの場合は日付をマスクする
             const isMasked = (mode === $Const.SCREEN_MODE.ARCHIVE_PUB || mode === $Const.SCREEN_MODE.SEARCH);
-            const dispDate = isMasked ? $Util.GetMaskedDate(detail.memo_date) : (detail.memo_date || "");
+            // const dispDate = isMasked ? $Util.GetMaskedDate(detail.memo_date) : (detail.memo_date || "");
+            const dispDate = detail.memo_date;
             $Dom.QuerySelector(".time", el).textContent = `${dispDate}  ${detail.memo_time || ""}`;
             // --- 項目反映（既存維持） ---
             $Dom.QuerySelector(".title", el).textContent = detail.title || "";

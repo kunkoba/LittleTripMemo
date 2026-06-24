@@ -118,6 +118,39 @@ const UI_Manager = {
 			}
 			if (badge) $Dom.ToggleShow(badge, isShow);
 		},
+		// DateLabel: 日付表示オブジェクト（バッジ・マスク対応）の生成
+		DateLabel(dateStr, timeStr, options = {}) {
+			const { size = 'sm', isMask = false, dayNum = 0 } = options;
+			const el = $Dom.GenerateTemplate("tpl-date-label", "ui-template-root");
+			const mainText = $Dom.QuerySelector(".js-main-text", el);
+			const timeText = $Dom.QuerySelector(".js-time-text", el);
+			const badge = $Dom.QuerySelector(".js-day-badge", el);
+			const dayText = $Dom.QuerySelector(".js-day-text", el);
+			// テキスト変換と反映
+			mainText.textContent = isMask ? $Util.GetMaskedDate(dateStr) : (dateStr || "");
+			if (timeStr) timeText.textContent = timeStr;
+			else $Dom.ToggleShow(timeText, false);
+			// DAYバッジ表示制御（1以上が指定された場合のみ表示）
+			if (dayNum > 0) {
+				$Dom.ToggleShow(badge, true);
+				dayText.textContent = `${dayNum}DAY`;
+			}
+			// サイズに応じた装飾の切り替え
+			if (size === 'lg') {
+				// 詳細画面用（大きく配置）
+				mainText.classList.add('text-[1.3rem]');
+				badge.classList.replace('w-10', 'w-14');
+				badge.classList.replace('h-10', 'h-14');
+				badge.classList.replace('text-[0.7rem]', 'text-[0.9rem]');
+			} else {
+				// リスト・ポップアップ用（コンパクトに配置）
+				mainText.classList.add('text-[0.85rem]');
+				badge.classList.replace('w-10', 'w-9');
+				badge.classList.replace('h-10', 'h-9');
+				badge.classList.replace('text-[0.7rem]', 'text-[0.6rem]');
+			}
+			return el;
+		}
     },
 	// 初期化
 	Init(){

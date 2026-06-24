@@ -1,5 +1,4 @@
-﻿// JwtMiddleware.cs（ここを唯一のセットアップ場所にする）
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
@@ -7,60 +6,59 @@ using LittleTripMemo.Common;
 
 namespace LittleTripMemo.JWT;
 
-public class JwtMiddleware
+/// <summary>
+/// HTTPリクエストのヘッダーからJWTトークンを抽出し、認証情報をUserContextに展開するミドルウェア
+/// </summary>
+public class JwtMiddleware(
+    RequestDelegate next,
+    IConfiguration configuration
+)
 {
-    private readonly RequestDelegate _next;
-    private readonly IConfiguration _configuration;
-
-    public JwtMiddleware(RequestDelegate next, IConfiguration configuration)
-    {
-        _next = next;
-        _configuration = configuration;
-    }
-
-    // JwtMiddleware.cs 内の Invoke メソッド
     public async Task Invoke(HttpContext context)
     {
-        // ✅ これを追加：OPTIONSリクエストなら何もしないで次へ渡す
+        // プリフライトリクエスト（OPTIONS）の場合は認証処理をスキップ
         if (context.Request.Method == "OPTIONS")
         {
-            await _next(context);
+            await next(context);
             return;
         }
 
-        var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+        var authorizationHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+        var token = authorizationHeader?.Split(" ").Last();
 
         if (!string.IsNullOrEmpty(token))
         {
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]);
+                var secretKey = Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"] ?? "");
 
-                // ★ここで署名・有効期限を厳格に検証
                 var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    IssuerSigningKey = new SymmetricSecurityKey(secretKey),
                     ValidateIssuer = true,
-                    ValidIssuer = _configuration["JwtSettings:Issuer"],
+                    ValidIssuer = configuration["JwtSettings:Issuer"],
                     ValidateAudience = true,
-                    ValidAudience = _configuration["JwtSettings:Audience"],
+                    ValidAudience = configuration["JwtSettings:Audience"],
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 }, out _);
 
-                // 成功したら UserContext に注入
+                // UserContext への注入
                 var userContext = context.RequestServices.GetRequiredService<UserContext>();
-                userContext.login_user_id = Guid.Parse(principal.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                userContext.table_id = int.Parse(principal.FindFirst(nameof(UserContext.table_id))?.Value ?? "0");
-                userContext.plan_type = principal.FindFirst(nameof(UserContext.plan_type))?.Value ?? PlanType.Free.ToString();
+                userContext.login_user_id = Guid.Parse(principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
+                userContext.table_id = int.Parse(principal.FindFirst("table_id")?.Value ?? "0");
+                userContext.plan_type = principal.FindFirst("plan_type")?.Value ?? PlanType.Free.ToString();
 
-                context.User = principal; // 標準のUserもセットしておく
+                context.User = principal;
             }
-            catch { /* 検証失敗時は何もしない。後続のAuthorize属性が401を出す */ }
+            catch
+            {
+                // トークン検証失敗時はコンテキストへの注入を行わず後続へ（Authorize属性で弾く）
+            }
         }
-        await _next(context);
+        await next(context);
     }
 
 }

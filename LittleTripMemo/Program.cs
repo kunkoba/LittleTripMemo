@@ -4,7 +4,7 @@ using LittleTripMemo.Configs;
 using LittleTripMemo.DataAccess;
 using LittleTripMemo.DbContext;
 using LittleTripMemo.Exceptions;
-using LittleTripMemo.Extensions; // 拡張メソッド用
+using LittleTripMemo.Extensions; 
 using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;

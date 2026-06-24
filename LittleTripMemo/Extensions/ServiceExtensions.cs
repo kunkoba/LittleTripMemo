@@ -96,13 +96,14 @@ public static class ServiceExtensions
         services.AddScoped<GetAllFeedbackService>();
         services.AddScoped<UpsertNotificationService>();
         services.AddScoped<SendUserNotificationService>();
-        services.AddScoped<UpdateUserBanStatusService>();
         services.AddScoped<GetReportSummaryService>();
         services.AddScoped<GetAdminNotificationsService>();
         services.AddScoped<GetSentUserMailListService>();
         services.AddScoped<GetReportDetailsService>();
         services.AddScoped<AdminCloseArchivePubService>();
         services.AddScoped<AdminUnpublishArchiveService>();
+        services.AddScoped<UpdateUserBanStatusService>();
+        services.AddScoped<GetUserHistoryService>();
 
         // Core (System Config)
         services.AddScoped<GetCoreConfigService>();    // ★新規開放

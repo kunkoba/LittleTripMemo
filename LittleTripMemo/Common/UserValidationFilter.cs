@@ -3,34 +3,41 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 
-public class UserValidationFilter : IActionFilter
+namespace LittleTripMemo.Common;
+
+/// <summary>
+/// 全リクエストの入力モデル（ILoginUserRequest実装クラス）と
+/// 現在のログインユーザーID（UserContext）の整合性を検証するフィルター
+/// </summary>
+public class UserValidationFilter(UserContext userContext) : IActionFilter
 {
-    private readonly UserContext _user;
-
-    public UserValidationFilter(UserContext user) => _user = user;
-
+    /// <summary>
+    /// アクション実行前の処理
+    /// </summary>
     public void OnActionExecuting(ActionExecutingContext context)
     {
         // 1. 全リクエストの引数をチェック
-        foreach (var arg in context.ActionArguments.Values)
+        foreach (var argument in context.ActionArguments.Values)
         {
             // 2. もし引数が ILoginUserRequest を実装していたら自動チェック発動
-            if (arg is ILoginUserRequest req)
+            if (argument is ILoginUserRequest request)
             {
-                // サーバー側のJWT情報（_user.UserId）とリクエスト内のIDを比較
-                if (_user.login_user_id != Guid.Empty && _user.login_user_id != req.login_user_id)
+                // サーバー側のJWT情報（userContext.login_user_id）とリクエスト内のIDを比較
+                if (userContext.login_user_id != Guid.Empty && userContext.login_user_id != request.login_user_id)
                 {
-                    //// 管理者でない場合はエラー
-                    //if (_user.Plan != PlanType.Admin.ToString())
-                    //{
-                    //    throw new BusinessException("不正なリクエストです。ログインユーザーが一致しません。");
-                    //}
+                    // IDが不一致の場合はビジネス例外をスロー（共通例外ハンドリングへ）
                     throw new BusinessException("不正なリクエストです。ログインユーザーが一致しません。");
                 }
             }
         }
     }
 
-    public void OnActionExecuted(ActionExecutedContext context) { }
+    /// <summary>
+    /// アクション実行後の処理
+    /// </summary>
+    public void OnActionExecuted(ActionExecutedContext context)
+    {
+        // 実行後の処理は不要
+    }
 
 }

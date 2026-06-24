@@ -53,6 +53,7 @@ const API_ENDPOINTS = {
     GetAdminNotifications:  { method: 'post', url: '/api/Admin/GetAdminNotifications' },
     GetSentUserMailList:    { method: 'post', url: '/api/Admin/GetSentUserMailList' },  // 未使用
     UpdateUserBanStatus:    { method: 'post', url: '/api/Admin/UpdateUserBanStatus' },  // 未使用
+    GetUserHistory:         { method: 'post', url: '/api/Admin/GetUserHistory' },  // 未使用
     // Core
     GetCoreConfig:          { method: 'post', url: '/api/Core/GetCoreConfig' },     // 未使用
     UpdateCoreConfig:       { method: 'post', url: '/api/Core/UpdateCoreConfig' },  // 未使用
@@ -66,9 +67,9 @@ Object.entries(API_ENDPOINTS).forEach(([methodName, config]) => {
 });
 // データ管理（通信・保持）を統合したオブジェクト
 window.$Data = {
-    // 取得したデータを保持する（常に上書き）
+    // 生データ
     resData: null,
-    // データの完全初期化
+    // データの初期化
     Clear() {
         this.resData = null;
         this.Access._rawData.archive = null; 
@@ -78,7 +79,7 @@ window.$Data = {
         this.Access._rawData.userProfile = null;
         this.Store.Restore(); 
     },
-    // 通信関連のメソッド群
+    // データ通信
     Access: {
         _rawData: {
             archive: null,
@@ -156,6 +157,8 @@ window.$Data = {
             if (data.archive) this._rawData.archive = data.archive;
             if (data.myReactions) this._rawData.myReactions = data.myReactions;
             if (data.details) {
+                // 保存直前に表示用ルールを適用（生データを直接書き換える）
+                $Data.Formatter.ApplyDisplayRules(data.details);
                 // 各明細に「取得時点の自分の状態」を紐付けて、後の計算（差分抽出）に備える
                 const myRes = data.myReactions || [];
                 data.details.forEach(d => {
@@ -206,7 +209,78 @@ window.$Data = {
             })();
         },
     },
-    // データ操作・取得のメソッド群
+    // データ加工
+    Formatter: {
+        // 【内部用】旬のマスク文字列を生成
+        _getMask(dateStr) {
+            if (!dateStr) return "";
+            const d = new Date(dateStr);
+            const m = d.getMonth() + 1;
+            const day = d.getDate();
+            let term = "下旬";
+            if (day <= 10) term = "上旬";
+            else if (day <= 20) term = "中旬";
+            return `${m}月${term}`;
+        },
+        // 【内部用】ソート済みのユニークな日付リストを取得
+        _getUniqueDates(details) {
+            if (!details || details.length === 0) return [];
+            const dates = details.map(d => d.memo_date).filter(d => d);
+            return [...new Set(dates)].sort();
+        },
+        // 【外部用】明細リストのソート（Storeから移設）
+        SortDetails(details) {
+            return details.sort((a, b) => {
+                const dtA = (a.memo_date || "") + (a.memo_time || "");
+                const dtB = (b.memo_date || "") + (b.memo_time || "");
+                if (dtA !== dtB) return dtA.localeCompare(dtB);
+                const seqA = Number(a.seq || 0), seqB = Number(b.seq || 0);
+                if (seqA !== seqB) return seqA - seqB;
+                return Number(a.dbid || 0) - Number(b.dbid || 0);
+            });
+        },
+        // 【メイン】表示用の日付ルール（マスク・DAY番号）をアタッチ
+        ApplyDisplayRules(details, mode) {
+            if (!details || details.length === 0) return;
+            // 1. ソート（時間順）
+            this.SortDetails(details);
+            // 2. 日付のブレーク判定とDAYカウントの準備
+            let lastDate = "";
+            let dayCounter = 0;
+            // 全体の日数を把握するため、先にユニークリストを取得
+            const dateList = this._getUniqueDates(details);
+            const isMultiDay = dateList.length > 1;
+            const baseMask = dateList.length > 0 ? this._getMask(dateList[0]) : "";
+            // 3. ループ処理：DAY番号のアタッチと、memo_date の上書き
+            details.forEach(d => {
+                // 日付が変わるタイミングでDAYをカウントアップ
+                if (d.memo_date !== lastDate) {
+                    dayCounter++;
+                    lastDate = d.memo_date;
+                }
+                d.display_day = dayCounter; // 丸バッジ等で使う数値
+                // 4. 自分以外のデータであればマスキング実行
+                if (!d.is_owner) {
+                    if (mode === $Const.SCREEN_MODE.ARCHIVE_PUB) {
+                        // 【まとめ参照時】
+                        if (dayCounter === 1) {
+                            // 1日目：旬 ＋ (2日以上あれば) 1day
+                            d.memo_date = isMultiDay ? `${baseMask} 1day` : baseMask;
+                        } else {
+                            // 2日目以降：DAY表記をそのまま日付データとして上書き
+                            // これによりタイムライン側は「日付が変わった」と判定し、この文字列を表示する
+                            d.memo_date = `${dayCounter}day`;
+                        }
+                    } else {
+                        // 【検索時など】単純な旬のマスクのみ
+                        d.memo_date = this._getMask(d.memo_date);
+                    }
+                }
+            });
+            console.log("加工後：", details);
+        },
+    },
+    // データ格納・取得
     Store: {
         _archive: null, _details:[], _archiveList: null, _userProfile: null,
         // 生データからクローンを作成
@@ -232,25 +306,6 @@ window.$Data = {
         },
         GetArchiveList() {
             return this._archiveList;
-        },
-        // タイムライン用に最適化されたソート済みリストを取得
-        GetDetailsSortByTimeline() {
-            const list = [...this._details]; // 元データを壊さないようコピー
-            list.sort((a, b) => {
-                // 1. 日時文字列で比較 (YYYY-MM-DDHH:mm)
-                const dtA = (a.memo_date || "") + (a.memo_time || "");
-                const dtB = (b.memo_date || "") + (b.memo_time || "");
-                if (dtA !== dtB) return dtA.localeCompare(dtB);
-                // 2. 日時が同じなら seq (サーバーID) で比較
-                const seqA = Number(a.seq || 0);
-                const seqB = Number(b.seq || 0);
-                if (seqA !== seqB) return seqA - seqB;
-                // 3. seqも同じ（共に未同期など）なら dbid (ローカルID) で比較
-                const dbidA = Number(a.dbid || 0);
-                const dbidB = Number(b.dbid || 0);
-                return dbidA - dbidB;
-            });
-            return list;
         },
         GetDetails() {
             return this._getDetails();
@@ -308,7 +363,7 @@ window.$Data = {
             }
         },
     },
-    // 同期処理の専門部署
+    // ローカル㏈
     LocalDb: {
         // バックグラウンドで明細を一括送信
         async BulkSendDetails() {

@@ -4,68 +4,54 @@ using System.Text.Json;
 
 namespace LittleTripMemo.Middleware;
 
-public class SystemManagementMiddleware
+/// <summary>
+/// アプリケーションのバージョンチェックおよびメンテナンスモードの判定を行うミドルウェア
+/// </summary>
+public class SystemManagementMiddleware(
+    RequestDelegate next,
+    SystemStatus systemStatus
+)
 {
-    private readonly RequestDelegate _next;
-    private readonly SystemStatus _systemStatus;
-
-    public SystemManagementMiddleware(RequestDelegate next, SystemStatus systemStatus)
-    {
-        _next = next;
-        _systemStatus = systemStatus;
-    }
-
     public async Task InvokeAsync(HttpContext context, UserContext userContext)
     {
-        // 1. バージョンチェック (カスタムヘッダー "X-App-Version" を想定)
-        // ※ フロント側でこのヘッダーを載せて送る必要があります
+        // 1. バージョンチェック (カスタムヘッダー "X-App-Version" を検証)
         var appVersion = context.Request.Headers["X-App-Version"].ToString();
-        if (!string.IsNullOrEmpty(_systemStatus.MinAppVersion) && !string.IsNullOrEmpty(appVersion))
+        if (!string.IsNullOrEmpty(systemStatus.MinAppVersion) && !string.IsNullOrEmpty(appVersion))
         {
-            // バージョン比較 (簡易的な文字列比較または Version クラスでの比較)
-            // ここでは簡易的に「現在のバージョン < 最小必須バージョン」を判定
-            if (IsVersionOlder(appVersion, _systemStatus.MinAppVersion))
+            if (IsVersionOlder(appVersion, systemStatus.MinAppVersion))
             {
-                await ReturnErrorResponse(context, HttpStatusCode.UpgradeRequired, "新しいバージョンのアプリが利用可能です。更新（リロード）してください。", "VERSION_UP_REQUIRED");
+                await ReturnErrorResponse(context, HttpStatusCode.UpgradeRequired, "新しいバージョンのアプリが利用可能です。更新してください。", "VERSION_UP_REQUIRED");
                 return;
             }
         }
 
         // 2. メンテナンスチェック
-        if (_systemStatus.IsMaintenanceMode)
+        if (systemStatus.IsMaintenanceMode)
         {
-            // 管理者権限（Admin）を持つユーザーのみ通過を許可する
+            // 管理者権限（Admin）を持つユーザー以外はアクセス遮断
             if (userContext.plan_type != PlanType.Admin.ToString())
             {
-                await ReturnErrorResponse(context, HttpStatusCode.ServiceUnavailable, _systemStatus.MaintenanceMessage, "MAINTENANCE_MODE");
+                await ReturnErrorResponse(context, HttpStatusCode.ServiceUnavailable, systemStatus.MaintenanceMessage, "MAINTENANCE_MODE");
                 return;
             }
         }
 
-        // 全てのチェックを通過
-        await _next(context);
+        await next(context);
     }
 
-    /// <summary>
-    /// エラーレスポンスをJSONで返却
-    /// </summary>
-    private static async Task ReturnErrorResponse(HttpContext context, HttpStatusCode code, string message, string errorCode)
+    private static async Task ReturnErrorResponse(HttpContext context, HttpStatusCode statusCode, string message, string errorCode)
     {
-        context.Response.StatusCode = (int)code;
+        context.Response.StatusCode = (int)statusCode;
         context.Response.ContentType = "application/json";
-
-        var response = new { message, errorCode };
-        await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+        var responseBody = new { message, errorCode };
+        await context.Response.WriteAsync(JsonSerializer.Serialize(responseBody));
     }
 
-    /// <summary>
-    /// バージョン比較ロジック (1.0.0 形式を想定)
-    /// </summary>
-    private static bool IsVersionOlder(string current, string minRequired)
+    private static bool IsVersionOlder(string currentVersion, string minRequiredVersion)
     {
-        if (Version.TryParse(current, out var v1) && Version.TryParse(minRequired, out var v2))
+        if (Version.TryParse(currentVersion, out var current) && Version.TryParse(minRequiredVersion, out var required))
         {
-            return v1 < v2;
+            return current < required;
         }
         return false;
     }
