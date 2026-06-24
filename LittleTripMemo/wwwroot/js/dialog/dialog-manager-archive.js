@@ -132,47 +132,37 @@ export default {
     ShowDetailsTimeLine() {
         const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) return $Notice.Warn("データはありません。");
-        // --- 1. 日付マスク（公開用）の準備 ---
-        // 公開まとめモード（ARCHIVE_PUB）かどうかを判定
         const isPub = $App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.ARCHIVE_PUB;
-        // まとめ内のユニークな日付リストを古い順に取得（○dayの算出用）
-        // const dateList = $Util.GetUniqueDateList(details);
-        // const isMultiDay = dateList.length > 1;
-        // 開始日の時期（例：4月下旬）を取得。2日目以降もこの「旬」を基準とする
-        // const baseMask = isPub ? $Util.GetMaskedDate(dateList[0]) : "";
-        const baseMask = isPub ? details[0] : "";
-        // --- 2. 各種フラグ・テンプレート準備 ---
         const archive = $Data.Store.GetArchive();
         const canDetach = archive && !archive.is_public && archive.is_owner;
         const el = $Dom.GenerateTemplate("tpl-timeline-container");
         const listContainer = $Dom.QuerySelector(".js-list-container", el);
-        let currentDate = "";
-        // --- 3. 明細ループ開始 ---
+        // ブレーク判定用のキー（公開ならday番号、自分用なら日付文字列）
+        let currentBreakKey = null;
         details.forEach((item, index) => {
-            const dateStr = (item.memo_date || "");
-            // 日付が変わったタイミングでヘッダーを挿入
-            if (currentDate !== dateStr) {
+            const breakKey = isPub ? item.display_day : item.memo_date;
+            // 日付（またはDAY）が変わったタイミングでヘッダーを挿入
+            if (currentBreakKey !== breakKey) {
                 const header = $Dom.GenerateTemplate("tpl-timeline-date");
-                const textEl = $Dom.QuerySelector(".js-date-text", header);
+                const container = $Dom.QuerySelector(".js-date-container", header);
                 if (isPub) {
-                    // // 公開時：何日目かを取得（0開始なので+1）
-                    // const dIdx = dateList.indexOf(dateStr);
-                    // if (dIdx === 0) {
-                    //     // 1日目：時期（4月下旬等）を表示。2日以上あるまとめなら「1day」を付与
-                    //     textEl.textContent = isMultiDay ? `${baseMask} 1day` : baseMask;
-                    // } else {
-                    //     // 2日目以降：カウントアップのみを表示（例：2day）
-                    //     textEl.textContent = `${dIdx + 1}day`;
-                    // }
-                    textEl.textContent = item.memo_date;
+                    const dayNum = item.display_day;
+                    const hideMask = (dayNum > 1);
+                    // "6月中旬 1day" から重複する " 1day" を除去して部品に渡す
+                    const cleanDate = (item.memo_date || "").replace(/\s\d+day$/, "");
+                    container.appendChild($UI.Generator.DateLabel(cleanDate, null, {
+                        size: 'list',
+                        dayNum: dayNum,
+                        hideMask: hideMask,
+                        isMask: false
+                    }));
                 } else {
-                    // 自分用（Private）：正確な日付をそのまま表示
-                    textEl.textContent = dateStr;
+                    container.appendChild($UI.Generator.DateLabel(item.memo_date, null, { size: 'list' }));
                 }
                 listContainer.appendChild(header);
-                currentDate = dateStr;
+                currentBreakKey = breakKey;
             }
-            // --- 4. アイテム描画（既存ロジック維持） ---
+            // --- 以降、アイテム描画ロジック（既存維持） ---
             const child = $Dom.GenerateTemplate("tpl-timeline-item");
             const indexBadge = $Dom.QuerySelector(".js-index-badge", child);
             if (indexBadge) indexBadge.textContent = (index + 1);
@@ -180,21 +170,17 @@ export default {
             $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
             $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
             $Dom.QuerySelector(".js-body", child).textContent = item.body || "";
-            // まとめからの切り離しボタン制御
             const btnDetach = $Dom.QuerySelector(".js-btn-detach", child);
-            if (btnDetach) {
-                if (canDetach) {
-                    $Dom.ToggleShow(btnDetach, true);
-                    btnDetach.onclick = async (e) => {
-                        e.stopPropagation();
-                        if (!await this.ShowConfirm({ title: "REMOVE ITEM", message: "このメモをまとめから外し、単独のメモに戻しますか？" })) return;
-                        if (await $Data.Access.DetachDetails({ seqs: [item.seq], archive_id: item.archive_id })) {
-                            $Notice.Info("まとめから外しました。"); this._core.closeAll(); await $App.RefreshScreen();
-                        }
-                    };
-                } else { $Dom.ToggleShow(btnDetach, false); }
+            if (btnDetach && canDetach) {
+                $Dom.ToggleShow(btnDetach, true);
+                btnDetach.onclick = async (e) => {
+                    e.stopPropagation();
+                    if (!await this.ShowConfirm({ title: "REMOVE ITEM", message: "このメモをまとめから外し、単独のメモに戻しますか？" })) return;
+                    if (await $Data.Access.DetachDetails({ seqs: [item.seq], archive_id: item.archive_id })) {
+                        $Notice.Info("まとめから外しました。"); this._core.closeAll(); await $App.RefreshScreen();
+                    }
+                };
             }
-            // 金額表示の色分け
             const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
             const priceEl = $Dom.QuerySelector(".js-price", child);
             const priceUnitEl = $Dom.QuerySelector(".js-price-unit", child);
@@ -215,7 +201,6 @@ export default {
                     }
                 } else { $Dom.ToggleShow(priceWrapper, false); }
             }
-            // マーカー選択イベント
             child.onclick = () => { this._core.closeAll(); $Marker.SelectMarker(index); };
             listContainer.appendChild(child);
         });

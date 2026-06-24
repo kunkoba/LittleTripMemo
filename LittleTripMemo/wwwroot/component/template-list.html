@@ -23,10 +23,19 @@
 </template>
 
 <!-- 【リスト子】タイムライン日付 -->
-<template id="tpl-timeline-date">
+<template id="tpl-timeline-date_2">
     <div class="flex items-center gap-3 pt-2 cursor-pointer opacity-80">
         <div class="text-[18px] font-black text-black-5 js-date-text italic"></div>
         <div class="flex-1 h-[1px] bg-slate-100"></div>
+    </div>
+</template>
+<!-- 【リスト子】タイムライン日付（部品注入用） -->
+<template id="tpl-timeline-date">
+    <div class="flex items-center gap-3 pt-2 cursor-pointer opacity-90">
+        <!-- ここに $UI.Generator.DateLabel で生成したオブジェクトを appendChild する -->
+        <div class="js-date-container flex items-center"></div>
+        <!-- 横線：バッジの高さに合わせて位置を微調整 -->
+        <div class="flex-1 h-[1px] bg-slate-100 mt-1"></div>
     </div>
 </template>
 
@@ -242,3 +251,4 @@
         </div>
     </div>
 </template>
+

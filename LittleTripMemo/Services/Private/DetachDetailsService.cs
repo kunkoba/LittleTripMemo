@@ -1,61 +1,84 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
+using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Repository.App;
+using LittleTripMemo.Services.Common;
 using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Private;
 
 /// <summary>
-/// まとめられた明細をアーカイブから解除し、未まとめ状態に戻すサービス
+/// まとめられた明細をアーカイブから解除し、未まとめ状態に戻すサービス。
+/// 解除の結果、アーカイブ内の明細が0件になった場合はアーカイブ自体を自動削除します。
 /// </summary>
-public class DetachDetailsService : _BaseService
+public class DetachDetailsService(
+    UserContext userContext,
+    ITransactionProvider transactionProvider,
+    DetailRepository detailRepository,
+    ArchiveRepository archiveRepository
+) : _BaseService(userContext)
 {
-    private readonly ITransactionProvider _provider;
-    private readonly DetailRepository _detailRepo;
-    private readonly ArchiveRepository _archiveRepo;
-
     public record DetachDetailsReq(
         [Required] Guid login_user_id,
         [Required(ErrorMessage = "解除対象のseqリストは必須です")] int[] seqs,
         [Required(ErrorMessage = "元のアーカイブIDは必須です")] int archive_id
     ) : ILoginUserRequest;
 
-    public record Response(int detachedCount);
+    public record Response(int detached_count, bool is_archive_deleted);
 
-    public DetachDetailsService(
-        UserContext userContext,
-        ITransactionProvider provider,
-        DetailRepository detailRepo,
-        ArchiveRepository archiveRepo
-    ) : base(userContext)
-    {
-        _provider = provider;
-        _detailRepo = detailRepo;
-        _archiveRepo = archiveRepo;
-    }
-
+    /// <summary>
+    /// 切り離し処理を実行する
+    /// </summary>
     public async Task<Response> ExecuteAsync(DetachDetailsReq req)
     {
-        BusinessException.ThrowIf(req.seqs.Length == 0, "対象が選択されていません。");
+        // 1. バリデーション
+        await ValidateAsync(req);
 
-        using var tran = _provider.BeginTransaction();
+        bool isArchiveDeleted = false;
+        int detachedCount = 0;
+
+        using var transaction = transactionProvider.BeginTransaction();
         try
         {
-            // archive_id > 0 のものを 0 に更新
-            var count = await _detailRepo.DetachBySeqsAsync(req.seqs);
+            // ① 対象の明細をアーカイブから切り離す (archive_id を 0 に更新)
+            detachedCount = await detailRepository.DetachBySeqsAsync(req.seqs);
 
-            // ★追加：影響を受けたアーカイブIDのカウントをリフレッシュ
-            // ※req に archive_id が含まれている、もしくは明細から特定して渡す
-            await _archiveRepo.UpdateDetailCountAsync(req.archive_id);
+            if (detachedCount > 0)
+            {
+                // ② アーカイブの現在の明細件数を更新
+                await archiveRepository.UpdateDetailCountAsync(req.archive_id);
 
-            tran.Commit();
-            return new Response(count);
+                // ③ 最新のアーカイブ情報を取得して件数を確認
+                var archive = await archiveRepository.GetByKeyAsync(req.archive_id);
+
+                // 明細が0件になった場合は、まとめ自体を削除（解除と同じ挙動）
+                if (archive != null && archive.detail_count <= 0)
+                {
+                    await archiveRepository.DeletePhysicalByKeyAsync(req.archive_id);
+                    isArchiveDeleted = true;
+                }
+            }
+
+            transaction.Commit();
+            return new Response(detachedCount, isArchiveDeleted);
         }
         catch
         {
             throw;
         }
+    }
+
+    /// <summary>
+    /// 業務バリデーション
+    /// </summary>
+    private async Task ValidateAsync(DetachDetailsReq req)
+    {
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
+        BusinessException.ThrowIf(req.seqs.Length == 0, "解除対象が選択されていません");
+        BusinessException.ThrowIf(req.archive_id <= 0, "無効なアーカイブIDです");
+
+        await Task.CompletedTask;
     }
 
 }
