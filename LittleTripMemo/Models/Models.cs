@@ -182,6 +182,17 @@ public class TSysUserNotification
     public DateTime send_tim { get; set; }
 }
 
+// ユーザログ
+public class TSysUserHistory
+{
+    public long seq { get; set; }
+    public Guid user_id { get; set; }
+    public string action_kind { get; set; } = string.Empty;
+    public string? body { get; set; }
+    public Dictionary<string, object>? memo_json { get; set; }
+    public DateTime create_tim { get; set; }
+}
+
 #endregion
 
 #region "DTO"

@@ -32,82 +32,6 @@ export default {
             $Notice.Warn("データはありません。");
             return;
         }
-        const el = $Dom.GenerateTemplate("tpl-timeline-container");
-        const listContainer = $Dom.QuerySelector(".js-list-container", el);
-        let currentDate = ""; // 現在描画中の日付を保持
-        // すでにソート済みなので、上から順にループするだけでOK！
-        details.forEach((item, index) => {
-            // const dateStr = (item.memo_date || "");
-            const dateStr = (item.memo_date || "");
-            // 日付が変わったタイミングでだけヘッダーを差し込む
-            if (currentDate !== dateStr) {
-                const header = $Dom.GenerateTemplate("tpl-timeline-date");
-                $Dom.QuerySelector(".js-date-text", header).textContent = dateStr;
-                listContainer.appendChild(header);
-                currentDate = dateStr;
-            }
-            // アイテムの描画
-            const child = $Dom.GenerateTemplate("tpl-timeline-item");
-            // インデックス番号のセット
-            const indexBadge = $Dom.QuerySelector(".js-index-badge", child);
-            if (indexBadge) indexBadge.textContent = (index + 1);
-            //
-            $Dom.QuerySelector(".js-time", child).textContent = item.memo_time || "";
-            $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
-            $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
-            $Dom.QuerySelector(".js-body", child).textContent = item.body || "";
-            // 金額のセットと色分け
-            const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
-            const priceEl = $Dom.QuerySelector(".js-price", child);
-            const priceUnitEl = $Dom.QuerySelector(".js-price-unit", child);
-            if (priceEl && priceWrapper) {
-                const price = Number(item.memo_price || 0);
-                if (price !== 0) {
-                    // 金額がある場合は表示
-                    $Dom.ToggleShow(priceWrapper, true);
-                    // 通貨単位の取得（親アーカイブの設定、またはユーザー設定）
-                    let displayCurrency = $App.AppData.Owner.Currency_unit || 'JPY';
-                    if (item.archive_id > 0) {
-                        const archiveList = $Data.Store.GetArchiveList() || [];
-                        const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
-                        if (targetArc && targetArc.currency_unit) {
-                            displayCurrency = targetArc.currency_unit;
-                        }
-                    }
-                    if (priceUnitEl) priceUnitEl.textContent = displayCurrency;
-                    if (price > 0) {
-                        priceEl.textContent = `+${price.toLocaleString()}`;
-                        // priceEl.className = "js-price text-[1rem] font-black italic  text-blue-500";
-                        priceEl.className += " text-blue-500";
-                    } else if (price < 0) {
-                        priceEl.textContent = price.toLocaleString();
-                        priceEl.className += " text-red-500";
-                    }
-                } else {
-                    // 0円の時は枠ごと隠す
-                    $Dom.ToggleShow(priceWrapper, false);
-                }
-            }
-            child.onclick = () => {
-                this._core.closeAll();
-                $Marker.SelectMarker(index); // details自体がソート済みなので、このindexをそのまま使える
-            };
-            listContainer.appendChild(child);
-        });
-        this._core.open({
-            title: "TRIP LOG",
-            content: el,
-            help: "",
-            buttons: []
-        });
-    },
-    ShowDetailsTimeLine() {
-        // ソートする
-        const details = $Data.Store.GetDetails();
-        if (!details || details.length === 0) {
-            $Notice.Warn("データはありません。");
-            return;
-        }
         // ▼ 追加：現在のアーカイブがプライベートかつ自分がオーナーか判定
         const archive = $Data.Store.GetArchive();
         const canDetach = archive && !archive.is_public && archive.is_owner;
@@ -205,70 +129,99 @@ export default {
             buttons: []
         });
     },
-    // 検索結果用リスト
-    ShowDetailsSearchResult_2() {
-        // ソートしない
+    ShowDetailsTimeLine() {
         const details = $Data.Store.GetDetails();
-        console.log("ShowDetailsSearchResult:", details);
-        if (!details || details.length === 0) {
-            $Notice.Warn("データはありません。");
-            return;
-        }
-        const el = $Dom.GenerateTemplate("tpl-list-parent");
+        if (!details || details.length === 0) return $Notice.Warn("データはありません。");
+        // --- 1. 日付マスク（公開用）の準備 ---
+        // 公開まとめモード（ARCHIVE_PUB）かどうかを判定
+        const isPub = $App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.ARCHIVE_PUB;
+        // まとめ内のユニークな日付リストを古い順に取得（○dayの算出用）
+        const dateList = $Util.GetUniqueDateList(details);
+        const isMultiDay = dateList.length > 1;
+        // 開始日の時期（例：4月下旬）を取得。2日目以降もこの「旬」を基準とする
+        const baseMask = isPub ? $Util.GetMaskedDate(dateList[0]) : "";
+        // --- 2. 各種フラグ・テンプレート準備 ---
+        const archive = $Data.Store.GetArchive();
+        const canDetach = archive && !archive.is_public && archive.is_owner;
+        const el = $Dom.GenerateTemplate("tpl-timeline-container");
+        const listContainer = $Dom.QuerySelector(".js-list-container", el);
+        let currentDate = "";
+        // --- 3. 明細ループ開始 ---
         details.forEach((item, index) => {
-            const child = $Dom.GenerateTemplate("tpl-list-child-search");
             const dateStr = (item.memo_date || "");
-            $Dom.QuerySelector(".js-date", child).textContent = dateStr;
+            // 日付が変わったタイミングでヘッダーを挿入
+            if (currentDate !== dateStr) {
+                const header = $Dom.GenerateTemplate("tpl-timeline-date");
+                const textEl = $Dom.QuerySelector(".js-date-text", header);
+                if (isPub) {
+                    // 公開時：何日目かを取得（0開始なので+1）
+                    const dIdx = dateList.indexOf(dateStr);
+                    if (dIdx === 0) {
+                        // 1日目：時期（4月下旬等）を表示。2日以上あるまとめなら「1day」を付与
+                        textEl.textContent = isMultiDay ? `${baseMask} 1day` : baseMask;
+                    } else {
+                        // 2日目以降：カウントアップのみを表示（例：2day）
+                        textEl.textContent = `${dIdx + 1}day`;
+                    }
+                } else {
+                    // 自分用（Private）：正確な日付をそのまま表示
+                    textEl.textContent = dateStr;
+                }
+                listContainer.appendChild(header);
+                currentDate = dateStr;
+            }
+            // --- 4. アイテム描画（既存ロジック維持） ---
+            const child = $Dom.GenerateTemplate("tpl-timeline-item");
+            const indexBadge = $Dom.QuerySelector(".js-index-badge", child);
+            if (indexBadge) indexBadge.textContent = (index + 1);
             $Dom.QuerySelector(".js-time", child).textContent = item.memo_time || "";
             $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
             $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
-            // 本文の改行をスペースに置換してセット（1行に収まるように）
-            const bodyStr = (item.body || "").replace(/\r?\n/g, ' ');
-            $Dom.QuerySelector(".js-body", child).textContent = bodyStr;
-            // ▼ 修正：金額エリアのセットと表示制御
+            $Dom.QuerySelector(".js-body", child).textContent = item.body || "";
+            // まとめからの切り離しボタン制御
+            const btnDetach = $Dom.QuerySelector(".js-btn-detach", child);
+            if (btnDetach) {
+                if (canDetach) {
+                    $Dom.ToggleShow(btnDetach, true);
+                    btnDetach.onclick = async (e) => {
+                        e.stopPropagation();
+                        if (!await this.ShowConfirm({ title: "REMOVE ITEM", message: "このメモをまとめから外し、単独のメモに戻しますか？" })) return;
+                        if (await $Data.Access.DetachDetails({ seqs: [item.seq], archive_id: item.archive_id })) {
+                            $Notice.Info("まとめから外しました。"); this._core.closeAll(); await $App.RefreshScreen();
+                        }
+                    };
+                } else { $Dom.ToggleShow(btnDetach, false); }
+            }
+            // 金額表示の色分け
             const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
-            const priceEl = $Dom.QuerySelector(".js-memo-price", child);
-            const currencyEl = $Dom.QuerySelector(".js-memo-currency", child);
-            if (priceWrapper && priceEl && currencyEl) {
+            const priceEl = $Dom.QuerySelector(".js-price", child);
+            const priceUnitEl = $Dom.QuerySelector(".js-price-unit", child);
+            if (priceEl && priceWrapper) {
                 const price = Number(item.memo_price || 0);
                 if (price !== 0) {
                     $Dom.ToggleShow(priceWrapper, true);
-                    let displayCurrency = item.currency_unit || 'JPY';
+                    let displayCurrency = $App.AppData.Owner.Currency_unit || 'JPY';
                     if (item.archive_id > 0) {
-                        const archiveList = $Data.Store.GetArchiveList() || [];
-                        const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
-                        if (targetArc && targetArc.currency_unit) {
-                            displayCurrency = targetArc.currency_unit;
-                        }
+                        const arc = $Data.Store.GetArchiveList()?.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
+                        if (arc?.currency_unit) displayCurrency = arc.currency_unit;
                     }
-                    currencyEl.textContent = displayCurrency;
+                    if (priceUnitEl) priceUnitEl.textContent = displayCurrency;
                     if (price > 0) {
-                        priceEl.textContent = `+${price.toLocaleString()}`;
-                        priceEl.className += " text-blue-500";
-                    } else if (price < 0) {
-                        priceEl.textContent = price.toLocaleString();
-                        priceEl.className += " text-red-500";
+                        priceEl.textContent = `+${price.toLocaleString()}`; priceEl.className += " text-blue-500";
+                    } else {
+                        priceEl.textContent = price.toLocaleString(); priceEl.className += " text-red-500";
                     }
-                } else {
-                    // 0円の時はラッパーごと非表示にして隙間を詰める
-                    $Dom.ToggleShow(priceWrapper, false);
-                }
+                } else { $Dom.ToggleShow(priceWrapper, false); }
             }
-            child.onclick = () => {
-                this._core.closeAll();
-                $Marker.SelectMarker(index);
-            };
-            el.appendChild(child);
+            // マーカー選択イベント
+            child.onclick = () => { this._core.closeAll(); $Marker.SelectMarker(index); };
+            listContainer.appendChild(child);
         });
-        this._core.open({
-            title: "SEARCH RESULTS",
-            content: el,
-            help: "",
-            buttons: []
-        });
+        this._core.open({ title: "TRIP LOG", content: el });
     },
     // 検索結果用リスト
-    ShowDetailsSearchResult() {
+    // 検索結果用リスト
+    ShowDetailsSearchResult_2() {
         const details = $Data.Store.GetDetails();
         console.log("ShowDetailsSearchResult:", details);
         if (!details || details.length === 0) {
@@ -333,6 +286,58 @@ export default {
             help: "",
             buttons: []
         });
+    },
+    ShowDetailsSearchResult() {
+        const details = $Data.Store.GetDetails();
+        if (!details || details.length === 0) return $Notice.Warn("データはありません。");
+        const el = $Dom.GenerateTemplate("tpl-list-parent");
+        const rt = $Const.REACTION_TYPE; // リアクション定数
+        details.forEach((item, index) => {
+            const child = $Dom.GenerateTemplate("tpl-list-child-search");
+            // --- 1. 基本情報の反映 ---
+            $Dom.QuerySelector(".js-index", child).textContent = (index + 1);
+            $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
+            $Dom.QuerySelector(".js-archive-title", child).textContent = item.a_title || "(No Archive)";
+            $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
+            $Dom.QuerySelector(".js-body", child).textContent = (item.body || "").replace(/\r?\n/g, ' ');
+            // --- 2. 日時情報の反映（日付マスク適用） ---
+            // 公開検索結果のため、正確な作成日ではなく「訪問時期（マスク済み）」を表示する
+            const maskedDate = $Util.GetMaskedDate(item.memo_date);
+            $Dom.QuerySelector(".js-create-tim", child).textContent = `${maskedDate} ${item.memo_time || ""}`;
+            $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
+            // --- 3. リアクション統計の反映 ---
+            $Dom.QuerySelector(".js-icon-funny", child).textContent = rt.FUNNY.emoji;
+            $Dom.QuerySelector(".js-count-funny", child).textContent = item.count_funny || 0;
+            $Dom.QuerySelector(".js-icon-love", child).textContent = rt.LOVE.emoji;
+            $Dom.QuerySelector(".js-count-love", child).textContent = item.count_love || 0;
+            $Dom.QuerySelector(".js-icon-surprise", child).textContent = rt.SURPRISE.emoji;
+            $Dom.QuerySelector(".js-count-surprise", child).textContent = item.count_surprise || 0;
+            $Dom.QuerySelector(".js-icon-sad", child).textContent = rt.SAD.emoji;
+            $Dom.QuerySelector(".js-count-sad", child).textContent = item.count_sad || 0;
+            // --- 4. 金額エリアの制御（既存ロジック） ---
+            const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
+            const priceEl = $Dom.QuerySelector(".js-memo-price", child);
+            const currencyEl = $Dom.QuerySelector(".js-memo-currency", child);
+            const price = Number(item.memo_price || 0);
+            if (price !== 0) {
+                $Dom.ToggleShow(priceWrapper, true);
+                let displayCurrency = item.currency_unit || 'JPY';
+                if (item.archive_id > 0) {
+                    const arc = $Data.Store.GetArchiveList()?.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
+                    if (arc?.currency_unit) displayCurrency = arc.currency_unit;
+                }
+                currencyEl.textContent = displayCurrency;
+                if (price > 0) {
+                    priceEl.textContent = `+${price.toLocaleString()}`; priceEl.classList.add("text-blue-500");
+                } else {
+                    priceEl.textContent = price.toLocaleString(); priceEl.classList.add("text-red-500");
+                }
+            }
+            // マーカー選択イベント
+            child.onclick = () => { this._core.closeAll(); $Marker.SelectMarker(index); };
+            el.appendChild(child);
+        });
+        this._core.open({ title: "SEARCH RESULTS", content: el });
     },
     // まとめ親一覧選択
     ShowArchiveList_2() {

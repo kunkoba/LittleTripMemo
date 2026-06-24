@@ -45,13 +45,23 @@ const _DialogCore = {
     },
     // 1. _DialogCore の create メソッド修正
     create({ title = "", content = "", buttons = [], headerButtons = [], 
-            help = null, onClose = null, theme = null, isFooterFixed = true, isModal = false }) {
+            help = null, onClose = null, theme = null, isFooterFixed = true, isModal = false, size = null }) {
         const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
         frame._isModal = isModal; // フラグ保持
         const titleEl = $Dom.QuerySelector("#dialog-title", frame);
         const contentEl = $Dom.QuerySelector("#dialog-content", frame);
         const headerActions = $Dom.QuerySelector("#dialog-header-actions", frame);
         const btnContainer = $Dom.QuerySelector("#dialog-button-container", frame);
+        // --- 【追加】サイズ（高さ）の制御 ---
+        if (size === 'lg') {
+            frameBg.classList.remove("max-h-[70vh]", "min-h-[40vh]");
+            frameBg.classList.add("h-[70vh]"); // 最大固定
+        } else if (size === 'md') {
+            frameBg.classList.remove("max-h-[70vh]", "min-h-[40vh]");
+            frameBg.classList.add("h-[50vh]"); // 中間固定
+        } else {
+            // frameBg.classList.add("max-h-[70vh]", "min-h-[20vh]"); // 可変（最小20vhに変更）
+        }
         titleEl.textContent = title;
         // --- ヘルプ・ヘッダーボタン（上段）の構築 ---
         headerActions.innerHTML = ""; // 一旦クリア

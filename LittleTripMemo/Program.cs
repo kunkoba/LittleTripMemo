@@ -1,4 +1,5 @@
-﻿using LittleTripMemo.Common;
+﻿using Dapper;
+using LittleTripMemo.Common;
 using LittleTripMemo.Configs;
 using LittleTripMemo.DataAccess;
 using LittleTripMemo.DbContext;
@@ -7,6 +8,7 @@ using LittleTripMemo.Extensions; // 拡張メソッド用
 using LittleTripMemo.JWT;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
+using LittleTripMemo.Services.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +16,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text;
-using Dapper;
 
 // 1. 起動前設定（Npgsql タイムスタンプ挙動の固定）
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -23,6 +24,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Dapper の型変換ハンドラーを登録（click_stats の解析に必須）
 SqlMapper.AddTypeHandler(new JsonbTypeHandler<Dictionary<string, ClickCountData>>());
+// Dapper の型変換ハンドラーを登録（Dictionary内の各オブジェクトをJSONBとしてシリアライズ/デシリアライズ可能にする）
+SqlMapper.AddTypeHandler(new JsonbTypeHandler<Dictionary<string, object>>());
 
 // 2. ログ設定 (Serilog)
 Log.Logger = new LoggerConfiguration()
@@ -92,6 +95,9 @@ builder.Services.AddCors(options => options.AddDefaultPolicy(p => p.AllowAnyOrig
 builder.Services.AddHostedService<LittleTripMemo.Worker.SystemMaintenanceWorker>();
 
 var app = builder.Build();
+
+// UserHistoryLogger に HttpContextAccessor を紐付け（静的サービスからの DI 解決を可能にする）
+UserHistoryRegister.Configure(app.Services.GetRequiredService<IHttpContextAccessor>());
 
 // 10. ミドルウェア・パイプライン
 app.UseMiddleware<ExceptionHandling>(); // 最外周で例外をキャッチ

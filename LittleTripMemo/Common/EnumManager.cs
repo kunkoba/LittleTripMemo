@@ -24,3 +24,16 @@ public enum ClickTargetType : short
     Archive = 2,
     Detail = 3
 }
+
+// ユーザーログのアクション種別
+public enum UserHistoryActionKind
+{
+    Feedback,       // フィードバック送信
+    Withdrawal,     // 退会
+    AdminClose,     // 管理者による強制クローズ
+    AdminUnpublish, // 管理者による強制公開停止
+    AdminMailSent,  // 管理者からの個別メール送信
+    AdminBan,       // BAN実行
+    AdminUnban      // BAN解除
+}
+
