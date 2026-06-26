@@ -12,7 +12,7 @@ public class GetReportSummaryService : _BaseService
 
     public record Response(IEnumerable<DtoReportSummary> reportSummary);
 
-    public GetReportSummaryService(UserContext u, SysReportRepository r) : base(u) => _repo = r;
+    public GetReportSummaryService(UserContext userContext, SysReportRepository sysReportRepository) : base(userContext) => _repo = sysReportRepository;
 
     public async Task<Response> ExecuteAsync()
     {

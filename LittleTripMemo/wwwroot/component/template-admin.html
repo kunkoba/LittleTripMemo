@@ -116,20 +116,24 @@
 </template>
 <!-- 【リスト子】管理者通報集計一覧用 -->
 <template id="tpl-admin-list-child-report-summary">
-    <div class="relative bg-white border-2 border-brand-1 shadow-md p-4 flex flex-col gap-1 cursor-pointer active:bg-slate-50 mb-4">
+    <div class="relative bg-white border border-brand-1 shadow-md p-3 flex flex-col gap-2 cursor-pointer active:bg-slate-50 mb-3 rounded-[1rem]">
+        <!-- 右上：通報件数バッジ -->
         <div class="absolute top-3 right-3 bg-red-500 text-white text-[0.8rem] font-black px-2.5 py-1 rounded-full shadow-sm">
             <span class="js-report-count js-badge-count">0</span>
         </div>
-        <div class="text-[0.8rem] font-black text-black-5 pr-16 truncate">
+        <!-- 最終更新日 -->
+        <div class="js-update-tim kb-date-tim-sm">
+        </div>
+        <!-- まとめタイトル -->
+        <div class="text-[0.95rem] font-black text-slate-800 pr-10 line-clamp-2">
             <span class="js-archive-title">タイトル</span>
         </div>
-        <div class="text-[0.8rem] font-medium text-slate-400 mb-1">
-            <span class="js-target-user">0000-0000...</span>
+        <!-- ユーザーバッジ領域（JSで生成して流し込む） -->
+        <div class="js-user-wrapper mt-1">
         </div>
-        <!-- ▼ 生存状態表示用のバッジ領域を追加 -->
-        <div class="flex gap-1">
-            <span class="hidden bg-slate-800 text-white text-[9px] px-2 py-0.5 rounded-full js-badge-deleted shadow-sm">DELETED</span>
-            <span class="hidden bg-slate-300 text-white text-[9px] px-2 py-0.5 rounded-full js-badge-closed shadow-sm">CLOSED</span>
+        <!-- 生存状態バッジ（Close状態の場合のみ表示） -->
+        <div class="flex gap-1 mt-1">
+            <span class="hidden bg-slate-400 text-white text-[9px] px-2 py-0.5 rounded-full js-badge-closed shadow-sm">CLOSED</span>
         </div>
     </div>
 </template>

@@ -243,6 +243,8 @@ public class DtoReportSummary
     public long report_count { get; set; }
     public bool is_closed { get; set; }  // t_memo_archive_pub.closed_flg
     public bool is_deleted { get; set; } // t_memo_archive_pub.del_flg
+    public string? target_icon { get; set; }
+    public string? target_nick_name { get; set; }
 }
 
 /// <summary>

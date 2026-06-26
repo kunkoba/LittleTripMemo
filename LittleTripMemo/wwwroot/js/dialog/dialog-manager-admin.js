@@ -176,12 +176,11 @@ export default {
         });
     },
     // 通報集計一覧（API通信化）
-    async ShowAdminReportList() {
+    async ShowAdminReportList_2() {
         const isSuccess = await $Data.Access.GetReportSummary();
         if (!isSuccess) return;
         const reportSummary = $App.AppData.Admin.reportSummary ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
-        // root.className = "w-full text-black-3 mb-2 px-1";
         if (reportSummary.length === 0) {
             root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">通報データはありません</div>`;
         } else {
@@ -192,12 +191,6 @@ export default {
                 $Dom.QuerySelector(".js-target-user", child).textContent = `Target: ${item.target_user_name || item.target_user_id}`;
                 $Dom.QuerySelector(".js-archive-title", child).textContent = item.archive_title || "Unknown Title";
                 $Dom.QuerySelector(".js-badge-count", child).textContent = `${item.report_count}`;
-                // 生存状態の表示
-                if (item.is_deleted) {
-                    $Dom.ToggleShow($Dom.QuerySelector(".js-badge-deleted", child), true);
-                } else if (item.is_closed) {
-                    $Dom.ToggleShow($Dom.QuerySelector(".js-badge-closed", child), true);
-                }
                 child.onclick = () => this.ShowAdminReportDetail(item);
                 root.appendChild(child);
             });
@@ -210,8 +203,51 @@ export default {
             buttons:[]
         });
     },
+    // 通報集計一覧（API通信化）
+    async ShowAdminReportList() {
+        const isSuccess = await $Data.Access.GetReportSummary();
+        if (!isSuccess) return;
+        const reportSummary = $App.AppData.Admin.reportSummary || [];
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        if (reportSummary.length === 0) {
+            root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">通報データはありません</div>`;
+        } else {
+            // 通報件数の多い順にソート
+            const sorted = [...reportSummary].sort((a, b) => b.report_count - a.report_count);
+            sorted.forEach(item => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-summary");
+                // ① まとめタイトルの反映
+                $Dom.QuerySelector(".js-archive-title", child).textContent = item.archive_title || "Unknown Title";
+                // ② 通報件数の反映
+                $Dom.QuerySelector(".js-badge-count", child).textContent = `${item.report_count}`;
+                // ③ 最終更新日の反映（キー名は実際のAPIに合わせてください）
+                const updateTim = item.update_tim || item.archive_update_tim;
+                if (updateTim) {
+                    $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(updateTim);
+                } else {
+                    $Dom.ToggleShow($Dom.QuerySelector(".js-update-tim", child), false);
+                }
+                // ④ ユーザーバッジの生成と反映（キー名は実際のAPIに合わせてください）
+                const userWrapper = $Dom.QuerySelector(".js-user-wrapper", child);
+                $UI.Generator.UserBadge(userWrapper, {
+                    user_id: item.target_user_id,
+                    nick_name: item.target_user_name || item.target_nick_name || item.target_user_id.slice(0, 8),
+                    icon: item.target_user_icon || item.target_icon || "👤"
+                }, { type: 'badge' }); // ラベル（バッジ）タイプで出力
+                child.onclick = () => this.ShowAdminReportDetail(item);
+                root.appendChild(child);
+            });
+        }
+        this._core.open({
+            title: "REPORT Mgmt",
+            content: root,
+            theme: "admin",
+            help: "",
+            buttons: []
+        });
+    },
     // 【管理者機能】通報詳細
-    async ShowAdminReportDetail(summaryItem) {
+    async ShowAdminReportDetail_2(summaryItem) {
         // 詳細データをAPI取得
         const isSuccess = await $Data.Access.GetReportDetails({
             target_user_id: summaryItem.target_user_id,
@@ -222,17 +258,7 @@ export default {
         const reports = $Data.resData.reports || [];
         const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
         // アーカイブタイトルの反映
-        // $Dom.QuerySelector(".js-archive-title", el).textContent = summaryItem.archive_title || "Unknown Title";
-        const titleEl = $Dom.QuerySelector(".js-archive-title", el);
-        if (summaryItem.is_deleted) {
-            titleEl.textContent = `${summaryItem.archive_title || "Unknown Title"} (DELETED)`;
-            titleEl.classList.add("text-slate-400", "line-through"); // 灰色・取り消し線
-        } else if (summaryItem.is_closed) {
-            titleEl.textContent = `${summaryItem.archive_title || "Unknown Title"} (CLOSED)`;
-            titleEl.classList.add("text-red-400"); // 警告色
-        } else {
-            titleEl.textContent = summaryItem.archive_title || "Unknown Title";
-        }
+        $Dom.QuerySelector(".js-archive-title", el).textContent = summaryItem.archive_title || "Unknown Title";
         // --- ターゲットユーザーボタンの設定 ---
         const userWrapper = $Dom.QuerySelector("#view-report-target-user-wrapper", el);
         userWrapper.innerHTML = "";
@@ -244,57 +270,41 @@ export default {
         const btnOpen    = $Dom.QuerySelector("#btn-admin-report-open", el);
         const btnClose   = $Dom.QuerySelector("#btn-admin-report-close", el);
         const btnPrivate = $Dom.QuerySelector("#btn-admin-report-private", el);
-        // ▼ 修正：状態に基づいたボタンの活性化・非活性化
-        if (summaryItem.is_deleted) {
-            // DELETED(削除済み)の場合は全ボタン非活性
-            [btnOpen, btnClose, btnPrivate].forEach(btn => {
-                btn.disabled = true;
-                btn.classList.add("opacity-50", "cursor-not-allowed", "grayscale");
-                btn.classList.remove("active:scale-95");
+        // 2. Open（まとめを開く）
+        btnOpen.onclick = async () => {
+            const isOk = await this.ShowConfirm({ title: "JUMP", message: "この Public まとめデータを開きますか？" });
+            if (!isOk) return;
+            this._core.closeAll();
+            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+            $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
+            await $App.RefreshScreen();
+        };
+        // 3. Close（強制クローズ：URLを知っている人だけ見れる状態へ）
+        btnClose.onclick = async () => {
+            const isOk = await this.ShowConfirm({ title: "FORCE CLOSE", message: "強制的に公開停止(Close)にしますか？" });
+            if (!isOk) return;
+            const isSuccess = await $Data.Access.AdminCloseArchive({ 
+                archive_id: summaryItem.archive_id, 
+                target_user_id: summaryItem.target_user_id 
             });
-        } else {
-            if (summaryItem.is_closed) {
-                // CLOSED中の場合はCloseボタンのみ非活性
-                btnClose.disabled = true;
-                btnClose.classList.add("opacity-50", "cursor-not-allowed", "grayscale");
-                btnClose.classList.remove("active:scale-95");
-            }
-            // 2. Open（まとめを開く）
-            btnOpen.onclick = async () => {
-                const isOk = await this.ShowConfirm({ title: "JUMP", message: "この Public まとめデータを開きますか？" });
-                if (!isOk) return;
+            if (isSuccess) {
+                $Notice.Info("強制的にCloseしました");
                 this._core.closeAll();
-                $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
-                $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
-                await $App.RefreshScreen();
-            };
-            // 3. Close（強制クローズ：URLを知っている人だけ見れる状態へ）
-            btnClose.onclick = async () => {
-                const isOk = await this.ShowConfirm({ title: "FORCE CLOSE", message: "強制的に公開停止(Close)にしますか？" });
-                if (!isOk) return;
-                const isSuccess = await $Data.Access.AdminCloseArchive({ 
-                    archive_id: summaryItem.archive_id, 
-                    target_user_id: summaryItem.target_user_id 
-                });
-                if (isSuccess) {
-                    $Notice.Info("強制的にCloseしました");
-                    this._core.closeAll();
-                }
-            };
-            // 4. Delete（強制Private：本人以外一切見れない状態へ戻す）
-            btnPrivate.onclick = async () => {
-                const isOk = await this.ShowConfirm({ title: "FORCE PRIVATE", message: "強制的に非公開(Private)に戻しますか？" });
-                if (!isOk) return;
-                const isSuccess = await $Data.Access.AdminUnpublishArchive({ 
-                    archive_id: summaryItem.archive_id, 
-                    target_user_id: summaryItem.target_user_id 
-                });
-                if (isSuccess) {
-                    $Notice.Info("非公開に戻しました");
-                    this._core.closeAll();
-                }
-            };
-        }
+            }
+        };
+        // 4. Delete（強制Private：本人以外一切見れない状態へ戻す）
+        btnPrivate.onclick = async () => {
+            const isOk = await this.ShowConfirm({ title: "FORCE PRIVATE", message: "強制的に非公開(Private)に戻しますか？" });
+            if (!isOk) return;
+            const isSuccess = await $Data.Access.AdminUnpublishArchive({ 
+                archive_id: summaryItem.archive_id, 
+                target_user_id: summaryItem.target_user_id 
+            });
+            if (isSuccess) {
+                $Notice.Info("非公開に戻しました");
+                this._core.closeAll();
+            }
+        };
         // 下部の通報理由リスト描画
         const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
         if (reports.length === 0) {
@@ -317,6 +327,81 @@ export default {
             help: "",
             buttons: []
         });
+    },
+    // 【管理者機能】通報詳細（is_deleted関連の処理を削除して整理）
+    async ShowAdminReportDetail(summaryItem) {
+        const isSuccess = await $Data.Access.GetReportDetails({
+            target_user_id: summaryItem.target_user_id,
+            archive_id: summaryItem.archive_id
+        });
+        if (!isSuccess) return;
+        const reports = $Data.resData.reports || [];
+        const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
+        // アーカイブタイトルの反映（削除判定をなくし、CLOSED判定のみ残す）
+        const titleEl = $Dom.QuerySelector(".js-archive-title", el);
+        if (summaryItem.is_closed) {
+            titleEl.textContent = `${summaryItem.archive_title || "Unknown Title"} (CLOSED)`;
+            titleEl.classList.add("text-red-400"); // 警告色
+        } else {
+            titleEl.textContent = summaryItem.archive_title || "Unknown Title";
+        }
+        // ターゲットユーザーボタンの設定
+        const userWrapper = $Dom.QuerySelector("#view-report-target-user-wrapper", el);
+        userWrapper.innerHTML = "";
+        const profile = $Data.resData.target_userProfile;
+        if (profile) {
+            $UI.Generator.UserBadge(userWrapper, profile, { type: 'button', isOwner: false });
+        }
+        const btnOpen    = $Dom.QuerySelector("#btn-admin-report-open", el);
+        const btnClose   = $Dom.QuerySelector("#btn-admin-report-close", el);
+        const btnPrivate = $Dom.QuerySelector("#btn-admin-report-private", el);
+        if (summaryItem.is_closed) {
+            // CLOSED中の場合はCloseボタンのみ非活性
+            btnClose.disabled = true;
+            btnClose.classList.add("opacity-50", "cursor-not-allowed", "grayscale");
+            btnClose.classList.remove("active:scale-95");
+        }
+        btnOpen.onclick = async () => {
+            const isOk = await this.ShowConfirm({ title: "JUMP", message: "この Public まとめデータを開きますか？" });
+            if (!isOk) return;
+            this._core.closeAll();
+            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+            $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
+            await $App.RefreshScreen();
+        };
+        btnClose.onclick = async () => {
+            const isOk = await this.ShowConfirm({ title: "FORCE CLOSE", message: "強制的に公開停止(Close)にしますか？" });
+            if (!isOk) return;
+            const success = await $Data.Access.AdminCloseArchive({ 
+                archive_id: summaryItem.archive_id, 
+                target_user_id: summaryItem.target_user_id 
+            });
+            if (success) { $Notice.Info("強制的にCloseしました"); this._core.closeAll(); }
+        };
+        btnPrivate.onclick = async () => {
+            const isOk = await this.ShowConfirm({ title: "FORCE PRIVATE", message: "強制的に非公開(Private)に戻しますか？" });
+            if (!isOk) return;
+            const success = await $Data.Access.AdminUnpublishArchive({ 
+                archive_id: summaryItem.archive_id, 
+                target_user_id: summaryItem.target_user_id 
+            });
+            if (success) { $Notice.Info("非公開に戻しました"); this._core.closeAll(); }
+        };
+        // 下部の通報理由リスト描画
+        const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
+        if (reports.length === 0) {
+            listContainer.innerHTML = `<div class="text-[0.8rem] text-slate-400 p-2">詳細データがありません</div>`;
+        } else {
+            reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
+                $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim);
+                $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
+                child.classList.add("cursor-pointer", "active:bg-slate-50");
+                child.onclick = () => this.ShowAdminReportItemDetail(rep);
+                listContainer.appendChild(child);
+            });
+        }
+        this._core.open({ title: "REPORT DETAILS", content: el, theme: "admin", help: "", buttons: [] });
     },
     // 【管理者機能】通報1件の全文詳細を表示
     async ShowAdminReportItemDetail(rep) {
