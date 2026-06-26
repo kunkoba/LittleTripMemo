@@ -388,6 +388,11 @@ export default {
 		const headerButtons = [];
         const isAdmin = $App.AppData.Owner.plan === "Admin"; // 管理者判定
         if (isOwner) {
+            // 統計アイコン
+            headerButtons.push({
+                label: "📊",
+                handler: () => this.ShowClickStats(profile)
+            });
             headerButtons.push({
                 label: "✏️",
                 handler: () => this.ShowEditProfile(profile, renderView)
@@ -558,6 +563,45 @@ export default {
         this._core.open({
             title: "REPORT DETAIL",
             content: el,
+        });
+    },
+    // クリック集計画面の表示
+    async ShowClickStats(profile) {
+        if (!profile) return;
+        const el = $Dom.GenerateTemplate('tpl-click-stats');
+        // ユーザー情報の反映
+        $Dom.QuerySelector('.js-user-id', el).textContent = profile.nick_name || "Unknown";
+        $Dom.QuerySelector('.js-nickname', el).textContent = profile.nick_name || "No Name";
+        const container = $Dom.QuerySelector('.js-links-container', el);
+        const stats = profile.click_stats || {};
+        // link_1 〜 link_3 までをループ処理
+        [1, 2, 3].forEach(num => {
+            const linkKey = `link_${num}`;
+            const url = profile[linkKey];
+            // URLが未設定のものはスキップ
+            if (!url || url.trim() === "") return;
+            // URLからホスト名（ドメイン）を抽出してタイトルにする
+            let domainName = "URL";
+            try { domainName = new URL(url).hostname; } catch(e) {}
+            // 対象リンクの集計データ（無ければ0をデフォルトに）
+            const stat = stats[linkKey] || { t: 0, u: 0, g: 0 };
+            const child = $Dom.GenerateTemplate('tpl-click-stats-item');
+            $Dom.QuerySelector('.js-link-title', child).textContent = `リンク ${num} (${domainName})`;
+            $Dom.QuerySelector('.js-link-url', child).textContent = url;
+            $Dom.QuerySelector('.js-total', child).textContent = stat.t || 0;
+            $Dom.QuerySelector('.js-unique', child).textContent = stat.u || 0;
+            $Dom.QuerySelector('.js-guest', child).textContent = stat.g || 0;
+            container.appendChild(child);
+        });
+        // リンクが1つも無い場合の表示
+        if (container.children.length === 0) {
+            container.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">設定されているリンクがありません</div>`;
+        }
+        this._core.open({
+            title: "CLICK STATS",
+            content: el,
+            help: "各リンクがクリックされた回数を集計しています。\nUniqueはクリックした人数、Guestは未ログインユーザーのクリック数です。",
+            buttons: []
         });
     },
 };

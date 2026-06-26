@@ -1,28 +1,146 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emoji Button</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<meta charset="UTF-8">
+<title>click_stats → CSV</title>
 
-    <!-- グリッドレイアウトで2x2の均等配置に変更 -->
-    <button class="relative w-20 h-20 bg-white shadow-md rounded-2xl">
-        <!-- 左上 -->
-        <span class="absolute top-0 left-0 text-[3.2rem] drop-shadow-md">😲</span>
-        <!-- 右下 -->
-        <span class="absolute bottom-0 right-0 text-[2rem] drop-shadow-md">🍓</span>
-    </button>
-    <div class="m-4"></div>
-    <!-- グリッドレイアウトで2x2の均等配置に変更 -->
-    <button class="relative w-10 h-10 bg-white shadow-md rounded-xl">
-        <!-- 左上 -->
-        <span class="absolute top-0 left-0 text-[1.6rem] drop-shadow-md">😲</span>
-        <!-- 右下 -->
-        <span class="absolute bottom-0 right-0 text-[1rem] drop-shadow-md">🍓</span>
-    </button>
+<style>
+body{
+    font-family:sans-serif;
+    margin:20px;
+}
+
+textarea{
+    width:100%;
+    height:250px;
+    font-family:Consolas,monospace;
+    font-size:14px;
+    margin-bottom:10px;
+}
+
+button{
+    padding:8px 16px;
+    margin-right:10px;
+    cursor:pointer;
+}
+
+#csv{
+    height:250px;
+}
+</style>
+</head>
+<body>
+
+<h2>JSON → CSV</h2>
+
+<h3>JSON入力</h3>
+<textarea id="json"></textarea>
+
+<button id="convert">CSVへ変換</button>
+<button id="download">CSVをダウンロード</button>
+
+<h3>CSV</h3>
+<textarea id="csv" readonly></textarea>
+
+<script>
+
+/**
+ * click_stats を CSV に変換
+ * @param {Object} data
+ * @returns {string}
+ */
+function clickStatsToCsv(data){
+
+    const rows = [
+        ["対象","項目","種別","t","u","g"]
+    ];
+
+    /**
+     * click_stats追加
+     */
+    function addRows(target, clickStats){
+
+        if(!clickStats) return;
+
+        for(const [item, stat] of Object.entries(clickStats)){
+
+            const type = item.startsWith("link") ? "link" : "view";
+
+            rows.push([
+                target,
+                item,
+                type,
+                stat.t ?? 0,
+                stat.u ?? 0,
+                stat.g ?? 0
+            ]);
+        }
+    }
+
+    // archive
+    addRows("archive", data.archive.click_stats);
+
+    // details
+    for(const detail of data.details){
+        addRows(`detail:${detail.seq}`, detail.click_stats);
+    }
+
+    // userProfile
+    addRows("userProfile", data.userProfile.click_stats);
+
+    return rows
+        .map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(","))
+        .join("\n");
+}
+
+
+// CSV変換
+document.getElementById("convert").onclick = ()=>{
+
+    try{
+
+        const json = JSON.parse(document.getElementById("json").value);
+
+        const csv = clickStatsToCsv(json);
+
+        document.getElementById("csv").value = csv;
+
+    }catch(e){
+
+        alert("JSONの形式が正しくありません。\n\n"+e.message);
+
+    }
+
+};
+
+
+// ダウンロード
+document.getElementById("download").onclick = ()=>{
+
+    const csv = document.getElementById("csv").value;
+
+    if(!csv){
+        alert("先にCSVへ変換してください。");
+        return;
+    }
+
+    const blob = new Blob([csv],{
+        type:"text/csv;charset=utf-8;"
+    });
+
+    const a = document.createElement("a");
+
+    a.href = URL.createObjectURL(blob);
+
+    a.download = "click_stats.csv";
+
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+
+};
+
+</script>
 
 </body>
 </html>

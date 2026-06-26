@@ -494,3 +494,136 @@
     </div>
 </template>
 
+<!-- 【ダイアログ子】クリック集計表示用親枠 -->
+<template id="tpl-click-stats">
+    <div class="w-full flex flex-col bg-slate-50 min-h-full pb-4">
+        <!-- ユーザー情報 -->
+        <div class="bg-white border-b border-slate-200 p-4 mb-4 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2 text-slate-700 font-black">
+                    <span class="text-[1.2rem]">👤</span>
+                    <span class="text-[0.9rem]">ユーザー情報</span>
+                </div>
+                <span class="js-user-id text-[0.8rem] text-slate-400 font-bold"></span>
+            </div>
+            <div>
+                <label class="block text-[0.65rem] font-bold text-slate-400 mb-1">ニックネーム</label>
+                <div class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-1.5 rounded-md font-black border border-amber-100 text-[0.85rem]">
+                    <span>📁</span> <span class="js-nickname"></span>
+                </div>
+            </div>
+        </div>
+        <!-- リンク集計リストコンテナ -->
+        <div class="js-links-container space-y-4 px-4"></div>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】リンク1件分のアイテム -->
+<template id="tpl-click-stats-item">
+    <div class="bg-white rounded-[1rem] shadow-sm border border-slate-200 p-4">
+        <label class="block text-[0.8rem] font-black text-slate-500 mb-2 js-link-title"></label>
+        <div class="bg-slate-50 border border-slate-200 rounded-md px-3 py-2 mb-3 text-[0.7rem] text-slate-500 truncate js-link-url"></div>
+        <div class="grid grid-cols-3 gap-2">
+            <!-- Total -->
+            <div class="flex flex-col items-center justify-center border border-amber-200 bg-amber-50/50 rounded-md py-2">
+                <span class="text-[0.55rem] font-bold text-slate-500 mb-0.5">Total</span>
+                <div class="font-black text-indigo-600 text-[1rem] leading-none mt-1"><span class="js-total">0</span><span class="text-[0.6rem] text-slate-500 ml-0.5">回</span></div>
+            </div>
+            <!-- Unique -->
+            <div class="flex flex-col items-center justify-center border border-slate-200 rounded-md py-2">
+                <span class="text-[0.55rem] font-bold text-slate-500 mb-0.5">Unique</span>
+                <div class="font-black text-emerald-500 text-[1rem] leading-none mt-1"><span class="js-unique">0</span><span class="text-[0.6rem] text-slate-500 ml-0.5">人</span></div>
+            </div>
+            <!-- Guest -->
+            <div class="flex flex-col items-center justify-center border border-slate-200 rounded-md py-2">
+                <span class="text-[0.55rem] font-bold text-slate-500 mb-0.5">Guest</span>
+                <div class="font-black text-slate-600 text-[1rem] leading-none mt-1"><span class="js-guest">0</span><span class="text-[0.6rem] text-slate-500 ml-0.5">回</span></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】アーカイブ・明細クリック集計表示用親枠 -->
+<template id="tpl-archive-click-stats">
+    <div class="w-full flex flex-col bg-slate-50 min-h-full pb-4 px-2 pt-2">
+        <!-- アーカイブ情報 -->
+        <div class="bg-white border border-slate-200 p-4 mb-4 shadow-sm rounded-lg">
+            <div class="flex items-center gap-2 text-slate-700 font-black mb-4">
+                <span class="text-[1.2rem]">📁</span>
+                <span class="text-[0.9rem]">アーカイブ情報</span>
+            </div>
+            <div class="mb-3">
+                <label class="block text-[0.65rem] font-bold text-slate-400 mb-1">タイトル</label>
+                <div class="font-black text-slate-800 text-[1rem] js-arc-title"></div>
+            </div>
+            <div class="mb-3">
+                <label class="block text-[0.65rem] font-bold text-slate-400 mb-1">リンクURL</label>
+                <div class="bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[0.75rem] text-slate-500 truncate js-arc-url"></div>
+            </div>
+            <div class="mb-3 mt-4">
+                <label class="flex items-center gap-1 text-[0.65rem] font-bold text-slate-500 mb-2">
+                    <span class="text-[0.8rem]">👁️</span> 閲覧クリック数 (click_stats)
+                </label>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="flex flex-col items-center justify-center border border-indigo-100 bg-white rounded-md py-2 shadow-sm">
+                        <span class="text-[0.55rem] font-bold text-slate-400 mb-0.5">Total</span>
+                        <div class="font-black text-indigo-600 text-[0.9rem] leading-none mt-1"><span class="js-arc-total">0</span><span class="text-[0.6rem] text-slate-500 ml-0.5">回</span></div>
+                    </div>
+                    <div class="flex flex-col items-center justify-center border border-emerald-100 bg-white rounded-md py-2 shadow-sm">
+                        <span class="text-[0.55rem] font-bold text-slate-400 mb-0.5">Unique</span>
+                        <div class="font-black text-emerald-500 text-[0.9rem] leading-none mt-1"><span class="js-arc-unique">0</span><span class="text-[0.6rem] text-slate-500 ml-0.5">人</span></div>
+                    </div>
+                    <div class="flex flex-col items-center justify-center border border-slate-200 bg-white rounded-md py-2 shadow-sm">
+                        <span class="text-[0.55rem] font-bold text-slate-400 mb-0.5">Guest</span>
+                        <div class="font-black text-slate-600 text-[0.9rem] leading-none mt-1"><span class="js-arc-guest">0</span><span class="text-[0.6rem] text-slate-500 ml-0.5">回</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 mt-5 pt-4 border-t border-slate-100">
+                <span class="text-[0.65rem] font-bold text-slate-500 mr-1">ステータス</span>
+                <span class="px-2 py-0.5 rounded text-[0.65rem] font-black js-arc-status-badge"></span>
+                <span class="px-2 py-0.5 rounded text-[0.65rem] font-black bg-blue-100 text-blue-600 js-arc-owner-badge hidden">オーナー</span>
+            </div>
+        </div>
+        <!-- 各明細情報 -->
+        <div class="bg-white border border-slate-200 p-4 rounded-lg shadow-sm">
+            <div class="flex items-center gap-2 text-slate-700 font-black mb-4">
+                <span class="text-[1.2rem]">📋</span>
+                <span class="text-[0.9rem]">各明細情報</span>
+            </div>
+            <div class="js-details-container flex flex-col"></div>
+        </div>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】明細1件分のアイテム -->
+<template id="tpl-archive-click-stats-item">
+    <div class="py-4 border-b border-slate-100 last:border-b-0">
+        <div class="flex items-start gap-3 overflow-hidden pr-2">
+            <div class="text-[0.7rem] font-black text-slate-400 w-4 text-right shrink-0 mt-0.5 js-dtl-seq"></div>
+            <div class="text-[1.2rem] shrink-0 leading-none js-dtl-icon drop-shadow-sm mt-0.5"></div>
+            <div class="flex flex-col min-w-0 w-full">
+                <!-- タイトル -->
+                <div class="text-[0.8rem] font-black text-slate-800 truncate js-dtl-title mb-1"></div>
+                <!-- URL -->
+                <div class="bg-slate-50 border border-slate-200 rounded-md px-2 py-1.5 text-[0.65rem] text-slate-500 truncate js-dtl-url"></div>
+                <!-- 集計ボックス（3列） -->
+                <div class="grid grid-cols-3 gap-2 mt-2 js-dtl-stats-box">
+                    <div class="flex flex-col items-center justify-center border border-indigo-100 bg-white rounded-md py-1.5 shadow-sm">
+                        <span class="text-[0.5rem] font-bold text-slate-400 mb-0.5">Total</span>
+                        <div class="font-black text-indigo-600 text-[0.8rem] leading-none mt-0.5"><span class="js-dtl-total">0</span><span class="text-[0.5rem] text-slate-500 ml-0.5">回</span></div>
+                    </div>
+                    <div class="flex flex-col items-center justify-center border border-emerald-100 bg-white rounded-md py-1.5 shadow-sm">
+                        <span class="text-[0.5rem] font-bold text-slate-400 mb-0.5">Unique</span>
+                        <div class="font-black text-emerald-500 text-[0.8rem] leading-none mt-0.5"><span class="js-dtl-unique">0</span><span class="text-[0.5rem] text-slate-500 ml-0.5">人</span></div>
+                    </div>
+                    <div class="flex flex-col items-center justify-center border border-slate-200 bg-white rounded-md py-1.5 shadow-sm">
+                        <span class="text-[0.5rem] font-bold text-slate-400 mb-0.5">Guest</span>
+                        <div class="font-black text-slate-600 text-[0.8rem] leading-none mt-0.5"><span class="js-dtl-guest">0</span><span class="text-[0.5rem] text-slate-500 ml-0.5">回</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+

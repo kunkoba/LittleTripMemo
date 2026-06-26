@@ -8,79 +8,81 @@ using System.ComponentModel.DataAnnotations;
 namespace LittleTripMemo.Services.Private;
 
 /// <summary>
-/// 日々の明細をまとめてアーカイブを作成するユースケース。
-/// 1. t_memo_archive を新規作成（archive_id を取得）
-/// 2. 指定された seq の明細に archive_id をセット
+/// 複数の未まとめ明細を統合し、新しいアーカイブ（まとめ）を作成するサービス
 /// </summary>
-public class MergeDetailsService : _BaseService
+public class MergeDetailsService(
+    UserContext userContext,
+    ITransactionProvider transactionProvider,
+    ArchiveRepository archiveRepository,
+    DetailRepository detailRepository
+) : _BaseService(userContext)
 {
-    private readonly ITransactionProvider _provider;
-    private readonly ArchiveRepository _archiveRepo;
-    private readonly DetailRepository _detailRepo;
-
+    /// <summary>
+    /// まとめ作成リクエストモデル
+    /// </summary>
+    /// <param name="login_user_id">操作ユーザーID</param>
+    /// <param name="seqs">統合対象とする明細のシーケンス番号リスト</param>
+    /// <param name="title">まとめのタイトル（未指定の場合はサーバー側で自動生成）</param>
     public record MergeDetailsReq(
-        [Required] Guid login_user_id, // ★ 追加
-        [Required(ErrorMessage = "seqリストは必須です")] int[] seqs,
-        [Required(ErrorMessage = "タイトルは必須です")][StringLength(100)] string title
-    ) : ILoginUserRequest; // ★ インターフェースを実装
+        [Required] Guid login_user_id,
+        [Required(ErrorMessage = "対象の明細が選択されていません")] int[] seqs,
+        string? title
+    ) : ILoginUserRequest;
 
-    public record Response(int archiveId, int updatedCount);
-
-    public MergeDetailsService(
-        UserContext userContext,
-        ITransactionProvider provider,
-        ArchiveRepository archiveRepo,
-        DetailRepository detailRepo)
-        : base(userContext)
-    {
-        _provider = provider;
-        _archiveRepo = archiveRepo;
-        _detailRepo = detailRepo;
-    }
+    public record Response(int archive_id, int updated_count);
 
     /// <summary>
-    /// 実行（1.検証 → 2.archive作成 → 3.detail更新）
+    /// 明細の統合処理を実行する
     /// </summary>
     public async Task<Response> ExecuteAsync(MergeDetailsReq req)
     {
-        // 1. 検証
+        // 1. バリデーション
         await ValidateAsync(req);
 
-        // 2. 実行
-        using var tran = _provider.BeginTransaction();
+        // 2. タイトルの決定（未入力なら現在日時を含めた名称を自動生成）
+        var archiveTitle = string.IsNullOrWhiteSpace(req.title)
+            ? $"旅のまとめのタイトル_{DateTime.Now:_HHmm}"
+            : req.title;
+
+        // 3. 実行（アーカイブ作成と明細更新を同一トランザクションで実行）
+        using var transaction = transactionProvider.BeginTransaction();
         try
         {
-            // 2-1. archive を新規作成して archive_id を取得
-            var archiveId = await _archiveRepo.InsertAsync(new TMemoArchive
+            // ① アーカイブ（親）を新規登録
+            var archiveId = await archiveRepository.InsertAsync(new TMemoArchive
             {
-                title    = req.title,
-                memo     = "メモ全体に対する説明を入力してください",
-                link_url = ""
+                title = archiveTitle,
+                memo = "旅の思い出についての情報を書き込みましょう。",
+                link_url = string.Empty
             });
 
-            // 2-2. 対象の明細に archive_id をセット
-            var updatedCount = await _detailRepo.UpdateArchiveIdBySeqsAsync(archiveId, req.seqs);
+            // ② 指定された明細（子）に作成したアーカイブIDをセットして紐付ける
+            var updatedCount = await detailRepository.UpdateArchiveIdBySeqsAsync(archiveId, req.seqs);
 
-            // 親の件数を更新
-            await _archiveRepo.UpdateDetailCountAsync(archiveId);
+            // ③ アーカイブ側の明細件数カウントを最新状態に更新
+            await archiveRepository.UpdateDetailCountAsync(archiveId);
 
-            tran.Commit();
+            transaction.Commit();
+
             return new Response(archiveId, updatedCount);
         }
         catch
         {
+            // ロールバックは provider の Dispose で自動実行される
             throw;
         }
     }
 
     /// <summary>
-    /// 1. 検証（業務チェック）
+    /// 業務バリデーション
     /// </summary>
     private async Task ValidateAsync(MergeDetailsReq req)
     {
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
-        BusinessException.ThrowIf(req.seqs.Length == 0, "seqリストが空です");
+        BusinessException.ThrowIf(req.seqs == null || req.seqs.Length == 0, "統合する明細が選択されていません");
+
         await Task.CompletedTask;
     }
+
 }

@@ -43,8 +43,8 @@ const _DialogCore = {
         this.backdrop.classList.remove("hidden");
         return frame;
     },
-    // 1. _DialogCore の create メソッド修正
-    create({ title = "", content = "", buttons = [], headerButtons = [], 
+    // ダイアログ画面の構築
+    create_2({ title = "", content = "", buttons = [], headerButtons = [], 
             help = null, onClose = null, theme = null, isFooterFixed = true, isModal = false, size = null }) {
         const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
         const frameBg = $Dom.QuerySelector(".pointer-events-auto", frame);
@@ -144,6 +144,114 @@ const _DialogCore = {
         }
         frame._onClose = onClose;
         // モーダルでない場合のみ「X」ボタンを追加
+        if (!isModal) { 
+            const btnCloseX = document.createElement("button");
+            btnCloseX.className = `${this.HEADER_BTN_CLASS} text-[0.8rem]`;
+            btnCloseX.textContent = "✖";
+            btnCloseX.onclick = () => this.close();
+            headerActions.appendChild(btnCloseX);
+        }
+        return frame;
+    },
+    // ダイアログ画面の構築
+    create({ title = "", content = "", buttons = [], headerButtons = [], 
+        help = null, onClose = null, theme = null, isFooterFixed = true, isModal = false, size = null }) {
+        const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
+        frame._isModal = isModal;
+        const frameBg = $Dom.QuerySelector("#dialog-frame-bg", frame);
+        const titleBar = $Dom.QuerySelector("#dialog-title-bar", frame);
+        const titleEl = $Dom.QuerySelector("#dialog-title", frame);
+        const contentEl = $Dom.QuerySelector("#dialog-content", frame);
+        const headerActions = $Dom.QuerySelector("#dialog-header-actions", frame);
+        const btnContainer = $Dom.QuerySelector("#dialog-button-container", frame);
+        // --- 1. テーマ別スタイルの明示的ADD ---
+        const themeConfigs = {
+            admin: {
+                frame:  ['bg-white', 'border-4', 'border-red-600', 'rounded-none'],
+                header: ['bg-slate-800'],
+                title:  ['text-white'],
+                footer: ['bg-slate-50', 'border-t-2', 'border-red-600']
+            },
+            report: {
+                frame:  ['bg-white', 'border-2', 'border-black', 'rounded-none'],
+                header: ['bg-black'],
+                title:  ['text-red-500'],
+                footer: ['bg-white', 'border-t', 'border-slate-300']
+            },
+            user: { // デフォルト
+                frame:  ['bg-brand-0', 'border-2', 'border-brand-5', 'rounded-[1rem]'],
+                header: ['bg-brand-1'],
+                title:  ['text-brand-5'],
+                footer: ['bg-brand-1', 'border-t', 'border-brand-2']
+            }
+        };
+        const config = themeConfigs[theme] || themeConfigs.user;
+        frameBg.classList.add(...config.frame);
+        titleBar.classList.add(...config.header);
+        titleEl.classList.add(...config.title);
+        btnContainer.classList.add(...config.footer);
+        // --- 2. サイズ（高さ）の制御 ---
+        if (size === 'lg') {
+            frameBg.classList.add("h-[70vh]");
+        } else if (size === 'md') {
+            frameBg.classList.add("h-[50vh]");
+        } else {
+            frameBg.classList.add("min-h-[20vh]");
+        }
+        titleEl.textContent = title;
+        // --- 3. ヘッダーアクション（ヘルプ・カスタムボタン） ---
+        headerActions.innerHTML = "";
+        if (help) {
+            const btnHelp = document.createElement("button");
+            btnHelp.className = `${this.HEADER_BTN_CLASS} text-brand-5 font-black`;
+            btnHelp.textContent = "?";
+            btnHelp.onclick = () => {
+                document.getElementById('ui-help-dialog-body').textContent = help;
+                document.getElementById('ui-help-dialog').classList.remove('hidden');
+            };
+            headerActions.appendChild(btnHelp);
+        }
+        if (headerButtons && headerButtons.length > 0) {
+            headerButtons.forEach(btnDef => {
+                const btn = document.createElement("button");
+                btn.className = this.HEADER_BTN_CLASS;
+                btn.innerHTML = btnDef.label;
+                if (btnDef.id) btn.id = btnDef.id;
+                btn.onclick = () => { if (btnDef.handler) btnDef.handler(); };
+                headerActions.appendChild(btn);
+            });
+        }
+        // --- 4. コンテンツ流し込み ---
+        if (content instanceof HTMLElement) {
+            contentEl.innerHTML = "";
+            contentEl.appendChild(content);
+        } else {
+            contentEl.innerHTML = content || "";
+        }
+        // --- 5. フッターボタン ---
+        if (buttons && buttons.length > 0) {
+            const targetContainer = (isFooterFixed === false) ? contentEl : btnContainer;
+            buttons.forEach(rowDef => {
+                const isArray = Array.isArray(rowDef);
+                const items = isArray ? rowDef : (rowDef.items || [rowDef]);
+                const rowDiv = document.createElement("div");
+                rowDiv.className = "w-full flex gap-3 " + (isFooterFixed === false ? "my-4" : "");
+                const sizeClass = items.length > 1 ? "flex-1" : "w-full";
+                items.forEach(btnDef => {
+                    const btn = document.createElement("button");
+                    btn.className = `${this.FOOTER_BTN_BASE} ${sizeClass} ${this.FOOTER_BTN_DEFAULT} ${btnDef.className || ''}`;
+                    btn.textContent = btnDef.label;
+                    if (btnDef.id) btn.id = btnDef.id;
+                    btn.onclick = () => { if (btnDef.handler) btnDef.handler(); };
+                    rowDiv.appendChild(btn);
+                });
+                targetContainer.appendChild(rowDiv);
+            });
+        } else if (isFooterFixed) {
+            // btnContainer.classList.add("hidden");
+        }
+        // --- 6. 閉じる制御 ---
+        frame._onClose = onClose;
         if (!isModal) { 
             const btnCloseX = document.createElement("button");
             btnCloseX.className = `${this.HEADER_BTN_CLASS} text-[0.8rem]`;

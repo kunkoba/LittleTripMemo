@@ -22,7 +22,12 @@ public class TAppUser
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }
     public DateTime update_tim { get; set; }
+    // クリック数の集計情報
     public Dictionary<string, ClickCountData> click_stats { get; set; } = new();
+    // 秘密側（分散テーブル）の集計情報
+    public Dictionary<string, object> info_stats { get; set; } = new();
+    // 公開側の集計情報
+    public Dictionary<string, object> info_stats_pub { get; set; } = new();
 }
 
 // 認証用（Identity標準に戻す）
@@ -320,7 +325,9 @@ public record DtoUserProfile(
     string? description,
     string? link_1, string? link_2, string? link_3,
     bool is_owner,
-    Dictionary<string, ClickCountData> click_stats
+    Dictionary<string, ClickCountData> click_stats,
+    Dictionary<string, object> info_stats,    
+    Dictionary<string, object> info_stats_pub 
 );
 
 /// <summary>

@@ -94,4 +94,65 @@ public class TableStatisticsTaskRepository : _BaseRepository
         await ExecuteAsync(sqlReaction);
     }
 
+    /// <summary>
+    /// 指定されたテーブルIDに所属するユーザーの、秘密側の活動統計を更新する
+    /// </summary>
+    /// <param name="tableId">集計対象のテーブル番号</param>
+    public async Task SyncUserPrivateStatsAsync(int tableId)
+    {
+        // 1. 各ユーザーごとにアーカイブ数、明細数、合計金額を算出
+        // 2. その結果を jsonb_build_object で JSON 形式に固める
+        // 3. t_app_user の info_stats カラムを一括更新
+        string sql = $"""
+            WITH UserAgg AS (
+                SELECT 
+                    u.user_id,
+                    (SELECT count(*) FROM t_memo_archive a WHERE a.user_id = u.user_id AND a.del_flg = false) as a_cnt,
+                    (SELECT count(*) FROM t_memo_detail_{tableId} d WHERE d.user_id = u.user_id AND d.archive_id > 0 AND d.del_flg = false) as d_cnt,
+                    (SELECT COALESCE(sum(memo_price), 0) FROM t_memo_detail_{tableId} d 
+                        WHERE d.user_id = u.user_id AND d.archive_id > 0 AND d.del_flg = false) as total_p
+                FROM t_app_user u
+                WHERE u.table_id = @tableId
+            )
+            UPDATE t_app_user
+            SET info_stats = jsonb_build_object(
+                'archive_count', UserAgg.a_cnt,
+                'detail_count', UserAgg.d_cnt,
+                'total_price', UserAgg.total_p
+            )
+            FROM UserAgg
+            WHERE t_app_user.user_id = UserAgg.user_id
+            """;
+
+        await ExecuteAsync(sql, new { tableId });
+    }
+
+    /// <summary>
+    /// 全ユーザーを対象に、公開側の活動統計（公開済みデータ）を更新する
+    /// </summary>
+    public async Task SyncUserPublicStatsAsync()
+    {
+        // 公開側はテーブルが分散されていないため、全ユーザーを一括で集計
+        const string sql = """
+            WITH UserAggPub AS (
+                SELECT 
+                    u.user_id,
+                    (SELECT count(*) FROM t_memo_archive_pub a WHERE a.user_id = u.user_id AND a.del_flg = false) as a_cnt,
+                    (SELECT count(*) FROM t_memo_detail_pub d WHERE d.user_id = u.user_id AND d.del_flg = false) as d_cnt,
+                    (SELECT COALESCE(sum(memo_price), 0) FROM t_memo_detail_pub d WHERE d.user_id = u.user_id AND d.del_flg = false) as total_p
+                FROM t_app_user u
+            )
+            UPDATE t_app_user
+            SET info_stats_pub = jsonb_build_object(
+                'archive_count', UserAggPub.a_cnt,
+                'detail_count', UserAggPub.d_cnt,
+                'total_price', UserAggPub.total_p
+            )
+            FROM UserAggPub
+            WHERE t_app_user.user_id = UserAggPub.user_id
+            """;
+
+        await ExecuteAsync(sql);
+    }
+
 }

@@ -9,6 +9,7 @@ export default {
         this._core.open({
             title: "ADMIN TOOLS",
             content: el,
+            theme: "admin",
             help: "",
         });
     },
@@ -63,6 +64,7 @@ export default {
         this._core.open({
             title: "NOTICE Mgmt",
             content: root,
+            theme: "admin",
             help: "システム全体への通知を管理します。\n下のボタンから新規作成、一覧の項目タップで編集が可能です。",
             // 新規登録ボタンをここ（下部ボタンエリア）に配置
             buttons: [
@@ -129,6 +131,7 @@ export default {
         this._core.open({
             title: isNew ? "NEW NOTICE" : "EDIT NOTICE",
             content: el,
+            theme: "admin",
             help: "",
             isFooterFixed: false,   // 編集用
             buttons:[[
@@ -197,6 +200,7 @@ export default {
         this._core.open({
             title: "REPORT Mgmt",
             content: root,
+            theme: "admin",
             help: "",
             buttons:[]
         });
@@ -279,6 +283,7 @@ export default {
         this._core.open({
             title: "REPORT DETAILS",
             content: el,
+            theme: "admin",
             help: "",
             buttons: []
         });
@@ -289,13 +294,6 @@ export default {
         // 1. 日時と本文の反映
         $Dom.QuerySelector(".js-report-tim", el).textContent = $Util.FormatDate(rep.report_tim);
         $Dom.QuerySelector(".js-report-body", el).textContent = rep.body || "（内容なし）";
-        // // 2. ユーザーボタンの反映（アイコン＋ニックネーム）
-        // const userIcon = $Dom.QuerySelector("#view-report-user-icon", el);
-        // const userName = $Dom.QuerySelector("#view-report-user-name", el);
-        // const btnUser = $Dom.QuerySelector("#btn-report-reporter-profile", el);
-        // // サーバーから渡されている通報者の情報を反映
-        // userIcon.textContent = rep.icon || "👤";
-        // userName.textContent = rep.nick_name || "Unknown User";
         // ▼ 修正：共通のUIジェネレータでボタンを生成して追加
         // （※通報者のIDは reporter_user_id というプロパティ名に注意）
         const userWrapper = $Dom.QuerySelector("#view-report-user-wrapper", el);
@@ -306,20 +304,10 @@ export default {
             user_id: rep.reporter_user_id
         }, { type: 'button', isOwner: false });
         if (userBtn) userWrapper.appendChild(userBtn);
-        // // ボタンクリック時のアクション
-        // btnUser.onclick = async () => {
-        //     // APIで対象ユーザーのフルプロフィールを取得
-        //     const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: rep.reporter_user_id });
-        //     if (isSuccess) {
-        //         // $Data.resData (最新レスポンス) から、先ほど取得したプロフィールを抽出
-        //         const profile = $Data.resData;
-        //         // 標準のプロフィール画面を表示 (編集不可モード)
-        //         this.ShowUserProfile(profile, false);
-        //     }
-        // };
         this._core.open({
             title: "REPORT CONTENT",
             content: el,
+            theme: "admin",
             help: "",
             buttons: []
         });
@@ -420,6 +408,7 @@ export default {
         this._core.open({
             title: "FEEDBACK Mgmt",
             content: frame,
+            theme: "admin",
             help: "★の数やワードでフィードバックの絞り込みができます。",
         });
     },
@@ -443,17 +432,10 @@ export default {
             user_id: item.user_id
         }, { type: 'button', isOwner: false });
         if (userBtn) userWrapper.appendChild(userBtn);
-        // btnUser.onclick = async () => {
-        //     const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: item.user_id });
-        //     if (isSuccess) {
-        //         const profile = $Data.resData;
-        //         // $Data.resData から取得したプロフィールを表示
-        //         this.ShowUserProfile(profile, false);
-        //     }
-        // };
         this._core.open({
             title: "FEEDBACK DETAILS",
             content: el,
+            theme: "admin",
             help: "",
             headerButtons: []
         });
@@ -499,6 +481,7 @@ export default {
         this._core.open({
             title: "SEND MAIL",
             content: el,
+            theme: "admin",
             help: "",
             buttons: [[
                 {
@@ -560,6 +543,7 @@ export default {
         this._core.open({
             title: "USER MESSAGE LOG",
             content: root,
+            theme: "admin",
             help: "",
         });
     },
@@ -588,6 +572,7 @@ export default {
         this._core.open({
             title: "MESSAGE DETAILS (ADMIN)",
             content: el,
+            theme: "admin",
             help: "",
             headerButtons: []
         });

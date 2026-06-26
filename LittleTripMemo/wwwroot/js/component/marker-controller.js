@@ -107,7 +107,7 @@ const _MarkerCore = {
             if ($App.AppData.Context.ScreenMode == $Const.SCREEN_MODE.CREATE) {
                 // マップ移動
                 this.generateArrowToCurrent();
-                this.focusToLocationMarker();
+                // this.focusToLocationMarker();
             }
         })();
     },

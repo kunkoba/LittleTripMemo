@@ -5,91 +5,98 @@ using LittleTripMemo.Repository.Sys;
 
 namespace LittleTripMemo.Services.Sys;
 
-public class GetSystemInfoService : _BaseService
+/// <summary>
+/// システム全体の共通情報と、ログインユーザー固有のステータスを一括取得するサービス
+/// </summary>
+public class GetSystemInfoService(
+    UserContext userContext,
+    SysFeedbackRepository sysFeedbackRepository,
+    SysNotificationRepository sysNotificationRepository,
+    SysUserNotificationRepository sysUserNotificationRepository,
+    SysReportRepository sysReportRepository,
+    AppUserRepository appUserRepository
+) : _BaseService(userContext)
 {
-    private readonly SysFeedbackRepository _feedbackRepo;
-    private readonly SysNotificationRepository _notificationRepo;
-    private readonly SysUserNotificationRepository _userNoteRepo;
-    private readonly SysReportRepository _reportRepo;
-    private readonly AppUserRepository _appUserRepo;
-
-    // 統合されたレスポンス構造
+    /// <summary>
+    /// システム情報のデータ構造
+    /// </summary>
     public record SystemInfoData(
         Guid login_user_id,
         double score_avg,
         IEnumerable<DtoFeedbackDetail> feedbacks,
         IEnumerable<TSysNotification> notifications,
-        DtoUserProfile? ownerProfile, 
+        DtoUserProfile? ownerProfile,
         IEnumerable<TSysUserNotification>? userNotifications,
         IEnumerable<DtoMyReportDetail>? myReports
     );
 
-    // レスポンス形式（systemInfo でラップ）
     public record Response(SystemInfoData systemInfo);
 
-    public GetSystemInfoService(
-        UserContext userContext,
-        SysFeedbackRepository feedbackRepo,
-        SysNotificationRepository notificationRepo,
-        SysUserNotificationRepository userNoteRepo,
-        SysReportRepository reportRepo,
-        AppUserRepository appUserRepo)
-        : base(userContext)
-    {
-        _feedbackRepo = feedbackRepo;
-        _notificationRepo = notificationRepo;
-        _userNoteRepo = userNoteRepo;
-        _reportRepo = reportRepo; 
-        _appUserRepo = appUserRepo;
-    }
-
+    /// <summary>
+    /// システム情報の取得処理を実行する
+    /// </summary>
     public async Task<Response> ExecuteAsync()
     {
-        // 検証（必要に応じて。システム情報の取得なので基本はスルー可能）
+        // 1. バリデーション
         await ValidateAsync();
 
-        // 1. システム共通情報の取得（お作法：ValidateAsync は基本スルーでOK）
-        var avg = await _feedbackRepo.GetAverageScoreAsync();
-        var feeds = await _feedbackRepo.GetAllFeedbacksAsync(0);
-        var notes = await _notificationRepo.GetActiveNotificationsAsync();
+        // 2. システム共通情報の取得（未ログインでも取得可能）
+        var averageScore = await sysFeedbackRepository.GetAverageScoreAsync();
+        var latestFeedbacks = await sysFeedbackRepository.GetAllFeedbacksAsync(0);
+        var activeNotifications = await sysNotificationRepository.GetActiveNotificationsAsync();
 
-        // 2. ユーザー固有情報の取得（ログイン時のみ）
-        DtoUserProfile? profile = null;
-        IEnumerable<TSysUserNotification>? userNotes = null;
+        // 3. ユーザー固有情報の初期化
+        DtoUserProfile? ownerProfile = null;
+        IEnumerable<TSysUserNotification>? userNotifications = null;
         IEnumerable<DtoMyReportDetail>? myReports = null;
 
+        // 4. ログイン済みの場合のみ、詳細情報を取得
         if (_user.login_user_id != Guid.Empty)
         {
-
-            // プロフィールをリポジトリから直接取得
-            var user = await _appUserRepo.GetByUserIdAsync(_user.login_user_id);
-            if (user != null)
+            // ユーザープロフィールの取得（バッチ集計済みの統計情報を含む）
+            var appUser = await appUserRepository.GetByUserIdAsync(_user.login_user_id);
+            if (appUser != null)
             {
-                profile = new DtoUserProfile(
-                    user.user_id,
-                    user.icon,
-                    user.nick_name,
-                    user.description,
-                    user.link_1, user.link_2, user.link_3,
+                ownerProfile = new DtoUserProfile(
+                    appUser.user_id,
+                    appUser.icon,
+                    appUser.nick_name,
+                    appUser.description,
+                    appUser.link_1,
+                    appUser.link_2,
+                    appUser.link_3,
                     is_owner: true,
-                    user.click_stats
+                    appUser.click_stats,
+                    appUser.info_stats,     // 秘密側統計
+                    appUser.info_stats_pub  // 公開側統計
                 );
             }
 
-            // 自分宛通知
-            userNotes = await _userNoteRepo.GetByUserIdAsync();
-            // ユーザ通報情報
-            myReports = await _reportRepo.GetMyReportsWithDetailsAsync();
+            // 自分宛ての通知一覧
+            userNotifications = await sysUserNotificationRepository.GetByUserIdAsync();
+            // 自分が行った通報の状態
+            myReports = await sysReportRepository.GetMyReportsWithDetailsAsync();
         }
 
+        // 5. 結果を集約して返却
         return new Response(new SystemInfoData(
-            _user.login_user_id, avg, feeds, notes, profile, userNotes, myReports
+            _user.login_user_id,
+            averageScore,
+            latestFeedbacks,
+            activeNotifications,
+            ownerProfile,
+            userNotifications,
+            myReports
         ));
     }
 
+    /// <summary>
+    /// 業務バリデーション（基本はスルーだが作法として定義）
+    /// </summary>
     private async Task ValidateAsync()
     {
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
+        // 特になし
         await Task.CompletedTask;
     }
+
 }

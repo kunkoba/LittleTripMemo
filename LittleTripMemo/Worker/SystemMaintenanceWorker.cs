@@ -24,6 +24,7 @@ public class SystemMaintenanceWorker(
     private DateTime _nextTableStatsUpdateTime = DateTime.Now;
     private DateTime _nextGarbageCleanupTime = DateTime.Now;
     private DateTime _nextClickAggregateTime = DateTime.Now;
+    private DateTime _nextUserSummaryUpdateTime = DateTime.Now; 
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -33,11 +34,12 @@ public class SystemMaintenanceWorker(
         {
             using (LogContext.PushProperty("CorrelationId", Guid.NewGuid().ToString()[..8]))
             {
-                await TaskSyncSystemStatusAsync();
-                await TaskUpdateReactionCountsAsync();
-                await TaskUpdateTableStatisticsAsync();
-                await TaskGarbageCleanupAsync();
-                await TaskAggregateClickQueueAsync();
+                await TaskSyncSystemStatusAsync();  // システムステータスの同期（メンテナンスモードや最小アプリバージョンなど）
+                await TaskUpdateReactionCountsAsync();  // リアクション数の再集計
+                await TaskUpdateTableStatisticsAsync();     // テーブル統計情報の更新（件数や最大IDなど）
+                await TaskGarbageCleanupAsync();    // 論理削除された古いデータの物理削除
+                await TaskAggregateClickQueueAsync();   // クリック・閲覧数集計キューの処理
+                await TaskUpdateUserSummaryStatsAsync();    // ユーザー統計情報の更新（t_app_user_summary の集計）
             }
 
             // 1分間隔でチェック
@@ -236,6 +238,39 @@ public class SystemMaintenanceWorker(
             });
 
             _nextClickAggregateTime = DateTime.Now.AddMinutes(settings.ClickAggregateIntervalMinutes);
+        }
+    }
+
+    /// <summary>
+    /// ユーザー別活動統計（件数・金額等）の再集計を行うタスク
+    /// </summary>
+    private async Task TaskUpdateUserSummaryStatsAsync()
+    {
+        var settings = optionsMonitor.CurrentValue;
+        var now = DateTime.Now;
+
+        // 設定値が 0 以下の場合は実行しない
+        if (settings.UserSummaryUpdateIntervalMinutes <= 0) return;
+
+        // 実行予定時刻に達しているか確認
+        if (now >= _nextUserSummaryUpdateTime)
+        {
+            await RunWithScopeAsync("ユーザー活動統計集計", async (scope) =>
+            {
+                var repository = scope.ServiceProvider.GetRequiredService<TableStatisticsTaskRepository>();
+
+                // ① 秘密側（分散テーブルごと）の集計を実行
+                for (int i = 1; i <= settings.MaxTableNum; i++)
+                {
+                    await repository.SyncUserPrivateStatsAsync(i);
+                }
+
+                // ② 公開側の集計を実行（全ユーザー一括）
+                await repository.SyncUserPublicStatsAsync();
+            });
+
+            // 次回の実行予定時刻を更新
+            _nextUserSummaryUpdateTime = now.AddMinutes(settings.UserSummaryUpdateIntervalMinutes);
         }
     }
 
