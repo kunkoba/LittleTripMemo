@@ -78,3 +78,35 @@ button:active {
 .bg-brand-4:active, .bg-slate-500:active {
     filter: brightness(0.9);
 }
+
+.kb-date-tim-sm {
+    /* 文字サイズ: text-[0.6rem] */
+    font-size: 0.8rem;
+    /* 太字: font-bold */
+    font-weight: 700;
+    /* 文字色: text-slate-400 */
+    color: rgb(148 163 184);
+    /* イタリック: italic */
+    font-style: italic;
+}
+.kb-date-tim-md {
+    /* 文字サイズ: text-[0.6rem] */
+    font-size: 1.0rem;
+    /* 太字: font-bold */
+    font-weight: 700;
+    /* 文字色: text-slate-400 */
+    color: rgb(148 163 184);
+    /* イタリック: italic */
+    font-style: italic;
+}
+.kb-date-tim-lg {
+    /* 文字サイズ: text-[0.6rem] */
+    font-size: 1.2rem;
+    /* 太字: font-bold */
+    font-weight: 700;
+    /* 文字色: text-slate-400 */
+    color: rgb(148 163 184);
+    /* イタリック: italic */
+    font-style: italic;
+}
+

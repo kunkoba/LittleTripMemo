@@ -80,11 +80,42 @@
         </div>
         <div class="px-4 w-full">
             <div class="bg-white rounded-[1rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-                <div class="flex justify-between items-center p-4 border-b border-slate-100"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">👤</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Developer</span></div><span class="text-[0.8rem] font-black text-slate-800 js-app-developer"></span></div>
-                <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">⭐</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Feedback</span></div><div class="flex items-center gap-1.5"><span class="text-[0.9rem] font-black text-yellow-500 leading-none js-app-score">★ 0.0</span><span class="text-slate-300 text-[1.2rem] font-normal leading-none -mt-0.5">›</span></div></button>
+                <div class="flex justify-between items-center p-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1.5rem] drop-shadow-md leading-none">🛠️</span>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Developer</span>
+                    </div>
+                    <span class="text-[0.8rem] font-black text-slate-800 js-app-developer">
+                    </span>
+                </div>
+                <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1.5rem] drop-shadow-md leading-none">⭐</span>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Feedback</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[0.9rem] font-black text-yellow-500 leading-none js-app-score">★ 0.0</span>
+                        <span class="text-slate-300 text-[1.5rem] font-normal leading-none -mt-0.5">›</span>
+                    </div>
+                </button>
                 <button id="link-info-official" type="button"
-                    class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">🌍</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Official Site</span></div><div class="flex items-center gap-1 bg-blue-50 text-blue-500 px-3 py-1 rounded-full border border-blue-100"><span class="text-[0.65rem] font-black uppercase tracking-wider mt-px">Open</span><span class="text-[0.7rem] leading-none">↗</span></div></a>
-                <button id="btn-info-license" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors"><div class="flex items-center gap-3"><span class="text-[1.2rem] opacity-80 leading-none">📜</span><span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">License</span></div><span class="text-slate-300 text-[1.2rem] font-normal leading-none -mt-0.5">›</span></button>
+                    class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1.5rem] drop-shadow-md leading-none">🌍</span>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Official Site</span>
+                    </div>
+                    <div class="flex items-center gap-1 bg-blue-50 text-blue-500 px-3 py-1 rounded-full border border-blue-100">
+                        <span class="text-[0.65rem] font-black uppercase tracking-wider mt-px">Open</span>
+                        <span class="text-[0.7rem] leading-none">↗</span>
+                    </div>
+                </a>
+                <button id="btn-info-license" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1.5rem] drop-shadow-md leading-none">📜</span>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">License</span>
+                    </div>
+                    <span class="text-slate-300 text-[1.5rem] font-normal leading-none -mt-0.5">›</span>
+                </button>
             </div>
         </div>
     </div>
@@ -288,7 +319,7 @@
         </div>
 		<div class="flex items-center gap-4 my-4">
             <div class="flex items-center gap-3 text-black font-bold text-[1rem]">
-                <span id="view-notice-date" class="text-slate-400 italic"></span>
+                <span id="view-notice-date" class="kb-date-tim-md"></span>
 			</div>
 		</div>
         <!-- ユーザー情報ボタン（Generator用コンテナ） -->
@@ -315,26 +346,11 @@
     </div>
 </template>
 
-<template id="tpl-multi-select-content2">
-    <div class="flex flex-col h-full w-full overflow-hidden">
-        <div class="flex-1 overflow-y-auto flex flex-col min-h-0">
-            <div class="js-list-container pb-4 px-1 flex-1"></div>
-        </div>
-        <div class="shrink-0 pt-4 mt-2 border-t border-brand-2 space-y-3 bg-white pb-2 px-1">
-            <div class="flex gap-3">
-                <button class="js-btn-merge flex-1 h-12 bg-brand-5 text-white rounded-[1rem] font-bold text-[0.7rem] uppercase shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2"><span class="text-[1.2rem]">⇄</span> MERGE</button>
-                <button class="js-btn-add flex-1 h-12 bg-brand-5 text-white rounded-[1rem] font-bold text-[0.7rem] uppercase shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2"><span class="text-[1.2rem]">＋</span> ADD</button>
-            </div>
-            <button class="js-btn-delete w-full h-10 bg-brand-1 text-red-400 rounded-[1rem] font-bold text-[0.6rem] uppercase active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2"><span class="text-[0.8rem]">🗑</span> LOGICAL DELETE SELECTED ITEMS</button>
-        </div>
-    </div>
-</template>
-
 <!-- 【ダイアログ子】自分の通報詳細 -->
 <template id="tpl-my-report-detail">
     <div class="w-full text-black-5 flex flex-col h-full overflow-hidden">
         <div class="flex justify-between items-center pb-2 px-1">
-            <span class="js-report-tim text-[1rem] font-black text-slate-400 italic"></span>
+            <span class="js-report-tim kb-date-tim-md"></span>
         </div>
         <!-- ターゲットユーザー情報 -->
         <div id="view-report-target-user-wrapper" class="flex-1"></div>
@@ -355,84 +371,33 @@
     </div>
 </template>
 
-
-
-<!-- 【ダイアログ子】各種メニュー -->
-<template id="tpl-menu-system_2">
-    <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-sys-user-profile" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1.2rem]">👤</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">User Profile</span></button>
-        <button id="btn-sys-user-config" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1.2rem]">⚙️</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">User Settings</span></button>
-        <button id="btn-sys-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1.2rem]">📢</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Notifications</span></button>
-        <button id="btn-sys-version" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1.2rem]">ℹ️</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">App Information</span></button>
-        <!-- tpl-menu-system 内の適切な位置（Notificationsの下など）に追加 -->
-        <button id="btn-sys-my-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">🚫</span>
-            <span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">My Reports</span>
-        </button>
-        <button id="btn-sys-auth" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1.2rem]">🚪</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Login / Logout</span></button>
-        <button id="btn-sys-admin" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-red-100 active:bg-red-200 transition-colors text-red-600 bg-red-50"><span class="col-span-1 flex justify-center text-[1.2rem]">👑</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Admin Tools</span></button>
-    </div>
-</template>
-
-<template id="tpl-menu-app_2">
-    <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-app-reload" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">🔄</span><span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Reload App</span>
-        </button>
-        <button id="btn-app-current" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📍</span><span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Focus to Current</span>
-        </button>
-        <button id="btn-app-restore" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">♻️</span><span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Restore Map</span>
-        </button>
-        <button id="btn-app-archive-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📚</span><span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Archive List</span>
-        </button>
-        <button id="btn-app-info" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📖</span>
-            <span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">archive info</span>
-        </button>
-        <button id="btn-app-point-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">☰</span><span class="col-span-1">
-                
-            </span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">point list</span>
-        </button>
-        <button id="btn-app-batch" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📦</span><span class="col-span-1">
-
-            </span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">point >> archive</span>
-        </button>
-        <button id="btn-app-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">🔎</span><span class="col-span-1">
-
-            </span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Map Search</span>
-        </button>
-        <button id="btn-app-point-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">👇</span><span class="col-span-1">
-
-            </span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Word Search</span>
-        </button>
-        <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5 hidden">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">➕</span><span class="col-span-1">
-
-            </span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Create Memo</span>
-        </button>
-    </div>
-</template>
-
-
 <!-- ⚙️ システムメニュー用 -->
 <template id="tpl-menu-sys">
     <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-sys-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1.2rem]">📢</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Notifications</span></button>
-        <button id="btn-sys-version" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1.2rem]">ℹ️</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">App Information</span></button>
-        <button id="btn-sys-auth" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1.2rem]">🚪</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Login / Logout</span></button>
-        <button id="btn-sys-admin" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-red-100 active:bg-red-200 transition-colors text-red-600 bg-red-50"><span class="col-span-1 flex justify-center text-[1.2rem]">👑</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Admin Tools</span></button>
+        <button id="btn-sys-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">📢</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Notifications</span>
+            <button id="btn-sys-version" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+                <span class="col-span-1 flex justify-center text-[1.5rem]">ℹ️</span>
+                <span class="col-span-1">
+                </span>
+                <span class="col-span-8 text-left font-bold text-[1rem] uppercase">App Information</span>
+            </button>
+            <button id="btn-sys-auth" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+                <span class="col-span-1 flex justify-center text-[1.5rem]">🚪</span>
+                <span class="col-span-1">
+                </span>
+                <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Login / Logout</span>
+            </button>
+            <button id="btn-sys-admin" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-red-100 active:bg-red-200 transition-colors text-red-600 bg-red-50">
+                <span class="col-span-1 flex justify-center text-[1.5rem]">👑</span>
+                <span class="col-span-1">
+                </span>
+                <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Admin Tools</span>
+            </button>
+        </button>
     </div>
 </template>
 
@@ -440,24 +405,24 @@
 <template id="tpl-menu-user">
     <div class="w-full flex flex-col bg-brand-0">
         <button id="btn-sys-user-profile" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">👤</span>
+            <span class="col-span-1 flex justify-center text-[1.5rem]">👤</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">User Profile</span>
         </button>
         <button id="btn-user-mail" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📩</span>
+            <span class="col-span-1 flex justify-center text-[1.5rem]">📩</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Messages</span>
         </button>
-        <button id="btn-sys-user-config" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">⚙️</span>
-            <span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">User Settings</span>
-        </button>
         <button id="btn-sys-my-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">🚫</span>
+            <span class="col-span-1 flex justify-center text-[1.5rem]">🚫</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">My Reports</span>
+        </button>
+        <button id="btn-sys-user-config" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">⚙️</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">User Settings</span>
         </button>
     </div>
 </template>
@@ -476,50 +441,55 @@
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Archive Info</span>
         </button>
         <button id="btn-app-point-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">☰</span>
+            <span class="col-span-1 flex justify-center text-[1.5rem]">☰</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Point List</span>
         </button>
         <button id="btn-app-batch" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📦</span>
+            <span class="col-span-1 flex justify-center text-[1.5rem]">📦</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Point >> Archive</span>
         </button>
-    </div>
-</template>
-
-<!-- ⋯ アクションメニュー用 -->
-<template id="tpl-menu-action">
-    <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-app-reload" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">🔄</span>
-            <span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Reload App</span>
-        </button>
-        <button id="btn-app-current" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📍</span>
-            <span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Focus to Current</span>
-        </button>
-        <button id="btn-app-restore" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">♻️</span>
-            <span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Restore Map</span>
-        </button>
         <button id="btn-app-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">🔎</span>
+            <span class="col-span-1 flex justify-center text-[1.5rem]">🔎</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Map Search</span>
         </button>
         <button id="btn-app-point-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">👇</span>
+            <span class="col-span-1 flex justify-center text-[1.5rem]">👇</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Word Search</span>
         </button>
         <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">➕</span>
+            <span class="col-span-1 flex justify-center text-[1.5rem]">➕</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Create Memo</span>
+        </button>
+    </div>
+</template>
+
+<!-- 👆 アクションメニュー用 -->
+<template id="tpl-menu-action">
+    <div class="w-full flex flex-col bg-brand-0">
+        <button id="btn-app-reload" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">🌐</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Reload App</span>
+        </button>
+        <button id="btn-app-refresh" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">🔄</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Refresh Screen</span>
+        </button>
+        <button id="btn-app-current" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">📍</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Focus to Current</span>
+        </button>
+        <button id="btn-app-restore" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">♻️</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Restore Map</span>
         </button>
     </div>
 </template>

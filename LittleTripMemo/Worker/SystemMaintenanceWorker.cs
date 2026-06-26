@@ -1,10 +1,12 @@
-﻿using LittleTripMemo.Configs;
-using LittleTripMemo.Common;
+﻿using LittleTripMemo.Common;
+using LittleTripMemo.Configs;
+using LittleTripMemo.Models;
 using LittleTripMemo.Repository.App;
 using LittleTripMemo.Repository.Batch;
 using LittleTripMemo.Repository.Core;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
+using System.Text.Json;
 
 namespace LittleTripMemo.Worker;
 
@@ -43,6 +45,12 @@ public class SystemMaintenanceWorker(
         }
     }
 
+    /// <summary>
+    /// 実行するタスクをスコープ付きでラップし、ログ出力と例外処理を行う
+    /// </summary>
+    /// <param name="taskName"></param>
+    /// <param name="action"></param>
+    /// <returns></returns>
     private async Task RunWithScopeAsync(string taskName, Func<IServiceScope, Task> action)
     {
         try
@@ -60,6 +68,12 @@ public class SystemMaintenanceWorker(
         }
     }
 
+    #region "タスク"
+
+    /// <summary>
+    /// システムステータス（メンテナンスモードや最小アプリバージョンなど）を DB から取得して同期するタスク
+    /// </summary>
+    /// <returns></returns>
     private async Task TaskSyncSystemStatusAsync()
     {
         await RunWithScopeAsync("システムステータス同期", async (scope) =>
@@ -80,6 +94,10 @@ public class SystemMaintenanceWorker(
         });
     }
 
+    /// <summary>
+    /// リアクション数の再集計を行うタスク（tmp_reaction_count_queue を処理して、各テーブルの reaction_counts を更新する）
+    /// </summary>
+    /// <returns></returns>
     private async Task TaskUpdateReactionCountsAsync()
     {
         var settings = optionsMonitor.CurrentValue;
@@ -94,6 +112,10 @@ public class SystemMaintenanceWorker(
         }
     }
 
+    /// <summary>
+    /// テーブル統計情報（各テーブルの件数や最大IDなど）を更新するタスク
+    /// </summary>
+    /// <returns></returns>
     private async Task TaskUpdateTableStatisticsAsync()
     {
         var settings = optionsMonitor.CurrentValue;
@@ -111,6 +133,10 @@ public class SystemMaintenanceWorker(
         }
     }
 
+    /// <summary>
+    /// 論理削除された古いデータを物理削除するタスク
+    /// </summary>
+    /// <returns></returns>
     private async Task TaskGarbageCleanupAsync()
     {
         var settings = optionsMonitor.CurrentValue;
@@ -125,14 +151,94 @@ public class SystemMaintenanceWorker(
         }
     }
 
+    /// <summary>
+    /// クリック・閲覧数集計キュー（tmp_count_queue）を処理し、各テーブルの統計情報を更新するタスク
+    /// </summary>
     private async Task TaskAggregateClickQueueAsync()
     {
         var settings = optionsMonitor.CurrentValue;
-        if (settings.ClickAggregateIntervalMinutes > 0 && DateTime.Now >= _nextClickAggregateTime)
+        if (settings.ClickAggregateIntervalMinutes <= 0) return;
+
+        if (DateTime.Now >= _nextClickAggregateTime)
         {
-            await RunWithScopeAsync("クリック数集計", async (scope) => { /* ロジック省略... */ await Task.CompletedTask; });
+            await RunWithScopeAsync("統計データ集計", async (scope) =>
+            {
+                var repository = scope.ServiceProvider.GetRequiredService<CountQueueTaskRepository>();
+
+                // 1. キューテーブルから未処理の生データを全件取得
+                var queueItems = await repository.GetQueueAllAsync();
+                if (!queueItems.Any()) return;
+
+                DateTime lastProcessedTime = DateTime.MinValue;
+
+                // 2. ターゲット（更新対象の行）ごとにグループ化
+                var targetGroups = queueItems.GroupBy(queue => new {
+                    TargetType = (int)queue.target_type,
+                    UserId = (Guid?)queue.target_user_id,
+                    ArchiveId = (int?)queue.archive_id,
+                    Seq = (long?)queue.seq
+                });
+
+                foreach (var targetGroup in targetGroups)
+                {
+                    // 3. 現在の統計 JSONB を対象テーブルから取得
+                    var currentJson = await repository.GetCurrentStatsJsonAsync(
+                        targetGroup.Key.TargetType,
+                        targetGroup.Key.UserId,
+                        targetGroup.Key.ArchiveId,
+                        targetGroup.Key.Seq
+                    );
+
+                    // JSON を Dictionary にデシリアライズ（存在しなければ新規作成）
+                    var statsMap = string.IsNullOrEmpty(currentJson)
+                        ? new Dictionary<string, ClickCountData>()
+                        : JsonSerializer.Deserialize<Dictionary<string, ClickCountData>>(currentJson) ?? new();
+
+                    // 4. アイテム（イベント名）ごとに集計
+                    var itemGroups = targetGroup.GroupBy(item => (string)item.item_name);
+                    foreach (var itemGroup in itemGroups)
+                    {
+                        string key = itemGroup.Key;
+
+                        if (!statsMap.ContainsKey(key))
+                        {
+                            statsMap[key] = new ClickCountData();
+                        }
+
+                        var stats = statsMap[key];
+                        // 総クリック/閲覧数
+                        stats.t += itemGroup.Count();
+                        // ユニークユーザー数（ログイン済みの viewer_user_id があるもののみ重複排除して加算）
+                        stats.u += itemGroup.Where(x => x.viewer_user_id != null).Select(x => (Guid)x.viewer_user_id!).Distinct().Count();
+                        // ゲスト閲覧数
+                        stats.g += itemGroup.Count(x => x.viewer_user_id == null);
+                    }
+
+                    // 5. 計算後の JSON を DB へ書き戻し
+                    await repository.UpdateStatsJsonAsync(
+                        targetGroup.Key.TargetType,
+                        targetGroup.Key.UserId,
+                        targetGroup.Key.ArchiveId,
+                        targetGroup.Key.Seq,
+                        JsonSerializer.Serialize(statsMap)
+                    );
+
+                    // 処理したデータの最大時刻を保持
+                    var maxTimeInGroup = targetGroup.Max(x => (DateTime)x.create_tim);
+                    if (maxTimeInGroup > lastProcessedTime) lastProcessedTime = maxTimeInGroup;
+                }
+
+                // 6. 今回処理した時刻までのキューを削除（物理削除）
+                if (lastProcessedTime > DateTime.MinValue)
+                {
+                    await repository.DeleteProcessedQueueAsync(lastProcessedTime);
+                }
+            });
+
             _nextClickAggregateTime = DateTime.Now.AddMinutes(settings.ClickAggregateIntervalMinutes);
         }
     }
+
+    #endregion
 
 }

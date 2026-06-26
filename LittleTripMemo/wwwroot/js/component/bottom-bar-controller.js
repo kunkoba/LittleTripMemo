@@ -92,6 +92,13 @@ const _BottomCore = {
 		const unreadMail = $App.AppData.Context.UnreadMailCount || 0;
 		$UI.Generator.ApplyNewBadge(this.btnUserMenu, unreadMail, 'dot');
 	},
+	// ユーザアイコン更新
+	updateUserIcon() {
+		const icon = $App.AppData.Owner.SystemInfo?.ownerProfile?.icon;
+		if (icon) {
+			this.btnUserMenu.textContent = icon;
+		}
+	},
 };
 
 // 窓口
@@ -109,8 +116,12 @@ const BottomBarController = {
         _BottomCore.toggleRoot(isOpen);
     },
 	// 新着バッヂ更新
-	UpdateNoticeBadge(count) {
+	UpdateNoticeBadge() {
 		_BottomCore.updateNoticeBadge();
+	},
+	// ユーザアイコン更新
+	UpdateUserIcon() {
+		_BottomCore.updateUserIcon();
 	},
 };
 

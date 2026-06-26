@@ -6,78 +6,82 @@ using LittleTripMemo.Repository.Sys;
 
 namespace LittleTripMemo.Services.Public;
 
-public class GetArchiveDetailsPubService : _BaseService
+/// <summary>
+/// 公開されているまとめの詳細情報を取得し、閲覧統計を記録するサービス
+/// </summary>
+public class GetArchiveDetailsPubService(
+    UserContext userContext,
+    ArchivePubRepository archivePubRepository,
+    DetailPubRepository detailPubRepository,
+    ReactionPubRepository reactionPubRepository,
+    AppUserRepository appUserRepository,
+    AddCountQueueService addCountQueueService 
+) : _BaseService(userContext)
 {
-    private readonly ArchivePubRepository _archivePubRepo;
-    private readonly DetailPubRepository _detailPubRepo;
-    private readonly ReactionPubRepository _reactionPubRepo;
-    private readonly AppUserRepository _appUserRepo; 
-
     public record GetArchiveDetailsPubReq(int archive_id);
 
     public record Response(
         TMemoArchivePub archive,
         IEnumerable<TMemoDetailPub> details,
         IEnumerable<TReactionPub> myReactions,
-        DtoUserProfile userProfile 
+        DtoUserProfile userProfile
     );
 
-    public GetArchiveDetailsPubService(
-        UserContext userContext,
-        ArchivePubRepository archivePubRepo,
-        DetailPubRepository detailPubRepo,
-        ReactionPubRepository reactionPubRepo,
-        AppUserRepository appUserRepo) 
-        : base(userContext)
-    {
-        _archivePubRepo = archivePubRepo;
-        _detailPubRepo = detailPubRepo;
-        _reactionPubRepo = reactionPubRepo;
-        _appUserRepo = appUserRepo;
-    }
-
+    /// <summary>
+    /// 公開詳細取得処理を実行し、他人のまとめであれば閲覧数をカウントアップする
+    /// </summary>
     public async Task<Response> ExecuteAsync(GetArchiveDetailsPubReq req)
     {
+        // 1. バリデーション
         await ValidateAsync(req);
 
-        // 親取得
-        var archive = await _archivePubRepo.GetByKeyAsync(req.archive_id);
-        
-        // 存在チェック
-        BusinessException.ThrowIf(archive == null, "アーカイブが見つかりません");
-        
-        // 「非公開(closed)」かつ「所有者ではない」場合はエラーにする
-        if (archive.closed_flg && archive.user_id != _user.login_user_id)
+        // 2. 公開アーカイブ（親）の取得
+        var archivePub = await archivePubRepository.GetByKeyAsync(req.archive_id);
+        BusinessException.ThrowIf(archivePub == null, "アーカイブが見つかりません");
+
+        // 非公開（closed）かつ所有者ではない場合はエラー
+        if (archivePub!.closed_flg && archivePub.user_id != _user.login_user_id)
         {
             throw new BusinessException("このアーカイブは現在非公開に設定されています。");
         }
 
-        SetAppFlags(archive);
+        // 3. ★統計データの記録（閲覧数カウント）
+        // 自分のまとめではない場合のみ、アーカイブとユーザーの「view」カウントをキューに入れる
+        if (_user.login_user_id != archivePub.user_id)
+        {
+            // アーカイブの閲覧数を＋1（item_name = "view"）
+            await addCountQueueService.ExecuteAsync(new AddCountQueueService.AddCountReq(
+                CountTargetType.Archive,
+                archivePub.user_id,
+                archivePub.archive_id,
+                null,
+                "view"
+            ));
+        }
 
-        // 明細取得（リアクション集計含む）
-        var details = await _detailPubRepo.GetByArchiveIdAsync(req.archive_id);
-        SetAppFlags(details);
+        // 4. 明細および関連情報の取得
+        SetAppFlags(archivePub);
+        var detailsPub = await detailPubRepository.GetByArchiveIdAsync(req.archive_id);
+        SetAppFlags(detailsPub);
 
-        // 自分のリアクション取得（ログイン済みの場合のみ）
-        var reactions = _user.login_user_id != Guid.Empty
-            ? await _reactionPubRepo.GetMyReactionsByArchiveIdAsync(req.archive_id)
+        var myReactions = _user.login_user_id != Guid.Empty
+            ? await reactionPubRepository.GetMyReactionsByArchiveIdAsync(req.archive_id)
             : Enumerable.Empty<TReactionPub>();
 
-        // ユーザープロフィールの取得
-        var user = await _appUserRepo.GetByUserIdAsync(archive.user_id)
+        var ownerAppUser = await appUserRepository.GetByUserIdAsync(archivePub.user_id)
             ?? throw new BusinessException("ユーザーが存在しません");
 
-        var profile = new DtoUserProfile(
-            user.user_id,
-            user.icon,
-            user.nick_name,
-            user.description,
-            user.link_1, user.link_2, user.link_3,
-            is_owner: (user.user_id == _user.login_user_id),
-            user.click_stats
+        var userProfile = new DtoUserProfile(
+            ownerAppUser.user_id,
+            ownerAppUser.icon,
+            ownerAppUser.nick_name,
+            ownerAppUser.description,
+            ownerAppUser.link_1, ownerAppUser.link_2, ownerAppUser.link_3,
+            is_owner: (ownerAppUser.user_id == _user.login_user_id),
+            ownerAppUser.click_stats
         );
 
-        return new Response(archive, details, reactions, profile);
+        return new Response(archivePub, detailsPub, myReactions, userProfile);
     }
 
     private async Task ValidateAsync(GetArchiveDetailsPubReq req)
@@ -85,4 +89,5 @@ public class GetArchiveDetailsPubService : _BaseService
         BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが無効です");
         await Task.CompletedTask;
     }
+
 }

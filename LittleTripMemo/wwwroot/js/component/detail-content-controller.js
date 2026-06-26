@@ -11,8 +11,9 @@ const _DetailContentCore = {
                 {
                     this.displayRoot = $Dom.GetElementById("detail-display");
                     this.displayIndexBadge = $Dom.QuerySelector(".js-index-badge", this.displayRoot);
-                    this.displayDate = $Dom.GetElementById("detail-display-memo_date");
-                    this.displayTime = $Dom.GetElementById("detail-display-memo_time");
+                    // this.displayDate = $Dom.GetElementById("detail-display-memo_date");
+                    // this.displayTime = $Dom.GetElementById("detail-display-memo_time");
+                    this.displayDateContainer = $Dom.GetElementById("detail-display-date-container");
                     this.displayFaceEmoji = $Dom.GetElementById("detail-display-face_emoji");
                     this.displayFaceEmojiBg = $Dom.GetElementById("detail-display-face_emoji_bg");
                     this.displayWeatherEmoji = $Dom.GetElementById("detail-display-weather_code");
@@ -161,9 +162,10 @@ const _DetailContentCore = {
         if (this.displayIndexBadge) {
             this.displayIndexBadge.textContent = ($Marker._currentIndex + 1);
         }
-        //
-        this.displayDate.textContent = detail.memo_date;
-        this.displayTime.textContent = detail.memo_time;
+        // 値反映
+        // this.displayDateContainer.innerHTML = "";
+        $UI.Generator.MemoDateFormatter(this.displayDateContainer, detail, 'lg');
+        // 
         this.displayTitle.textContent = detail.title;
         this.displayBody.textContent = detail.body;
         // 金額の表示制御

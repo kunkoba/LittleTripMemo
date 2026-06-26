@@ -174,13 +174,11 @@
                         </div>
                         <!-- メインコンテンツ：ここを縦並び・左揃えに設定 -->
                         <div class="relative z-10 flex flex-col items-start flex-1">
-                            <!-- 1. 日付・時刻・顔文字を横並びに -->
+                            <!-- 1. 日付・時刻を部品化 -->
                             <div class="gap-4 w-fit">
                                 <div class="flex items-center gap-3 text-black font-bold text-[1rem] text-slate-500 italic">
-                                    <div>
-                                        <span id="detail-display-memo_date" class="mr-2"></span>
-                                        <span id="detail-display-memo_time" ></span>
-                                    </div>
+                                    <!-- 部品注入用コンテナに変更 -->
+                                    <div id="detail-display-date-container"></div>
                                     <!-- 顔文字（1rem） -->
                                     <span id="detail-display-face_emoji" class="text-[1.5rem] hidden"></span>
                                 </div>
@@ -402,20 +400,20 @@
                     <!-- 【下段】固定エリア：①メニューグループ（カプセル：装飾なしアイコンを4つ配置） -->
                     <div id="bot-group-menu" class="w-full max-w-[500px] flex items-center justify-between bg-brand-1 rounded-full px-6 py-1 shadow-md border border-brand-2 pointer-events-auto">
                         <!-- システムメニュー -->
-                        <button id="btn-sys-menu" class="relative w-10 h-10 flex items-center justify-center text-[1.5rem] active:scale-95 transition-transform outline-none">
+                        <button id="btn-sys-menu" class="relative w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-md">
                             ⚙️
                         </button>
                         <!-- ユーザメニュー -->
-                        <button id="btn-user-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] active:scale-95 transition-transform outline-none opacity-50">
+                        <button id="btn-user-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-md">
                             👤
                         </button>
                         <!-- データメニュー― -->
-                        <button id="btn-data-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] active:scale-95 transition-transform outline-none opacity-50">
+                        <button id="btn-data-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-md">
                             🗺️
                         </button>
                         <!-- アクションメニュー -->
-                        <button id="btn-app-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] text-brand-5 active:scale-95 transition-transform outline-none">
-                            ✨
+                        <button id="btn-app-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] text-brand-5 drop-shadow-md">
+                            👆
                         </button>
                     </div>
                     <!-- 【上段】動的エリア：②移動カプセル または ③メインアクション（作成・検索） -->
@@ -452,7 +450,6 @@
             </div>
         </div>
     </div>
-
     <!-- その他 -->
     <div>
         <!-- ■　ダイアログ -->
@@ -473,7 +470,7 @@
         </div>
 
         <!-- ■　Toast を積み上げるコンテナ -->
-        <div id="toast-container" class="absolute bottom-[120px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
+        <div id="toast-container" class="absolute bottom-[150px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
 
         <!-- ヘルプメッセージ -->
         <div id="ui-help-dialog" onclick="if(event.target === this) this.classList.add('hidden')"

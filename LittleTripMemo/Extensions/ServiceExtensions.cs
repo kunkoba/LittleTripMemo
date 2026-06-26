@@ -26,7 +26,7 @@ public static class ServiceExtensions
         services.AddScoped<ArchivePubRepository>();
         services.AddScoped<DetailPubRepository>();
         services.AddScoped<ReactionPubRepository>();
-        services.AddScoped<ClickQueueRepository>();
+        services.AddScoped<CountQueueRepository>();
 
         // Sys / Core
         services.AddScoped<SysFeedbackRepository>();
@@ -39,7 +39,7 @@ public static class ServiceExtensions
 
         // Batch (Worker用)
         services.AddScoped<TableStatisticsTaskRepository>();
-        services.AddScoped<ClickQueueTaskRepository>();
+        services.AddScoped<CountQueueTaskRepository>();
 
         return services;
     }
@@ -69,7 +69,7 @@ public static class ServiceExtensions
         services.AddScoped<BulkSyncDetailsService>();
         services.AddScoped<PublishArchiveService>();
         services.AddScoped<UpdateDetailService>();
-        services.AddScoped<RecreatePublicArchiveService>(); // ★新規開放
+        services.AddScoped<RecreatePublicArchiveService>(); 
 
         // Public (World Explorer)
         services.AddScoped<GetArchiveDetailsPubService>();
@@ -80,7 +80,7 @@ public static class ServiceExtensions
         services.AddScoped<UpdateArchivePubService>();
         services.AddScoped<UpdateDetailPubService>();
         services.AddScoped<BulkSyncReactionService>();
-        services.AddScoped<AddClickQueueService>();
+        services.AddScoped<AddCountQueueService>();
 
         // Sys (General)
         services.AddScoped<GetSystemInfoService>();

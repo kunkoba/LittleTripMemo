@@ -32,7 +32,7 @@
 <!-- 【リスト子】タイムライン日付（部品注入用） -->
 <template id="tpl-timeline-date">
     <div class="flex items-center gap-3 pt-2 cursor-pointer opacity-90">
-        <!-- ここに $UI.Generator.DateLabel で生成したオブジェクトを appendChild する -->
+        <!-- ここに $UI.Generator.MemoDateFormatter で生成したオブジェクトを appendChild する -->
         <div class="js-date-container flex items-center"></div>
         <!-- 横線：バッジの高さに合わせて位置を微調整 -->
         <div class="flex-1 h-[1px] bg-slate-100 mt-1"></div>
@@ -93,33 +93,28 @@
 </template>
 <template id="tpl-list-child-search">
     <div class="js-item-card relative flex flex-col p-4 rounded-[1rem] border border-slate-200 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3">
-        <!-- 1. ヘッダー：No、作成日時、顔 -->
         <div class="flex justify-between items-center mb-2">
             <div class="flex items-center gap-2">
                 <span class="js-index w-6 h-6 bg-slate-800 text-white text-[0.7rem] font-black rounded-full flex items-center justify-center"></span>
-                <span class="js-create-tim text-[0.6rem] font-bold text-slate-400 tracking-wider italic"></span>
+                <!-- 【変更】作成日時表示用spanをコンテナに変更 -->
+                <div class="js-date-container"></div>
             </div>
             <div class="shrink-0 text-[1.5rem] drop-shadow-md js-face"></div>
         </div>
-
         <!-- 2. 所属まとめタイトル -->
         <div class="flex items-center gap-1.5 mb-1.5">
             <span class="text-[0.7rem] opacity-50">🗂️</span>
             <span class="js-archive-title text-[0.7rem] font-black text-brand-5 truncate"></span>
         </div>
-
         <!-- 3. 地点タイトル -->
         <div class="js-title text-[0.95rem] font-black text-slate-800 truncate mb-1"></div>
-        
         <!-- 4. 本文 (2行まで許容) -->
         <div class="js-body text-[0.75rem] text-slate-500 line-clamp-2 leading-relaxed mb-3"></div>
-
         <!-- 5. 金額表示（既存ロジック用） -->
         <div class="js-price-wrapper hidden flex items-baseline gap-1 mb-3 bg-slate-50 w-fit px-2 py-0.5 rounded-md border border-slate-100">
             <span class="js-memo-price text-[0.9rem] font-black italic"></span>
             <span class="js-memo-currency text-[0.6rem] font-bold text-slate-400"></span>
         </div>
-
         <!-- 6. フッター：リアクション統計 ＆ 更新日 -->
         <div class="flex justify-between items-end mt-auto pt-2 border-t border-slate-50">
             <div class="flex gap-2.5">
@@ -130,40 +125,20 @@
             </div>
             <div class="text-right">
                 <div class="text-[0.5rem] font-black text-slate-300 uppercase tracking-tighter leading-none mb-1">Last Update</div>
-                <div class="js-update-tim text-[0.6rem] font-bold text-slate-400 italic"></div>
+                <div class="js-update-tim kb-date-tim-sm"></div>
             </div>
         </div>
     </div>
 </template>
 
 <!-- 【リスト子】まとめ親一覧 -->
-<template id="tpl-list-child-archive_2">
-    <div class="js-item-card relative bg-white rounded-[1rem] shadow-md border border-brand-1 mb-3 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform">
-        <div class="js-item-border absolute left-0 top-0 bottom-0 w-1"></div>
-        <div class="p-3 pl-4 flex flex-col gap-1">
-            <div class="flex justify-between items-start mb-1">
-                <!-- 左側：日付とメモ数 -->
-                <div class="flex items-center gap-3">
-                    <span class="js-update-tim text-[0.8rem] font-bold text-black-2 tracking-wider italic"></span>
-                    <div class="ml-6 flex items-center gap-1 text-[0.7rem] font-bold text-black-3">
-                        <span class="js-count">0</span> memos
-                    </div>
-                </div>
-                <!-- 右側：バッヂコンテナ -->
-                <div class="js-badge"></div>
-            </div>
-            <div class="js-title text-[0.9rem] font-black text-black-5 truncate mb-1"></div>
-            <div class="js-memo text-[0.7rem] text-black-3 line-clamp-1"></div>
-        </div>
-    </div>
-</template>
 <template id="tpl-list-child-archive">
     <div class="js-item-card relative bg-white rounded-[1rem] shadow-md border border-brand-1 mb-3 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform">
         <div class="js-item-border absolute left-0 top-0 bottom-0 w-1"></div>
         <div class="p-3 pl-4 flex flex-col gap-1">
             <div class="flex justify-between items-start mb-1">
                 <!-- 左：日付のみ -->
-                <span class="js-update-tim text-[0.8rem] font-bold text-black-2 tracking-wider italic"></span>
+                <span class="js-update-tim kb-date-tim-sm"></span>
                 <!-- 右：件数バッジ（背景色はJSで設定） -->
                 <div class="js-count-badge px-2.5 py-0.5 rounded-md text-[0.7rem] font-black text-white shadow-sm italic tracking-tight">
                     <span class="js-count">0</span> memos
@@ -178,11 +153,12 @@
 <!-- 【リスト子】マルチセレクト用 -->
 <template id="tpl-multi-select-date">
     <div class="flex items-center gap-3 p-3 cursor-pointer active:opacity-50">
-        <div class="text-[1rem] font-black text-black-4 js-date-text"></div>
+        <!-- 部品注入用コンテナ（クラス名は維持） -->
+        <div class="js-date-text"></div>
         <div class="flex-1 h-[1px] bg-brand-2"></div>
     </div>
 </template>
-
+<!-- 【リスト子】マルチセレクト用 -->
 <template id="tpl-multi-select-item">
     <div class="js-item-card flex items-center gap-3 p-2.5 rounded-[1rem] border border-brand-2 bg-white cursor-pointer active:scale-[0.98] transition-all shadow-md mb-2">
         <div class="shrink-0 w-5 h-5 rounded border border-brand-3 flex items-center justify-center js-checkbox transition-colors">
@@ -207,7 +183,7 @@
         <!-- テキストエリア -->
         <div class="flex-1 min-w-0 pr-4 flex flex-col justify-center">
             <div>
-                <span class="text-[0.8rem] text-slate-400 font-black tracking-wider js-date mb-1.5 italic"></span>
+                <span class="js-date kb-date-tim-sm"></span>
                 <span class="hidden ml-3 js-badge-new bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">NEW</span>
             </div>
             <div class="text-[0.9rem] font-black text-black-5 truncate js-title mt-2"></div>

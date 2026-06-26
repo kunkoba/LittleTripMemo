@@ -17,12 +17,12 @@ public enum UserNotificationKind : short
     Warning = 9,  // 警告（強制公開停止：データが秘密側へ戻された）
 }
 
-// クリック統計の対象種別
-public enum ClickTargetType : short
+// クリック数、閲覧数の統計の対象種別
+public enum CountTargetType : short
 {
     User = 1,
     Archive = 2,
-    Detail = 3
+    Detail = 3,
 }
 
 // ユーザーログのアクション種別

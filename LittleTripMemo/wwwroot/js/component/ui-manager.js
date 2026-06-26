@@ -26,16 +26,6 @@ const UI_Manager = {
     },
     // パーツ生成を担うジェネレータ
     Generator: {
-        // 安全なドメインのホワイトリスト
-        SAFE_DOMAINS: ['youtube.com', 'youtu.be', 'twitter.com', 'x.com', 'instagram.com', 
-			'facebook.com', 'tiktok.com', 'github.com', 'google.com', 'google.co.jp', 'maps.app.goo.gl'],
-        // URLの安全判定
-        IsSafeUrl(url) {
-            try {
-                const hostname = new URL(url).hostname.toLowerCase();
-                return this.SAFE_DOMAINS.some(domain => hostname === domain || hostname.endsWith('.' + domain));
-            } catch (e) { return false; }
-        },
         // URLリンクボタンの生成（安全確認とトラッキング機能を内包）
         LinkButton(url, params = null, isOwner = false) {
             if (!url) return null;
@@ -52,7 +42,7 @@ const UI_Manager = {
                     return;
                 }
                 // 2. ホワイトリストによる安全性の判定
-                const isSafe = this.IsSafeUrl(url);
+                const isSafe = $Util.IsSafeUrl(url);
                 const title = isSafe ? "外部サイトを開く" : "セキュリティ警告";
                 // 信頼できないURLの場合はGoogle検索を経由する旨をユーザーに通知
                 const message = isSafe 
@@ -118,39 +108,46 @@ const UI_Manager = {
 			}
 			if (badge) $Dom.ToggleShow(badge, isShow);
 		},
-		// DateLabel: 日付表示オブジェクト（バッジ・マスク対応）の生成
-		DateLabel(dateStr, timeStr, options = {}) {
-			const { size = 'sm', isMask = false, dayNum = 0 } = options;
+		// 日付ラベルを生成し、指定した要素に追加する
+		MemoDateFormatter(targetEl, detail, size = 'sm') {
+			if (!targetEl || !detail) return;
+			targetEl.innerHTML = "";
 			const el = $Dom.GenerateTemplate("tpl-date-label", "ui-template-root");
-			const mainText = $Dom.QuerySelector(".js-main-text", el);
-			const timeText = $Dom.QuerySelector(".js-time-text", el);
-			const badge = $Dom.QuerySelector(".js-day-badge", el);
-			const dayText = $Dom.QuerySelector(".js-day-text", el);
-			// テキスト変換と反映
-			mainText.textContent = isMask ? $Util.GetMaskedDate(dateStr) : (dateStr || "");
-			if (timeStr) timeText.textContent = timeStr;
-			else $Dom.ToggleShow(timeText, false);
-			// DAYバッジ表示制御（1以上が指定された場合のみ表示）
-			if (dayNum > 0) {
-				$Dom.ToggleShow(badge, true);
-				dayText.textContent = `${dayNum}DAY`;
-			}
-			// サイズに応じた装飾の切り替え
+			// 1. レイアウト切り替え（detailサイズ時のみ差分クラスをadd）
 			if (size === 'lg') {
-				// 詳細画面用（大きく配置）
-				mainText.classList.add('text-[1.3rem]');
-				badge.classList.replace('w-10', 'w-14');
-				badge.classList.replace('h-10', 'h-14');
-				badge.classList.replace('text-[0.7rem]', 'text-[0.9rem]');
+				el.classList.add('gap-6');
+				$Dom.QuerySelector(".js-main-text", el).classList.add('text-[1.3rem]');
+				$Dom.QuerySelector(".js-time-text", el).classList.add('text-[1.3rem]');
+				const badge = $Dom.QuerySelector(".js-day-badge", el);
+				badge.classList.add('w-20', 'h-10', 'text-[1.0rem]'); // テンプレート側のサイズクラスを上書き
 			} else {
-				// リスト・ポップアップ用（コンパクトに配置）
-				mainText.classList.add('text-[0.85rem]');
-				badge.classList.replace('w-10', 'w-9');
-				badge.classList.replace('h-10', 'h-9');
-				badge.classList.replace('text-[0.7rem]', 'text-[0.6rem]');
+				el.classList.add('gap-4');
+				$Dom.QuerySelector(".js-main-text", el).classList.add('text-[1rem]');
+				$Dom.QuerySelector(".js-time-text", el).classList.add('text-[1rem]');
+				const badge = $Dom.QuerySelector(".js-day-badge", el);
+				badge.classList.add('w-16', 'h-8', 'text-[0.8rem]'); // テンプレート側のサイズクラスを上書き
 			}
-			return el;
-		}
+			// 2. データの流し込み（Formatterで加工済みの値を信頼して代入）
+			const mainText = $Dom.QuerySelector(".js-main-text", el);
+			mainText.textContent = detail.memo_date;
+			const timeEl = $Dom.QuerySelector(".js-time-text", el);
+			if (detail.memo_time) {
+				timeEl.textContent = detail.memo_time;
+			} else {
+				$Dom.ToggleShow(timeEl, false);
+			}
+			// 3. DAYバッジ制御
+			if (detail.display_day > 0 && $App.AppData.Context.ScreenMode !== $Const.SCREEN_MODE.SEARCH) {
+				const badge = $Dom.QuerySelector(".js-day-badge", el);
+				$Dom.ToggleShow(badge, true);
+				$Dom.QuerySelector(".js-day-text", badge).textContent = `${detail.display_day} DAY`;
+				// // 公開まとめの2日目以降（文字がDAY表記と重複する場合）はメインテキストを隠す
+				// if (detail.display_day > 1 && $App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.ARCHIVE_PUB) {
+				// 	$Dom.ToggleShow(mainText, false);
+				// }
+			}
+			targetEl.appendChild(el);
+		},
     },
 	// 初期化
 	Init(){
@@ -218,9 +215,36 @@ const UI_Manager = {
 		document.documentElement.setAttribute('data-font-size', size || 'standard');
 	},
 	// 通知バッヂの更新
-	UpdateNoticeBadge(count) {
-		$BotBar.UpdateNoticeBadge(count);
+	UpdateNoticeBadge() {
+		// 下段バーのバッヂ更新
+		$BotBar.UpdateNoticeBadge();
+		// ダイアログのバッヂ更新
+		$Dialog.UpdateNoticeBadgeDialog();
 	},
+	// GPSボタンの表示切替
+    ToggleGpsButton(isOn) {
+        const btn = document.getElementById('btn-map-gps-toggle');
+        if (!btn) return;
+        if (isOn) {
+            // ONのスタイル（発光する緑）
+            btn.classList.remove('bg-slate-700', 'text-slate-500', 'border-slate-600', 'shadow-md');
+            btn.classList.add(
+                'bg-emerald-500', 
+                'text-white', 
+                'border-emerald-400', 
+                'shadow-[0_0_20px_rgba(16,185,129,0.8)]'
+            );
+        } else {
+            // OFFのスタイル（沈んだダークグレー）
+            btn.classList.remove(
+                'bg-emerald-500', 
+                'text-white', 
+                'border-emerald-400', 
+                'shadow-[0_0_20px_rgba(16,185,129,0.8)]'
+            );
+            btn.classList.add('bg-slate-700', 'text-slate-500', 'border-slate-600', 'shadow-md');
+        }
+    },
 };
 
 // Public

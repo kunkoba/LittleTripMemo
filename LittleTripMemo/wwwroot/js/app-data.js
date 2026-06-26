@@ -1,5 +1,5 @@
-// const BaseUrl = "https://localhost:7292";
-const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
+const BaseUrl = "https://localhost:7292";
+// const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
 // const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
 const API_ENDPOINTS = {
     // Account
@@ -177,6 +177,8 @@ window.$Data = {
             // ユーザ用：システムデータ
             if (data.systemInfo) {
                 $App.AppData.Owner.SystemInfo = data.systemInfo;
+                // 下段バーのアイコンを更新
+                $BotBar.UpdateUserIcon();
                 // 通知の未読判定とローカルDBの掃除を非同期で実行
                 $Warn.CatchAsync(async () => {
                     await $Data.LocalDb.CheckUnreadNotices();
@@ -277,7 +279,7 @@ window.$Data = {
                     }
                 }
             });
-            console.log("加工後：", details);
+            // console.log("加工後：", details);
         },
     },
     // データ格納・取得
@@ -481,7 +483,7 @@ window.$Data = {
             // 4. 未読件数を Context に保存し、UIを更新
             $App.AppData.Context.UnreadNoticeCount = unreadCount;
             // 新着バッヂ更新
-            $UI.UpdateNoticeBadge(unreadCount);
+            $UI.UpdateNoticeBadge();
         },
         // 通知の未読判定（個別メッセージ版）
         async CheckUnreadMails() {
@@ -502,7 +504,7 @@ window.$Data = {
             }
             $App.AppData.Context.UnreadMailCount = unreadCount;
             // 新着バッヂ更新
-            $UI.UpdateNoticeBadge(unreadCount);
+            $UI.UpdateNoticeBadge();
         },
     },
 };

@@ -1,74 +1,49 @@
 export default {
-    // 【基幹】アプリメニューを表示
-    ShowActionMenu() {
+    // 【🗺️ データメニュー】
+    ShowDataMenu() {
         const isLoggedIn = $App.AppData.Context.IsLoggedIn;
-        const mode = $App.AppData.Context.ScreenMode;
-        const el = $Dom.GenerateTemplate('tpl-menu-action');
-        // 各ボタンを一度だけ取得してオブジェクトに格納
+        if (!isLoggedIn) return this.ShowLoginDialog();
+        const el = $Dom.GenerateTemplate('tpl-menu-data');
         const b = {
-            create: $Dom.QuerySelector('#btn-app-create', el),
-            current: $Dom.QuerySelector('#btn-app-current', el),
-            restore: $Dom.QuerySelector('#btn-app-restore', el),
-            pointSearch:   $Dom.QuerySelector('#btn-app-point-search', el),
-            search: $Dom.QuerySelector('#btn-app-search', el),
-            reload: $Dom.QuerySelector('#btn-app-reload', el),
+            archiveList: $Dom.QuerySelector('#btn-app-archive-list', el),
+            archiveInfo: $Dom.QuerySelector('#btn-app-info', el),
+            pointList:   $Dom.QuerySelector('#btn-app-point-list', el),
+            batch:       $Dom.QuerySelector('#btn-app-batch', el),
+            search:      $Dom.QuerySelector('#btn-app-search', el),
+            pointSearch: $Dom.QuerySelector('#btn-app-point-search', el),
+            create:      $Dom.QuerySelector('#btn-app-create', el),
         };
-        // 表示制御（取得済みの変数を使用）
-        switch (mode) {
-            case $Const.SCREEN_MODE.CREATE:
-                $Dom.ToggleShow(b.search, true);
-                $Dom.ToggleShow(b.pointSearch, false);
-                break;
-            case $Const.SCREEN_MODE.ARCHIVE:
-                case $Const.SCREEN_MODE.ARCHIVE_PUB:
-                $Dom.ToggleShow(b.create, true);
-                $Dom.ToggleShow(b.search, true);
-                $Dom.ToggleShow(b.pointSearch, false);
-                break;
-            case $Const.SCREEN_MODE.SEARCH:
-                $Dom.ToggleShow(b.create, true);
-                $Dom.ToggleShow(b.pointSearch, true);
-                break;
-        }
-        // 未ログインなら
-        if (!isLoggedIn) {
-            $Dom.ToggleShow(b.create, false);
-            $Dom.ToggleShow(b.search, false);
-        }
-        // イベント登録（取得済みの変数を使用）
-        b.create.onclick = () => {
-            this._core.close();
-            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-            $App.RefreshScreen();
+        const mode = $App.AppData.Context.ScreenMode;
+        const isArchive = (mode === $Const.SCREEN_MODE.ARCHIVE || mode === $Const.SCREEN_MODE.ARCHIVE_PUB);
+        $Dom.ToggleShow(b.archiveInfo, isArchive);
+        $Dom.ToggleShow(b.search, isLoggedIn && mode !== $Const.SCREEN_MODE.SEARCH);
+        $Dom.ToggleShow(b.pointSearch, mode === $Const.SCREEN_MODE.SEARCH);
+        $Dom.ToggleShow(b.create, isLoggedIn && mode !== $Const.SCREEN_MODE.CREATE);
+        b.archiveList.onclick = () => this.ShowArchiveList();
+        b.archiveInfo.onclick = () => this.ShowArchiveInfo();
+        b.pointList.onclick = () => (mode === $Const.SCREEN_MODE.SEARCH) ? this.ShowDetailsSearchResult() : this.ShowDetailsTimeLine();
+        b.batch.onclick = () => this.ShowMultiSelectTimeline();
+        b.search.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH; $App.RefreshScreen(); };
+        b.pointSearch.onclick = () => this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18));
+        b.create.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; $App.RefreshScreen(); };
+        this._core.open({ title: "DATA MENU", content: el });
+    },
+    // 【� アクションメニュー】
+    ShowActionMenu() {
+        const el = $Dom.GenerateTemplate('tpl-menu-action');
+        const isLoggedIn = $App.AppData.Context.IsLoggedIn;
+        const b = {
+            reload:   $Dom.QuerySelector('#btn-app-reload', el),
+            refresh:  $Dom.QuerySelector('#btn-app-refresh', el),
+            current:  $Dom.QuerySelector('#btn-app-current', el),
+            restore:  $Dom.QuerySelector('#btn-app-restore', el),
         };
-        b.current.onclick = () => {
-            this._core.close();
-            $Marker.RefreshCurrentLocation();
-            $Marker.FocusToLocationMarker(1000);
-        };
-        b.restore.onclick = () => {
-            this._core.close();
-            $Marker.RestoreMarkers();
-        };
-        b.pointSearch.onclick = () => {
-            this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18));
-        };
-        b.search.onclick = () => {
-            this._core.close();
-            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH;
-            $App.RefreshScreen();
-        };
-        b.reload.onclick = () => {
-            this._core.close();
-            // $Util.ReloadApp();
-            $App.RefreshScreen();
-        };
-        //
-        this._core.open({
-            title: "APP MENU",
-            content: el,
-            help: "アプリメ\nニュー",
-        });
+        const mode = $App.AppData.Context.ScreenMode;
+        b.reload.onclick = () => { this._core.close(); $Util.ReloadApp(); };
+        b.refresh.onclick = () => { this._core.close(); $App.RefreshScreen(); };
+        b.current.onclick = () => { this._core.close(); $Marker.RefreshCurrentLocation(); $Marker.FocusToLocationMarker(1000); };
+        b.restore.onclick = () => { this._core.close(); $Marker.RestoreMarkers(); };
+        this._core.open({ title: "ACTIONS", content: el });
     },
     // 絵文字選択（定数リスト＋履歴保存、入力欄反映・OK確定）
     ShowEmojiPicker(onSelect) {

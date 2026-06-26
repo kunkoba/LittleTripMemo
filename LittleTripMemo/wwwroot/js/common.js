@@ -113,23 +113,32 @@ window.$Util = {
         // return format.replace(/YYYY|MM|M|DD|D/g, (match) => parts[match]);
         return format.replace(/YYYY|MM|M|DD|D|HH|mm|ss/g, (match) => parts[match]);
     },
-    // // GetMaskedDate: 日付を「M月[上/中/下]旬」に変換
-    // GetMaskedDate(dateStr) {
-    //     if (!dateStr) return "";
-    //     const d = new Date(dateStr);
-    //     const m = d.getMonth() + 1;
-    //     const day = d.getDate();
-    //     let term = "下旬";
-    //     if (day <= 10) term = "上旬";
-    //     else if (day <= 20) term = "中旬";
-    //     return `${m}月${term}`;
-    // },
-    // // GetUniqueDateList: 明細リストから重複なし・ソート済みの全日程リストを取得
-    // GetUniqueDateList(details) {
-    //     if (!details || details.length === 0) return [];
-    //     const dates = details.map(d => d.memo_date).filter(d => d);
-    //     return [...new Set(dates)].sort();
-    // },
+    // URLのホワイトリストチェック
+    IsSafeUrl(url) {
+        const SAFE_DOMAINS = [
+            'youtube.com', 'youtu.be',
+            'twitter.com', 'x.com',
+            'instagram.com',
+            'facebook.com',
+            'tiktok.com',
+            'github.com',
+            'google.com', 'google.co.jp'
+        ];
+        try {
+            const u = new URL(url);
+            // ★ ① protocol制限
+            if (u.protocol !== 'https:' && u.protocol !== 'http:') {
+                return false;
+            }
+            const hostname = u.hostname.toLowerCase();
+            // ★ ② 完全一致 or 正規サブドメインのみ
+            return SAFE_DOMAINS.some(domain =>
+                hostname === domain || hostname.endsWith('.' + domain)
+            );
+        } catch {
+            return false;
+        }
+    },
     // GPSから現在地を取得する（純粋な座標取得のみ）
     async GetCurrentPosition() {
         return new Promise((resolve, reject) => {

@@ -47,6 +47,7 @@ const _DialogCore = {
     create({ title = "", content = "", buttons = [], headerButtons = [], 
             help = null, onClose = null, theme = null, isFooterFixed = true, isModal = false, size = null }) {
         const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
+        const frameBg = $Dom.QuerySelector(".pointer-events-auto", frame);
         frame._isModal = isModal; // フラグ保持
         const titleEl = $Dom.QuerySelector("#dialog-title", frame);
         const contentEl = $Dom.QuerySelector("#dialog-content", frame);
@@ -176,12 +177,31 @@ const _DialogCore = {
         }
         this.backdrop.classList.add("hidden");
     },
+    // 新着バッヂ更新
+    updateNoticeBadge() {
+        this.stack.forEach(frame => {
+            // 各フレーム内を探索。$Dom.QuerySelectorは要素不在で例外を出すため、ここでは生のquerySelectorを使用
+            const btnNotice = frame.querySelector('#btn-sys-notice');
+            if (btnNotice) {
+                $UI.Generator.ApplyNewBadge(btnNotice, $App.AppData.Context.UnreadNoticeCount, 'label');
+            }
+            const btnMail = frame.querySelector('#btn-user-mail');
+            if (btnMail) {
+                $UI.Generator.ApplyNewBadge(btnMail, $App.AppData.Context.UnreadMailCount, 'label');
+            }
+        });
+    },
 };
 
 const DialogController = {
     // 🌟 コアを内包させる（従ファイルからは this._core でアクセス）
     _core: _DialogCore,
-
+    // 🌟 従ファイルをスプレッド構文で展開して結合
+    ...DialogSystem,
+    ...DialogApp,
+    ...DialogArchive,
+    ...DialogNotice,
+    ...DialogAdmin,
     // 【共通】確認用ダイアログ
     async ShowConfirm({ title = "", message = "", label = "OK", help = ""}) {
         return new Promise((resolve) => {
@@ -261,13 +281,10 @@ const DialogController = {
             setTimeout(() => input.focus(), 100);
         });
     },
-
-    // 🌟 従ファイルをスプレッド構文で展開して結合
-    ...DialogSystem,
-    ...DialogApp,
-    ...DialogArchive,
-    ...DialogNotice,
-    ...DialogAdmin,
+    // ダイアログ内の新着バッヂを巡回して更新
+    UpdateNoticeBadgeDialog() {
+        this._core.updateNoticeBadge();
+    },
 };
 
 // 初期処理

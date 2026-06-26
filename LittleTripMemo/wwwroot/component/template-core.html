@@ -131,7 +131,8 @@
             <span class="index"></span>
         </div>
         <div class="text-[0.8rem] mb-2 font-black text-slate-400 italic">
-            <span class="time"></span>
+            <!-- 【変更】個別spanを廃止し、コンテナを設置 -->
+            <div class="js-date-container"></div>
         </div>
         <div class="text-[0.8rem] border-l-4 border-brand-3 pl-3 font-black text-black-5 mb-2 line-clamp-1 pr-8 relative z-10">
             <span class="title"></span>
@@ -332,15 +333,25 @@
 <template id="tpl-date-label">
     <div class="js-date-root flex items-center gap-2 font-black italic tracking-tighter">
         <!-- DAYバッジ（丸囲み） -->
-        <div class="js-day-badge hidden w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center text-[0.7rem] shrink-0 shadow-sm">
+        <div class="js-day-badge hidden rounded-full bg-brand-3 text-white flex items-center justify-center shrink-0 shadow-sm">
             <span class="js-day-text"></span>
         </div>
         <!-- メインテキスト（マスク日付 or 実日付） -->
-        <div class="flex flex-col leading-none">
-            <div class="js-main-text text-slate-800"></div>
+        <div class="flex leading-none">
+            <div class="js-main-text text-slate-800 mr-2"></div>
             <!-- 時刻（オプション） -->
-            <div class="js-time-text text-slate-400 text-[0.8em] mt-1"></div>
+            <div class="js-time-text text-slate-400 ml-2"></div>
         </div>
     </div>
+</template>
+
+<!-- 【部品】GPSトラッキングトグルボタン -->
+<template id="tpl-map-gps-btn">
+    <button id="btn-map-gps-toggle" type="button" 
+        class="w-[50px] h-[50px] rounded-full flex items-center justify-center font-black tracking-widest text-[0.8rem] transition-all duration-300 pointer-events-auto outline-none active:scale-95
+               /* デフォルト (OFF) のスタイル */
+               bg-slate-700 text-slate-500 border border-slate-600 shadow-md">
+        GPS
+    </button>
 </template>
 

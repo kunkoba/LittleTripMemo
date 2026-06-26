@@ -54,7 +54,7 @@ export default {
             help: "",
             buttons:[
                 {
-                    label: "Write Feedback",
+                    label: "Write",
                     className: "",
                     handler: async () => {
                         this.ShowReviewPost();
@@ -326,7 +326,7 @@ export default {
             // 既読管理（後ほど既読判定ロジックを追加可能。一旦すべて未読として扱う）
             const isNew = item.is_new ?? true; 
             setMailStyle(child, isNew);
-            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
+            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim);
             $Dom.QuerySelector(".js-icon", child).textContent = item.emoji || "✉️️";
             $Dom.QuerySelector(".js-body", child).textContent = item.body;
             $Dom.ToggleShow($Dom.QuerySelector(".js-title", child), false);
@@ -360,7 +360,7 @@ export default {
         const body = item.body;
         // 各要素への反映
         $Dom.QuerySelector('#view-notice-icon', el).textContent = item.emoji || "✉️️";
-        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
+        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim);
         $Dom.ToggleShow($Dom.QuerySelector("#view-notice-title-area", el), false);
         // 2行目以降があれば本文に、なければ全体を表示（運営からの短い連絡を考慮）
         const bodyEl = $Dom.QuerySelector('#view-notice-body', el);

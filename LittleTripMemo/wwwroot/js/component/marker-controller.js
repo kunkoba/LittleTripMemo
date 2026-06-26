@@ -166,12 +166,15 @@ const _MarkerCore = {
         }
     },
     // 物理的なポップアップ表示（DOM生成含む）
-    toggleMarkerPopup_2(isOpen, index = null, detail = null) {
+    toggleMarkerPopup(isOpen, index = null, detail = null) {
         if (isOpen && index !== null) {
             const marker = this._markerList[index];
             const el = $Dom.GenerateTemplate("tpl-marker-popup");
             $Dom.QuerySelector(".index", el).textContent = (index + 1);
-            $Dom.QuerySelector(".time", el).textContent = detail.memo_date + '  ' + detail.memo_time
+            // $Dom.QuerySelector(".time", el).textContent = detail.memo_date + '  ' + detail.memo_time
+        const dateContainer = $Dom.QuerySelector(".js-date-container", el);
+        // dateContainer.innerHTML = ""; // 念のためクリア
+        $UI.Generator.MemoDateFormatter(dateContainer, detail); // デフォルトサイズで呼び出し
             $Dom.QuerySelector(".title", el).textContent = detail.title || "";
             const bodyEl = $Dom.QuerySelector(".body", el);
             if (bodyEl) {
@@ -213,51 +216,6 @@ const _MarkerCore = {
                 maxWidth: 240,
                 className: 'custom-popup',
                 closeButton: false,
-            }).setLatLng(marker.getLatLng()).setContent(el).openOn(this._map);
-        } else {
-            this._map.closePopup();
-        }
-    },
-    // _MarkerCore.toggleMarkerPopup メソッド内の修正
-    toggleMarkerPopup(isOpen, index = null, detail = null) {
-        if (isOpen && index !== null) {
-            const marker = this._markerList[index];
-            const el = $Dom.GenerateTemplate("tpl-marker-popup");
-            $Dom.QuerySelector(".index", el).textContent = (index + 1);
-            // --- 日付表示のマスク判定 ---
-            const mode = $App.AppData.Context.ScreenMode;
-            // 公開まとめ参照、または地図検索モードの場合は日付をマスクする
-            const isMasked = (mode === $Const.SCREEN_MODE.ARCHIVE_PUB || mode === $Const.SCREEN_MODE.SEARCH);
-            // const dispDate = isMasked ? $Util.GetMaskedDate(detail.memo_date) : (detail.memo_date || "");
-            const dispDate = detail.memo_date;
-            $Dom.QuerySelector(".time", el).textContent = `${dispDate}  ${detail.memo_time || ""}`;
-            // --- 項目反映（既存維持） ---
-            $Dom.QuerySelector(".title", el).textContent = detail.title || "";
-            const bodyEl = $Dom.QuerySelector(".body", el);
-            if (bodyEl) {
-                bodyEl.textContent = detail.body || "";
-                bodyEl.classList.add("whitespace-pre-wrap");
-            }
-            const btnAction = $Dom.QuerySelector("#btn-popup-action", el);
-            const actionText = $Dom.QuerySelector(".js-action-text", el);
-            if (mode === $Const.SCREEN_MODE.SEARCH) {
-                if (actionText) actionText.textContent = detail.a_title || "VIEW ARCHIVE";
-                btnAction.onclick = async (e) => {
-                    e.stopPropagation();
-                    if (!await $Dialog.ShowConfirm({ title: "Archive", message: "このまとめを開きますか？" })) return;
-                    $App.AppData.Context.ScreenMode = detail.is_public ? $Const.SCREEN_MODE.ARCHIVE_PUB : $Const.SCREEN_MODE.ARCHIVE;
-                    $App.AppData.Context.TargetArchiveId = detail.archive_id;
-                    $App.AppData.Context.TargetSeq = detail.seq;
-                    $App.RefreshScreen();
-                    this._map.closePopup();
-                };
-            } else {
-                if (actionText) actionText.textContent = "VIEW detail";
-                btnAction.onclick = (e) => { e.stopPropagation(); $DetailFrame.Open(detail); };
-            }
-            L.popup({
-                offset:[0, -50], minWidth: 240, maxWidth: 240,
-                className: 'custom-popup', closeButton: false,
             }).setLatLng(marker.getLatLng()).setContent(el).openOn(this._map);
         } else {
             this._map.closePopup();

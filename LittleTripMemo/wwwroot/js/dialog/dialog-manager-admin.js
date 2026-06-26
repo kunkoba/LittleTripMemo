@@ -325,48 +325,6 @@ export default {
         });
     },
     // 【管理者機能】フィードバックリスト
-    async ShowAdminFeedbackList_2(currentScore = 0) {
-        const isSuccess = await $Data.Access.GetAllFeedback({ score: currentScore });
-        if (!isSuccess) return;
-        // 新設した「検索バー付き」テンプレートを使用
-        const frame = $Dom.GenerateTemplate("tpl-admin-feedback-list-parent");
-        const listContainer = $Dom.QuerySelector("#feedback-list-container", frame);
-        const scoreButtons = $Dom.QuerySelectorAll(".js-score-btn", frame);
-        // 1. ボタンの状態（色）を現在のスコアに合わせて設定
-        scoreButtons.forEach(btn => {
-            const score = parseInt(btn.dataset.score);
-            if (score === currentScore) {
-                btn.classList.add("bg-brand-5", "text-white", "shadow-md");
-            } else {
-                btn.classList.add("text-slate-400");
-                // クリック時にスコアを指定して再検索
-                btn.onclick = async () => {
-                    this._core.close(); // 現在の一覧を閉じる
-                    this.ShowAdminFeedbackList(score); // 指定スコアで開き直す
-                };
-            }
-        });
-        // 2. リストの描画
-        const feedbackList = $App.AppData.Admin.feedbackList || [];
-        if (feedbackList.length === 0) {
-            listContainer.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-10">データはありません。</div>`;
-        } else {
-            feedbackList.forEach(item => {
-                const child = $Dom.GenerateTemplate("tpl-admin-list-child-feedback");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim);
-                $Dom.QuerySelector(".js-score", child).textContent = "★".repeat(item.score) + "☆".repeat(5 - item.score);
-                $Dom.QuerySelector(".js-body", child).textContent = item.body || "（内容なし）";
-                child.onclick = () => this.ShowAdminFeedbackDetail(item);
-                listContainer.appendChild(child);
-            });
-        }
-        this._core.open({
-            title: "FEEDBACK Mgmt",
-            content: frame,
-            help: "",
-        });
-    },
-    // 【管理者機能】フィードバックリスト
     async ShowAdminFeedbackList() {
         // 初回のみ全件取得
         const isSuccess = await $Data.Access.GetAllFeedback({ score: 0 });
@@ -624,7 +582,7 @@ export default {
         const kindObj = Object.values($Const.USER_NOTICE_KIND).find(k => k.id === item.kind) || $Const.USER_NOTICE_KIND.INFO;
         $Dom.QuerySelector('#view-notice-icon', el).textContent = kindObj.emoji; // 詳細時
         // 送信日時
-        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim, "YYYY-MM-DD　HH:mm");
+        $Dom.QuerySelector('#view-notice-date', el).textContent = $Util.FormatDate(item.send_tim);
         // 本文（全文表示）
         $Dom.QuerySelector('#view-notice-body', el).textContent = item.body;
         this._core.open({

@@ -16,10 +16,13 @@ docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql
 
 
 ファイル群を提供する
-トークンの無駄遣いをするな
-ソースの出力は許可なく行うな
 指示を待て
 
+まず結論から言え
+憶測はするな
+トークンの無駄遣いをするな
+長文出力はやめろ
+ソースの出力は許可なく行うな
 
 
 ★コンセプト
@@ -70,9 +73,6 @@ docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql
 ・地点⇒旅行記⇒各SNSへ
 ・まとめ（旅行記）、メモ（スポット）
 　・旅行タイプ：まとめをカテゴライズ（ドライブ、散歩、買い物、観光、他）
-・公開時に日付が特定されないようにマスクする機能（日付⇒１day、2026年5月⇒2026年春ごろ）
-　・上記だと、「日本限定」になってしまうなぁ、、、
-・閲覧数をカウントしたい
 ・まとめ一覧（閲覧ユーザのため）
 ・まとめ解析パネル（閲覧数、アクセス数、など）
 ・○日～○日まで○日間
@@ -92,49 +92,8 @@ docker exec -i trip_memo_db psql -U postgres -d littletripmemo_db -f /backup.sql
 　　・特定ユーザとの個別通知（やりとり）を管理したい
 　　・ユーザ画面の受信BOXと送信履歴（管理者
 　　・強制非公開にした履歴を残す（ユーザID、archiveID、日付、区分（警告、停止））
-　・フィードバック１～５まで、一括区分分けで取得）
 
-            
- bg-white text-red-500 border-2 border-red-200
- 
-			// パスワード制御
-            if (await $Util.CheckAdminAuth()) {
-                const isSuccess = await $Data.Access.GetAdminAllInfo();
-                if (isSuccess) this.ShowAdminMenu();
-            }
-            
-	        // --- 管理者専用ボタン ---
-	        const dialogButtons = [];
-	        if (isAdmin && archive.is_public && !archive.is_owner) {
-	            if (!archive.closed_flg) {
-	                dialogButtons.push([{
-	                    label: "【ADMIN】強制 Close",
-	                    className: "bg-red-500 text-white shadow-md",
-	                    handler: async () => {
-	                        const isOk = await this.ShowConfirm({ title: "ADMIN: CLOSE", help: "", message: "【注意】\n強制的にClose状態にしますか？" });
-	                        if (!isOk) return;
-	                        const isSuccess = await $Data.Access.AdminCloseArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
-	                        if (!isSuccess) return;
-	                        $Notice.Info("強制的にCloseしました");
-	                        this._core.closeAll();
-	                        $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-	                        await $App.RefreshScreen();
-	                    }
-	                }]);
-	            }
-	            dialogButtons.push([{
-	                label: "【ADMIN】強制 Privateに戻す",
-	                className: "bg-white text-red-600 border-2 border-red-500 shadow-sm",
-	                handler: async () => {
-	                    const isOk = await this.ShowConfirm({ title: "ADMIN: UNPUBLISH", help: "", message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？" });
-	                    if (!isOk) return;
-	                    const isSuccess = await $Data.Access.AdminUnpublishArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
-	                    if (!isSuccess) return;
-	                    $Notice.Info("強制的にPrivateに戻しました");
-	                    this._core.closeAll();
-	                    $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-	                    await $App.RefreshScreen();
-	                }
-	            }]);
-	        }
+
+bg-white text-red-500 border-2 border-red-200
+
 

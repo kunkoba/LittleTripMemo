@@ -3,16 +3,16 @@ using System.Text.Json;
 
 namespace LittleTripMemo.Repository.Batch;
 
-public class ClickQueueTaskRepository : _BaseRepository
+public class CountQueueTaskRepository : _BaseRepository
 {
-    public ClickQueueTaskRepository(ITransactionProvider p, ILogger<ClickQueueTaskRepository> l, UserContext u) : base(p, l, u) { }
+    public CountQueueTaskRepository(ITransactionProvider p, ILogger<CountQueueTaskRepository> l, UserContext u) : base(p, l, u) { }
 
     /// <summary>
     /// キューから未処理のデータを全件取得する
     /// </summary>
     public async Task<IEnumerable<dynamic>> GetQueueAllAsync()
     {
-        const string sql = "SELECT * FROM tmp_click_queue ORDER BY create_tim ASC";
+        const string sql = "SELECT * FROM tmp_count_queue ORDER BY create_tim ASC";
         return await QueryAsync<dynamic>(sql);
     }
 
@@ -52,7 +52,7 @@ public class ClickQueueTaskRepository : _BaseRepository
     /// </summary>
     public async Task DeleteProcessedQueueAsync(DateTime upTo)
     {
-        const string sql = "DELETE FROM tmp_click_queue WHERE create_tim <= @upTo";
+        const string sql = "DELETE FROM tmp_count_queue WHERE create_tim <= @upTo";
         await ExecuteAsync(sql, new { upTo });
     }
 

@@ -25,110 +25,6 @@ export default {
         })();
     },
     // タイムライン用リスト
-    ShowDetailsTimeLine_2() {
-        // ソートする
-        const details = $Data.Store.GetDetails();
-        if (!details || details.length === 0) {
-            $Notice.Warn("データはありません。");
-            return;
-        }
-        // ▼ 追加：現在のアーカイブがプライベートかつ自分がオーナーか判定
-        const archive = $Data.Store.GetArchive();
-        const canDetach = archive && !archive.is_public && archive.is_owner;
-        console.log("canDetach:", archive);
-        const el = $Dom.GenerateTemplate("tpl-timeline-container");
-        const listContainer = $Dom.QuerySelector(".js-list-container", el);
-        let currentDate = ""; // 現在描画中の日付を保持
-        // すでにソート済みなので、上から順にループするだけでOK！
-        details.forEach((item, index) => {
-            const dateStr = (item.memo_date || "");
-            // 日付が変わったタイミングでだけヘッダーを差し込む
-            if (currentDate !== dateStr) {
-                const header = $Dom.GenerateTemplate("tpl-timeline-date");
-                $Dom.QuerySelector(".js-date-text", header).textContent = dateStr;
-                listContainer.appendChild(header);
-                currentDate = dateStr;
-            }
-            // アイテムの描画
-            const child = $Dom.GenerateTemplate("tpl-timeline-item");
-            // インデックス番号のセット
-            const indexBadge = $Dom.QuerySelector(".js-index-badge", child);
-            if (indexBadge) indexBadge.textContent = (index + 1);
-            $Dom.QuerySelector(".js-time", child).textContent = item.memo_time || "";
-            $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
-            $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
-            $Dom.QuerySelector(".js-body", child).textContent = item.body || "";
-            // ==========================================
-            // ▼ 追加：野良化（切り離し）ボタンの制御
-            // ==========================================
-            const btnDetach = $Dom.QuerySelector(".js-btn-detach", child);
-            if (btnDetach) {
-                if (canDetach) {
-                    $Dom.ToggleShow(btnDetach, true);
-                    btnDetach.onclick = async (e) => {
-                        e.stopPropagation(); // 親の「マーカー選択(onclick)」が誤爆しないようにストップ
-                        const isOk = await this.ShowConfirm({
-                            title: "REMOVE ITEM",
-                            help: "",
-                            message: "このメモをまとめから外し、単独のメモに戻しますか？"
-                        });
-                        if (!isOk) return;
-                        // API通信（対象の seq を送る）
-                        const isSuccess = await $Data.Access.DetachDetails({ seqs: [item.seq], archive_id: item.archive_id });
-                        if (!isSuccess) return;
-                        $Notice.Info("まとめから外しました。");
-                        this._core.closeAll();
-                        // まとめを再読み込みして画面をリフレッシュ
-                        await $App.RefreshScreen(); 
-                    };
-                } else {
-                    $Dom.ToggleShow(btnDetach, false); // 表示条件を満たさない場合は隠す
-                }
-            }
-            // 金額のセットと色分け
-            const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
-            const priceEl = $Dom.QuerySelector(".js-price", child);
-            const priceUnitEl = $Dom.QuerySelector(".js-price-unit", child);
-            if (priceEl && priceWrapper) {
-                const price = Number(item.memo_price || 0);
-                if (price !== 0) {
-                    // 金額がある場合は表示
-                    $Dom.ToggleShow(priceWrapper, true);
-                    // 通貨単位の取得（親アーカイブの設定、またはユーザー設定）
-                    let displayCurrency = $App.AppData.Owner.Currency_unit || 'JPY';
-                    if (item.archive_id > 0) {
-                        const archiveList = $Data.Store.GetArchiveList() || [];
-                        const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
-                        if (targetArc && targetArc.currency_unit) {
-                            displayCurrency = targetArc.currency_unit;
-                        }
-                    }
-                    if (priceUnitEl) priceUnitEl.textContent = displayCurrency;
-                    if (price > 0) {
-                        priceEl.textContent = `+${price.toLocaleString()}`;
-                        priceEl.className += " text-blue-500";
-                    } else if (price < 0) {
-                        priceEl.textContent = price.toLocaleString();
-                        priceEl.className += " text-red-500";
-                    }
-                } else {
-                    // 0円の時は枠ごと隠す
-                    $Dom.ToggleShow(priceWrapper, false);
-                }
-            }
-            child.onclick = () => {
-                this._core.closeAll();
-                $Marker.SelectMarker(index); // details自体がソート済みなので、このindexをそのまま使える
-            };
-            listContainer.appendChild(child);
-        });
-        this._core.open({
-            title: "TRIP LOG",
-            content: el,
-            help: "",
-            buttons: []
-        });
-    },
     ShowDetailsTimeLine() {
         const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) return $Notice.Warn("データはありません。");
@@ -137,32 +33,20 @@ export default {
         const canDetach = archive && !archive.is_public && archive.is_owner;
         const el = $Dom.GenerateTemplate("tpl-timeline-container");
         const listContainer = $Dom.QuerySelector(".js-list-container", el);
-        // ブレーク判定用のキー（公開ならday番号、自分用なら日付文字列）
+        // ブレーク判定用（公開ならday番号、自分用なら日付文字列）
         let currentBreakKey = null;
         details.forEach((item, index) => {
             const breakKey = isPub ? item.display_day : item.memo_date;
-            // 日付（またはDAY）が変わったタイミングでヘッダーを挿入
+            // 日付が変わるタイミングでヘッダーを挿入
             if (currentBreakKey !== breakKey) {
                 const header = $Dom.GenerateTemplate("tpl-timeline-date");
                 const container = $Dom.QuerySelector(".js-date-container", header);
-                if (isPub) {
-                    const dayNum = item.display_day;
-                    const hideMask = (dayNum > 1);
-                    // "6月中旬 1day" から重複する " 1day" を除去して部品に渡す
-                    const cleanDate = (item.memo_date || "").replace(/\s\d+day$/, "");
-                    container.appendChild($UI.Generator.DateLabel(cleanDate, null, {
-                        size: 'list',
-                        dayNum: dayNum,
-                        hideMask: hideMask,
-                        isMask: false
-                    }));
-                } else {
-                    container.appendChild($UI.Generator.DateLabel(item.memo_date, null, { size: 'list' }));
-                }
+                // 【修正箇所】新部品を呼び出し。ヘッダーなので時刻は表示しないよう null を渡す
+                $UI.Generator.MemoDateFormatter(container, { ...item, memo_time: null });
                 listContainer.appendChild(header);
                 currentBreakKey = breakKey;
             }
-            // --- 以降、アイテム描画ロジック（既存維持） ---
+            // --- アイテム本体の描画（ここからは既存維持） ---
             const child = $Dom.GenerateTemplate("tpl-timeline-item");
             const indexBadge = $Dom.QuerySelector(".js-index-badge", child);
             if (indexBadge) indexBadge.textContent = (index + 1);
@@ -207,73 +91,6 @@ export default {
         this._core.open({ title: "TRIP LOG", content: el });
     },
     // 検索結果用リスト
-    // 検索結果用リスト
-    ShowDetailsSearchResult_2() {
-        const details = $Data.Store.GetDetails();
-        console.log("ShowDetailsSearchResult:", details);
-        if (!details || details.length === 0) {
-            $Notice.Warn("データはありません。");
-            return;
-        }
-        const el = $Dom.GenerateTemplate("tpl-list-parent");
-        const rt = $Const.REACTION_TYPE; // 定数ショートカット
-
-        details.forEach((item, index) => {
-            const child = $Dom.GenerateTemplate("tpl-list-child-search");
-            // --- 基本・追加情報の反映 ---
-            $Dom.QuerySelector(".js-index", child).textContent = (index + 1);
-            $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
-            $Dom.QuerySelector(".js-archive-title", child).textContent = item.a_title || "(No Archive)";
-            $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
-            $Dom.QuerySelector(".js-body", child).textContent = (item.body || "").replace(/\r?\n/g, ' ');
-            // --- 日時 (作成・更新) ---
-            $Dom.QuerySelector(".js-create-tim", child).textContent = $Util.FormatDate(item.create_tim);
-            $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
-            // --- リアクション統計 (定数から絵文字を取得) ---
-            $Dom.QuerySelector(".js-icon-funny", child).textContent = rt.FUNNY.emoji;
-            $Dom.QuerySelector(".js-count-funny", child).textContent = item.count_funny || 0;
-            $Dom.QuerySelector(".js-icon-love", child).textContent = rt.LOVE.emoji;
-            $Dom.QuerySelector(".js-count-love", child).textContent = item.count_love || 0;
-            $Dom.QuerySelector(".js-icon-surprise", child).textContent = rt.SURPRISE.emoji;
-            $Dom.QuerySelector(".js-count-surprise", child).textContent = item.count_surprise || 0;
-            $Dom.QuerySelector(".js-icon-sad", child).textContent = rt.SAD.emoji;
-            $Dom.QuerySelector(".js-count-sad", child).textContent = item.count_sad || 0;
-            // --- 金額エリア（既存ロジック維持） ---
-            const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
-            const priceEl = $Dom.QuerySelector(".js-memo-price", child);
-            const currencyEl = $Dom.QuerySelector(".js-memo-currency", child);
-            const price = Number(item.memo_price || 0);
-            if (price !== 0) {
-                $Dom.ToggleShow(priceWrapper, true);
-                let displayCurrency = item.currency_unit || 'JPY';
-                if (item.archive_id > 0) {
-                    const archiveList = $Data.Store.GetArchiveList() || [];
-                    const targetArc = archiveList.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
-                    if (targetArc && targetArc.currency_unit) displayCurrency = targetArc.currency_unit;
-                }
-                currencyEl.textContent = displayCurrency;
-                if (price > 0) {
-                    priceEl.textContent = `+${price.toLocaleString()}`;
-                    priceEl.classList.add("text-blue-500");
-                } else {
-                    priceEl.textContent = price.toLocaleString();
-                    priceEl.classList.add("text-red-500");
-                }
-            }
-            child.onclick = () => {
-                this._core.closeAll();
-                $Marker.SelectMarker(index);
-            };
-            el.appendChild(child);
-        });
-
-        this._core.open({
-            title: "SEARCH RESULTS",
-            content: el,
-            help: "",
-            buttons: []
-        });
-    },
     ShowDetailsSearchResult() {
         const details = $Data.Store.GetDetails();
         if (!details || details.length === 0) return $Notice.Warn("データはありません。");
@@ -287,11 +104,10 @@ export default {
             $Dom.QuerySelector(".js-archive-title", child).textContent = item.a_title || "(No Archive)";
             $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
             $Dom.QuerySelector(".js-body", child).textContent = (item.body || "").replace(/\r?\n/g, ' ');
-            // --- 2. 日時情報の反映（日付マスク適用） ---
-            // 公開検索結果のため、正確な作成日ではなく「訪問時期（マスク済み）」を表示する
-            // const maskedDate = $Util.GetMaskedDate(item.memo_date);
-            $Dom.QuerySelector(".js-create-tim", child).textContent = `${item.memo_date} ${item.memo_time || ""}`;
-            $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
+            // --- 【変更】日付情報の反映 ---
+            const dateContainer = $Dom.QuerySelector(".js-date-container", child);
+            // dateContainer.innerHTML = "";
+            $UI.Generator.MemoDateFormatter(dateContainer, item);
             // --- 3. リアクション統計の反映 ---
             $Dom.QuerySelector(".js-icon-funny", child).textContent = rt.FUNNY.emoji;
             $Dom.QuerySelector(".js-count-funny", child).textContent = item.count_funny || 0;
@@ -325,97 +141,6 @@ export default {
             el.appendChild(child);
         });
         this._core.open({ title: "SEARCH RESULTS", content: el });
-    },
-    // まとめ親一覧選択
-    ShowArchiveList_2() {
-        $Warn.CatchAsync(async () => {
-            const isSuccess = await $Data.Access.GetArchiveList();
-            if (!isSuccess) return;
-            const root = $Dom.GenerateTemplate("tpl-list-parent");
-            const archives = $Data.Store.GetArchiveList() ||[];
-            if (archives.length == 0){
-                $Notice.Warn("データはありません");
-                return;
-            }
-            // is_public で分類
-            const privateList = archives.filter(item => !item.is_public);
-            const publicList  = archives.filter(item => item.is_public);
-            // リスト描画処理
-            const renderGroup = (title, list, isPublicGroup) => {
-                if (list.length === 0) return;
-                // ヘッダーの生成
-                const header = $Dom.GenerateTemplate("tpl-list-group-header");
-                // クラス名を指定してヘッダーのバッジ要素を取得
-                const badgeEl = $Dom.QuerySelector(".js-header-badge", header);
-                // クラス名を指定してタイトル表示要素を取得しテキストを設定
-                $Dom.QuerySelector(".js-header-title", header).textContent = title;
-                // グループごとのヘッダーカラーとアイコン
-                if (isPublicGroup) {
-                    // バッジ要素にパブリック用の背景色クラスを追加
-                    badgeEl.classList.add("bg-brand-5");
-                    // クラス名を指定してアイコン表示要素を取得しパブリック用記号を設定
-                    $Dom.QuerySelector(".js-header-icon", header).textContent = "◎";
-                } else {
-                    // バッジ要素にプライベート用の背景色クラスを追加
-                    badgeEl.classList.add("bg-slate-800");
-                    // クラス名を指定してアイコン表示要素を取得しプライベート用記号を設定
-                    $Dom.QuerySelector(".js-header-icon", header).textContent = "🔒";
-                }
-                root.appendChild(header);
-                // アイテムの生成
-                list.forEach(item => {
-                    const child = $Dom.GenerateTemplate("tpl-list-child-archive");
-                    // 要素取得
-                    $Dom.QuerySelector(".js-title", child).textContent = item.title;
-                    $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
-                    $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
-                    $Dom.QuerySelector(".js-count", child).textContent = item.detail_count || "0";
-                    const leftBorder = $Dom.QuerySelector(".js-item-border", child);
-                    const countBadge = $Dom.QuerySelector(".js-count-badge", child);
-                    // 
-                    if (isPublicGroup) {
-                        if (item.closed_flg) {
-                            // CLOSE (灰)
-                            leftBorder.classList.add("bg-slate-400");
-                            countBadge.classList.add("bg-slate-400");
-                        } else {
-                            // OPEN (テーマカラー)
-                            leftBorder.classList.add("bg-brand-5");
-                            countBadge.classList.add("bg-brand-5");
-                        }
-                    } else {
-                        // PRIVATE (黒)
-                        leftBorder.classList.add("bg-slate-800");
-                        countBadge.classList.add("bg-slate-800");
-                    }
-                    // // バッヂ適用
-                    // const badgeContainer = $Dom.QuerySelector(".js-badge", child);
-                    // let sIdx = 0; // Private
-                    // if (item.is_public) {
-                    //     sIdx = item.closed_flg ? 1 : 2; // 1:Close, 2:Open
-                    // }
-                    // $Util.ApplyBadge(badgeContainer, sIdx);
-                    child.onclick = () => {
-                        this._core.closeAll();
-                        $App.AppData.Context.ScreenMode = isPublicGroup
-                            ? $Const.SCREEN_MODE.ARCHIVE_PUB
-                            : $Const.SCREEN_MODE.ARCHIVE;
-                        $App.AppData.Context.TargetArchiveId = item.archive_id;
-                        $App.RefreshScreen();
-                    };
-                    root.appendChild(child);
-                });
-            };
-            renderGroup("PRIVATE ARCHIVE", privateList, false);
-            renderGroup("PUBLIC ARCHIVE", publicList, true);
-            // ダイアログを開く
-            this._core.open({
-                title: "ARCHIVE LIST",
-                content: root,
-                help: "",
-                buttons: []
-            });
-        })();
     },
     async ShowArchiveList() {
         const isSuccess = await $Data.Access.GetArchiveList();
@@ -499,7 +224,12 @@ export default {
             input.focus();
         };
         render("");
-        this._core.open({ title: "ARCHIVE LIST", content: root, help: "上部の入力欄から検索できます。" });
+        this._core.open({
+            title: "ARCHIVE LIST", 
+            size: "lg",
+            content: root, 
+            help: "上部の入力欄から検索できます。" 
+        });
     },
     // 既存まとめへの追加先選択ダイアログ
     SelectArchiveForAdd(seqs) {
@@ -624,7 +354,9 @@ export default {
         const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
         sortedDates.forEach(date => {
             const header = $Dom.GenerateTemplate("tpl-multi-select-date");
-            $Dom.QuerySelector(".js-date-text", header).textContent = date;
+            const dateEl = $Dom.QuerySelector(".js-date-text", header);
+            // 共通部品を呼び出し（グループ化のキーである date 文字列をオブジェクトとして渡す）
+            $UI.Generator.MemoDateFormatter(dateEl, { memo_date: date });
             header.onclick = () => {
                 const groupItems = groups[date];
                 const isAllSelected = groupItems.every(item => selectedSeqs.has(item.seq));
@@ -670,7 +402,7 @@ export default {
                         if (!isOk) return;
                         const isSuccess = await $Data.Access.MergeDetails({
                             seqs,
-                            title: "title-" + $Util.FormatDate(new Date(), 'YYYYMMDD_HHmmss'),
+                            title: "まとめのタイトル" + $Util.FormatDate(new Date(), '_HHmmss'),
                             currency_unit: $App.AppData.Owner.Currency_unit || 'JPY'
                         });
                         if (!isSuccess) return;
@@ -720,230 +452,6 @@ export default {
             ]]
         });
         updateSelectionUI(); // フッターボタン生成後に再度呼んで初期状態の disabled を反映
-    },
-    // まとめ親詳細参照（アーカイブ）
-    ShowArchiveInfo_2() {
-        const archive = $Data.Store.GetArchive();
-        // 管理者かどうかの判定
-        const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.plan === "Admin";
-        //
-        const el = $Dom.GenerateTemplate('tpl-view-archive');
-        const renderView = () => {
-            // ① 常に最新のデータを取得
-            const currentArchive = $Data.Store.GetArchive(); 
-            // ステータスバッジの表示制御
-            const bPrivate = $Dom.QuerySelector('#badge-private', el);
-            const bClose = $Dom.QuerySelector('#badge-close', el);
-            const bOpen = $Dom.QuerySelector('#badge-open', el);
-            // 一旦すべて「非アクティブ（グレー文字・背景透明）」にリセット
-            const inactiveClass = "flex-1 flex items-center justify-center gap-1 py-1.5 rounded-full text-[0.7rem] font-black transition-all tracking-wider text-slate-300";
-            bPrivate.className = inactiveClass;
-            bClose.className = inactiveClass;
-            bOpen.className = inactiveClass;
-            // 状態に応じて1つだけ「アクティブ（色付き・影あり）」にする
-            const activeBaseClass = "flex-1 flex items-center justify-center gap-1 py-1.5 rounded-full text-[0.7rem] font-black transition-all tracking-wider text-white shadow-md ";
-            if (!currentArchive.is_public) {
-                // PRIVATE (黒系)
-                bPrivate.className = activeBaseClass + "bg-slate-900";
-            } else if (currentArchive.closed_flg) {
-                // CLOSE (グレー系)
-                bClose.className = activeBaseClass + "bg-slate-400";
-            } else {
-                // OPEN (赤系)
-                bOpen.className = activeBaseClass + "bg-red-500";
-            }
-            // ② タイトルと本文の反映
-            $Dom.QuerySelector('#view-mem-title', el).textContent = currentArchive.title || "";
-            $Dom.QuerySelector('#view-mem-body', el).textContent = currentArchive.memo || "";
-            // ③ リンクの反映（すべて currentArchive を参照するように統一）
-            // const viewUrl = $Dom.QuerySelector('#view-mem-url', el);
-            if (currentArchive.link_url) {
-                const iconHtml = $Util.GetUrlIconHtml(currentArchive.link_url, 28);
-                // viewUrl.href = currentArchive.link_url;
-                viewUrl.onclick = () => $Util.OpenSafeUrl(currentArchive.link_url);
-                viewUrl.innerHTML = iconHtml;
-                $Dom.ToggleShow(viewUrl, true); // 表示する
-            } else {
-                $Dom.ToggleShow(viewUrl, false); // 隠す
-            }
-            // ④ 件数の反映
-            const details = $Data.Store.GetDetails() || [];
-            $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
-            $Dom.QuerySelector('#btn-view-mem-timeline', el).onclick = () => {
-                this.ShowDetailsTimeLine();
-            };
-            // ⑤ 金額の反映
-            const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
-            const priceVal = $Dom.QuerySelector('#mem-stat-price', el);
-            const priceUnit = $Dom.QuerySelector('#view-mem-price-unit', el);
-            const displayCurrency = currentArchive.currency_unit || $App.AppData.Owner.Currency_unit || 'JPY';
-            priceUnit.textContent = displayCurrency;
-            if (totalPrice > 0) {
-                // priceVal.className = "text-[1.2rem] font-black text-blue-600 mr-2 italic";
-                priceVal.className += " text-blue-600";
-                priceVal.textContent = `+${totalPrice.toLocaleString()}`;
-            } else if (totalPrice < 0) {
-                priceVal.className += " text-red-600";
-                priceVal.textContent = `- ${Math.abs(totalPrice).toLocaleString()}`;
-            } else {
-                priceVal.className += " text-black-5";
-                priceVal.textContent = `0`;
-            }
-        };
-        renderView();
-        const btnUserProfile = $Dom.QuerySelector('#btn-mem-user-profile', el);
-        const profile = $Data.Store.GetUserProfile();
-        if (profile) {
-            $Dom.QuerySelector('#view-mem-user-icon', el).textContent = profile.icon || "😀";
-            $Dom.QuerySelector('#view-mem-user-id', el).textContent = profile.nick_name;
-            btnUserProfile.onclick = () => this.ShowUserProfile(profile, archive.is_owner);
-        } else {
-            $Dom.ToggleShow(btnUserProfile, false);
-        }
-        // --- ヘッダーボタンの定義 ---
-        const headerButtons = [];
-        if (archive.is_public && !archive.closed_flg) {
-            headerButtons.push({
-                label: "🔗",
-                handler: () => this.ShowShareArchive(archive, profile)
-            });
-        }
-        if (archive.is_owner) {
-            headerButtons.push({
-                label: "✏️",
-                handler: () => this.ShowEditArchive(archive, renderView)
-            });
-        }
-        if (!archive.is_owner) {
-            headerButtons.push({
-                label: "🚫",
-                handler: () => this.ShowReportPost(archive)
-            });
-        }
-        // --- ボタンの定義 ---
-        const dialogButtons = [];
-        if (archive.is_owner) {
-        const btnMainClass    = "bg-brand-5 text-white shadow-md";
-        const btnReleaseClass = "bg-white text-red-400 border border-brand-4 shadow-md";
-            if (!archive.is_public) {
-                dialogButtons.push([{
-                    label: "Private　⇒　Public",
-                    className: btnMainClass,
-                    handler: () => this._execStatusChange(
-                        'PublishArchive',
-                        { archive_id: archive.archive_id },
-                        "Switch to [Public]",
-                        "このまとめを[Public]に設定しますか？",
-                        "[Public]に設定しました。",
-                        $Const.SCREEN_MODE.ARCHIVE_PUB
-                    )
-                }]);
-                dialogButtons.push([{
-                    label: "Archive　⇒　Details",
-                    className: btnReleaseClass,
-                    handler: () => this._execStatusChange(
-                        'DeleteArchive',
-                        { archive_id: archive.archive_id },
-                        "Restore to Details",
-                        "このまとめを[Private]に戻しますか？",
-                        "単体のメモに戻しました。",
-                        $Const.SCREEN_MODE.CREATE
-                    )
-                }]);
-            } else {
-                if (archive.closed_flg) {
-                    dialogButtons.push([{
-                        label: "Close　⇒　Open",
-                        className: btnMainClass,
-                        handler: () => this._execStatusChange(
-                            'OpenArchive',
-                            { archive_id: archive.archive_id },
-                            "Switch to [Open]",
-                            "このまとめを[Open]に切り替えますか？",
-                            "[Open]に切り替えました。",
-                            null,
-                            () => $Data.Store.UpdateArchive({ closed_flg: false })
-                        )
-                    }]);
-                } else {
-                    dialogButtons.push([{
-                        label: "Open　⇒　Close",
-                        className: btnMainClass,
-                        handler: () => this._execStatusChange(
-                            'CloseArchive',
-                            { archive_id: archive.archive_id },
-                            "Switch to [Close]",
-                            "このまとめを[Close]に切り替えますか？",
-                            "[Close]に切り替えました。",
-                            null,
-                            () => $Data.Store.UpdateArchive({ closed_flg: true })
-                        )
-                    }]);
-                }
-                dialogButtons.push([{
-                    label: "Public　⇒　Private",
-                    className: btnReleaseClass,
-                    handler: () => this._execStatusChange(
-                        'UnpublishArchive',
-                        { archive_id: archive.archive_id },
-                        "Switch to [Private]",
-                        "このまとめを[Private]に戻しますか？",
-                        "[Private]に戻しました。",
-                        $Const.SCREEN_MODE.ARCHIVE
-                    )
-                }]);
-            }
-        }
-        // --- 管理者専用ボタン ---
-        if (isAdmin && archive.is_public && !archive.is_owner) {
-            // 【注意】強制Close
-            if (!archive.closed_flg) {
-                dialogButtons.push([{
-                    label: "【ADMIN】強制 Close",
-                    className: "bg-red-500 text-white shadow-md",
-                    handler: async () => {
-                        const isOk = await this.ShowConfirm({
-                            title: "ADMIN: CLOSE",
-                            help: "",
-                            message: "【注意】\n強制的にClose状態にしますか？"
-                        });
-                        if (!isOk) return;
-                        const isSuccess = await $Data.Access.AdminCloseArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
-                        if (!isSuccess) return;
-                        $Notice.Info("強制的にCloseしました");
-                        this._core.closeAll();
-                        $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                        await $App.RefreshScreen(); // 画面を更新して反映
-                    }
-                }]);
-            }
-            // 【警告】強制Private戻し
-            dialogButtons.push([{
-                label: "【ADMIN】強制 Privateに戻す",
-                className: "bg-white text-red-600 border-2 border-red-500 shadow-sm",
-                handler: async () => {
-                    const isOk = await this.ShowConfirm({
-                        title: "ADMIN: UNPUBLISH",
-                        help: "",
-                        message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？"
-                    });
-                    if (!isOk) return;
-                    const isSuccess = await $Data.Access.AdminUnpublishArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
-                    if (!isSuccess) return;
-                    $Notice.Info("強制的にPrivateに戻しました");
-                    this._core.closeAll();
-                    $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    await $App.RefreshScreen(); // 画面を更新して反映
-                }
-            }]);
-        }
-        const frame = this._core.open({
-            title: "Archive info",
-            content: el,
-            help: "",
-            headerButtons: headerButtons, // ここで上段ボタンを渡す
-            buttons: dialogButtons,
-        });
     },
     // まとめ親詳細参照（アーカイブ）
     ShowArchiveInfo() {

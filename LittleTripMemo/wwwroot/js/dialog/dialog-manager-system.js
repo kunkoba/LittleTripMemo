@@ -23,106 +23,6 @@ export default {
             help: "aaaa",
         });
     },
-    // 【基幹】システムメニューを表示
-    ShowSystemMenu_2() {
-        const el = $Dom.GenerateTemplate('tpl-menu-system');
-        const isLoggedIn = $App.AppData.Context.IsLoggedIn;
-        const isAdmin = isLoggedIn && $App.AppData.Owner.plan === "Admin";
-        // 1. ShowActionMenuと同様、まとめてボタン変数にする
-        const b = {
-            profile: $Dom.QuerySelector('#btn-sys-user-profile', el),
-            config:  $Dom.QuerySelector('#btn-sys-user-config', el),
-            notice:  $Dom.QuerySelector('#btn-sys-notice', el),
-            version: $Dom.QuerySelector('#btn-sys-version', el),
-            reports: $Dom.QuerySelector('#btn-sys-my-report', el),
-            auth:    $Dom.QuerySelector('#btn-sys-auth', el),
-            admin:   $Dom.QuerySelector('#btn-sys-admin', el),
-        };
-        // // ログイン中であれば、プロフィールのアイコンを反映する
-        // if (isLoggedIn) {
-        //     const profile = $App.AppData.Owner.SystemInfo.ownerProfile;
-        //     if (profile && profile.icon) {
-        //         // ボタン内の最初のspan（アイコン表示用）を取得して書き換え
-        //         const iconSpan = $Dom.QuerySelector('span:first-child', b.profile);
-        //         iconSpan.textContent = profile.icon;
-        //     }
-        // }
-        // 2. まとめて表示設定（ログイン・権限状態で絞り込み）
-        $Dom.ToggleShow(b.profile, isLoggedIn);
-        $Dom.ToggleShow(b.notice,  isLoggedIn);
-        $Dom.ToggleShow(b.version, isLoggedIn);
-        $Dom.ToggleShow(b.reports, isLoggedIn);
-        $Dom.ToggleShow(b.admin, isAdmin);
-        // 3. ログイン/ログアウトボタンのラベル反映
-        const authLabel = $Dom.QuerySelector('span:last-child', b.auth);
-        authLabel.textContent = isLoggedIn ? "LOGOUT" : "LOGIN";
-        // 新着通知
-        const unreadCount = $App.AppData.Context.UnreadNoticeCount || 0;
-        // if (unreadCount > 0) {
-        //     const labelSpan = $Dom.QuerySelector('span:last-child', b.notice);
-        //     labelSpan.classList.add("flex", "items-center", "gap-2");
-        //     if (!labelSpan.querySelector('.badge-new')) {
-        //         labelSpan.insertAdjacentHTML('beforeend', `<span class="badge-new ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full tracking-wider mt-0.5">NEW</span>`);
-        //     }
-        // }
-        // 新着メール
-        const unreadMail = $App.AppData.Context.UnreadMailCount || 0;
-        // if (unreadMail > 0) {
-        //     const labelSpan = $Dom.QuerySelector('span:last-child', b.profile);
-        //     labelSpan.classList.add("flex", "items-center", "gap-2");
-        //     if (!labelSpan.querySelector('.badge-new')) {
-        //         labelSpan.insertAdjacentHTML('beforeend', `<span class="badge-new ml-4 bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full tracking-wider mt-0.5">NEW</span>`);
-        //     }
-        // }
-        // 4. 各ボタンのイベント登録
-        b.profile.onclick = async () => {
-            // this._core.close();
-            this.ShowUserProfile($App.AppData.Owner.SystemInfo.ownerProfile, true)
-        };
-        b.config.onclick = () => {
-            // this._core.close();
-            this.ShowUserSettingsMenu()
-        };
-        b.notice.onclick = () => {
-            // this._core.close();
-            this.ShowNoticeList()
-        };
-        b.version.onclick = () => {
-            // this._core.close();
-            this.ShowAppInfo()
-        };
-        b.reports.onclick = async () => {
-            // this._core.close();
-            this.ShowMyReportList();
-        };
-        b.auth.onclick = async () => {
-            if (isLoggedIn) {
-                if (await this.ShowConfirm({
-                    title: "LOGOUT",
-                    help: "",
-                    message: "ログアウトしますか？"
-                })) {
-                    this._core.closeAll();
-                    // AppManagerのログアウトを呼ぶ
-                    $App.Logout();
-                    setTimeout(() => location.reload(), 500);
-                }
-            } else {
-                this.ShowLoginDialog();
-            }
-        };
-        b.admin.onclick = async () => {
-            // // メニューを開く前に一括取得を実行
-            // const isSuccess = await $Data.Access.GetAdminAllInfo();
-            // if (isSuccess) this.ShowAdminMenu();
-            this.ShowAdminMenu();
-        };
-        this._core.open({
-            title: "SYSTEM MENU",
-            content: el,
-            help: "システムメニュー\nシステムメニュー",
-        });
-    },
     // 【⚙️ システムメニュー】
     ShowSystemMenu() {
         const el = $Dom.GenerateTemplate('tpl-menu-sys');
@@ -178,50 +78,6 @@ export default {
         b.config.onclick  = () => this.ShowUserSettingsMenu();
         b.reports.onclick = () => this.ShowMyReportList();
         this._core.open({ title: "USER MENU", content: el });
-    },
-    // 【🗺️ データメニュー】
-    ShowDataMenu() {
-        const isLoggedIn = $App.AppData.Context.IsLoggedIn;
-        if (!isLoggedIn) return this.ShowLoginDialog();
-        const el = $Dom.GenerateTemplate('tpl-menu-data');
-        const b = {
-            archiveList: $Dom.QuerySelector('#btn-app-archive-list', el),
-            archiveInfo: $Dom.QuerySelector('#btn-app-info', el),
-            pointList:   $Dom.QuerySelector('#btn-app-point-list', el),
-            batch:       $Dom.QuerySelector('#btn-app-batch', el),
-        };
-        const mode = $App.AppData.Context.ScreenMode;
-        const isArchive = (mode === $Const.SCREEN_MODE.ARCHIVE || mode === $Const.SCREEN_MODE.ARCHIVE_PUB);
-        $Dom.ToggleShow(b.archiveInfo, isArchive);
-        b.archiveList.onclick = () => this.ShowArchiveList();
-        b.archiveInfo.onclick = () => this.ShowArchiveInfo();
-        b.pointList.onclick = () => (mode === $Const.SCREEN_MODE.SEARCH) ? this.ShowDetailsSearchResult() : this.ShowDetailsTimeLine();
-        b.batch.onclick = () => this.ShowMultiSelectTimeline();
-        this._core.open({ title: "DATA MENU", content: el });
-    },
-    // 【⋯ アクションメニュー】
-    ShowActionMenu() {
-        const el = $Dom.GenerateTemplate('tpl-menu-action');
-        const isLoggedIn = $App.AppData.Context.IsLoggedIn;
-        const b = {
-            reload:  $Dom.QuerySelector('#btn-app-reload', el),
-            current: $Dom.QuerySelector('#btn-app-current', el),
-            restore: $Dom.QuerySelector('#btn-app-restore', el),
-            search:  $Dom.QuerySelector('#btn-app-search', el),
-            point:   $Dom.QuerySelector('#btn-app-point-search', el),
-            create:  $Dom.QuerySelector('#btn-app-create', el),
-        };
-        const mode = $App.AppData.Context.ScreenMode;
-        $Dom.ToggleShow(b.search, isLoggedIn && mode !== $Const.SCREEN_MODE.SEARCH);
-        $Dom.ToggleShow(b.point, mode === $Const.SCREEN_MODE.SEARCH);
-        $Dom.ToggleShow(b.create, isLoggedIn && mode !== $Const.SCREEN_MODE.CREATE);
-        b.reload.onclick = () => { this._core.close(); $App.RefreshScreen(); };
-        b.current.onclick = () => { this._core.close(); $Marker.RefreshCurrentLocation(); $Marker.FocusToLocationMarker(1000); };
-        b.restore.onclick = () => { this._core.close(); $Marker.RestoreMarkers(); };
-        b.search.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH; $App.RefreshScreen(); };
-        b.point.onclick = () => this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18));
-        b.create.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; $App.RefreshScreen(); };
-        this._core.open({ title: "ACTIONS", content: el });
     },
     // （ユーザ設定）ユーザー設定メニュー（第2階層）
     ShowUserSettingsMenu() {
@@ -505,6 +361,8 @@ export default {
             $Dom.QuerySelector('#view-profile-nickname', el).textContent = pName;
             $Dom.QuerySelector('#view-profile-description', el).textContent = pDesc;
             const viewLinks = $Dom.QuerySelector('#view-profile-links', el);
+            // 【重要】追加前に既存のボタンをすべて削除してリセットする
+            viewLinks.innerHTML = '';
             // 項目名と値のペアで定義し、入力があるもののみループ
             [
                 { val: pL1, key: "link_1" },
@@ -609,6 +467,8 @@ export default {
                             $Notice.Info("プロフィールを更新しました");
                             this._core.close();
                             if (onUpdate) onUpdate();
+                            // 下段バーのアイコンを更新
+                            $BotBar.UpdateUserIcon();
                         })
                     }
                 ]

@@ -334,11 +334,11 @@ public class ClickCountData
 }
 
 /// <summary>
-/// クリックキューテーブル (tmp_click_queue) のエンティティ
+/// クリックキューテーブル (tmp_count_queue) のエンティティ
 /// </summary>
-public class TClickQueue
+public class TCountQueue
 {
-    public ClickTargetType target_type { get; set; }
+    public CountTargetType target_type { get; set; }
     public Guid target_user_id { get; set; }
     public int? archive_id { get; set; }
     public long? seq { get; set; }

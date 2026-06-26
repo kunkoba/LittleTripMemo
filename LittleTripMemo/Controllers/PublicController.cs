@@ -22,7 +22,7 @@ public class PublicController(
     UpdateArchivePubService updateArchivePubService,
     UpdateDetailPubService updateDetailPubService,
     BulkSyncReactionService bulkSyncReactionService,
-    AddClickQueueService addClickQueueService
+    AddCountQueueService addClickQueueService
 ) : _BaseController(userContext)
 {
     #region "未ログイン・ゲスト可"
@@ -44,7 +44,7 @@ public class PublicController(
     /// </summary>
     [AllowAnonymous]
     [HttpPost("AddClick")]
-    public async Task<IActionResult> AddClick([FromBody] AddClickQueueService.AddClickReq req)
+    public async Task<IActionResult> AddClick([FromBody] AddCountQueueService.AddCountReq req)
         => OkWithBase(await addClickQueueService.ExecuteAsync(req));
 
     #endregion
