@@ -44,116 +44,6 @@ const _DialogCore = {
         return frame;
     },
     // ダイアログ画面の構築
-    create_2({ title = "", content = "", buttons = [], headerButtons = [], 
-            help = null, onClose = null, theme = null, isFooterFixed = true, isModal = false, size = null }) {
-        const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
-        const frameBg = $Dom.QuerySelector(".pointer-events-auto", frame);
-        frame._isModal = isModal; // フラグ保持
-        const titleEl = $Dom.QuerySelector("#dialog-title", frame);
-        const contentEl = $Dom.QuerySelector("#dialog-content", frame);
-        const headerActions = $Dom.QuerySelector("#dialog-header-actions", frame);
-        const btnContainer = $Dom.QuerySelector("#dialog-button-container", frame);
-        // --- 【追加】サイズ（高さ）の制御 ---
-        if (size === 'lg') {
-            frameBg.classList.remove("max-h-[70vh]", "min-h-[40vh]");
-            frameBg.classList.add("h-[70vh]"); // 最大固定
-        } else if (size === 'md') {
-            frameBg.classList.remove("max-h-[70vh]", "min-h-[40vh]");
-            frameBg.classList.add("h-[50vh]"); // 中間固定
-        } else {
-            // frameBg.classList.add("max-h-[70vh]", "min-h-[20vh]"); // 可変（最小20vhに変更）
-        }
-        titleEl.textContent = title;
-        // --- ヘルプ・ヘッダーボタン（上段）の構築 ---
-        headerActions.innerHTML = ""; // 一旦クリア
-        // 【追加】help 引数がある場合、ヘルプボタンを先頭に追加
-        if (help) {
-            const btnHelp = document.createElement("button");
-            btnHelp.className = `${this.HEADER_BTN_CLASS} text-brand-5 font-black`;
-            btnHelp.textContent = "?";
-            btnHelp.onclick = () => {
-                document.getElementById('ui-help-dialog-body').textContent = help;
-                document.getElementById('ui-help-dialog').classList.remove('hidden');
-            };
-            headerActions.appendChild(btnHelp);
-        }
-        // 引数のカスタムボタンを追加
-        if (headerButtons && headerButtons.length > 0) {
-            headerButtons.forEach(btnDef => {
-                const btn = document.createElement("button");
-                btn.className = this.HEADER_BTN_CLASS;
-                btn.innerHTML = btnDef.label;
-                if (btnDef.id) btn.id = btnDef.id;
-                btn.onclick = () => { if (btnDef.handler) btnDef.handler(); };
-                headerActions.appendChild(btn);
-            });
-        }
-        // ------------------------------------------
-        if (content instanceof HTMLElement) {
-            contentEl.innerHTML = "";
-            contentEl.appendChild(content);
-        } else {
-            contentEl.innerHTML = content || "";
-        }
-        // 通報用レイアウト
-        if (theme && theme === "black") {
-            const frameBg = $Dom.QuerySelector(".pointer-events-auto", frame);
-            const titleBar = $Dom.QuerySelector("#dialog-title-bar", frame);
-            const titleText = $Dom.QuerySelector("#dialog-title", frame);
-            // 外枠から角丸と色を外し、黒い直線的な枠にする
-            frameBg.classList.remove("rounded-[1rem]", "border-brand-5", "bg-brand-0");
-            frameBg.classList.add("rounded-none", "border-black", "bg-white");
-            // ヘッダーを黒ベース＋赤文字にする
-            titleBar.classList.remove("bg-brand-1");
-            titleBar.classList.add("bg-black");
-            titleText.classList.remove("text-brand-5");
-            titleText.classList.add("text-red-500");
-            // ボタンエリアの背景も白（角丸なし）に
-            btnContainer.classList.remove("bg-brand-1");
-            btnContainer.classList.add("bg-white", "border-t", "border-slate-300");
-        }
-        // フッター
-        if (buttons && buttons.length > 0) {
-            // isFooterFixed が false の場合は、スクロール領域(contentEl)の末尾にボタンを置く
-            const targetContainer = (isFooterFixed === false) ? contentEl : btnContainer;
-            buttons.forEach(rowDef => {
-                const isArray = Array.isArray(rowDef);
-                const items = isArray ? rowDef : (rowDef.items || [rowDef]);
-                const rowDiv = document.createElement("div");
-                // isFooterFixed が false（埋め込み）の時だけ mt-4 を追加
-                rowDiv.className = "w-full flex gap-3 " + (isFooterFixed === false ? "my-4" : "");
-                if (!isArray && rowDef.rowId) rowDiv.id = rowDef.rowId;
-                if (!isArray && rowDef.isHidden) rowDiv.classList.add("hidden");
-                const sizeClass = items.length > 1 ? "flex-1" : "w-full";
-                items.forEach(btnDef => {
-                    const btn = document.createElement("button");
-                    btn.className = `${this.FOOTER_BTN_BASE} ${sizeClass} ${this.FOOTER_BTN_DEFAULT} ${btnDef.className}`;
-                    btn.textContent = btnDef.label;
-                    if (btnDef.id) btn.id = btnDef.id;
-                    if (btnDef.isHidden) btn.classList.add("hidden");
-                    btn.onclick = () => {
-                        if (btnDef.handler) btnDef.handler();
-                    };
-                    rowDiv.appendChild(btn);
-                });
-                targetContainer.appendChild(rowDiv);
-            });
-            if (isFooterFixed !== false) {
-                btnContainer.classList.remove("hidden");
-            }
-        }
-        frame._onClose = onClose;
-        // モーダルでない場合のみ「X」ボタンを追加
-        if (!isModal) { 
-            const btnCloseX = document.createElement("button");
-            btnCloseX.className = `${this.HEADER_BTN_CLASS} text-[0.8rem]`;
-            btnCloseX.textContent = "✖";
-            btnCloseX.onclick = () => this.close();
-            headerActions.appendChild(btnCloseX);
-        }
-        return frame;
-    },
-    // ダイアログ画面の構築
     create({ title = "", content = "", buttons = [], headerButtons = [], 
         help = null, onClose = null, theme = null, isFooterFixed = true, isModal = false, size = null }) {
         const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
@@ -170,7 +60,8 @@ const _DialogCore = {
                 frame:  ['bg-white', 'border-4', 'border-red-600', 'rounded-none'],
                 header: ['bg-slate-800'],
                 title:  ['text-white'],
-                footer: ['bg-slate-50', 'border-t-2', 'border-red-600']
+                // footer: ['bg-slate-50', 'border-t-2', 'border-red-600']
+                footer: ['bg-slate-50']
             },
             report: {
                 frame:  ['bg-white', 'border-2', 'border-black', 'rounded-none'],
@@ -358,7 +249,7 @@ const DialogController = {
             div.className = "w-full p-4 space-y-3";
             if (message) {
                 const msg = document.createElement('p');
-                msg.className = "text-[0.85rem] font-bold text-slate-600";
+                msg.className = "text-[0.8rem] font-bold text-slate-600";
                 msg.textContent = message;
                 div.appendChild(msg);
             }

@@ -470,7 +470,7 @@ export default {
             const btnClose = $Dom.QuerySelector('#btn-status-close', el);
             const btnOpen = $Dom.QuerySelector('#btn-status-open', el);
             // スタイル定義（通常時 vs 現在地）
-            // const styleBase = "flex-1 h-11 font-black text-[0.75rem] rounded-[0.5rem] tracking-wider outline-none";
+            // const styleBase = "flex-1 h-11 font-black text-[0.8rem] rounded-[0.5rem] tracking-wider outline-none";
             const styleActive = ` bg-white text-slate-600 shadow-md border border-slate-200 active:scale-95 transition-all`;
             const styleCurrent = ` bg-brand-5 text-white shadow-inner border border-brand-5 cursor-default`;
             const styleDisabled = ` bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed`;
@@ -646,6 +646,7 @@ export default {
         this._core.open({
             title: "Archive info",
             content: el,
+            size: 'lg',
             help: "",
             headerButtons: headerButtons,
             buttons: dialogButtons, // 一般ユーザーはダイアログ下部フッター(buttons)は無し
@@ -890,7 +891,7 @@ export default {
         const detailsContainer = $Dom.QuerySelector('.js-details-container', el);
         const details = $Data.Store.GetDetails() || [];
         if (details.length === 0) {
-            detailsContainer.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-4">明細データがありません</div>`;
+            detailsContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-4">明細データがありません</div>`;
         } else {
             details.forEach(dtl => {
                 const child = $Dom.GenerateTemplate('tpl-archive-click-stats-item');

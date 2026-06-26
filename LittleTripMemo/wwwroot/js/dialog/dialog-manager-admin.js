@@ -40,7 +40,6 @@ export default {
                 const badge = $Dom.QuerySelector(".js-badge-status", child);
                 if (isPublic) {
                     badge.textContent = "公開中";
-                    // badge.className = "js-badge-status text-[9px] font-black px-2 py-0.5 _rounded-full uppercase tracking-wider shadow-md border border-brand-3 bg-brand-5 text-white";
                     badge.className += " border-brand-3 bg-brand-5 text-white";
                 } else if (now < fromDate) {
                     badge.textContent = "公開前";
@@ -268,7 +267,7 @@ export default {
         // 下部の通報理由リスト描画
         const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
         if (reports.length === 0) {
-            listContainer.innerHTML = `<div class="text-[0.7rem] text-slate-400 p-2">詳細データがありません</div>`;
+            listContainer.innerHTML = `<div class="text-[0.8rem] text-slate-400 p-2">詳細データがありません</div>`;
         } else {
             // 降順ソートしてからリスト化
             reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
@@ -370,7 +369,7 @@ export default {
             // リスト再描画
             listContainer.innerHTML = "";
             if (filtered.length === 0) {
-                listContainer.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-10">合致するデータはありません。</div>`;
+                listContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-10">合致するデータはありません。</div>`;
                 return;
             }
             filtered.forEach(item => {

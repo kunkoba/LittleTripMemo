@@ -287,47 +287,10 @@ const _DetailFrameCore = {
         $UI.ToggleIconBar(!isShow);
     },
     // リアクションのカウントと状態を反映する
-    async renderReactions_2(detail) {
-        if (!detail) return;
-        // --- 【追加】UIの初期化（リセット） ---
-        const btns = [this.btnReactionFunny, this.btnReactionHelpful, this.btnReactionSurprise, this.btnReactionSad];
-        btns.forEach(btn => {
-            if (!btn) return;
-            $Dom.QuerySelector('.js-count', btn).textContent = "..."; // 取得中表示
-            btn.classList.remove('text-brand-5', 'border-brand-3', 'bg-brand-1', 'shadow-brand');
-        });
-        // 1. ローカルDBから自分のリアクション状態を取得
-        const myLocal = await $LocalDb.Reaction.Get(detail.archive_id, detail.seq) || {};
-        // 2. サーバー数値 + ローカルフラグ を加算
-        const counts = {
-            funny:    (detail.count_funny || 0)    + (myLocal.is_funny ? 1 : 0),
-            love:  (detail.count_love || 0)  + (myLocal.is_love ? 1 : 0),
-            surprise: (detail.count_surprise || 0) + (myLocal.is_surprise ? 1 : 0),
-            sad:  (detail.count_sad || 0)  + (myLocal.is_sad ? 1 : 0)
-        };
-        // 3. UIに数値を反映
-        if (this.btnReactionFunny)    $Dom.QuerySelector('.js-count', this.btnReactionFunny).textContent = counts.funny;
-        if (this.btnReactionHelpful)  $Dom.QuerySelector('.js-count', this.btnReactionHelpful).textContent = counts.love;
-        if (this.btnReactionSurprise) $Dom.QuerySelector('.js-count', this.btnReactionSurprise).textContent = counts.surprise;
-        if (this.btnReactionSad)  $Dom.QuerySelector('.js-count', this.btnReactionSad).textContent = counts.sad;
-        // 4. 自分の状態を反映
-        const states = [
-            { el: this.btnReactionFunny,    active: myLocal.is_funny },
-            { el: this.btnReactionHelpful,  active: myLocal.is_love },
-            { el: this.btnReactionSurprise, active: myLocal.is_surprise },
-            { el: this.btnReactionSad,  active: myLocal.is_sad }
-        ];
-        states.forEach(item => {
-            if (!item.el) return;
-            if (item.active) {
-                item.el.classList.add('text-brand-5', 'border-brand-3', 'bg-brand-1', 'shadow-brand');
-            }
-        });
-    },
     async renderReactions(detail) {
         if (!detail) return;
         const myLocal = await $LocalDb.Reaction.Get(detail.archive_id, detail.seq) || {};
-        Object.values($Const.REACTION_TYPE).forEach(type => {            
+        Object.values($Const.REACTION_TYPE).forEach(type => {
             const btn = this.reactionButtons[type.id];
             if (!btn) return;
             // 2. 集計ロジック：
@@ -350,33 +313,6 @@ const _DetailFrameCore = {
         });
     },
     // リアクションボタンクリック
-    async _onReactionClick_2(propName, unusedType) {
-        // 未ログイン時はダイアログを出して処理を中断
-        if (!$App.AppData.Context.IsLoggedIn) {
-            $Dialog.ShowLoginDialog();
-            return;
-        }
-        const detail = $DetailContent.GetFormEditData();
-        if (!detail || !detail.archive_id) return;
-        // 1. 自分のまとめの場合は何もしない
-        if (detail.is_owner) return;
-        // 2. 現在のローカル状態を取得
-        let myLocal = await $LocalDb.Reaction.Get(detail.archive_id, detail.seq);
-        if (!myLocal) {
-            myLocal = {
-                archive_id: Number(detail.archive_id),
-                seq: Number(detail.seq),
-                is_funny: false, is_love: false, is_surprise: false, is_sad: false
-            };
-        }
-        // 3. 押されたボタンに対応するフラグを反転
-        myLocal[propName] = !myLocal[propName];
-        // 4. 送信フラグを 0 (未送信) に設定
-        myLocal.send_flag = 0;
-        // 5. ローカルDBへ保存 ＆ UIを即座に再描画
-        await $LocalDb.Reaction.Save(myLocal);
-        await this.renderReactions(detail);
-    },
     async _onReactionClick(type) {
         const detail = $DetailContent.GetFormEditData();
         if (!detail || !detail.archive_id) return;

@@ -298,44 +298,6 @@ const LocalDbController = {
             const all = await _LocalDbCore.getAllData(this.storeName);
             return all.filter(item => item.user_id === uid && item.send_flag === 0);
         },
-        // サーバーからの生データ（1リアクション＝1レコード）を受け取り、ローカルDBに同期する
-        async ParseAndSaveMyReactions_2(archiveId, rawReactions, allDetails = []) {
-            if (!archiveId) return;
-            const targetArchiveId = Number(archiveId);
-            const uid = getUserId();
-            // 1. ローカルの未送信(send_flag === 0)を保護（既存ロジック）
-            const unsentList = await this.GetUnsentAll();
-            const unsentSeqs = unsentList
-                .filter(r => r.archive_id === targetArchiveId)
-                .map(r => r.seq);
-            // 2. サーバーからのリアクションを集約
-            const aggregated = {};
-            rawReactions.forEach(raw => {
-                const seq = Number(raw.seq);
-                if (!aggregated[seq]) {
-                    aggregated[seq] = this._createEmptyReaction(targetArchiveId, seq, 1); // 1=同期済み
-                }
-                // 各フラグを反映
-                if (raw.reaction_type === 1) aggregated[seq].is_funny = true;
-                if (raw.reaction_type === 2) aggregated[seq].is_love = true;
-                if (raw.reaction_type === 3) aggregated[seq].is_surprise = true;
-                if (raw.reaction_type === 4) aggregated[seq].is_sad = true;
-            });
-            // 3. 明細(allDetails)をループして、不足しているseqに空のレコードを作る
-            allDetails.forEach(detail => {
-                const seq = Number(detail.seq);
-                if (!aggregated[seq]) {
-                    // サーバーにリアクションがなかった明細にも空枠を作成
-                    aggregated[seq] = this._createEmptyReaction(targetArchiveId, seq, 1);
-                }
-            });
-            // 4. 未送信(send_flag=0)以外のものを一括保存
-            const promises = Object.values(aggregated).map(data => {
-                if (unsentSeqs.includes(data.seq)) return Promise.resolve();
-                return this.Save(data);
-            });
-            await Promise.all(promises);
-        },
         // local-db-controller.js -> Reaction.ParseAndSaveMyReactions を改修
         async ParseAndSaveMyReactions(archiveId, rawReactions, allDetails = []) {
             if (!archiveId) return;

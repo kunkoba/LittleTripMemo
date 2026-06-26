@@ -37,7 +37,7 @@ export default {
         $Dom.QuerySelector(".js-avg-score", el).textContent = scoreAvg.toFixed(1);
         $Dom.QuerySelector(".js-avg-stars", el).textContent = "★".repeat(Math.round(scoreAvg)) + "☆".repeat(5 - Math.round(scoreAvg));
         if (feedbackList.length === 0) {
-            container.innerHTML = `<div class="text-center text-[0.7rem] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
+            container.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
         } else {
             feedbackList.forEach(rev => {
                 const child = $Dom.GenerateTemplate("tpl-list-child-review");

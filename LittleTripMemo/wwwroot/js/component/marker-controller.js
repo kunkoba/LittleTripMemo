@@ -278,10 +278,6 @@ const MarkerController = {
         });
     },
     // 画面モード変更時
-    ChangeScreenMode_2(){
-		this.RefreshPointMarker();
-	},
-    // 画面モード変更時
     ChangeScreenMode(){
         switch ($App.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:

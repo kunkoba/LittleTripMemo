@@ -123,7 +123,7 @@ const UI_Manager = {
 			} else {
 				el.classList.add('gap-4');
 				$Dom.QuerySelector(".js-main-text", el).classList.add('text-[1rem]');
-				$Dom.QuerySelector(".js-time-text", el).classList.add('text-[0.9rem]');
+				$Dom.QuerySelector(".js-time-text", el).classList.add('text-[0.8rem]');
 				const badge = $Dom.QuerySelector(".js-day-badge", el);
 				badge.classList.add('w-16', 'h-8', 'text-[0.8rem]'); // テンプレート側のサイズクラスを上書き
 			}

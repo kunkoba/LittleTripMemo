@@ -321,8 +321,6 @@ const AppManager = {
         $UI.ChangeScreenMode();
         // マーカー更新
         $Marker.ChangeScreenMode();
-        // // 不要になったらクリア
-        // this.AppData.Context.TargetArchiveId = 0;
     },
     // サーバエラー処理
     async HandleServerFailure(response) {
@@ -340,8 +338,6 @@ const AppManager = {
                 const serverErr = await response.json();
                 console.error("serverErr:", serverErr);
                 const err = new Error(serverErr.message);
-                // if (serverErr.errorCode) err.errorCode = serverErr.errorCode
-                // if (serverErr.debugInfo) err.debugInfo = serverErr.debugInfo
                 throw err;
             }
         } else {
