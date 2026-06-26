@@ -157,8 +157,9 @@ export default {
             $Dom.ToggleShow(urlWrapper, true);
             urlWrapper.innerHTML = "";
             // システム通知の場合はトラッキング不要（paramsなし）
-            const btn = $UI.Generator.LinkButton(notice.link_url);
-            if (btn) urlWrapper.appendChild(btn);
+            // const btn = $UI.Generator.LinkButton(notice.link_url);
+            // if (btn) urlWrapper.appendChild(btn);
+            $UI.Generator.LinkButton(urlWrapper, notice.link_url);
         } else {
             $Dom.ToggleShow(urlWrapper, false);
         }

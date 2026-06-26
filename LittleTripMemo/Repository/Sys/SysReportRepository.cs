@@ -52,21 +52,29 @@ public class SysReportRepository : _BaseRepository
     /// <param name="minCount">抽出対象とする最小通報件数</param>
     public async Task<IEnumerable<DtoReportSummary>> GetReportSummaryAsync()
     {
-        const string sql = @"
-        SELECT 
-            r.target_user_id, 
-            r.archive_id, 
-            a.title AS archive_title, 
-            COUNT(1) AS report_count
-        FROM t_sys_reports r
-        INNER JOIN t_memo_archive_pub a 
-            ON r.archive_id = a.archive_id
-        GROUP BY 
-            r.target_user_id, 
-            r.archive_id, 
-            a.title
-        ORDER BY report_count DESC
-        LIMIT 100";
+        // 1. t_sys_reports を起点に集計
+        // 2. t_memo_archive_pub を LEFT JOIN して現在の状態を取得
+        // 3. title が NULL の場合は、既に公開停止（物理削除）されたものとして扱う
+        const string sql = """
+            SELECT 
+                r.target_user_id, 
+                r.archive_id, 
+                COALESCE(a.title, '（公開停止済みデータ）') AS archive_title, 
+                COUNT(1) AS report_count,
+                COALESCE(a.closed_flg, true) AS is_closed,
+                COALESCE(a.del_flg, true) AS is_deleted
+            FROM t_sys_reports r
+            LEFT JOIN t_memo_archive_pub a 
+                ON r.archive_id = a.archive_id
+            GROUP BY 
+                r.target_user_id, 
+                r.archive_id, 
+                a.title,
+                a.closed_flg,
+                a.del_flg
+            ORDER BY report_count DESC
+            LIMIT 100
+            """;
 
         return await QueryAsync<DtoReportSummary>(sql);
     }

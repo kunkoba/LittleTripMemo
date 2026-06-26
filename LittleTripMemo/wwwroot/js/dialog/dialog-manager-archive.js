@@ -459,18 +459,16 @@ export default {
         const archive = $Data.Store.GetArchive();
         const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.plan === "Admin";
         const el = $Dom.GenerateTemplate('tpl-view-archive');
+        // 描画処理
         const renderView = () => {
             const currentArchive = $Data.Store.GetArchive();
-            // ==========================================
             // ▼ ステータスボタンの表示・スタイル切替
-            // ==========================================
             const statusBar = $Dom.QuerySelector('#archive-status-bar', el);
             const btnMemo = $Dom.QuerySelector('#btn-status-memo', el);
             const btnPrivate = $Dom.QuerySelector('#btn-status-private', el);
             const btnClose = $Dom.QuerySelector('#btn-status-close', el);
             const btnOpen = $Dom.QuerySelector('#btn-status-open', el);
             // スタイル定義（通常時 vs 現在地）
-            // const styleBase = "flex-1 h-11 font-black text-[0.8rem] rounded-[0.5rem] tracking-wider outline-none";
             const styleActive = ` bg-white text-slate-600 shadow-md border border-slate-200 active:scale-95 transition-all`;
             const styleCurrent = ` bg-brand-5 text-white shadow-inner border border-brand-5 cursor-default`;
             const styleDisabled = ` bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed`;
@@ -539,8 +537,9 @@ export default {
                     item_name: "link_url"
                 };
                 // ジェネレータでボタンを生成（第3引数に is_owner を渡す）
-                const btn = $UI.Generator.LinkButton(currentArchive.link_url, params, currentArchive.is_owner);
-                if (btn) urlWrapper.appendChild(btn);
+                // const btn = $UI.Generator.LinkButton(currentArchive.link_url, params, currentArchive.is_owner);
+                // if (btn) urlWrapper.appendChild(btn);
+                $UI.Generator.LinkButton(urlWrapper, currentArchive.link_url, params, currentArchive.is_owner);
             } else {
                 $Dom.ToggleShow(urlWrapper, false);
             }
@@ -576,21 +575,26 @@ export default {
         renderView();
         // --- ユーザー情報の表示設定（Generatorによる部品注入へ置換） ---
         const userWrapper = $Dom.QuerySelector('#view-mem-user-wrapper', el);
-        userWrapper.innerHTML = ""; // コンテナをクリア
         const profile = $Data.Store.GetUserProfile();
         if (profile) {
             // ジェネレータでプロフィールボタンを生成して追加
-            const userBtn = $UI.Generator.UserBadge(profile, { type: 'button', isOwner: archive.is_owner });
-            if (userBtn) userWrapper.appendChild(userBtn);
+            $UI.Generator.UserBadge(userWrapper, profile, { type: 'button', isOwner: archive.is_owner });
         } else {
             $Dom.ToggleShow(userWrapper, false);
         }
+        // QRコードのプリロード（事前ダウンロード）
+        const baseUrl = window.location.origin + window.location.pathname;
+        const encodedId = $Util.EncodeId(archive.archive_id);
+        const shareUrl = `${baseUrl}?mode=archive_pub&encodedId=${encodedId}`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`;
+        const imgPreload = new Image();
+        imgPreload.src = qrUrl;     // このタイミングでプリロード開始
         // --- ヘッダーボタンの定義 ---
         const headerButtons = [];
         if (archive.is_public && !archive.closed_flg) {
             headerButtons.push({
                 label: "🔗",
-                handler: () => this.ShowShareArchive(archive, profile)
+                handler: () => this.ShowShareArchive(archive, profile, qrUrl)
             });
         }
         if (archive.is_owner) {
@@ -610,39 +614,6 @@ export default {
             });
         }
         const dialogButtons = [];
-        // // --- 管理者専用ボタン ---
-        // if (isAdmin && archive.is_public && !archive.is_owner) {
-        //     if (!archive.closed_flg) {
-        //         dialogButtons.push([{
-        //             label: "【ADMIN】強制 Close",
-        //             className: "bg-red-500 text-white shadow-md",
-        //             handler: async () => {
-        //                 const isOk = await this.ShowConfirm({ title: "ADMIN: CLOSE", help: "", message: "【注意】\n強制的にClose状態にしますか？" });
-        //                 if (!isOk) return;
-        //                 const isSuccess = await $Data.Access.AdminCloseArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
-        //                 if (!isSuccess) return;
-        //                 $Notice.Info("強制的にCloseしました");
-        //                 this._core.closeAll();
-        //                 $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-        //                 await $App.RefreshScreen();
-        //             }
-        //         }]);
-        //     }
-        //     dialogButtons.push([{
-        //         label: "【ADMIN】強制 Privateに戻す",
-        //         className: "bg-white text-red-600 border-2 border-red-500 shadow-sm",
-        //         handler: async () => {
-        //             const isOk = await this.ShowConfirm({ title: "ADMIN: UNPUBLISH", help: "", message: "【警告】\n強制的にPrivate(公開停止)に戻しますか？" });
-        //             if (!isOk) return;
-        //             const isSuccess = await $Data.Access.AdminUnpublishArchive({ archive_id: archive.archive_id, target_user_id: archive.user_id });
-        //             if (!isSuccess) return;
-        //             $Notice.Info("強制的にPrivateに戻しました");
-        //             this._core.closeAll();
-        //             $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-        //             await $App.RefreshScreen();
-        //         }
-        //     }]);
-        // }
         this._core.open({
             title: "Archive info",
             content: el,
@@ -650,6 +621,29 @@ export default {
             help: "",
             headerButtons: headerButtons,
             buttons: dialogButtons, // 一般ユーザーはダイアログ下部フッター(buttons)は無し
+        });
+    },
+    // URL公開画面
+    ShowShareArchive(archive, profile, shareUrl) {
+        const el = $Dom.GenerateTemplate('tpl-share-archive');
+        // 1. タイトルの反映
+        $Dom.QuerySelector('#share-archive-title', el).textContent = archive.title || "No Title";
+        // 3. QRコードの生成 (無料APIを利用)
+        const qrImg = $Dom.QuerySelector('#share-qr-image', el);
+        qrImg.src = shareUrl;
+        // 4. コピー処理 (ボタンをクリックでコピー)
+        $Dom.QuerySelector('#btn-share-copy', el).onclick = () => {
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                $Notice.Info("URLをクリップボードにコピーしました！");
+            }).catch(err => {
+                $Notice.Error("コピーに失敗しました");
+            });
+        };
+        this._core.open({
+            title: "SHARE ARCHIVE",
+            content: el,
+            help: "",
+            buttons: [] // CLOSEボタンは右上の✖で代用し、下部はコピーボタンのみにする
         });
     },
     // 状態変更専用ダイアログ
@@ -828,33 +822,6 @@ export default {
                     }
                 ]
             ]
-        });
-    },
-    // URL公開画面
-    ShowShareArchive(archive, profile) {
-        const el = $Dom.GenerateTemplate('tpl-share-archive');
-        // 1. タイトルの反映
-        $Dom.QuerySelector('#share-archive-title', el).textContent = archive.title || "No Title";
-        // 2. URLの生成 (現在のドメイン + パラメータ)
-        const baseUrl = window.location.origin + window.location.pathname;
-        const encodedId = $Util.EncodeId(archive.archive_id);
-        const shareUrl = `${baseUrl}?mode=archive_pub&encodedId=${encodedId}`;
-        // 3. QRコードの生成 (無料APIを利用)
-        const qrImg = $Dom.QuerySelector('#share-qr-image', el);
-        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`;
-        // 4. コピー処理 (ボタンをクリックでコピー)
-        $Dom.QuerySelector('#btn-share-copy', el).onclick = () => {
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                $Notice.Info("URLをクリップボードにコピーしました！");
-            }).catch(err => {
-                $Notice.Error("コピーに失敗しました");
-            });
-        };
-        this._core.open({
-            title: "SHARE ARCHIVE",
-            content: el,
-            help: "",
-            buttons: [] // CLOSEボタンは右上の✖で代用し、下部はコピーボタンのみにする
         });
     },
     // アーカイブと明細のクリック集計画面の表示

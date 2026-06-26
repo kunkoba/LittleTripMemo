@@ -192,6 +192,12 @@ export default {
                 $Dom.QuerySelector(".js-target-user", child).textContent = `Target: ${item.target_user_name || item.target_user_id}`;
                 $Dom.QuerySelector(".js-archive-title", child).textContent = item.archive_title || "Unknown Title";
                 $Dom.QuerySelector(".js-badge-count", child).textContent = `${item.report_count}`;
+                // 生存状態の表示
+                if (item.is_deleted) {
+                    $Dom.ToggleShow($Dom.QuerySelector(".js-badge-deleted", child), true);
+                } else if (item.is_closed) {
+                    $Dom.ToggleShow($Dom.QuerySelector(".js-badge-closed", child), true);
+                }
                 child.onclick = () => this.ShowAdminReportDetail(item);
                 root.appendChild(child);
             });
@@ -216,54 +222,79 @@ export default {
         const reports = $Data.resData.reports || [];
         const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
         // アーカイブタイトルの反映
-        $Dom.QuerySelector(".js-archive-title", el).textContent = summaryItem.archive_title || "Unknown Title";
+        // $Dom.QuerySelector(".js-archive-title", el).textContent = summaryItem.archive_title || "Unknown Title";
+        const titleEl = $Dom.QuerySelector(".js-archive-title", el);
+        if (summaryItem.is_deleted) {
+            titleEl.textContent = `${summaryItem.archive_title || "Unknown Title"} (DELETED)`;
+            titleEl.classList.add("text-slate-400", "line-through"); // 灰色・取り消し線
+        } else if (summaryItem.is_closed) {
+            titleEl.textContent = `${summaryItem.archive_title || "Unknown Title"} (CLOSED)`;
+            titleEl.classList.add("text-red-400"); // 警告色
+        } else {
+            titleEl.textContent = summaryItem.archive_title || "Unknown Title";
+        }
         // --- ターゲットユーザーボタンの設定 ---
         const userWrapper = $Dom.QuerySelector("#view-report-target-user-wrapper", el);
         userWrapper.innerHTML = "";
         const profile = $Data.resData.target_userProfile;
         if (profile) {
-            const userBtn = $UI.Generator.UserBadge(profile, { type: 'button', isOwner: false });
-            if (userBtn) userWrapper.appendChild(userBtn);
+            $UI.Generator.UserBadge(userWrapper, profile, { type: 'button', isOwner: false });
         }
         // 1. 各種ボタンの取得
         const btnOpen    = $Dom.QuerySelector("#btn-admin-report-open", el);
         const btnClose   = $Dom.QuerySelector("#btn-admin-report-close", el);
         const btnPrivate = $Dom.QuerySelector("#btn-admin-report-private", el);
-        // 2. Open（まとめを開く）
-        btnOpen.onclick = async () => {
-            const isOk = await this.ShowConfirm({ title: "JUMP", message: "この Public まとめデータを開きますか？" });
-            if (!isOk) return;
-            this._core.closeAll();
-            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
-            $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
-            await $App.RefreshScreen();
-        };
-        // 3. Close（強制クローズ：URLを知っている人だけ見れる状態へ）
-        btnClose.onclick = async () => {
-            const isOk = await this.ShowConfirm({ title: "FORCE CLOSE", message: "強制的に公開停止(Close)にしますか？" });
-            if (!isOk) return;
-            const isSuccess = await $Data.Access.AdminCloseArchive({ 
-                archive_id: summaryItem.archive_id, 
-                target_user_id: summaryItem.target_user_id 
+        // ▼ 修正：状態に基づいたボタンの活性化・非活性化
+        if (summaryItem.is_deleted) {
+            // DELETED(削除済み)の場合は全ボタン非活性
+            [btnOpen, btnClose, btnPrivate].forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add("opacity-50", "cursor-not-allowed", "grayscale");
+                btn.classList.remove("active:scale-95");
             });
-            if (isSuccess) {
-                $Notice.Info("強制的にCloseしました");
-                this._core.closeAll();
+        } else {
+            if (summaryItem.is_closed) {
+                // CLOSED中の場合はCloseボタンのみ非活性
+                btnClose.disabled = true;
+                btnClose.classList.add("opacity-50", "cursor-not-allowed", "grayscale");
+                btnClose.classList.remove("active:scale-95");
             }
-        };
-        // 4. Delete（強制Private：本人以外一切見れない状態へ戻す）
-        btnPrivate.onclick = async () => {
-            const isOk = await this.ShowConfirm({ title: "FORCE PRIVATE", message: "強制的に非公開(Private)に戻しますか？" });
-            if (!isOk) return;
-            const isSuccess = await $Data.Access.AdminUnpublishArchive({ 
-                archive_id: summaryItem.archive_id, 
-                target_user_id: summaryItem.target_user_id 
-            });
-            if (isSuccess) {
-                $Notice.Info("非公開に戻しました");
+            // 2. Open（まとめを開く）
+            btnOpen.onclick = async () => {
+                const isOk = await this.ShowConfirm({ title: "JUMP", message: "この Public まとめデータを開きますか？" });
+                if (!isOk) return;
                 this._core.closeAll();
-            }
-        };
+                $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+                $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
+                await $App.RefreshScreen();
+            };
+            // 3. Close（強制クローズ：URLを知っている人だけ見れる状態へ）
+            btnClose.onclick = async () => {
+                const isOk = await this.ShowConfirm({ title: "FORCE CLOSE", message: "強制的に公開停止(Close)にしますか？" });
+                if (!isOk) return;
+                const isSuccess = await $Data.Access.AdminCloseArchive({ 
+                    archive_id: summaryItem.archive_id, 
+                    target_user_id: summaryItem.target_user_id 
+                });
+                if (isSuccess) {
+                    $Notice.Info("強制的にCloseしました");
+                    this._core.closeAll();
+                }
+            };
+            // 4. Delete（強制Private：本人以外一切見れない状態へ戻す）
+            btnPrivate.onclick = async () => {
+                const isOk = await this.ShowConfirm({ title: "FORCE PRIVATE", message: "強制的に非公開(Private)に戻しますか？" });
+                if (!isOk) return;
+                const isSuccess = await $Data.Access.AdminUnpublishArchive({ 
+                    archive_id: summaryItem.archive_id, 
+                    target_user_id: summaryItem.target_user_id 
+                });
+                if (isSuccess) {
+                    $Notice.Info("非公開に戻しました");
+                    this._core.closeAll();
+                }
+            };
+        }
         // 下部の通報理由リスト描画
         const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
         if (reports.length === 0) {
@@ -293,16 +324,21 @@ export default {
         // 1. 日時と本文の反映
         $Dom.QuerySelector(".js-report-tim", el).textContent = $Util.FormatDate(rep.report_tim);
         $Dom.QuerySelector(".js-report-body", el).textContent = rep.body || "（内容なし）";
-        // ▼ 修正：共通のUIジェネレータでボタンを生成して追加
-        // （※通報者のIDは reporter_user_id というプロパティ名に注意）
+        // 共通のUIジェネレータでボタンを生成して追加
         const userWrapper = $Dom.QuerySelector("#view-report-user-wrapper", el);
-        userWrapper.innerHTML = "";
-        const userBtn = $UI.Generator.UserBadge({
+        // userWrapper.innerHTML = "";
+        // const userBtn = $UI.Generator.UserBadge({
+        //     icon: rep.icon,
+        //     nick_name: rep.nick_name,
+        //     user_id: rep.reporter_user_id
+        // }, { type: 'button', isOwner: false });
+        // if (userBtn) userWrapper.appendChild(userBtn);
+        $UI.Generator.UserBadge(userWrapper, {
             icon: rep.icon,
             nick_name: rep.nick_name,
             user_id: rep.reporter_user_id
         }, { type: 'button', isOwner: false });
-        if (userBtn) userWrapper.appendChild(userBtn);
+        //
         this._core.open({
             title: "REPORT CONTENT",
             content: el,
@@ -418,19 +454,13 @@ export default {
         $Dom.QuerySelector(".js-score", el).textContent = "★".repeat(item.score) + "☆".repeat(5 - item.score);
         $Dom.QuerySelector(".js-body", el).textContent = item.body || "（内容なし）";
         // --- ユーザーボタンへの反映 ---
-        // const userIcon = $Dom.QuerySelector("#view-feedback-user-icon", el);
-        // const userName = $Dom.QuerySelector("#view-feedback-user-name", el);
-        // const btnUser = $Dom.QuerySelector("#btn-feedback-user-profile", el);
-        // userIcon.textContent = item.icon || "👤";
-        // userName.textContent = item.nick_name || "Unknown User";
         const userWrapper = $Dom.QuerySelector("#view-feedback-user-wrapper", el);
-        userWrapper.innerHTML = "";
-        const userBtn = $UI.Generator.UserBadge({
+        $UI.Generator.UserBadge(userWrapper, {
             icon: item.icon,
             nick_name: item.nick_name,
             user_id: item.user_id
         }, { type: 'button', isOwner: false });
-        if (userBtn) userWrapper.appendChild(userBtn);
+        //
         this._core.open({
             title: "FEEDBACK DETAILS",
             content: el,
@@ -444,18 +474,12 @@ export default {
         if (!profile) return $Notice.Warn("ユーザー情報が不明です");
         const el = $Dom.GenerateTemplate("tpl-admin-send-user-notification");
         // --- 1. 宛先ユーザー情報の反映 ---
-        // $Dom.QuerySelector('#admin-send-target-icon', el).textContent = profile.icon;
-        // $Dom.QuerySelector('#admin-send-target-name', el).textContent = profile.nick_name;
-        // ▼ 修正：宛先としてバッジタイプのUI部品を生成して追加
-        // （メッセージ作成中にプロフィール画面に飛ぶと不自然なので、ここは 'badge' 形式を指定します）
         const userWrapper = $Dom.QuerySelector('#admin-send-target-user-wrapper', el);
-        userWrapper.innerHTML = "";
-        const userBadge = $UI.Generator.UserBadge({
+        $UI.Generator.UserBadge(userWrapper, {
             icon: profile.icon,
             nick_name: profile.nick_name,
             user_id: profile.user_id
         }, { type: 'badge' });
-        if (userBadge) userWrapper.appendChild(userBadge);
         // --- 2. メッセージ用アイコン選択 (明細入力風) ---
         const previewEmoji = $Dom.QuerySelector('#admin-send-emoji-preview', el);
         const inputKind = $Dom.QuerySelector('#admin-send-emoji-val', el); // 内部的に ID は reuse
@@ -524,13 +548,11 @@ export default {
                 $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim);
                 // --- 宛先ユーザー表示（Generator: badgeモードを使用） ---
                 const userWrapper = $Dom.QuerySelector(".js-user-wrapper", child);
-                userWrapper.innerHTML = ""; // コンテナをクリア
-                const badge = $UI.Generator.UserBadge({
+                $UI.Generator.UserBadge(userWrapper, {
                     icon: item.icon,
                     nick_name: item.nick_name || item.user_id.slice(0, 8),
                     user_id: item.user_id
                 }, { type: 'badge' });
-                if (badge) userWrapper.appendChild(badge);
                 // 
                 const kindObj = Object.values($Const.USER_NOTICE_KIND).find(k => k.id === item.kind) || $Const.USER_NOTICE_KIND.INFO;
                 $Dom.QuerySelector(".js-emoji", child).textContent = kindObj.emoji; // リスト時
@@ -555,12 +577,11 @@ export default {
         $Dom.ToggleShow(userWrapper, true);
         $Dom.ToggleShow($Dom.QuerySelector('#view-notice-title-area', el), false);
         // --- 差出人表示（Generator: buttonモードを使用） ---
-        const userBtn = $UI.Generator.UserBadge({
+        $UI.Generator.UserBadge(userWrapper, {
             icon: item.icon,
             nick_name: item.nick_name || item.user_id.slice(0, 8),
             user_id: item.user_id
         }, { type: 'button', isOwner: false });
-        if (userBtn) userWrapper.appendChild(userBtn);
         // 右上のメール（封筒）アイコンなど
         const kindObj = Object.values($Const.USER_NOTICE_KIND).find(k => k.id === item.kind) || $Const.USER_NOTICE_KIND.INFO;
         $Dom.QuerySelector('#view-notice-icon', el).textContent = kindObj.emoji; // 詳細時

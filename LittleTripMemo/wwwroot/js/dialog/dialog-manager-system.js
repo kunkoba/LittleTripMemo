@@ -377,11 +377,12 @@ export default {
                     item_name: item.key
                 };
                 // ジェネレータでボタンを生成（第3引数は ShowUserProfile の引数 isOwner を使用）
-                const btn = $UI.Generator.LinkButton(item.val, params, isOwner);
-                if (btn) {
-                    btn.title = item.val;
-                    viewLinks.appendChild(btn);
-                }
+                // const btn = $UI.Generator.LinkButton(item.val, params, isOwner);
+                // if (btn) {
+                //     btn.title = item.val;
+                //     viewLinks.appendChild(btn);
+                // }
+                $UI.Generator.LinkButton(viewLinks, item.val, params, isOwner);
             });
         };
         renderView();
@@ -495,11 +496,10 @@ export default {
             $Dom.QuerySelector(".js-body", child).textContent = item.body;
             // --- ターゲットユーザー表示（Generator: badgeモードを使用） ---
             const targetWrapper = $Dom.QuerySelector(".js-target-wrapper", child);
-            const badge = $UI.Generator.UserBadge({
+            $UI.Generator.UserBadge(targetWrapper, {
                 nick_name: item.target_nick_name,
                 icon: item.target_icon
             }, { type: 'badge' });
-            if (badge) targetWrapper.appendChild(badge);
             // ステータスバッジの表示
             if (item.is_deleted) {
                 $Dom.ToggleShow($Dom.QuerySelector(".js-badge-deleted", child), true);
@@ -535,13 +535,11 @@ export default {
         $Dom.QuerySelector("#view-report-body", el).textContent = report.body;
         // ターゲットユーザーボタン（Generatorによる注入へ置換）
         const userWrapper = $Dom.QuerySelector("#view-report-target-user-wrapper", el);
-        userWrapper.innerHTML = "";
-        const userBtn = $UI.Generator.UserBadge({
+        $UI.Generator.UserBadge(userWrapper, {
             user_id: report.target_user_id,
             nick_name: report.target_nick_name,
             icon: report.target_icon
         }, { type: 'button', isOwner: false });
-        if (userBtn) userWrapper.appendChild(userBtn);
         // アーカイブジャンプボタン
         const btnJump = $Dom.QuerySelector("#btn-report-jump-archive", el);
         if (report.is_deleted || report.is_closed) {

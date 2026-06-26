@@ -5,32 +5,26 @@ const _BottomCore = {
 	init() {
 		if (!this.root) {
 			this.root = $Dom.GetElementById(this._elementId);
-			
 			// --- 1. 要素取得 (メニューボタン 4種) ---
 			this.btnSysMenu  = $Dom.GetElementById('btn-sys-menu');
 			this.btnUserMenu = $Dom.GetElementById('btn-user-menu');
 			this.btnDataMenu = $Dom.GetElementById('btn-data-menu');
 			this.btnAppMenu  = $Dom.GetElementById('btn-app-menu');
-
 			// --- 2. 要素取得 (動的エリア・バッジ) ---
 			this.btnCreate     = $Dom.GetElementById('btn-create');
 			this.btnSearch     = $Dom.GetElementById('btn-search');
 			this.groupMove     = $Dom.GetElementById('bot-group-move');
-			// this.badgeSysMenu  = $Dom.GetElementById('badge-sys-menu');
-
 			// --- 3. 要素取得 (移動ボタン群：既存維持) ---
 			this.btnFirst = $Dom.GetElementById('btn-bot-move-first');
 			this.btnPrev  = $Dom.GetElementById('btn-bot-move-prev');
 			this.btnOpen  = $Dom.GetElementById('btn-bot-move-open');
 			this.btnNext  = $Dom.GetElementById('btn-bot-move-next');
 			this.btnLast  = $Dom.GetElementById('btn-bot-move-last');
-
 			// --- 4. イベント登録 (4つのメニュー) ---
 			this.btnSysMenu.addEventListener('click',  () => $Dialog.ShowSystemMenu());
 			this.btnUserMenu.addEventListener('click', () => $Dialog.ShowUserMenu());
 			this.btnDataMenu.addEventListener('click', () => $Dialog.ShowDataMenu());
 			this.btnAppMenu.addEventListener('click',  () => $Dialog.ShowActionMenu());
-
 			// --- 5. イベント登録 (メインアクション・移動ボタン：既存維持) ---
 			this.btnCreate.addEventListener('click', () => {
 				$Marker.RefreshCurrentArrow();

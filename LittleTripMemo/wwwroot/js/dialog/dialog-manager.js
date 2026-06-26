@@ -57,7 +57,7 @@ const _DialogCore = {
         // --- 1. テーマ別スタイルの明示的ADD ---
         const themeConfigs = {
             admin: {
-                frame:  ['bg-white', 'border-4', 'border-red-600', 'rounded-none'],
+                frame:  ['bg-white', 'border-2', 'border-red-600', 'rounded-none'],
                 header: ['bg-slate-800'],
                 title:  ['text-white'],
                 // footer: ['bg-slate-50', 'border-t-2', 'border-red-600']

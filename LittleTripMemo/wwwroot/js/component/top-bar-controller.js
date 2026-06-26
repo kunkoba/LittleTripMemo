@@ -13,7 +13,7 @@ const _TopCore = {
                 this.sortField = $Dom.GetElementById('sort-field');
                 this.sortReaction = $Dom.GetElementById('sort-reaction');
                 this.sortWord = $Dom.GetElementById('sort-word');
-                this.btnSysMenu = $Dom.GetElementById('btn-sys-menu');
+                // this.btnSysMenu = $Dom.GetElementById('btn-sys-menu');
             }
             // イベント登録
             {
@@ -21,10 +21,10 @@ const _TopCore = {
                     // まとめ親編集
                     $Dialog.ShowArchiveInfo();
                 });
-                this.btnSysMenu.addEventListener('click', (e) => {
-                    // システムメニュー
-                    $Dialog.ShowSystemMenu();
-                });
+                // this.btnSysMenu.addEventListener('click', (e) => {
+                //     // システムメニュー
+                //     $Dialog.ShowSystemMenu();
+                // });
                 this.sortField.addEventListener("click", (e) => {
                     const btn = e.target.closest("button");
                     if (!btn) return;

@@ -26,9 +26,11 @@ const UI_Manager = {
     },
     // パーツ生成を担うジェネレータ
     Generator: {
-        // URLリンクボタンの生成（安全確認とトラッキング機能を内包）
-        LinkButton(url, params = null, isOwner = false) {
+        // URLリンクボタンの生成（安全確認とクリック数の送信）
+        LinkButton(targetEl, url, params = null, isOwner = false) {
             if (!url) return null;
+			if (!targetEl) return;
+			// targetEl.innerHTML = "";	// 消しちゃダメ
             // テンプレートからボタンDOMを生成
             const btn = $Dom.GenerateTemplate("tpl-link-button", "ui-template-root");
             // アイコンの注入（サイズは28px固定）
@@ -60,11 +62,13 @@ const UI_Manager = {
                 const finalUrl = isSafe ? url : `https://www.google.com/search?q=${encodeURIComponent(url)}`;
                 window.open(finalUrl, '_blank', 'noopener,noreferrer');
             };
-            return btn;
+			targetEl.appendChild(btn);
         },
 		// ユーザ情報バッヂの生成
-		UserBadge(profile, options = {}) {
+		UserBadge(targetEl, profile, options = {}) {
 			if (!profile) return null;
+			if (!targetEl) return;
+			targetEl.innerHTML = "";	// 消しちゃダメ
 			const type = options.type || 'button'; // 'button' or 'badge'
 			const isOwner = !!options.isOwner;
 			// テンプレートの生成
@@ -87,11 +91,13 @@ const UI_Manager = {
 					}
 				};
 			}
-			return el;
+			// return el;
+			targetEl.appendChild(el);
 		},
 		// 新規バッヂ生成
 		ApplyNewBadge(targetEl, count, type = 'dot') {
 			if (!targetEl) return;
+			// targetEl.innerHTML = "";	// 消しちゃダメ
 			let badge = targetEl.querySelector('.js-unread-badge');
 			const isShow = count > 0;
 			if (isShow && !badge) {
@@ -141,10 +147,6 @@ const UI_Manager = {
 				const badge = $Dom.QuerySelector(".js-day-badge", el);
 				$Dom.ToggleShow(badge, true);
 				$Dom.QuerySelector(".js-day-text", badge).textContent = `${detail.display_day} DAY`;
-				// // 公開まとめの2日目以降（文字がDAY表記と重複する場合）はメインテキストを隠す
-				// if (detail.display_day > 1 && $App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.ARCHIVE_PUB) {
-				// 	$Dom.ToggleShow(mainText, false);
-				// }
 			}
 			targetEl.appendChild(el);
 		},

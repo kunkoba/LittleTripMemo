@@ -206,8 +206,9 @@ const _DetailContentCore = {
                 item_name: "link_url"
             };
             // 第3引数に is_owner を渡し、Generator側でログ送信を判定
-            const btn = $UI.Generator.LinkButton(detail.link_url, params, detail.is_owner);
-            if (btn) this.displayUrlWrapper.appendChild(btn);
+            // const btn = $UI.Generator.LinkButton(detail.link_url, params, detail.is_owner);
+            // if (btn) this.displayUrlWrapper.appendChild(btn);
+            $UI.Generator.LinkButton(this.displayUrlWrapper, detail.link_url, params, detail.is_owner);
         } else {
             $Dom.ToggleShow(this.displayUrlWrapper, false);
         }

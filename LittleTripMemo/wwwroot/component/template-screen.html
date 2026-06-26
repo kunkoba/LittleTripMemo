@@ -16,12 +16,35 @@
 
 <template id="tpl-menu-user-settings">
     <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-set-theme" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">🎨</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Theme Config</span></button>
-        <button id="btn-set-map" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">🗺️</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Map Style Config</span></button>
-        <button id="btn-set-currency" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">💰</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Currency Config</span></button>
-        <button id="btn-set-gps" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">📍</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">GPS Tracking</span></button>
+        <button id="btn-set-theme" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">🎨</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Theme Config</span>
+        </button>
+        <button id="btn-set-map" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">🗺️</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Map Style Config</span>
+        </button>
+        <button id="btn-set-currency" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">💰</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Currency Config</span>
+        </button>
+        <button id="btn-set-gps" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">📍</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">GPS Tracking</span>
+        </button>
         <button id="btn-set-font" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1rem]">Aa</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Font Size Config</span>
+            <span class="col-span-1 flex justify-center text-[1.5rem]">Aa</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Font Size Config</span>
         </button>
     </div>
 </template>
@@ -85,7 +108,7 @@
                         <span class="text-[1.5rem] drop-shadow-md leading-none">🛠️</span>
                         <span class="text-[0.8rem] font-black text-slate-400 uppercase tracking-widest">Developer</span>
                     </div>
-                    <span class="text-[0.8rem] font-black text-slate-800 js-app-developer">
+                    <span class="text-[1rem] font-black text-slate-800 js-app-developer">
                     </span>
                 </div>
                 <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
@@ -93,8 +116,8 @@
                         <span class="text-[1.5rem] drop-shadow-md leading-none">⭐</span>
                         <span class="text-[0.8rem] font-black text-slate-400 uppercase tracking-widest">Feedback</span>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-[0.8rem] font-black text-yellow-500 leading-none js-app-score">★ 0.0</span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1rem] font-black text-yellow-500 leading-none js-app-score">★ 0.0</span>
                         <span class="text-slate-300 text-[1.5rem] font-normal leading-none -mt-0.5">›</span>
                     </div>
                 </button>
@@ -105,7 +128,7 @@
                         <span class="text-[0.8rem] font-black text-slate-400 uppercase tracking-widest">Official Site</span>
                     </div>
                     <div class="flex items-center gap-1 bg-blue-50 text-blue-500 px-3 py-1 rounded-full border border-blue-100">
-                        <span class="text-[0.5rem] font-black uppercase tracking-wider mt-px">Open</span>
+                        <span class="text-[0.8rem] uppercase">Open</span>
                         <span class="text-[0.8rem] leading-none">↗</span>
                     </div>
                 </a>
@@ -330,24 +353,24 @@
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Notifications</span>
-            <button id="btn-sys-version" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-                <span class="col-span-1 flex justify-center text-[1.5rem]">ℹ️</span>
-                <span class="col-span-1">
-                </span>
-                <span class="col-span-8 text-left font-bold text-[1rem] uppercase">App Information</span>
-            </button>
-            <button id="btn-sys-auth" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-                <span class="col-span-1 flex justify-center text-[1.5rem]">🚪</span>
-                <span class="col-span-1">
-                </span>
-                <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Login / Logout</span>
-            </button>
-            <button id="btn-sys-admin" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-red-100 active:bg-red-200 transition-colors text-red-600 bg-red-50">
-                <span class="col-span-1 flex justify-center text-[1.5rem]">👑</span>
-                <span class="col-span-1">
-                </span>
-                <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Admin Tools</span>
-            </button>
+        </button>
+        <button id="btn-sys-version" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">ℹ️</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">App Information</span>
+        </button>
+        <button id="btn-sys-auth" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">🚪</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Login / Logout</span>
+        </button>
+        <button id="btn-sys-admin" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-red-100 active:bg-red-200 transition-colors text-red-600 bg-red-50">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">👑</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Admin Tools</span>
         </button>
     </div>
 </template>
@@ -382,12 +405,12 @@
 <template id="tpl-menu-data">
     <div class="w-full flex flex-col bg-brand-0">
         <button id="btn-app-archive-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📚</span>
+            <span class="col-span-1 flex justify-center text-[1.5rem]">📚</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Archive List</span>
         </button>
         <button id="btn-app-info" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
-            <span class="col-span-1 flex justify-center text-[1.2rem]">📖</span>
+            <span class="col-span-1 flex justify-center text-[1.5rem]">📖</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Archive Info</span>
         </button>
@@ -452,7 +475,7 @@
         <div class="bg-white border-b border-slate-200 p-4 mb-4 shadow-sm">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2 text-slate-700 font-black">
-                    <span class="text-[1.2rem]">👤</span>
+                    <span class="text-[1.5rem]">👤</span>
                     <span class="text-[0.8rem]">ユーザー情報</span>
                 </div>
                 <span class="js-user-id text-[0.8rem] text-slate-400 font-bold"></span>
@@ -500,7 +523,7 @@
         <!-- アーカイブ情報 -->
         <div class="bg-white border border-slate-200 p-4 mb-4 shadow-sm rounded-lg">
             <div class="flex items-center gap-2 text-slate-700 font-black mb-4">
-                <span class="text-[1.2rem]">📁</span>
+                <span class="text-[1.5rem]">📁</span>
                 <span class="text-[0.8rem]">アーカイブ情報</span>
             </div>
             <div class="mb-3">
@@ -539,7 +562,7 @@
         <!-- 各明細情報 -->
         <div class="bg-white border border-slate-200 p-4 rounded-lg shadow-sm">
             <div class="flex items-center gap-2 text-slate-700 font-black mb-4">
-                <span class="text-[1.2rem]">📋</span>
+                <span class="text-[1.5rem]">📋</span>
                 <span class="text-[0.8rem]">各明細情報</span>
             </div>
             <div class="js-details-container flex flex-col"></div>
