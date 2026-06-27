@@ -49,7 +49,8 @@ public class GetReportDetailsService : _BaseService
 			is_owner: (user.user_id == _user.login_user_id),
 			user.click_stats,
 			user.info_stats,
-			user.info_stats_pub
+			user.info_stats_pub,
+			user.report_count
         );
 
 		// 3. マッピング

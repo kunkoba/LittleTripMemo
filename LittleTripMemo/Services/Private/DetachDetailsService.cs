@@ -21,7 +21,7 @@ public class DetachDetailsService(
 {
     public record DetachDetailsReq(
         [Required] Guid login_user_id,
-        [Required(ErrorMessage = "解除対象のseqリストは必須です")] int[] seqs,
+        [Required(ErrorMessage = "解除対象のseqリストは必須です")] long[] seqs,
         [Required(ErrorMessage = "元のアーカイブIDは必須です")] int archive_id
     ) : ILoginUserRequest;
 

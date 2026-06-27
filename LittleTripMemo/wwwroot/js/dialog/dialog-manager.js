@@ -45,7 +45,7 @@ const _DialogCore = {
     },
     // ダイアログ画面の構築
     create({ title = "", content = "", buttons = [], headerButtons = [], 
-        help = null, onClose = null, theme = null, isFooterFixed = true, isModal = false, size = null }) {
+        help = null, onClose = null, theme = null, isFooterFixed = true, isModal = false, size = 'md' }) {
         const frame = $Dom.GenerateTemplate("tpl-dialog-frame", this.elementId);
         frame._isModal = isModal;
         const frameBg = $Dom.QuerySelector("#dialog-frame-bg", frame);
@@ -85,9 +85,9 @@ const _DialogCore = {
         if (size === 'lg') {
             frameBg.classList.add("h-[70vh]");
         } else if (size === 'md') {
-            frameBg.classList.add("h-[50vh]");
+            frameBg.classList.add("min-h-[50vh]");
         } else {
-            frameBg.classList.add("min-h-[20vh]");
+            frameBg.classList.add("min-h-[30vh]");
         }
         titleEl.textContent = title;
         // --- 3. ヘッダーアクション（ヘルプ・カスタムボタン） ---
@@ -211,6 +211,7 @@ const DialogController = {
                 title: title,
                 content: el,
                 help: help,
+                size: 'sm',
                 onClose: () => { if (!isResolved) resolve(false); },
                 buttons: [[
                     { label: "CANCEL", className: "bg-slate-400 text-white shadow-md", handler: () => { isResolved = true; resolve(false); this._core.close(); } },
@@ -221,7 +222,6 @@ const DialogController = {
     },
     // 【共通】エラー用ダイアログ
     ShowErrorDialog(message) {
-        console.log("ShowErrorDialog:", message);
         const el = $Dom.GenerateTemplate('tpl-dialog-error');
         const msgEl = $Dom.QuerySelector('.js-error-message', el);
         // 補足情報の流し込み
@@ -230,11 +230,18 @@ const DialogController = {
             title: "SYSTEM ERROR",
             isModal: true, // 背景クリックやXボタンで閉じさせない
             content: el,
-            buttons: [[{
-                label: "RELOAD",
-                className: "bg-brand-5 text-white w-full",
-                handler: () => $Util.ReloadApp()
-            }]]
+            buttons: [[
+                {
+                    label: "RELOAD",
+                    className: "bg-brand-5 text-white w-full",
+                    handler: () => $Util.ReloadApp()
+                },
+                {
+                    label: "refresh",
+                    className: "bg-brand-5 text-white w-full",
+                    handler: () => $App.RefreshScreen()
+                }
+            ]]
         });
         // ✖ボタンを強制非表示にして閉じられないようにする
         const headerActions = frame.querySelector("#dialog-header-actions");
@@ -256,7 +263,6 @@ const DialogController = {
             const input = (type === 'textarea') 
                 ? document.createElement('textarea') 
                 : document.createElement('input');
-                
             input.className = "w-full border-2 border-brand-3 px-4 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white";
             if (type === 'textarea') {
                 input.classList.add("h-[150px]", "resize-none");

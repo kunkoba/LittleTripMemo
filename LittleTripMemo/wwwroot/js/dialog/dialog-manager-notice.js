@@ -132,6 +132,13 @@ export default {
                         const rating = Number(inputRating.value);
                         const body = inputBody.value.trim();
                         const req = { body: body, score: rating };
+                        // 確認
+                        const isOk = await $Dialog.ShowConfirm({
+                            title: "SUBMIT",
+                            help: "",
+                            message: `フィードバックを送信しますか？`
+                        });
+                        if (!isOk) return;
                         const isSuccess = await $Data.Access.UpsertFeedback(req);
                         if (!isSuccess) return;
                         console.log(">$App.AppData.Owner.myFeedback:", $App.AppData.Owner.myFeedback);

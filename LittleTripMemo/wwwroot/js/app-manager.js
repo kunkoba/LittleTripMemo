@@ -26,6 +26,26 @@ const AppManager = {
             userMailList: [],
         }
     },
+    // iPhoneのキーボード対策（入力中を考慮）
+    _initViewport() {
+        if (!window.visualViewport) return;
+        const root = document.getElementById('app-root');
+        const adjust = () => {
+            // 入力中（inputやtextareaにフォーカスがある）なら制御をスキップ
+            const activeEl = document.activeElement;
+            const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+            if (isTyping) return;
+            // キーボードが閉じていれば高さを固定し、ズレを戻す
+            root.style.height = `${window.visualViewport.height}px`;
+            window.scrollTo(0, 0);
+        };
+        // 各種イベントに紐付け
+        window.visualViewport.addEventListener('resize', adjust);
+        window.visualViewport.addEventListener('scroll', adjust);
+        // 入力終了（フォーカス外れ）の瞬間に再計算をかける
+        document.addEventListener('focusout', () => setTimeout(adjust, 100));
+        adjust();
+    },
     // 設定を保存
     _saveSettings() {
         localStorage.setItem(this.AppSettingKey, JSON.stringify({
@@ -50,26 +70,6 @@ const AppManager = {
         if (saved.fontSize) this.AppData.Owner.FontSize = saved.fontSize;
         if (saved.lastLoginDate) this.AppData.Owner.LastLoginDate = saved.lastLoginDate;
         // console.log("_loadSettings:", this.AppData.Owner);
-    },
-    // iPhoneのキーボード対策（入力中を考慮）
-    _initViewport() {
-        if (!window.visualViewport) return;
-        const root = document.getElementById('app-root');
-        const adjust = () => {
-            // 入力中（inputやtextareaにフォーカスがある）なら制御をスキップ
-            const activeEl = document.activeElement;
-            const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
-            if (isTyping) return;
-            // キーボードが閉じていれば高さを固定し、ズレを戻す
-            root.style.height = `${window.visualViewport.height}px`;
-            window.scrollTo(0, 0);
-        };
-        // 各種イベントに紐付け
-        window.visualViewport.addEventListener('resize', adjust);
-        window.visualViewport.addEventListener('scroll', adjust);
-        // 入力終了（フォーカス外れ）の瞬間に再計算をかける
-        document.addEventListener('focusout', () => setTimeout(adjust, 100));
-        adjust();
     },
     // 定期タスクの定義と開始
     _initPollingTasks() {
@@ -150,90 +150,59 @@ const AppManager = {
         // 定期タスク開始-----
         $Polling.Start($Polling.TASKS.OFFLINE_CHECK);
     },
-    // 【ユーザ設定】カラーテーマ変更
-    ChangeTheme(theme){
-        this.AppData.Owner.Theme = theme;
-        this._saveSettings(); // 保存実行
-        $UI.ChangeTheme(theme);
-    },
-    // 【ユーザ設定】カラーテーマ変更
-    ChangeMapStyle(style){
-        this.AppData.Owner.MapStyle = style;
-        this._saveSettings(); // 保存実行
-        $Map.SetMapStyle(style);
-    },
-    // 【ユーザ設定】追従設定の変更メソッド
-    ChangeGpsTracking(sec) {
-        const targetSec = parseInt(sec || 0);
-        this.AppData.Owner.GpsTrackingSec = targetSec;
-        // 一旦既存のタスクを停止
-        $Polling.Stop($Polling.TASKS.GPS_FOLLOW);
-        // 秒数が1以上かつオンラインなら新しくタスクを開始
-        if (targetSec > 0 && this.AppData.Context.IsOnline) {
-            $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
-                $Marker.RefreshCurrentLocation();
-            }, targetSec);
-            $Polling.Start($Polling.TASKS.GPS_FOLLOW);
-        }
-        this._saveSettings(); // ローカルストレージに永続化
-    },
-    // 【ユーザ設定】通貨単位の変更メソッド
-    ChangeCurrency(unit) {
-        this.AppData.Owner.Currency_unit = unit;
-        this._saveSettings(); // 保存実行
-    },
-    // 【ユーザ設定】フォントサイズの変更メソッド
-    ChangeFontSize(size) {
-        this.AppData.Owner.FontSize = size;
-        this._saveSettings(); // 保存実行
-        $UI.ChangeFontSize(size);
-    },
     // アプリ起動時フロー
     async Init() {
         console.log("★App.Init");
-        this._loadSettings();
-        await $LocalDb.Init();
-        // 最初に設定をロードし、トークンがあればログイン状態にしておく
-        if (this.AppData.Owner.Token) {
-            this.AppData.Context.IsLoggedIn = true;
-            // ユーザ存在チェック＆最終ログイン日時設定
-            let isSuccess = await this.SyncActivityLog();
-            if (!isSuccess) {
-                $Dialog.ShowLoginDialog();
-                return;
+        // --- 起動処理 ---
+        {
+            this._initViewport();
+            this._loadSettings();
+            await $LocalDb.Init();
+            // 最初に設定をロードし、トークンがあればログイン状態にしておく
+            if (this.AppData.Owner.Token) {
+                this.AppData.Context.IsLoggedIn = true;
+                // ユーザ存在チェック＆最終ログイン日時設定
+                let isSuccess = await this.SyncActivityLog();
+                if (!isSuccess) {
+                    $Dialog.ShowLoginDialog();
+                    return;
+                }
+                // システム情報取得
+                $Data.Access.GetSystemInfo();
             }
-            // システム情報取得
-            $Data.Access.GetSystemInfo();
         }
         // リクエストパラメータ取得
-        const params = new URLSearchParams(location.search);
-        const urlMode = params.get("mode");
-        const targetArchiveId = $Util.DecodeId(params.get("encodedId"));
-        // URLパラメータの mode を優先、なければ TargetArchiveId の有無で分岐、それ以外は CREATE
-        this.AppData.Context.TargetArchiveId = targetArchiveId;
-        if (urlMode) {
-            this.AppData.Context.ScreenMode = urlMode;
-        } else {
-            if (this.AppData.Context.TargetArchiveId) {
-                this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+        {
+            const params = new URLSearchParams(location.search);
+            const urlMode = params.get("mode");
+            const targetArchiveId = $Util.DecodeId(params.get("encodedId"));
+            // URLパラメータの mode を優先、なければ TargetArchiveId の有無で分岐、それ以外は CREATE
+            this.AppData.Context.TargetArchiveId = targetArchiveId;
+            if (urlMode) {
+                this.AppData.Context.ScreenMode = urlMode;
             } else {
-                this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                if (this.AppData.Context.TargetArchiveId) {
+                    this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+                } else {
+                    this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                }
+            }
+            // 処理前チェック：TargetArchiveIdが無く、未ログインならダイアログ表示（初期画面としてのCREATE用）
+            if (!this.AppData.Context.TargetArchiveId && !this.AppData.Context.IsLoggedIn) {
+                $Dialog.ShowLoginDialog();
             }
         }
-        // 処理前チェック：TargetArchiveIdが無く、未ログインならダイアログ表示（初期画面としてのCREATE用）
-        if (!this.AppData.Context.TargetArchiveId && !this.AppData.Context.IsLoggedIn) {
-            $Dialog.ShowLoginDialog();
-        }
         // メイン処理
-        this._initViewport();
-        this._initPollingTasks();
-        // ユーザ設定反映
-        $UI.Init();
-        this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
-        this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD);
-        this.ChangeGpsTracking(this.AppData.Owner.GpsTrackingSec || 0)
-        this.ChangeCurrency(this.AppData.Owner.Currency_unit || 'JPY')
-        this.ChangeFontSize(this.AppData.Owner.FontSize || '');
+        {
+            this._initPollingTasks();
+            // ユーザ設定反映
+            $UI.Init();
+            this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
+            this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD);
+            this.ChangeGpsTracking(this.AppData.Owner.GpsTrackingSec || 0)
+            this.ChangeCurrency(this.AppData.Owner.Currency_unit || 'JPY')
+            this.ChangeFontSize(this.AppData.Owner.FontSize || '');
+        }
         // UI関連
         await this.RefreshScreen();
     },
@@ -404,6 +373,44 @@ const AppManager = {
             return true;
         }
         return false;
+    },
+    // 【ユーザ設定】カラーテーマ変更
+    ChangeTheme(theme){
+        this.AppData.Owner.Theme = theme;
+        this._saveSettings(); // 保存実行
+        $UI.ChangeTheme(theme);
+    },
+    // 【ユーザ設定】カラーテーマ変更
+    ChangeMapStyle(style){
+        this.AppData.Owner.MapStyle = style;
+        this._saveSettings(); // 保存実行
+        $Map.SetMapStyle(style);
+    },
+    // 【ユーザ設定】追従設定の変更メソッド
+    ChangeGpsTracking(sec) {
+        const targetSec = parseInt(sec || 0);
+        this.AppData.Owner.GpsTrackingSec = targetSec;
+        // 一旦既存のタスクを停止
+        $Polling.Stop($Polling.TASKS.GPS_FOLLOW);
+        // 秒数が1以上かつオンラインなら新しくタスクを開始
+        if (targetSec > 0 && this.AppData.Context.IsOnline) {
+            $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
+                $Marker.RefreshCurrentLocation();
+            }, targetSec);
+            $Polling.Start($Polling.TASKS.GPS_FOLLOW);
+        }
+        this._saveSettings(); // ローカルストレージに永続化
+    },
+    // 【ユーザ設定】通貨単位の変更メソッド
+    ChangeCurrency(unit) {
+        this.AppData.Owner.Currency_unit = unit;
+        this._saveSettings(); // 保存実行
+    },
+    // 【ユーザ設定】フォントサイズの変更メソッド
+    ChangeFontSize(size) {
+        this.AppData.Owner.FontSize = size;
+        this._saveSettings(); // 保存実行
+        $UI.ChangeFontSize(size);
     },
 };
 

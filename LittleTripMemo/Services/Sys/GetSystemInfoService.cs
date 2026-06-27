@@ -68,7 +68,8 @@ public class GetSystemInfoService(
                     is_owner: true,
                     appUser.click_stats,
                     appUser.info_stats,     // 秘密側統計
-                    appUser.info_stats_pub  // 公開側統計
+                    appUser.info_stats_pub,  // 公開側統計
+                    appUser.report_count
                 );
             }
 

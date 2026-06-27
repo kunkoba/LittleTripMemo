@@ -22,7 +22,7 @@ public class DetailRepository : _BaseRepository
     /// <summary>
     /// 明細登録。モデルのスネークケース（user_id等）をそのままSQLパラメータに使用。
     /// </summary>
-    public async Task<int> InsertAsync(TMemoDetail entity)
+    public async Task<long> InsertAsync(TMemoDetail entity)
     {
         entity.user_id = _user.login_user_id;
 
@@ -192,7 +192,7 @@ public class DetailRepository : _BaseRepository
     /// <summary>
     /// 指定された seq リスト（未まとめ明細のみ）を論理削除する
     /// </summary>
-    public async Task<int> DeleteStrayBySeqsAsync(int[] seqs)
+    public async Task<int> DeleteStrayBySeqsAsync(long[] seqs)
     {
         string sql = $@"
             UPDATE t_memo_detail_{_user.table_id} SET
@@ -209,7 +209,7 @@ public class DetailRepository : _BaseRepository
     /// <summary>
     /// 指定された seq リストをアーカイブから切り離す（archive_id を 0 に戻す）
     /// </summary>
-    public async Task<int> DetachBySeqsAsync(int[] seqs)
+    public async Task<int> DetachBySeqsAsync(long[] seqs)
     {
         string sql = $@"
             UPDATE t_memo_detail_{_user.table_id} SET

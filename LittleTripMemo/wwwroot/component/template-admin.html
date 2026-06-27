@@ -139,7 +139,7 @@
 </template>
 
 <!-- 【ダイアログ子】管理者通報詳細 -->
-<template id="tpl-admin-report-detail">
+<template id="tpl-admin-report-detail_2">
     <div class="w-full text-black-5 flex flex-col h-full overflow-hidden">
         <div class="shrink-0 p-4 border-b border-brand-2 bg-slate-50 relative mb-3">
             <!-- まとめタイトル -->
@@ -154,6 +154,33 @@
                 <button id="btn-admin-report-open" class="flex-1 h-9 bg-brand-5 text-white text-[0.8rem] font-black rounded-lg shadow-sm active:scale-95 transition-all uppercase">Open</button>
                 <button id="btn-admin-report-close" class="flex-1 h-9 bg-slate-700 text-white text-[0.8rem] font-black rounded-lg shadow-sm active:scale-95 transition-all uppercase">Close</button>
                 <button id="btn-admin-report-private" class="flex-1 h-9 bg-white text-red-500 border-2 border-red-200 text-[0.8rem] font-black rounded-lg shadow-sm active:scale-95 transition-all uppercase">Delete</button>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-2 bg-brand-0">
+            <div id="admin-report-detail-list" class="space-y-2 pb-4 px-1"></div>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】管理者通報詳細 -->
+<template id="tpl-admin-report-detail">
+    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden">
+        <div class="shrink-0 p-4 border-b border-brand-2 bg-slate-50 relative mb-3">
+            <!-- まとめタイトル (全体をボタン化) -->
+            <button id="btn-admin-report-open-archive" class="w-full text-left active:scale-[0.98] transition-transform mb-4 bg-white p-3 rounded-[1rem] border border-slate-200 shadow-sm flex items-center justify-between">
+                <div class="flex-1 min-w-0 pr-2">
+                    <div class="text-[0.5rem] font-black text-slate-400 uppercase tracking-widest mb-1">Target Archive</div>
+                    <div class="text-[0.8rem] font-black text-brand-5 js-archive-title break-words line-clamp-2"></div>
+                </div>
+                <div class="text-[1.5rem] ml-2 drop-shadow-sm">🗺️</div>
+            </button>
+            <!-- ユーザ情報アイコン -->
+            <div class="text-[0.5rem] font-black text-slate-400 uppercase tracking-widest mb-1">Target User</div>
+            <div id="view-report-target-user-wrapper">
+            </div>
+            <!-- 追加：管理者用アクションボタン -->
+            <div class="flex gap-3 mt-5">
+                <button id="btn-admin-report-close" class="flex-1 h-11 bg-slate-500 text-white text-[0.8rem] font-black rounded-lg shadow-md active:scale-95 transition-all uppercase tracking-wider">Close</button>
+                <button id="btn-admin-report-private" class="flex-1 h-11 bg-slate-800 text-white text-[0.8rem] font-black rounded-lg shadow-md active:scale-95 transition-all uppercase tracking-wider">Delete</button>
             </div>
         </div>
         <div class="flex-1 overflow-y-auto p-2 bg-brand-0">
@@ -222,7 +249,6 @@
         </div>
     </div>
 </template>
-
 
 <!-- 【ダイアログ子】管理者フィードバック詳細 -->
 <template id="tpl-admin-feedback-detail">
@@ -326,6 +352,89 @@
         <div class="js-target-wrapper mt-1"></div>
         <div class="text-[0.8rem] text-slate-500 line-clamp-1 mt-2">
             <span class="js-body"></span>
+        </div>
+    </div>
+</template>
+
+<!-- ユーザ解析情報 -->
+<template id="tpl-user-analytics">
+    <div class="w-full flex flex-col gap-4 text-[0.8rem]">
+        <!-- ヘッダー：ユーザ情報 & 通報数 -->
+        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-200">
+            <div id="js-analytics-user-badge"></div>
+            <div class="flex flex-col items-end">
+                <span class="text-[0.6rem] font-black text-slate-400 uppercase">Reports</span>
+                <span class="js-report-count text-[1.2rem] font-black text-red-500">0</span>
+            </div>
+        </div>
+        <!-- 統計：Private / Public -->
+        <div class="grid grid-cols-2 gap-3">
+            <!-- Private Card -->
+            <div class="bg-white border-2 border-slate-100 rounded-xl p-3 shadow-sm">
+                <div class="text-[0.6rem] font-black text-slate-400 uppercase mb-2 border-b border-slate-50">Private Stats</div>
+                <div class="js-private-stats space-y-1"></div>
+            </div>
+            <!-- Public Card -->
+            <div class="bg-white border-2 border-brand-2 rounded-xl p-3 shadow-md">
+                <div class="text-[0.6rem] font-black text-brand-5 uppercase mb-2 border-b border-brand-5">Public Stats</div>
+                <div class="js-public-stats space-y-1"></div>
+            </div>
+        </div>
+        <!-- クリック解析 -->
+        <div class="bg-white border border-slate-200 rounded-xl p-3">
+            <div class="text-[0.6rem] font-black text-slate-400 uppercase mb-3">Link Click Stats</div>
+            <div class="js-click-list space-y-2"></div>
+        </div>
+    </div>
+</template>
+
+
+<!-- 【修正】ユーザ解析：外枠テンプレート -->
+<template id="tpl-user-click-stats">
+    <div class="w-full flex flex-col gap-4 text-[0.8rem]">
+        <!-- ① ユーザ基本情報 & 通報リスク -->
+        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-[1rem] border border-slate-200">
+            <div class="js-user-badge-container"></div>
+            <div class="flex flex-col items-end px-2">
+                <span class="text-[0.6rem] font-black text-slate-400 uppercase">Reported</span>
+                <span class="js-report-count text-[1.2rem] font-black text-red-500 leading-none">0</span>
+            </div>
+        </div>
+        <!-- ② 解析情報（非公開 vs 公開）: 横並び grid-cols-2 を flex-col に変更 -->
+        <div class="flex flex-col gap-3">
+            <!-- Private Activity -->
+            <div class="bg-white border-2 border-slate-100 rounded-[1rem] p-4 shadow-sm">
+                <div class="text-[0.6rem] font-black text-slate-400 uppercase mb-3 border-b border-slate-50 pb-1">Private Activity</div>
+                <div class="js-stats-pvt"></div>
+            </div>
+            <!-- Public Activity -->
+            <div class="bg-white border-2 border-brand-2 rounded-[1rem] p-4 shadow-sm">
+                <div class="text-[0.6rem] font-black text-brand-5 uppercase mb-3 border-b border-brand-5 pb-1">Public Activity</div>
+                <div class="js-stats-pub"></div>
+            </div>
+        </div>
+        <!-- ③ クリック集計情報（リスト） -->
+        <div class="flex flex-col gap-2">
+            <div class="text-[0.6rem] font-black text-slate-400 uppercase pl-1">Profile Link Performance</div>
+            <div class="js-click-container space-y-2"></div>
+        </div>
+    </div>
+</template>
+
+<!-- 【修正】ユーザ解析：数値項目テンプレート -->
+<template id="tpl-user-activity-summary">
+    <div class="space-y-2">
+        <div class="flex justify-between items-center">
+            <span class="text-slate-400 text-[0.7rem]">Archives</span>
+            <b class="js-archive-count font-black text-slate-700 text-[1rem]">0</b>
+        </div>
+        <div class="flex justify-between items-center">
+            <span class="text-slate-400 text-[0.7rem]">Memos</span>
+            <b class="js-memo-count font-black text-slate-700 text-[1rem]">0</b>
+        </div>
+        <div class="flex justify-between items-center pt-2 mt-1 border-t border-slate-50">
+            <span class="text-slate-400 text-[0.7rem]">Total Value</span>
+            <b class="js-value font-black text-[1.1rem]">0</b>
         </div>
     </div>
 </template>

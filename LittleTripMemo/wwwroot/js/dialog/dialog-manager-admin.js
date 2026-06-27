@@ -329,6 +329,7 @@ export default {
         });
     },
     // 【管理者機能】通報詳細（is_deleted関連の処理を削除して整理）
+    // 【管理者機能】通報詳細
     async ShowAdminReportDetail(summaryItem) {
         const isSuccess = await $Data.Access.GetReportDetails({
             target_user_id: summaryItem.target_user_id,
@@ -337,31 +338,32 @@ export default {
         if (!isSuccess) return;
         const reports = $Data.resData.reports || [];
         const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
-        // アーカイブタイトルの反映（削除判定をなくし、CLOSED判定のみ残す）
+        // アーカイブタイトルの反映（CLOSED判定による色変え）
         const titleEl = $Dom.QuerySelector(".js-archive-title", el);
         if (summaryItem.is_closed) {
             titleEl.textContent = `${summaryItem.archive_title || "Unknown Title"} (CLOSED)`;
-            titleEl.classList.add("text-red-400"); // 警告色
+            titleEl.classList.replace("text-brand-5", "text-red-500"); // 警告色に変更
         } else {
             titleEl.textContent = summaryItem.archive_title || "Unknown Title";
         }
         // ターゲットユーザーボタンの設定
         const userWrapper = $Dom.QuerySelector("#view-report-target-user-wrapper", el);
-        userWrapper.innerHTML = "";
         const profile = $Data.resData.target_userProfile;
         if (profile) {
             $UI.Generator.UserBadge(userWrapper, profile, { type: 'button', isOwner: false });
         }
-        const btnOpen    = $Dom.QuerySelector("#btn-admin-report-open", el);
-        const btnClose   = $Dom.QuerySelector("#btn-admin-report-close", el);
-        const btnPrivate = $Dom.QuerySelector("#btn-admin-report-private", el);
+        // 各種ボタンの取得（Openボタンの代わりにタイトルボタンを取得）
+        const btnOpenArchive = $Dom.QuerySelector("#btn-admin-report-open-archive", el);
+        const btnClose       = $Dom.QuerySelector("#btn-admin-report-close", el);
+        const btnPrivate     = $Dom.QuerySelector("#btn-admin-report-private", el);
         if (summaryItem.is_closed) {
             // CLOSED中の場合はCloseボタンのみ非活性
             btnClose.disabled = true;
             btnClose.classList.add("opacity-50", "cursor-not-allowed", "grayscale");
             btnClose.classList.remove("active:scale-95");
         }
-        btnOpen.onclick = async () => {
+        // ▼ 修正：タイトルボタンをクリックしたときの処理
+        btnOpenArchive.onclick = async () => {
             const isOk = await this.ShowConfirm({ title: "JUMP", message: "この Public まとめデータを開きますか？" });
             if (!isOk) return;
             this._core.closeAll();
@@ -369,6 +371,7 @@ export default {
             $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
             await $App.RefreshScreen();
         };
+        // 3. Close（強制クローズ：URLを知っている人だけ見れる状態へ）
         btnClose.onclick = async () => {
             const isOk = await this.ShowConfirm({ title: "FORCE CLOSE", message: "強制的に公開停止(Close)にしますか？" });
             if (!isOk) return;
@@ -378,8 +381,9 @@ export default {
             });
             if (success) { $Notice.Info("強制的にCloseしました"); this._core.closeAll(); }
         };
+        // 4. Delete（強制Private：本人以外一切見れない状態へ戻す）
         btnPrivate.onclick = async () => {
-            const isOk = await this.ShowConfirm({ title: "FORCE PRIVATE", message: "強制的に非公開(Private)に戻しますか？" });
+            const isOk = await this.ShowConfirm({ title: "FORCE DELETE", message: "強制的に非公開(Private)に戻し、削除扱いとしますか？" });
             if (!isOk) return;
             const success = await $Data.Access.AdminUnpublishArchive({ 
                 archive_id: summaryItem.archive_id, 
@@ -528,6 +532,7 @@ export default {
         this._core.open({
             title: "FEEDBACK Mgmt",
             content: frame,
+            size: 'lg',
             theme: "admin",
             help: "★の数やワードでフィードバックの絞り込みができます。",
         });

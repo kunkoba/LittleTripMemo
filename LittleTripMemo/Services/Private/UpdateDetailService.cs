@@ -18,7 +18,7 @@ public class UpdateDetailService : _BaseService
 
     public record UpdateDetailReq(
         [Required] Guid login_user_id,
-        [Required(ErrorMessage = "seqは必須です")][Range(0, int.MaxValue)] int seq,
+        [Required(ErrorMessage = "seqは必須です")][Range(0, int.MaxValue)] long seq,
         [Required(ErrorMessage = "旅の記録IDは必須です")] int archive_id,
         [Required(ErrorMessage = "緯度は必須です")] decimal latitude,
         [Required(ErrorMessage = "経度は必須です")] decimal longitude,
@@ -100,4 +100,5 @@ public class UpdateDetailService : _BaseService
         memo_price = req.memo_price,
         del_flg = false
     };
+
 }

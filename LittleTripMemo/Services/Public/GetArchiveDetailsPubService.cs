@@ -80,7 +80,8 @@ public class GetArchiveDetailsPubService(
             is_owner: (ownerAppUser.user_id == _user.login_user_id),
             ownerAppUser.click_stats,
             ownerAppUser.info_stats,     // 秘密側統計
-            ownerAppUser.info_stats_pub  // 公開側統計
+            ownerAppUser.info_stats_pub,  // 公開側統計
+            ownerAppUser.report_count
         );
 
         return new Response(archivePub, detailsPub, myReactions, userProfile);

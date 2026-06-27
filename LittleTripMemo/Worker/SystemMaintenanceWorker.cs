@@ -24,7 +24,8 @@ public class SystemMaintenanceWorker(
     private DateTime _nextTableStatsUpdateTime = DateTime.Now;
     private DateTime _nextGarbageCleanupTime = DateTime.Now;
     private DateTime _nextClickAggregateTime = DateTime.Now;
-    private DateTime _nextUserSummaryUpdateTime = DateTime.Now; 
+    private DateTime _nextUserSummaryUpdateTime = DateTime.Now;
+    private DateTime _nextReportStatsUpdateTime = DateTime.Now; 
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -40,6 +41,7 @@ public class SystemMaintenanceWorker(
                 await TaskGarbageCleanupAsync();    // 論理削除された古いデータの物理削除
                 await TaskAggregateClickQueueAsync();   // クリック・閲覧数集計キューの処理
                 await TaskUpdateUserSummaryStatsAsync();    // ユーザー統計情報の更新（t_app_user_summary の集計）
+                await TaskUpdateReportStatsAsync(); // 通報実績統計の更新（アーカイブ受領数およびユーザー送信数の集計）
             }
 
             // 1分間隔でチェック
@@ -273,6 +275,37 @@ public class SystemMaintenanceWorker(
             _nextUserSummaryUpdateTime = now.AddMinutes(settings.UserSummaryUpdateIntervalMinutes);
         }
     }
+
+    /// <summary>
+    /// 通報実績（アーカイブ受領数およびユーザー送信数）の再集計を行うタスク
+    /// </summary>
+    private async Task TaskUpdateReportStatsAsync()
+    {
+        var settings = optionsMonitor.CurrentValue;
+        var now = DateTime.Now;
+
+        // 設定値が 0 以下の場合は実行しない
+        if (settings.ReportStatsUpdateIntervalMinutes <= 0) return;
+
+        // 実行予定時刻に達しているか確認
+        if (now >= _nextReportStatsUpdateTime)
+        {
+            await RunWithScopeAsync("通報実績統計集約", async (scope) =>
+            {
+                var repository = scope.ServiceProvider.GetRequiredService<TableStatisticsTaskRepository>();
+
+                // ① アーカイブ側の受領通報数を更新
+                await repository.SyncArchiveReportStatsAsync();
+
+                // ② ユーザー側の送信通報数を更新
+                await repository.SyncUserReportStatsAsync();
+            });
+
+            // 次回の実行予定時刻を更新
+            _nextReportStatsUpdateTime = now.AddMinutes(settings.ReportStatsUpdateIntervalMinutes);
+        }
+    }
+
 
     #endregion
 

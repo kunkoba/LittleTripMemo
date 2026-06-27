@@ -20,7 +20,7 @@ public class AddDetailsService : _BaseService
 
     public record AddDetailsReq(
         [Required] Guid login_user_id,
-        [Required(ErrorMessage = "seqリストは必須です")] int[] seqs,
+        [Required(ErrorMessage = "seqリストは必須です")] long[] seqs,
         [Required(ErrorMessage = "archiveIdは必須です")] int archive_id
     ) : ILoginUserRequest;
 

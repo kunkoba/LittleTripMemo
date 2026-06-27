@@ -61,7 +61,8 @@ public class GetArchiveDetailsService(
             is_owner: (ownerUser.user_id == _user.login_user_id),
             ownerUser.click_stats,
             ownerUser.info_stats,     // 秘密側統計
-            ownerUser.info_stats_pub  // 公開側統計
+            ownerUser.info_stats_pub,  // 公開側統計
+            ownerUser.report_count
         );
 
         return new Response(archive, details, userProfile);

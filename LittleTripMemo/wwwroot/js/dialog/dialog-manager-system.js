@@ -377,23 +377,21 @@ export default {
                     item_name: item.key
                 };
                 // ジェネレータでボタンを生成（第3引数は ShowUserProfile の引数 isOwner を使用）
-                // const btn = $UI.Generator.LinkButton(item.val, params, isOwner);
-                // if (btn) {
-                //     btn.title = item.val;
-                //     viewLinks.appendChild(btn);
-                // }
                 $UI.Generator.LinkButton(viewLinks, item.val, params, isOwner);
             });
         };
         renderView();
 		const headerButtons = [];
         const isAdmin = $App.AppData.Owner.plan === "Admin"; // 管理者判定
-        if (isOwner) {
+        if (isOwner || isAdmin) {
             // 統計アイコン
             headerButtons.push({
                 label: "📊",
-                handler: () => this.ShowClickStats(profile)
+                // handler: () => this.ShowClickStats(profile)
+                handler: () => this.ShowUserClickStats(profile)
             });
+        }
+        if (isOwner) {
             headerButtons.push({
                 label: "✏️",
                 handler: () => this.ShowEditProfile(profile, renderView)
@@ -405,6 +403,7 @@ export default {
                 handler: () => this.ShowAdminSendUserNotification(profile)
             });
         }
+        //
 		this._core.open({
 			title: "USER PROFILE",
 			content: el,
@@ -600,6 +599,97 @@ export default {
             content: el,
             help: "各リンクがクリックされた回数を集計しています。\nUniqueはクリックした人数、Guestは未ログインユーザーのクリック数です。",
             buttons: []
+        });
+    },
+    // 【管理者機能】ユーザ解析情報
+    ShowUserAnalytics(profile) {
+        const el = $Dom.GenerateTemplate("tpl-user-analytics");
+        // 1. 基本情報 & 通報数
+        const badge = $UI.Generator.UserBadge(u, { type: 'badge' });
+        $Dom.GetElementById("js-analytics-user-badge", el).appendChild(badge);
+        $Dom.QuerySelector(".js-report-count", el).textContent = profile.report_count || 0;
+        // 2. 統計値の流し込みヘルパー
+        const renderStats = (containerSelector, stats) => {
+            const target = $Dom.QuerySelector(containerSelector, el);
+            if (!stats) return target.innerHTML = "No Data";
+            target.innerHTML = `
+                <div class="flex justify-between"><span>Archives:</span><span class="font-black">${stats.archive_count}</span></div>
+                <div class="flex justify-between"><span>Memos:</span><span class="font-black">${stats.detail_count}</span></div>
+                <div class="flex justify-between"><span>Price:</span><span class="font-black ${stats.total_price < 0 ? 'text-red-500' : 'text-blue-500'}">${stats.total_price.toLocaleString()}</span></div>
+            `;
+        };
+        renderStats(".js-private-stats", profile.info_stats);
+        renderStats(".js-public-stats", profile.info_stats_pub);
+        // 3. クリック統計
+        const clickList = $Dom.QuerySelector(".js-click-list", el);
+        const links = [ {key:'link_1', url:profile.link_1}, {key:'link_2', url:profile.link_2}, {key:'link_3', url:profile.link_3} ];
+        links.forEach(l => {
+            if (!l.url) return;
+            const s = profile.click_stats?.[l.key] || { t: 0, u: 0, g: 0 };
+            const row = document.createElement("div");
+            row.className = "p-2 bg-slate-50 rounded-lg text-[0.75rem]";
+            row.innerHTML = `
+                <div class="truncate text-blue-500 italic mb-1">🔗 ${l.url}</div>
+                <div class="flex gap-4">
+                    <span>🖱️ <b class="text-brand-5">${s.t}</b> <small class="text-slate-300">TTL</small></span>
+                    <span>👤 <b class="text-slate-600">${s.u}</b> <small class="text-slate-300">UNIQ</small></span>
+                    <span>👻 <b class="text-slate-400">${s.g}</b> <small class="text-slate-300">GST</small></span>
+                </div>
+            `;
+            clickList.appendChild(row);
+        });
+        this._core.open({ title: "USER ANALYTICS", content: el, theme: "admin" });
+    },
+    // 【管理者機能】ユーザ解析情報2
+    ShowUserClickStats(profile) {
+        const el = $Dom.GenerateTemplate("tpl-user-click-stats");
+        // 1. ユーザバッジ & 通報数
+        // const badge = $UI.Generator.UserBadge(profile, { type: 'badge' });
+        // $Dom.QuerySelector(".js-user-badge-container", el).appendChild(badge);
+        $UI.Generator.UserBadge($Dom.QuerySelector(".js-user-badge-container", el), profile, { type: 'badge' });
+        $Dom.QuerySelector(".js-report-count", el).textContent = profile.report_count || 0;
+        // 2. 実績解析（Private/Public共通ヘルパー）
+        const fillStats = (selector, data) => {
+            const target = $Dom.QuerySelector(selector, el);
+            target.innerHTML = ""; 
+            if (!data) {
+                target.innerHTML = `<span class="text-slate-300 italic">No Data</span>`;
+                return;
+            }
+            const child = $Dom.GenerateTemplate("tpl-user-activity-summary");
+            $Dom.QuerySelector(".js-archive-count", child).textContent = data.archive_count;
+            $Dom.QuerySelector(".js-memo-count", child).textContent = data.detail_count;
+            const valEl = $Dom.QuerySelector(".js-value", child);
+            valEl.textContent = data.total_price.toLocaleString();
+            // 金額の色分け（text-[1.1rem] などのサイズ指定を消さないように注意）
+            valEl.classList.add(data.total_price < 0 ? 'text-red-500' : 'text-blue-500');
+            target.appendChild(child);
+        };
+        fillStats(".js-stats-pvt", profile.info_stats);
+        fillStats(".js-stats-pub", profile.info_stats_pub);
+        // 3. クリック集計リスト
+        const container = $Dom.QuerySelector(".js-click-container", el);
+        const links = [
+            { id: 'link_1', url: profile.link_1 },
+            { id: 'link_2', url: profile.link_2 },
+            { id: 'link_3', url: profile.link_3 }
+        ];
+        links.forEach(link => {
+            if (!link.url) return;
+            const stats = profile.click_stats?.[link.id] || { t: 0, u: 0, g: 0 };
+            const child = $Dom.GenerateTemplate("tpl-user-click-stats-item");
+            $Dom.QuerySelector(".js-url", child).textContent = `🔗 ${link.url}`;
+            $Dom.QuerySelector(".js-total", child).textContent = stats.t;
+            $Dom.QuerySelector(".js-unique", child).textContent = stats.u;
+            $Dom.QuerySelector(".js-guest", child).textContent = stats.g;
+            container.appendChild(child);
+        });
+        //
+        this._core.open({
+            title: "USER CLICK STATS",
+            content: el,
+            theme: profile.is_owner ? "user" : "admin", // 閲覧者が本人の場合は通常、管理者の場合はAdminテーマ
+            size: "lg"
         });
     },
 };

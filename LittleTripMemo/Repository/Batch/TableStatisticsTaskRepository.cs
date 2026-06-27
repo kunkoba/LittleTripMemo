@@ -155,4 +155,59 @@ public class TableStatisticsTaskRepository : _BaseRepository
         await ExecuteAsync(sql);
     }
 
+    /// <summary>
+    /// 全公開アーカイブを対象に、受け取った通報の累計件数を集計・更新する
+    /// </summary>
+    public async Task SyncArchiveReportStatsAsync()
+    {
+        // 1. t_sys_reports からアーカイブごとの通報数を集計
+        // 2. その結果を用いて t_memo_archive_pub の report_count を一括更新
+        // 3. 通報が1件もないアーカイブも考慮し、一旦0リセットしてから更新、もしくは集計結果を外部結合する
+        const string sql = """
+            WITH ReportAgg AS (
+                SELECT 
+                    archive_id, 
+                    COUNT(*) AS cnt
+                FROM t_sys_reports
+                GROUP BY archive_id
+            )
+            UPDATE t_memo_archive_pub a
+            SET 
+                report_count = COALESCE(ra.cnt, 0),
+                update_tim   = CURRENT_TIMESTAMP
+            FROM (SELECT archive_id FROM t_memo_archive_pub) target
+            LEFT JOIN ReportAgg ra ON target.archive_id = ra.archive_id
+            WHERE a.archive_id = target.archive_id;
+            """;
+
+        await ExecuteAsync(sql);
+    }
+
+    /// <summary>
+    /// 全ユーザーを対象に、自分が行った通報の累計送信件数を集計・更新する
+    /// </summary>
+    public async Task SyncUserReportStatsAsync()
+    {
+        // 1. t_sys_reports から通報者(reporter_user_id)ごとの送信数を集計
+        // 2. その結果を用いて t_app_user の report_count を一括更新
+        const string sql = """
+            WITH UserReportAgg AS (
+                SELECT 
+                    reporter_user_id, 
+                    COUNT(*) AS cnt
+                FROM t_sys_reports
+                GROUP BY reporter_user_id
+            )
+            UPDATE t_app_user u
+            SET 
+                report_count = COALESCE(ura.cnt, 0),
+                update_tim   = CURRENT_TIMESTAMP
+            FROM (SELECT user_id FROM t_app_user) target
+            LEFT JOIN UserReportAgg ura ON target.user_id = ura.reporter_user_id
+            WHERE u.user_id = target.user_id;
+            """;
+
+        await ExecuteAsync(sql);
+    }
+
 }

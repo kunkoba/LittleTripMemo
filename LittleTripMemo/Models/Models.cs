@@ -22,12 +22,10 @@ public class TAppUser
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }
     public DateTime update_tim { get; set; }
-    // クリック数の集計情報
     public Dictionary<string, ClickCountData> click_stats { get; set; } = new();
-    // 秘密側（分散テーブル）の集計情報
     public Dictionary<string, object> info_stats { get; set; } = new();
-    // 公開側の集計情報
     public Dictionary<string, object> info_stats_pub { get; set; } = new();
+    public int report_count { get; set; } = 0;
 }
 
 // 認証用（Identity標準に戻す）
@@ -70,6 +68,7 @@ public class TMemoArchivePub : IAppRecord
     public bool is_owner { get; set; } = false;
     public int detail_count { get; set; } = 0;
     public Dictionary<string, ClickCountData> click_stats { get; set; } = new();
+    public int report_count { get; set; } = 0;
 }
 
 public class TMemoDetail : IAppRecord
@@ -221,6 +220,7 @@ public class DtoArchive
     public bool is_public { get; set; } = true;
     public bool is_owner { get; set; } = false;
     public int detail_count { get; set; } = 0;
+    public int report_count { get; set; } = 0;
 }
 
 /// <summary>
@@ -331,7 +331,8 @@ public record DtoUserProfile(
     bool is_owner,
     Dictionary<string, ClickCountData> click_stats,
     Dictionary<string, object> info_stats,    
-    Dictionary<string, object> info_stats_pub 
+    Dictionary<string, object> info_stats_pub,
+    int report_count // ★追加：そのユーザーの通報送信累計数 
 );
 
 /// <summary>

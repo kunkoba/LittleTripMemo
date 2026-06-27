@@ -537,8 +537,6 @@ export default {
                     item_name: "link_url"
                 };
                 // ジェネレータでボタンを生成（第3引数に is_owner を渡す）
-                // const btn = $UI.Generator.LinkButton(currentArchive.link_url, params, currentArchive.is_owner);
-                // if (btn) urlWrapper.appendChild(btn);
                 $UI.Generator.LinkButton(urlWrapper, currentArchive.link_url, params, currentArchive.is_owner);
             } else {
                 $Dom.ToggleShow(urlWrapper, false);
@@ -599,21 +597,23 @@ export default {
         }
         if (archive.is_owner) {
             headerButtons.push({
-                label: "📊",
-                handler: () => this.ShowArchiveClickStats(archive)
-            });
-            headerButtons.push({
                 label: "✏️",
                 handler: () => this.ShowEditArchive(archive, renderView)
             });
-        }
-        if (!archive.is_owner) {
+        } else {
             headerButtons.push({
                 label: "🚫",
                 handler: () => this.ShowReportPost(archive)
             });
         }
+        if (archive.is_owner || isAdmin) {
+            headerButtons.push({
+                label: "📊",
+                handler: () => this.ShowArchiveClickStats(archive)
+            });
+        }
         const dialogButtons = [];
+        //
         this._core.open({
             title: "Archive info",
             content: el,
@@ -642,6 +642,7 @@ export default {
         this._core.open({
             title: "SHARE ARCHIVE",
             content: el,
+            size: 'sm',
             help: "",
             buttons: [] // CLOSEボタンは右上の✖で代用し、下部はコピーボタンのみにする
         });
@@ -825,20 +826,20 @@ export default {
         });
     },
     // アーカイブと明細のクリック集計画面の表示
-    ShowArchiveClickStats(archive) {
+    ShowArchiveClickStats_2(archive) {
         if (!archive) return;
         const el = $Dom.GenerateTemplate('tpl-archive-click-stats');
         // --- 1. アーカイブ情報の反映 ---
         $Dom.QuerySelector('.js-arc-title', el).textContent = archive.title || "No Title";
         $Dom.QuerySelector('.js-arc-url', el).textContent = archive.link_url || "リンクなし";
-        // アーカイブの click_stats を取得（プロフィールの時と同様の構造を想定）
-        const arcStats = (archive.click_stats && archive.click_stats.link_url) 
-                        ? archive.click_stats.link_url 
-                        : { t: 0, u: 0, g: 0 };
+        const arcStats = (archive.click_stats && archive.click_stats.link_url) ? archive.click_stats.link_url : { t: 0, u: 0, g: 0 };
         $Dom.QuerySelector('.js-arc-total', el).textContent = arcStats.t || 0;
         $Dom.QuerySelector('.js-arc-unique', el).textContent = arcStats.u || 0;
         $Dom.QuerySelector('.js-arc-guest', el).textContent = arcStats.g || 0;
-        // ステータスバッジ
+        // --- 追加: アーカイブ自体の閲覧数 ---
+        const arcViewCount = archive.click_count || (archive.click_stats && archive.click_stats.view && archive.click_stats.view.t) || 0;
+        const arcViewCountEl = $Dom.QuerySelector('.js-arc-view-count', el);
+        if (arcViewCountEl) arcViewCountEl.textContent = arcViewCount;
         const statusBadge = $Dom.QuerySelector('.js-arc-status-badge', el);
         if (!archive.is_public) {
             statusBadge.textContent = "非公開";
@@ -850,10 +851,7 @@ export default {
             statusBadge.textContent = "公開中";
             statusBadge.className += " bg-emerald-100 text-emerald-600";
         }
-        // オーナーバッジ
-        if (archive.is_owner) {
-            $Dom.ToggleShow($Dom.QuerySelector('.js-arc-owner-badge', el), true);
-        }
+        if (archive.is_owner) $Dom.ToggleShow($Dom.QuerySelector('.js-arc-owner-badge', el), true);
         // --- 2. 明細情報の反映 ---
         const detailsContainer = $Dom.QuerySelector('.js-details-container', el);
         const details = $Data.Store.GetDetails() || [];
@@ -865,37 +863,116 @@ export default {
                 $Dom.QuerySelector('.js-dtl-seq', child).textContent = dtl.seq || "-";
                 $Dom.QuerySelector('.js-dtl-icon', child).textContent = dtl.face_emoji || "🚩";
                 $Dom.QuerySelector('.js-dtl-title', child).textContent = dtl.title || "No Title";
+                // --- 2.1 リアクション集計の動的生成 ---
+                const reactContainer = $Dom.QuerySelector('.js-dtl-reactions', child);
+                reactContainer.innerHTML = ""; 
+                Object.values($Const.REACTION_TYPE).forEach(type => {
+                    const countProp = type.prop.replace('has_', 'count_');
+                    const count = dtl[countProp] || 0;
+                    const div = document.createElement("div");
+                    div.className = "flex items-center gap-1 text-[0.8rem]";
+                    div.innerHTML = `<span>${type.emoji}</span><span class="font-black text-slate-500">${count}</span>`;
+                    reactContainer.appendChild(div);
+                });
+                // --- 2.2 クリック統計の反映 ---
                 const urlEl = $Dom.QuerySelector('.js-dtl-url', child);
                 const statsBox = $Dom.QuerySelector('.js-dtl-stats-box', child);
                 if (dtl.link_url && dtl.link_url.trim() !== "") {
                     urlEl.textContent = dtl.link_url;
                     urlEl.classList.replace("text-slate-500", "text-blue-500");
-                    
-                    const dStats = (dtl.click_stats && dtl.click_stats.link_url) 
-                                   ? dtl.click_stats.link_url 
-                                   : { t: 0, u: 0, g: 0 };
-                    
+                    const dStats = (dtl.click_stats && dtl.click_stats.link_url) ? dtl.click_stats.link_url : { t: 0, u: 0, g: 0 };
                     $Dom.QuerySelector('.js-dtl-total', child).textContent = dStats.t || 0;
                     $Dom.QuerySelector('.js-dtl-unique', child).textContent = dStats.u || 0;
                     $Dom.QuerySelector('.js-dtl-guest', child).textContent = dStats.g || 0;
-                    
                     $Dom.ToggleShow(statsBox, true);
                 } else {
                     urlEl.textContent = "リンクなし";
                     urlEl.classList.add("text-slate-300", "italic");
-                    // リンクがない場合は集計ボックス自体を隠す
                     $Dom.ToggleShow(statsBox, false);
                 }
                 detailsContainer.appendChild(child);
             });
         }
-        // 
         this._core.open({
-            title: "ARCHIVE CLICK STATS",
+            title: "ARCHIVE STATS",
             content: el,
-            help: "まとめや各明細に設定されたリンクのクリック数を集計しています。\nUniqueはクリックした人数、Guestは未ログインユーザーのクリック数です。",
-            buttons: [],
-            size: 'lg' // 先ほど追加した大型ダイアログ指定
+            help: "まとめや各明細の統計（閲覧数・リンククリック数・リアクション数）を表示しています。",
+            size: 'lg'
+        });
+    },
+    ShowArchiveClickStats(archive) {
+        if (!archive) return;
+        const el = $Dom.GenerateTemplate('tpl-archive-click-stats');
+        // --- 1. アーカイブ情報の反映 ---
+        $Dom.QuerySelector('.js-arc-title', el).textContent = archive.title || "No Title";
+        $Dom.QuerySelector('.js-arc-url', el).textContent = archive.link_url || "リンクなし";
+        const arcStats = (archive.click_stats && archive.click_stats.link_url) ? archive.click_stats.link_url : { t: 0, u: 0, g: 0 };
+        $Dom.QuerySelector('.js-arc-total', el).textContent = arcStats.t || 0;
+        $Dom.QuerySelector('.js-arc-unique', el).textContent = arcStats.u || 0;
+        $Dom.QuerySelector('.js-arc-guest', el).textContent = arcStats.g || 0;
+        // --- 追加: アーカイブ自体の閲覧数 ---
+        const arcViewCount = archive.click_count || (archive.click_stats && archive.click_stats.view && archive.click_stats.view.t) || 0;
+        const arcViewCountEl = $Dom.QuerySelector('.js-arc-view-count', el);
+        if (arcViewCountEl) arcViewCountEl.textContent = arcViewCount;
+        const statusBadge = $Dom.QuerySelector('.js-arc-status-badge', el);
+        if (!archive.is_public) {
+            statusBadge.textContent = "非公開";
+            statusBadge.className += " bg-slate-200 text-slate-600";
+        } else if (archive.closed_flg) {
+            statusBadge.textContent = "CLOSE";
+            statusBadge.className += " bg-slate-400 text-white";
+        } else {
+            statusBadge.textContent = "公開中";
+            statusBadge.className += " bg-emerald-100 text-emerald-600";
+        }
+        if (archive.is_owner) $Dom.ToggleShow($Dom.QuerySelector('.js-arc-owner-badge', el), true);
+        // --- 2. 明細情報の反映 ---
+        const detailsContainer = $Dom.QuerySelector('.js-details-container', el);
+        const details = $Data.Store.GetDetails() || [];
+        if (details.length === 0) {
+            detailsContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-4">明細データがありません</div>`;
+        } else {
+            details.forEach(dtl => {
+                const child = $Dom.GenerateTemplate('tpl-archive-click-stats-item');
+                // 修正: seq ではなく no (付与した連番) を表示
+                $Dom.QuerySelector('.js-dtl-seq', child).textContent = dtl.no || "-";
+                $Dom.QuerySelector('.js-dtl-icon', child).textContent = dtl.face_emoji || "🚩";
+                $Dom.QuerySelector('.js-dtl-title', child).textContent = dtl.title || "No Title";
+                // --- 2.1 リアクション集計の動的生成 ---
+                const reactContainer = $Dom.QuerySelector('.js-dtl-reactions', child);
+                reactContainer.innerHTML = ""; 
+                Object.values($Const.REACTION_TYPE).forEach(type => {
+                    const countProp = type.prop.replace('has_', 'count_');
+                    const count = dtl[countProp] || 0;
+                    const div = document.createElement("div");
+                    div.className = "flex items-center gap-1 text-[0.8rem]";
+                    div.innerHTML = `<span>${type.emoji}</span><span class="font-black text-slate-500">${count}</span>`;
+                    reactContainer.appendChild(div);
+                });
+                // --- 2.2 クリック統計の反映 ---
+                const urlEl = $Dom.QuerySelector('.js-dtl-url', child);
+                const statsBox = $Dom.QuerySelector('.js-dtl-stats-box', child);
+                if (dtl.link_url && dtl.link_url.trim() !== "") {
+                    urlEl.textContent = dtl.link_url;
+                    urlEl.classList.replace("text-slate-500", "text-blue-500");
+                    const dStats = (dtl.click_stats && dtl.click_stats.link_url) ? dtl.click_stats.link_url : { t: 0, u: 0, g: 0 };
+                    $Dom.QuerySelector('.js-dtl-total', child).textContent = dStats.t || 0;
+                    $Dom.QuerySelector('.js-dtl-unique', child).textContent = dStats.u || 0;
+                    $Dom.QuerySelector('.js-dtl-guest', child).textContent = dStats.g || 0;
+                    $Dom.ToggleShow(statsBox, true);
+                } else {
+                    urlEl.textContent = "リンクなし";
+                    urlEl.classList.add("text-slate-300", "italic");
+                    $Dom.ToggleShow(statsBox, false);
+                }
+                detailsContainer.appendChild(child);
+            });
+        }
+        this._core.open({
+            title: "ARCHIVE STATS",
+            content: el,
+            help: "まとめや各明細の統計（閲覧数・リンククリック数・リアクション数）を表示しています。",
+            size: 'lg'
         });
     },
 };

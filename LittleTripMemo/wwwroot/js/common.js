@@ -3,17 +3,12 @@ window.$Err = {
 	_errMode: "fatal",
 	// エラー処理
     Handle(err, mode) {
-		console.error("App.Err >> ",err);
         $Notice.Loading.Hide(); // ローディングを消す
         if ($App.AppData.Context.IsLoggedIn) {
             $Dialog.ShowErrorDialog(err); // エラー表示画面
         } else {
             $Dialog.ShowLoginDialog(); // ログイン画面
         }
-        // if (mode === this._errMode) {
-		// 	console.log("エラーページへジャンプ！");
-		// 	window.location.href = "component/fatal-error.html";
-        // }
     },
 	// エラースロー
     Throw(message, mode = this._errMode) {

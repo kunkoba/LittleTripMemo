@@ -16,7 +16,7 @@ public class DeleteStrayDetailsService : _BaseService
 
     public record DeleteStrayDetailsReq(
         [Required] Guid login_user_id,
-        [Required(ErrorMessage = "削除対象のseqリストは必須です")] int[] seqs
+        [Required(ErrorMessage = "削除対象のseqリストは必須です")] long[] seqs
     ) : ILoginUserRequest;
 
     public record Response(int deletedCount);
