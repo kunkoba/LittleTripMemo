@@ -6,6 +6,7 @@ export default {
         $Dom.QuerySelector('#btn-admin-report', el).onclick = () => this.ShowAdminReportList();
         $Dom.QuerySelector('#btn-admin-feedback', el).onclick = () => this.ShowAdminFeedbackList();
         $Dom.QuerySelector('#btn-admin-user-mail', el).onclick = () => this.ShowAdminUserMailList();
+        $Dom.QuerySelector('#btn-admin-core-cfg', el).onclick = () => this.ShowAdminCoreConfig();
         this._core.open({
             title: "ADMIN TOOLS",
             content: el,
@@ -577,56 +578,117 @@ export default {
             headerButtons: []
         });
     },
-    // 【管理者機能】ユーザー行動履歴の表示
-    async ShowUserHistory(profile) {
-        if (!profile) return;
-        // 履歴データをAPI取得
+    // 【管理者機能】ユーザー操作履歴一覧
+    async ShowAdminUserHistory(profile) {
         const isSuccess = await $Data.Access.GetUserHistory({ target_user_id: profile.user_id });
         if (!isSuccess) return;
-        // APIのレスポンス形式に柔軟に対応するためのプロパティ推測
-        const histories = $Data.resData.histories || $Data.resData.historyList || $Data.resData.list || [];
-        // 全体のコンテナ
-        const root = document.createElement("div");
-        root.className = "w-full flex flex-col h-full";
-        // 上部：ターゲットユーザー情報を表示
-        const header = document.createElement("div");
-        header.className = "shrink-0 p-3 bg-slate-50 border-b border-brand-2 flex items-center justify-between";
-        $UI.Generator.UserBadge(header, profile, { type: 'badge' });
-        root.appendChild(header);
-        // リスト部
-        const listContainer = document.createElement("div");
-        listContainer.className = "flex-1 overflow-y-auto bg-brand-0";
-        if (histories.length === 0) {
-            listContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">行動履歴はありません</div>`;
+        const historyList = $Data.resData.historyList || [];
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        if (historyList.length === 0) {
+            root.innerHTML = `<div class="text-center py-10 text-slate-400 font-bold">履歴データはありません</div>`;
         } else {
-            // 時間の新しい順に降順ソート
-            const sorted = [...histories].sort((a, b) => {
-                const timA = new Date(a.create_tim || a.update_tim || a.log_tim || a.action_tim || 0);
-                const timB = new Date(b.create_tim || b.update_tim || b.log_tim || b.action_tim || 0);
-                return timB - timA;
-            });
-            sorted.forEach(h => {
-                const child = document.createElement("div");
-                child.className = "p-3 bg-white border-b border-slate-200 hover:bg-slate-50";
-                // プロパティ名の揺れに対応（バックエンドの実装に合致させる）
-                const tim = h.create_tim || h.update_tim || h.log_tim || h.action_tim || "";
-                const action = h.action || h.title || h.message || h.log_type || "Unknown Action";
-                const detail = h.detail || h.body || h.description || h.ip_address || "";
+            historyList.forEach(item => {
+                // ※リスト子テンプレートは既存の汎用的なもの（tpl-admin-list-child-notice等）を流用するか作成
+                const child = document.createElement("button");
+                child.className = "w-full text-left p-3 border-b border-slate-100 active:bg-slate-50 flex justify-between items-center";
                 child.innerHTML = `
-                    <div class="text-[0.7rem] text-slate-400 font-bold mb-1">${tim ? $Util.FormatDate(tim) : "Unknown Date"}</div>
-                    <div class="text-[0.8rem] font-black text-slate-700">${action}</div>
-                    ${detail ? `<div class="text-[0.7rem] text-slate-500 mt-1 break-words whitespace-pre-wrap">${detail}</div>` : ""}
+                    <div>
+                        <div class="text-[0.7rem] text-slate-400 font-mono">${$Util.FormatDate(item.create_tim)}</div>
+                        <div class="text-[0.85rem] font-black text-slate-700">${item.action_kind}</div>
+                    </div>
+                    <span class="text-slate-300 text-[1.2rem]">›</span>
                 `;
-                listContainer.appendChild(child);
+                // クリックで詳細を表示
+                child.onclick = () => this.ShowAdminUserHistoryDetail(item);
+                root.appendChild(child);
             });
         }
-        root.appendChild(listContainer);
+        this._core.open({ title: "USER HISTORY", content: root, theme: "admin", size: "lg" });
+    },
+    // 【管理者機能】操作履歴の詳細表示
+    ShowAdminUserHistoryDetail(item) {
+        console.log("item:", item);
+        const el = $Dom.GenerateTemplate("tpl-admin-user-history-detail");
+        $Dom.QuerySelector(".js-tim", el).textContent = $Util.FormatDate(item.create_tim);
+        $Dom.QuerySelector(".js-action", el).textContent = item.action_kind;
+        $Dom.QuerySelector(".js-target-type", el).textContent = item.body || "N/A";
+        $Dom.QuerySelector(".js-target-id", el).textContent = item.user_id || "-";
+        // ペイロード（詳細データ）の整形表示
+        const payloadEl = $Dom.QuerySelector(".js-payload", el);
+        try {
+            // JSON文字列であればインデントを付けて整形
+            // const data = JSON.parse(item.memo_json);
+            payloadEl.textContent = JSON.stringify(item.memo_json, null, 4);
+        } catch (e) {
+            // 文字列ならそのまま表示
+            payloadEl.textContent = item.payload || "No detailed data.";
+        }
         this._core.open({
-            title: "USER HISTORY",
-            content: root,
+            title: "HISTORY DETAIL",
+            content: el,
             theme: "admin",
-            help: "ユーザーの行動履歴やアクセスログを表示します。",
-            buttons: []
+            size: "md"
         });
     },
+    // 【管理者機能】システム設定の取得と編集
+    async ShowAdminCoreConfig() {
+        const isSuccess = await $Data.Access.GetCoreConfig();
+        if (!isSuccess) return;
+        // 1. 配列データとして取得
+        const configList = $Data.resData.configs || [];
+        const el = $Dom.GenerateTemplate("tpl-admin-core-config");
+        // 2. ヘルパー：配列内から指定キーの「値」を取り出す
+        const getVal = (key) => configList.find(c => c.key === key)?.value || "";
+        // 3. 要素への反映（テンプレート側のIDに合わせる）
+        const inptLatest = $Dom.QuerySelector('#cfg-ver-latest', el);
+        const inptMin    = $Dom.QuerySelector('#cfg-ver-min', el);
+        const btnMaint   = $Dom.QuerySelector('#btn-cfg-maint', el);
+        const valMaint   = $Dom.QuerySelector('#val-cfg-maint', el);
+        const txtMaintMsg = $Dom.QuerySelector('#cfg-maint-msg', el);
+        // 値の流し込み
+        inptLatest.value = getVal("LatestAppVersion");
+        inptMin.value    = getVal("MinAppVersion");
+        txtMaintMsg.value = getVal("MaintenanceMsg");
+        // トグルUIの初期化
+        const updateToggleUI = (isOn) => {
+            const dot = btnMaint.querySelector('.js-dot');
+            if (isOn) {
+                btnMaint.classList.replace('bg-slate-300', 'bg-red-500');
+                dot.style.transform = "translateX(24px)";
+                valMaint.value = "true";
+            } else {
+                btnMaint.classList.replace('bg-red-500', 'bg-slate-300');
+                dot.style.transform = "translateX(0px)";
+                valMaint.value = "false";
+            }
+        };
+        updateToggleUI(getVal("MaintenanceMode") === "true");
+        btnMaint.onclick = () => updateToggleUI(valMaint.value === "false");
+        this._core.open({
+            title: "SYSTEM CONFIG",
+            content: el, theme: "admin", size: "md",
+            buttons: [[
+                { label: "CANCEL", className: "bg-slate-400 text-white", handler: () => this._core.close() },
+                {
+                    label: "UPDATE",
+                    handler: async () => {
+                        if (!await $Util.CheckAdminAuth()) return;
+                        // 送信用データの再構築（配列形式で送る）
+                        const params = {
+                            configs: [
+                                { key: "LatestAppVersion", value: inptLatest.value.trim() },
+                                { key: "MinAppVersion",    value: inptMin.value.trim() },
+                                { key: "MaintenanceMode",  value: valMaint.value },
+                                { key: "MaintenanceMsg",   value: txtMaintMsg.value.trim() }
+                            ]
+                        };
+                        if (await $Data.Access.UpdateCoreConfig(params)) {
+                            $Notice.Info("設定を更新しました。");
+                            this._core.close();
+                        }
+                    }
+                }
+            ]]
+        });
+    }
 };

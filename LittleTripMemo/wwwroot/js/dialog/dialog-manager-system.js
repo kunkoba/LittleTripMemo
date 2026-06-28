@@ -55,7 +55,6 @@ export default {
             }
         };
         b.admin.onclick = async () => {
-            // if (await $Data.Access.GetAdminAllInfo()) this.ShowAdminMenu();
             this.ShowAdminMenu();
         };
         this._core.open({ title: "SYSTEM", content: el });
@@ -396,12 +395,6 @@ export default {
                 label: "✏️",
                 handler: () => this.ShowEditProfile(profile, renderView)
             });
-        } else if (isAdmin) {
-            // 【自分が管理者 且つ 他人のプロフ】メッセージ送信（返信）ボタンを表示
-            headerButtons.push({
-                label: "✉️",
-                handler: () => this.ShowAdminSendUserNotification(profile)
-            });
         }
         //
 		this._core.open({
@@ -682,12 +675,44 @@ export default {
         if ($App.AppData.Owner.plan === "Admin") {
             headerButtons.push({
                 label: "🕒",
-                handler: () => this.ShowUserHistory(profile) // 行動履歴画面の呼び出し
+                handler: () => this.ShowAdminUserHistory(profile) // 行動履歴画面の呼び出し
             });
             headerButtons.push({
                 label: "✉️",
                 handler: () => this.ShowAdminSendUserNotification(profile) // 個別通知送信画面の呼び出し
             });
+        }
+        // 強制アクション
+        const isAdmin = $App.AppData.Owner.plan === "Admin";
+        if (isAdmin && !profile.is_owner) {
+            const banCtrl = $Dom.QuerySelector('#admin-ban-control', el);
+            const btnBan = $Dom.QuerySelector('#btn-admin-ban', el);
+            const btnUnban = $Dom.QuerySelector('#btn-admin-unban', el);
+            $Dom.ToggleShow(banCtrl, true);
+            const refreshBanUI = (isBanned) => {
+                $Dom.ToggleShow(btnBan, !isBanned);
+                $Dom.ToggleShow(btnUnban, isBanned);
+            };
+            refreshBanUI(!!profile.ban_flg);
+            const handleBanUpdate = async (isBanning) => {
+                const title = isBanning ? "CONFIRM BAN" : "CONFIRM UNBAN";
+                const msg = isBanning 
+                    ? "このユーザをBANしますか？\n（本人の投稿が他人に表示されなくなります）" 
+                    : "BANを解除しますか？";
+                if (!await this.ShowConfirm({ title, message: msg })) return;
+                if (!await $Util.CheckAdminAuth()) return; // 管理者PW確認
+                const success = await $Data.Access.UpdateUserBanStatus({
+                    target_user_id: profile.user_id,
+                    is_banned: isBanning
+                });
+                if (success) {
+                    profile.ban_flg = isBanning;
+                    $Notice.Info(isBanning ? "ユーザをBANしました" : "BANを解除しました");
+                    refreshBanUI(isBanning);
+                }
+            };
+            btnBan.onclick = () => handleBanUpdate(true);
+            btnUnban.onclick = () => handleBanUpdate(false);
         }
         //
         this._core.open({

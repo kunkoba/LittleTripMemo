@@ -199,22 +199,27 @@
 </template>
 
 <template id="tpl-view-archive">
-    <!-- 全体を h-full にし、垂直に並べる -->
     <div class="relative h-full flex flex-col bg-white p-1 gap-4">
-        <!-- 1. ユーザバッヂ (固定) -->
-        <div id="view-mem-user-wrapper" class="shrink-0 w-fit"></div>
-        <!-- 2. タイトル (固定) -->
+        <!-- 1. ユーザバッヂ ＆ 明細件数ボタン (横並び) -->
+        <div class="shrink-0 flex justify-between items-center w-full px-1">
+            <div id="view-mem-user-wrapper" class="w-fit"></div>
+            <!-- 元に戻したボタン -->
+            <button id="btn-view-mem-timeline" class="h-10 shadow-md rounded-[1rem] flex items-center justify-center gap-2 active:scale-95 transition-transform px-4 outline-none bg-white border border-slate-200">
+                <span id="mem-stat-count" class="text-[1.1rem] font-black text-slate-800">0</span>
+                <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-wider">memos</span>
+            </button>
+        </div>
+        <!-- 2. タイトル -->
         <div class="shrink-0">
             <h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight border-l-4 border-brand-3 pl-3"></h1>
         </div>
-        <!-- 3. 本文（ここを残りいっぱいの高さにする） -->
+        <!-- 3. 本文 (残りいっぱい) -->
         <div class="flex-1 min-h-0 bg-brand-1 rounded-xl p-3 flex flex-col gap-3 overflow-y-auto">
             <div id="view-mem-body" class="text-[1rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-words"></div>
-            <!-- リンクも本文枠の中の下部に配置されるように調整 -->
             <div id="view-mem-url-wrapper" class="flex flex-wrap gap-2 mt-auto pt-2"></div>
         </div>
-        <!-- 4. 金額 & 5. 距離 (固定) -->
-        <div class="shrink-0 flex flex-col border-t border-slate-200">
+        <!-- 4. 金額 & 5. 距離 -->
+        <div class="shrink-0 flex flex-col mb-2">
             <div class="flex justify-between items-center pt-3 border-b border-slate-200 px-2">
                 <span class="text-[1rem] text-slate-600">金額</span>
                 <span class="text-[1.1rem] font-bold text-slate-800">
@@ -226,14 +231,14 @@
                 <span id="mem-stat-distance" class="text-[1.1rem] font-bold text-slate-800"></span>
             </div>
         </div>
-        <!-- 7. ステータス変更ボタン群 (固定) -->
+        <!-- 7. ステータス変更ボタン群 -->
         <div id="archive-status-bar" class="shrink-0 pt-2 flex gap-2">
             <button id="btn-status-memo" class="flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none">memo</button>
             <button id="btn-status-private" class="flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none">private</button>
             <button id="btn-status-close" class="flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none">public</button>
             <button id="btn-status-open" class="flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none">open</button>
         </div>
-        <!-- 6. 限定公開ボタン (固定) -->
+        <!-- 6. 限定公開ボタン -->
         <div id="archive-limit-btn-area" class="shrink-0 pb-2">
             <button id="btn-toggle-limited" class="w-full h-12 font-black rounded-lg border-2 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                 <span class="js-check-icon text-[1.2rem]">☐</span>

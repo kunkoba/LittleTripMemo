@@ -151,7 +151,6 @@ public class DetailPubRepository : _BaseRepository
               AND d.del_flg    = false
               AND a.closed_flg = false
               AND a.limited_open_flg = false
-              AND u.ban_flg    = false
             ";
 
         // 2. ソート順と「0件除外」条件の決定
@@ -222,7 +221,7 @@ public class DetailPubRepository : _BaseRepository
               AND d.del_flg   = false
               AND a.closed_flg = false
               AND a.limited_open_flg = false
-              AND u.ban_flg = false";
+            ";
 
         // 2. ソート順と条件の決定（変更なし）
         string orderBy = "d.create_tim DESC";

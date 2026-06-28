@@ -160,7 +160,7 @@
 </template>
 
 <!-- 【ダイアログ子】Atmosphere設定ダイアログ（完全高さ同調版） -->
-<template id="tpl-setting-weather">
+<template id="tpl-setting-weather_2">
 	<div class="w-full text-black-5 space-y-4 px-1 py-1">
 		<div class="flex gap-4 items-start">
 			<!-- 左側：天候選択ボタン -->
@@ -222,6 +222,65 @@
 			<span id="atm-code-preview" class="text-[2rem] font-black text-brand-5 tracking-widest leading-none">0000</span>
 		</div>
 	</div>
+</template>
+<!-- 【修正】Atmosphere設定：数値左・スライダー中・大型ボタン右 -->
+<template id="tpl-setting-weather">
+    <div class="w-full text-black-5 space-y-6 px-1 py-1">
+        <!-- 1. 天候選択ボタン（上部） -->
+        <div class="w-full">
+            <div id="atm-weather-group" class="grid grid-cols-3 gap-2">
+                <button data-val="0" class="atm-w-btn h-11 border-2 border-red-100 bg-white text-red-500 font-black text-[0.8rem] rounded-xl active:scale-95 transition-all">Clear</button>
+                <button data-val="1" class="atm-w-btn h-11 border-2 border-brand-2 bg-white text-brand-5 font-black text-[0.8rem] rounded-xl active:scale-95 transition-all">Leaf</button>
+                <button data-val="2" class="atm-w-btn h-11 border-2 border-brand-2 bg-white text-brand-5 font-black text-[0.8rem] rounded-xl active:scale-95 transition-all">Rain</button>
+                <button data-val="3" class="atm-w-btn h-11 border-2 border-brand-2 bg-white text-brand-5 font-black text-[0.8rem] rounded-xl active:scale-95 transition-all">Storm</button>
+                <button data-val="4" class="atm-w-btn h-11 border-2 border-brand-2 bg-white text-brand-5 font-black text-[0.8rem] rounded-xl active:scale-95 transition-all">Snow</button>
+                <button data-val="5" class="atm-w-btn h-11 border-2 border-brand-2 bg-white text-brand-5 font-black text-[0.8rem] rounded-xl active:scale-95 transition-all">Cherry</button>
+            </div>
+        </div>
+        <!-- 2. 設定エリア（垂直並び） -->
+        <div class="flex flex-col gap-2">
+            <!-- WIND -->
+            <div class="bg-white p-2">
+                <label class="block font-black text-slate-400 text-[0.5rem] uppercase tracking-widest mb-1 pl-1">Wind Speed</label>
+                <div class="flex items-center gap-4">
+                    <span id="atm-wind-val" class="w-8 text-[1.5rem] font-black text-brand-5 text-center italic">0</span>
+                    <input id="atm-wind" type="range" min="0" max="9" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5">
+                    <div class="flex gap-2 shrink-0">
+                        <button id="btn-wind-minus" class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 text-[1.5rem] font-bold active:scale-90 shadow-sm">-</button>
+                        <button id="btn-wind-plus"  class="w-12 h-12 rounded-xl bg-brand-5 border border-brand-4 flex items-center justify-center text-white text-[1.5rem] font-bold active:scale-90 shadow-md">+</button>
+                    </div>
+                </div>
+            </div>
+            <!-- DENSITY -->
+            <div class="bg-white p-2">
+                <label class="block font-black text-slate-400 text-[0.5rem] uppercase tracking-widest mb-1 pl-1">Density</label>
+                <div class="flex items-center gap-4">
+                    <span id="atm-density-val" class="w-8 text-[1.5rem] font-black text-brand-5 text-center italic">0</span>
+                    <input id="atm-density" type="range" min="0" max="9" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5">
+                    <div class="flex gap-2 shrink-0">
+                        <button id="btn-density-minus" class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 text-[1.5rem] font-bold active:scale-90 shadow-sm">-</button>
+                        <button id="btn-density-plus"  class="w-12 h-12 rounded-xl bg-brand-5 border border-brand-4 flex items-center justify-center text-white text-[1.5rem] font-bold active:scale-90 shadow-md">+</button>
+                    </div>
+                </div>
+            </div>
+            <!-- DARK -->
+            <div class="bg-white p-2">
+                <label class="block font-black text-slate-400 text-[0.5rem] uppercase tracking-widest mb-1 pl-1">Darkness</label>
+                <div class="flex items-center gap-4">
+                    <span id="atm-darkness-val" class="w-8 text-[1.5rem] font-black text-brand-5 text-center italic">0</span>
+                    <input id="atm-darkness" type="range" min="0" max="9" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5">
+                    <div class="flex gap-2 shrink-0">
+                        <button id="btn-dark-minus" class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 text-[1.5rem] font-bold active:scale-90 shadow-sm">-</button>
+                        <button id="btn-dark-plus"  class="w-12 h-12 rounded-xl bg-brand-5 border border-brand-4 flex items-center justify-center text-white text-[1.5rem] font-bold active:scale-90 shadow-md">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 3. 下部：コード（非表示でも良いが、デバッグ用に最小化して残す） -->
+        <div class="flex justify-center border-t border-slate-50 pt-4">
+            <span id="atm-code-preview" class="text-[1.2rem] font-black text-slate-300 tracking-[0.5em]">0000</span>
+        </div>
+    </div>
 </template>
 
 <!-- 【ダイアログ子】エラー通知用画面 -->

@@ -68,7 +68,6 @@ public class SysReportRepository : _BaseRepository
                 ON r.target_user_id = u.user_id
             WHERE a.del_flg = false      -- 削除されていない
               AND a.closed_flg = false   -- 非公開(クローズ)状態ではない
-              AND u.ban_flg = false      -- 投稿者がBANされていない
             GROUP BY 
                 r.target_user_id, 
                 r.archive_id, 

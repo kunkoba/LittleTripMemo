@@ -1,5 +1,5 @@
-// const BaseUrl = "https://localhost:7292";
-const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
+// const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
+const BaseUrl = "https://localhost:7292";
 // const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
 const API_ENDPOINTS = {
     // Account
@@ -52,8 +52,8 @@ const API_ENDPOINTS = {
     GetReportSummary:       { method: 'post', url: '/api/Admin/GetReportSummary' },
     GetAdminNotifications:  { method: 'post', url: '/api/Admin/GetAdminNotifications' },
     GetSentUserMailList:    { method: 'post', url: '/api/Admin/GetSentUserMailList' },
+    GetUserHistory:         { method: 'post', url: '/api/Admin/GetUserHistory' },
     UpdateUserBanStatus:    { method: 'post', url: '/api/Admin/UpdateUserBanStatus' },  // 未使用
-    GetUserHistory:         { method: 'post', url: '/api/Admin/GetUserHistory' },  // 未使用
     // Core
     GetCoreConfig:          { method: 'post', url: '/api/Core/GetCoreConfig' },     // 未使用
     UpdateCoreConfig:       { method: 'post', url: '/api/Core/UpdateCoreConfig' },  // 未使用
