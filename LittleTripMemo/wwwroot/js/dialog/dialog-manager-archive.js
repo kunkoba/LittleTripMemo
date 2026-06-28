@@ -455,234 +455,6 @@ export default {
         updateSelectionUI(); // フッターボタン生成後に再度呼んで初期状態の disabled を反映
     },
     // まとめ親詳細参照（アーカイブ）
-    ShowArchiveInfo_2() {
-        const archive = $Data.Store.GetArchive();
-        const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.plan === "Admin";
-        const el = $Dom.GenerateTemplate('tpl-view-archive');
-        // 描画処理
-        const renderView = () => {
-            const currentArchive = $Data.Store.GetArchive();
-            // ▼ ステータスボタンの表示・スタイル切替
-            const statusBar = $Dom.QuerySelector('#archive-status-bar', el);
-            const btnMemo = $Dom.QuerySelector('#btn-status-memo', el);
-            const btnPrivate = $Dom.QuerySelector('#btn-status-private', el);
-            const btnClose = $Dom.QuerySelector('#btn-status-close', el);
-            const btnOpen = $Dom.QuerySelector('#btn-status-open', el);
-            // スタイル定義（通常時 vs 現在地）
-            const styleActive = ` bg-white text-slate-600 shadow-md border border-slate-200 active:scale-95 transition-all`;
-            const styleCurrent = ` bg-brand-5 text-white shadow-inner border border-brand-5 cursor-default`;
-            const styleDisabled = ` bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed`;
-            // ボタンスタイルとテキストを適用するヘルパー関数
-            const setBtnStyle = (btn, isCurrent, isEnabled, text) => {
-                if (text.length > 0) btn.textContent = text;
-                if (!isEnabled) {
-                    btn.disabled = true;
-                    btn.onclick = null;
-                    btn.className += styleDisabled;
-                    return;
-                }
-                btn.disabled = false;
-                if (isCurrent) {
-                    btn.onclick = null;
-                    btn.className += styleCurrent;
-                } else {
-                    btn.className += styleActive;
-                }
-            };
-            // 一旦すべて非表示にリセット
-            if (currentArchive.is_owner) {
-                $Dom.ToggleShow(statusBar, true);
-                if (!currentArchive.is_public) {
-                    // ① PRIVATE 状態 [ 1> memo | (2> private) | 3> public ]
-                    setBtnStyle(btnMemo, false, true, "memo");
-                    setBtnStyle(btnPrivate, true, true, "");
-                    setBtnStyle(btnClose, false, true, "public");
-                    setBtnStyle(btnOpen, false, false, "open");
-                    btnMemo.onclick = () => this._execStatusChange(
-                        'DeleteArchive', 
-                        { archive_id: currentArchive.archive_id }, 
-                        "RESTORE TO DETAILS", 
-                        "まとめを解体し、単独のメモに戻しますか？", 
-                        "単体のメモに戻しました。", 
-                        $Const.SCREEN_MODE.CREATE
-                    );
-                    btnClose.onclick = () => this._execStatusChange(
-                        'PublishArchive', 
-                        { archive_id: currentArchive.archive_id }, 
-                        "SWITCH TO CLOSE", 
-                        "まとめを [CLOSE] 状態にしますか？", 
-                        "[CLOSE] 状態に移行しました。", 
-                        $Const.SCREEN_MODE.ARCHIVE_PUB, 
-                        () => $Data.Store.UpdateArchive({ 
-                            is_public: true, 
-                            closed_flg: true 
-                        })
-                    );
-                } else if (currentArchive.closed_flg) {
-                    // ② CLOSE 状態 [ 2> private | (3> close) | 4> open ]
-                    setBtnStyle(btnMemo, false, false, "memo");
-                    setBtnStyle(btnPrivate, false, true, "private");
-                    setBtnStyle(btnClose, true, true, "close");
-                    setBtnStyle(btnOpen, false, true, "open");
-                    btnPrivate.onclick = () => this._execStatusChange(
-                        'UnpublishArchive', 
-                        { archive_id: currentArchive.archive_id }, 
-                        "SWITCH TO PRIVATE", 
-                        "完全に非公開 (PRIVATE) に戻しますか？", 
-                        "[PRIVATE] に戻しました。", 
-                        $Const.SCREEN_MODE.ARCHIVE, 
-                        () => $Data.Store.UpdateArchive({ 
-                            is_public: false, 
-                            closed_flg: false 
-                        })
-                    );
-                    btnOpen.onclick = () => this._execStatusChange(
-                        'OpenArchive', 
-                        { archive_id: currentArchive.archive_id }, 
-                        "SWITCH TO OPEN", 
-                        "マップ上に公開 (OPEN) しますか？", 
-                        "[OPEN] に切り替えました。", 
-                        null, 
-                        () => $Data.Store.UpdateArchive({ 
-                            closed_flg: false 
-                        })
-                    );
-                } else {
-                    // ③ OPEN 状態 [ 2> private | 3> close | (4> open) ]
-                    setBtnStyle(btnMemo, false, false, "memo");
-                    setBtnStyle(btnPrivate, false, true, "private");
-                    setBtnStyle(btnClose, false, true, "close");
-                    setBtnStyle(btnOpen, true, true, "open");
-                    btnPrivate.onclick = () => this._execStatusChange(
-                        'UnpublishArchive', 
-                        { archive_id: currentArchive.archive_id }, 
-                        "SWITCH TO PRIVATE", 
-                        "完全に非公開 (PRIVATE) に戻しますか？", 
-                        "[PRIVATE] に戻しました。", 
-                        $Const.SCREEN_MODE.ARCHIVE, 
-                        () => $Data.Store.UpdateArchive({ 
-                            is_public: false, 
-                            closed_flg: false 
-                        })
-                    );
-                    btnClose.onclick = () => this._execStatusChange(
-                        'CloseArchive', 
-                        { archive_id: currentArchive.archive_id }, 
-                        "SWITCH TO CLOSE", 
-                        "公開を一時停止 (CLOSE) しますか？", 
-                        "[CLOSE] に切り替えました。", 
-                        null, 
-                        () => $Data.Store.UpdateArchive({ 
-                            closed_flg: true 
-                        })
-                    );
-                }
-            } else {
-                // オーナー以外は非表示
-                $Dom.ToggleShow(statusBar, false);
-            }
-            // タイトルと本文の反映
-            $Dom.QuerySelector('#view-mem-title', el).textContent = currentArchive.title || "";
-            $Dom.QuerySelector('#view-mem-body', el).textContent = currentArchive.memo || "";
-            // --- URLリンクの反映（スクロール領域内） ---
-            const urlWrapper = $Dom.QuerySelector('#view-mem-url-wrapper', el);
-            if (currentArchive.link_url) {
-                $Dom.ToggleShow(urlWrapper, true);
-                urlWrapper.innerHTML = ""; // コンテナをクリア
-                // サーバー送信用パラメータ (AddClickReq 形式)
-                const params = {
-                    target_type: 2, // ClickTargetType.Archive
-                    target_user_id: currentArchive.user_id,
-                    archive_id: currentArchive.archive_id,
-                    item_name: "link_url"
-                };
-                // ジェネレータでボタンを生成（第3引数に is_owner を渡す）
-                $UI.Generator.LinkButton(urlWrapper, currentArchive.link_url, params, currentArchive.is_owner);
-            } else {
-                $Dom.ToggleShow(urlWrapper, false);
-            }
-            // 件数の反映
-            const details = $Data.Store.GetDetails() || [];
-            $Dom.QuerySelector('#mem-stat-count', el).textContent = details.length;
-            $Dom.QuerySelector('#btn-view-mem-timeline', el).onclick = () => {
-                this.ShowDetailsTimeLine();
-            };
-            // --- 距離の計算と表示 ---
-            const totalKm = $Util.GetTotalDistance(details);
-            const distVal = $Dom.QuerySelector('#mem-stat-distance', el);
-            // 1km未満なら小数点第2位まで、1km以上なら小数点第1位くらいが見やすい
-            distVal.textContent = totalKm < 1 ? totalKm.toFixed(2) + ' km' : totalKm.toFixed(1) + ' km';
-            // 金額の反映
-            const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
-            const priceVal = $Dom.QuerySelector('#mem-stat-price', el);
-            const priceUnit = $Dom.QuerySelector('#view-mem-price-unit', el);
-            const displayCurrency = currentArchive.currency_unit || $App.AppData.Owner.Currency_unit || 'JPY';
-            priceUnit.textContent = displayCurrency;
-            if (totalPrice > 0) {
-                priceVal.className += " text-blue-600";
-                priceVal.textContent = `+${totalPrice.toLocaleString()}`;
-            } else if (totalPrice < 0) {
-                priceVal.className += " text-red-600";
-                priceVal.textContent = `- ${Math.abs(totalPrice).toLocaleString()}`;
-            } else {
-                priceVal.className += " text-black-5";
-                priceVal.textContent = `0`;
-            }
-        };
-        // 初期描画の実行
-        renderView();
-        // --- ユーザー情報の表示設定（Generatorによる部品注入へ置換） ---
-        const userWrapper = $Dom.QuerySelector('#view-mem-user-wrapper', el);
-        const profile = $Data.Store.GetUserProfile();
-        if (profile) {
-            // ジェネレータでプロフィールボタンを生成して追加
-            $UI.Generator.UserBadge(userWrapper, profile, { type: 'button', isOwner: archive.is_owner });
-        } else {
-            $Dom.ToggleShow(userWrapper, false);
-        }
-        // QRコードのプリロード（事前ダウンロード）
-        const baseUrl = window.location.origin + window.location.pathname;
-        const encodedId = $Util.EncodeId(archive.archive_id);
-        const shareUrl = `${baseUrl}?mode=archive_pub&encodedId=${encodedId}`;
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`;
-        const imgPreload = new Image();
-        imgPreload.src = qrUrl;     // このタイミングでプリロード開始
-        // --- ヘッダーボタンの定義 ---
-        const headerButtons = [];
-        if (archive.is_public && !archive.closed_flg) {
-            headerButtons.push({
-                label: "🔗",
-                handler: () => this.ShowShareArchive(archive, profile, qrUrl)
-            });
-        }
-        if (archive.is_owner) {
-            headerButtons.push({
-                label: "✏️",
-                handler: () => this.ShowEditArchive(archive, renderView)
-            });
-        } else {
-            headerButtons.push({
-                label: "🚫",
-                handler: () => this.ShowReportPost(archive)
-            });
-        }
-        if (archive.is_owner || isAdmin) {
-            headerButtons.push({
-                label: "📊",
-                handler: () => this.ShowArchiveClickStats(archive)
-            });
-        }
-        const dialogButtons = [];
-        //
-        this._core.open({
-            title: "Archive info",
-            content: el,
-            size: 'lg',
-            help: "",
-            headerButtons: headerButtons,
-            buttons: dialogButtons, // 一般ユーザーはダイアログ下部フッター(buttons)は無し
-        });
-    },
     ShowArchiveInfo() {
         const archive = $Data.Store.GetArchive();
         const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.plan === "Admin";
@@ -694,7 +466,7 @@ export default {
             // 1. タイトルと本文
             $Dom.QuerySelector('#view-mem-title', el).textContent = arc.title || "";
             $Dom.QuerySelector('#view-mem-body', el).textContent = arc.memo || "";
-            // 2. URLリンク（スクロールエリア内）
+            // 2. URLリンク
             const urlWrapper = $Dom.QuerySelector('#view-mem-url-wrapper', el);
             urlWrapper.innerHTML = "";
             if (arc.link_url) {
@@ -709,11 +481,10 @@ export default {
             } else {
                 $Dom.ToggleShow(urlWrapper, false);
             }
-            // 3. 金額・距離（画像通りの横並び・ボーダーデザイン）
+            // 3. 金額・距離（画像通りのリスト形式）
             const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
             const priceVal = $Dom.QuerySelector('#mem-stat-price', el);
             priceVal.textContent = totalPrice.toLocaleString();
-            // 金額の色分け
             priceVal.className = "font-bold text-[1.1rem]";
             if (totalPrice > 0) priceVal.classList.add("text-blue-500");
             else if (totalPrice < 0) priceVal.classList.add("text-red-500");
@@ -736,17 +507,14 @@ export default {
             [btnMemo, btnPrivate, btnClose, btnOpen].forEach(resetStyles);
             if (arc.is_owner) {
                 if (!arc.is_public) {
-                    // 現在：PRIVATE
                     btnMemo.className += styleActive;
-                    btnMemo.onclick = () => this._execStatusChange('DeleteArchive', { archive_id: arc.archive_id }, "RESTORE", "まとめを解体し、単独メモに戻しますか？", "戻しました", $Const.SCREEN_MODE.CREATE);
+                    btnMemo.onclick = () => this._execStatusChange('DeleteArchive', { archive_id: arc.archive_id }, "RESTORE", "解体しますか？", "戻しました", $Const.SCREEN_MODE.CREATE);
                     btnPrivate.className += styleCurrent;
-                    btnClose.textContent = "public";
                     btnClose.className += styleActive;
-                    btnClose.onclick = () => this._execStatusChange('PublishArchive', { archive_id: arc.archive_id }, "PUBLISH", "まとめを公開準備状態にしますか？", "公開準備完了", $Const.SCREEN_MODE.ARCHIVE_PUB, () => $Data.Store.UpdateArchive({ is_public: true, closed_flg: true }));
+                    btnClose.onclick = () => this._execStatusChange('PublishArchive', { archive_id: arc.archive_id }, "PUBLISH", "公開準備にしますか？", "完了", $Const.SCREEN_MODE.ARCHIVE_PUB, () => $Data.Store.UpdateArchive({ is_public: true, closed_flg: true }));
                     btnOpen.className += styleDisabled;
                     btnOpen.disabled = true;
                 } else {
-                    // 現在：PUBLIC (CLOSE or OPEN)
                     btnMemo.className += styleDisabled;
                     btnMemo.disabled = true;
                     btnPrivate.className += styleActive;
@@ -754,39 +522,43 @@ export default {
                     if (arc.closed_flg) {
                         btnClose.className += styleCurrent;
                         btnOpen.className += styleActive;
-                        btnOpen.onclick = () => this._execStatusChange('OpenArchive', { archive_id: arc.archive_id }, "OPEN", "マップ上に全体公開しますか？", "全体公開しました", null, () => $Data.Store.UpdateArchive({ closed_flg: false }));
+                        btnOpen.onclick = () => this._execStatusChange('OpenArchive', { archive_id: arc.archive_id }, "OPEN", "全体公開しますか？", "公開しました", null, () => $Data.Store.UpdateArchive({ closed_flg: false }));
                     } else {
                         btnClose.className += styleActive;
-                        btnClose.onclick = () => this._execStatusChange('CloseArchive', { archive_id: arc.archive_id }, "CLOSE", "全体公開を停止（限定公開）しますか？", "限定公開にしました", null, () => $Data.Store.UpdateArchive({ closed_flg: true }));
+                        btnClose.onclick = () => this._execStatusChange('CloseArchive', { archive_id: arc.archive_id }, "CLOSE", "限定公開にしますか？", "変更しました", null, () => $Data.Store.UpdateArchive({ closed_flg: true }));
                         btnOpen.className += styleCurrent;
                     }
                 }
             } else {
                 $Dom.ToggleShow($Dom.QuerySelector('#archive-status-bar', el), false);
             }
-            // 5. 下部の巨大ボタン [☑ 限定公開に変更する]
+            // 5. 【修正】最下段ボタン：limited_open_flg の制御
             const limitArea = $Dom.QuerySelector('#archive-limit-btn-area', el);
             const btnLimit = $Dom.QuerySelector('#btn-toggle-limited', el);
             if (arc.is_owner && arc.is_public) {
                 $Dom.ToggleShow(limitArea, true);
-                const isClosed = !!arc.closed_flg;
+                const isLimited = !!arc.limited_open_flg; // 正しいフラグを参照
                 const icon = $Dom.QuerySelector('.js-check-icon', btnLimit);
                 const label = $Dom.QuerySelector('.js-label-text', btnLimit);
-                icon.textContent = isClosed ? "☑" : "☐";
-                label.textContent = isClosed ? "限定公開中（URLのみ）" : "限定公開に変更する";
+                icon.textContent = isLimited ? "☑" : "☐";
+                label.textContent = isLimited ? "限定公開中（URLのみ）" : "限定公開に変更する";
                 btnLimit.className = "w-full h-12 font-black rounded-lg border-2 active:scale-[0.98] transition-all flex items-center justify-center gap-2";
-                if (isClosed) {
+                if (isLimited) {
                     btnLimit.classList.add("bg-brand-1", "border-brand-3", "text-brand-5");
                 } else {
-                    btnLimit.classList.add("bg-slate-100", "border-slate-200", "text-slate-700");
+                    btnLimit.classList.add("bg-slate-50", "border-slate-200", "text-slate-400");
                 }
                 btnLimit.onclick = async () => {
-                    const nextStatus = !isClosed;
-                    const method = nextStatus ? 'CloseArchive' : 'OpenArchive';
-                    if (await $Data.Access[method]({ archive_id: arc.archive_id })) {
-                        $Data.Store.UpdateArchive({ closed_flg: nextStatus });
-                        $Notice.Info(nextStatus ? "限定公開に変更しました" : "全体公開に変更しました");
-                        renderView(); // 再描画して反映
+                    const nextStatus = !isLimited;
+                    // API経由で limited_open_flg のみを更新
+                    const isSuccess = await $Data.Access.UpdateArchivePub({ 
+                        archive_id: arc.archive_id, 
+                        limited_open_flg: nextStatus 
+                    });
+                    if (isSuccess) {
+                        $Data.Store.UpdateArchive({ limited_open_flg: nextStatus });
+                        $Notice.Info(nextStatus ? "限定公開に設定しました" : "全体公開に設定しました");
+                        renderView(); // 自身の状態を再描画
                     }
                 };
             } else {
@@ -1050,80 +822,6 @@ export default {
         });
     },
     // アーカイブと明細のクリック集計画面の表示
-    ShowArchiveClickStats_2(archive) {
-        if (!archive) return;
-        const el = $Dom.GenerateTemplate('tpl-archive-click-stats');
-        // --- 1. アーカイブ情報の反映 ---
-        $Dom.QuerySelector('.js-arc-title', el).textContent = archive.title || "No Title";
-        $Dom.QuerySelector('.js-arc-url', el).textContent = archive.link_url || "リンクなし";
-        const arcStats = (archive.click_stats && archive.click_stats.link_url) ? archive.click_stats.link_url : { t: 0, u: 0, g: 0 };
-        $Dom.QuerySelector('.js-arc-total', el).textContent = arcStats.t || 0;
-        $Dom.QuerySelector('.js-arc-unique', el).textContent = arcStats.u || 0;
-        $Dom.QuerySelector('.js-arc-guest', el).textContent = arcStats.g || 0;
-        // --- 追加: アーカイブ自体の閲覧数 ---
-        const arcViewCount = archive.click_count || (archive.click_stats && archive.click_stats.view && archive.click_stats.view.t) || 0;
-        const arcViewCountEl = $Dom.QuerySelector('.js-arc-view-count', el);
-        if (arcViewCountEl) arcViewCountEl.textContent = arcViewCount;
-        const statusBadge = $Dom.QuerySelector('.js-arc-status-badge', el);
-        if (!archive.is_public) {
-            statusBadge.textContent = "非公開";
-            statusBadge.className += " bg-slate-200 text-slate-600";
-        } else if (archive.closed_flg) {
-            statusBadge.textContent = "CLOSE";
-            statusBadge.className += " bg-slate-400 text-white";
-        } else {
-            statusBadge.textContent = "公開中";
-            statusBadge.className += " bg-emerald-100 text-emerald-600";
-        }
-        if (archive.is_owner) $Dom.ToggleShow($Dom.QuerySelector('.js-arc-owner-badge', el), true);
-        // --- 2. 明細情報の反映 ---
-        const detailsContainer = $Dom.QuerySelector('.js-details-container', el);
-        const details = $Data.Store.GetDetails() || [];
-        if (details.length === 0) {
-            detailsContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-4">明細データがありません</div>`;
-        } else {
-            details.forEach(dtl => {
-                const child = $Dom.GenerateTemplate('tpl-archive-click-stats-item');
-                $Dom.QuerySelector('.js-dtl-seq', child).textContent = dtl.seq || "-";
-                $Dom.QuerySelector('.js-dtl-icon', child).textContent = dtl.face_emoji || "🚩";
-                $Dom.QuerySelector('.js-dtl-title', child).textContent = dtl.title || "No Title";
-                // --- 2.1 リアクション集計の動的生成 ---
-                const reactContainer = $Dom.QuerySelector('.js-dtl-reactions', child);
-                reactContainer.innerHTML = ""; 
-                Object.values($Const.REACTION_TYPE).forEach(type => {
-                    const countProp = type.prop.replace('has_', 'count_');
-                    const count = dtl[countProp] || 0;
-                    const div = document.createElement("div");
-                    div.className = "flex items-center gap-1 text-[0.8rem]";
-                    div.innerHTML = `<span>${type.emoji}</span><span class="font-black text-slate-500">${count}</span>`;
-                    reactContainer.appendChild(div);
-                });
-                // --- 2.2 クリック統計の反映 ---
-                const urlEl = $Dom.QuerySelector('.js-dtl-url', child);
-                const statsBox = $Dom.QuerySelector('.js-dtl-stats-box', child);
-                if (dtl.link_url && dtl.link_url.trim() !== "") {
-                    urlEl.textContent = dtl.link_url;
-                    urlEl.classList.replace("text-slate-500", "text-blue-500");
-                    const dStats = (dtl.click_stats && dtl.click_stats.link_url) ? dtl.click_stats.link_url : { t: 0, u: 0, g: 0 };
-                    $Dom.QuerySelector('.js-dtl-total', child).textContent = dStats.t || 0;
-                    $Dom.QuerySelector('.js-dtl-unique', child).textContent = dStats.u || 0;
-                    $Dom.QuerySelector('.js-dtl-guest', child).textContent = dStats.g || 0;
-                    $Dom.ToggleShow(statsBox, true);
-                } else {
-                    urlEl.textContent = "リンクなし";
-                    urlEl.classList.add("text-slate-300", "italic");
-                    $Dom.ToggleShow(statsBox, false);
-                }
-                detailsContainer.appendChild(child);
-            });
-        }
-        this._core.open({
-            title: "ARCHIVE STATS",
-            content: el,
-            help: "まとめや各明細の統計（閲覧数・リンククリック数・リアクション数）を表示しています。",
-            size: 'lg'
-        });
-    },
     ShowArchiveClickStats(archive) {
         if (!archive) return;
         const el = $Dom.GenerateTemplate('tpl-archive-click-stats');

@@ -176,34 +176,6 @@ export default {
         });
     },
     // 通報集計一覧（API通信化）
-    async ShowAdminReportList_2() {
-        const isSuccess = await $Data.Access.GetReportSummary();
-        if (!isSuccess) return;
-        const reportSummary = $App.AppData.Admin.reportSummary ||[];
-        const root = $Dom.GenerateTemplate("tpl-list-parent");
-        if (reportSummary.length === 0) {
-            root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">通報データはありません</div>`;
-        } else {
-            // 通報件数の多い順にソート
-            const sorted = [...reportSummary].sort((a, b) => b.report_count - a.report_count);
-            sorted.forEach(item => {
-                const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-summary");
-                $Dom.QuerySelector(".js-target-user", child).textContent = `Target: ${item.target_user_name || item.target_user_id}`;
-                $Dom.QuerySelector(".js-archive-title", child).textContent = item.archive_title || "Unknown Title";
-                $Dom.QuerySelector(".js-badge-count", child).textContent = `${item.report_count}`;
-                child.onclick = () => this.ShowAdminReportDetail(item);
-                root.appendChild(child);
-            });
-        }
-        this._core.open({
-            title: "REPORT Mgmt",
-            content: root,
-            theme: "admin",
-            help: "",
-            buttons:[]
-        });
-    },
-    // 通報集計一覧（API通信化）
     async ShowAdminReportList() {
         const isSuccess = await $Data.Access.GetReportSummary();
         if (!isSuccess) return;
@@ -241,88 +213,6 @@ export default {
         this._core.open({
             title: "REPORT Mgmt",
             content: root,
-            theme: "admin",
-            help: "",
-            buttons: []
-        });
-    },
-    // 【管理者機能】通報詳細
-    async ShowAdminReportDetail_2(summaryItem) {
-        // 詳細データをAPI取得
-        const isSuccess = await $Data.Access.GetReportDetails({
-            target_user_id: summaryItem.target_user_id,
-            archive_id: summaryItem.archive_id
-        });
-        if (!isSuccess) return;
-        // 
-        const reports = $Data.resData.reports || [];
-        const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
-        // アーカイブタイトルの反映
-        $Dom.QuerySelector(".js-archive-title", el).textContent = summaryItem.archive_title || "Unknown Title";
-        // --- ターゲットユーザーボタンの設定 ---
-        const userWrapper = $Dom.QuerySelector("#view-report-target-user-wrapper", el);
-        userWrapper.innerHTML = "";
-        const profile = $Data.resData.target_userProfile;
-        if (profile) {
-            $UI.Generator.UserBadge(userWrapper, profile, { type: 'button', isOwner: false });
-        }
-        // 1. 各種ボタンの取得
-        const btnOpen    = $Dom.QuerySelector("#btn-admin-report-open", el);
-        const btnClose   = $Dom.QuerySelector("#btn-admin-report-close", el);
-        const btnPrivate = $Dom.QuerySelector("#btn-admin-report-private", el);
-        // 2. Open（まとめを開く）
-        btnOpen.onclick = async () => {
-            const isOk = await this.ShowConfirm({ title: "JUMP", message: "この Public まとめデータを開きますか？" });
-            if (!isOk) return;
-            this._core.closeAll();
-            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
-            $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
-            await $App.RefreshScreen();
-        };
-        // 3. Close（強制クローズ：URLを知っている人だけ見れる状態へ）
-        btnClose.onclick = async () => {
-            const isOk = await this.ShowConfirm({ title: "FORCE CLOSE", message: "強制的に公開停止(Close)にしますか？" });
-            if (!isOk) return;
-            const isSuccess = await $Data.Access.AdminCloseArchive({ 
-                archive_id: summaryItem.archive_id, 
-                target_user_id: summaryItem.target_user_id 
-            });
-            if (isSuccess) {
-                $Notice.Info("強制的にCloseしました");
-                this._core.closeAll();
-            }
-        };
-        // 4. Delete（強制Private：本人以外一切見れない状態へ戻す）
-        btnPrivate.onclick = async () => {
-            const isOk = await this.ShowConfirm({ title: "FORCE PRIVATE", message: "強制的に非公開(Private)に戻しますか？" });
-            if (!isOk) return;
-            const isSuccess = await $Data.Access.AdminUnpublishArchive({ 
-                archive_id: summaryItem.archive_id, 
-                target_user_id: summaryItem.target_user_id 
-            });
-            if (isSuccess) {
-                $Notice.Info("非公開に戻しました");
-                this._core.closeAll();
-            }
-        };
-        // 下部の通報理由リスト描画
-        const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
-        if (reports.length === 0) {
-            listContainer.innerHTML = `<div class="text-[0.8rem] text-slate-400 p-2">詳細データがありません</div>`;
-        } else {
-            // 降順ソートしてからリスト化
-            reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
-                const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
-                $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim);
-                $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
-                child.classList.add("cursor-pointer", "active:bg-slate-50");
-                child.onclick = () => this.ShowAdminReportItemDetail(rep);
-                listContainer.appendChild(child);
-            });
-        }
-        this._core.open({
-            title: "REPORT DETAILS",
-            content: el,
             theme: "admin",
             help: "",
             buttons: []
@@ -685,6 +575,58 @@ export default {
             theme: "admin",
             help: "",
             headerButtons: []
+        });
+    },
+    // 【管理者機能】ユーザー行動履歴の表示
+    async ShowUserHistory(profile) {
+        if (!profile) return;
+        // 履歴データをAPI取得
+        const isSuccess = await $Data.Access.GetUserHistory({ target_user_id: profile.user_id });
+        if (!isSuccess) return;
+        // APIのレスポンス形式に柔軟に対応するためのプロパティ推測
+        const histories = $Data.resData.histories || $Data.resData.historyList || $Data.resData.list || [];
+        // 全体のコンテナ
+        const root = document.createElement("div");
+        root.className = "w-full flex flex-col h-full";
+        // 上部：ターゲットユーザー情報を表示
+        const header = document.createElement("div");
+        header.className = "shrink-0 p-3 bg-slate-50 border-b border-brand-2 flex items-center justify-between";
+        $UI.Generator.UserBadge(header, profile, { type: 'badge' });
+        root.appendChild(header);
+        // リスト部
+        const listContainer = document.createElement("div");
+        listContainer.className = "flex-1 overflow-y-auto bg-brand-0";
+        if (histories.length === 0) {
+            listContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">行動履歴はありません</div>`;
+        } else {
+            // 時間の新しい順に降順ソート
+            const sorted = [...histories].sort((a, b) => {
+                const timA = new Date(a.create_tim || a.update_tim || a.log_tim || a.action_tim || 0);
+                const timB = new Date(b.create_tim || b.update_tim || b.log_tim || b.action_tim || 0);
+                return timB - timA;
+            });
+            sorted.forEach(h => {
+                const child = document.createElement("div");
+                child.className = "p-3 bg-white border-b border-slate-200 hover:bg-slate-50";
+                // プロパティ名の揺れに対応（バックエンドの実装に合致させる）
+                const tim = h.create_tim || h.update_tim || h.log_tim || h.action_tim || "";
+                const action = h.action || h.title || h.message || h.log_type || "Unknown Action";
+                const detail = h.detail || h.body || h.description || h.ip_address || "";
+                child.innerHTML = `
+                    <div class="text-[0.7rem] text-slate-400 font-bold mb-1">${tim ? $Util.FormatDate(tim) : "Unknown Date"}</div>
+                    <div class="text-[0.8rem] font-black text-slate-700">${action}</div>
+                    ${detail ? `<div class="text-[0.7rem] text-slate-500 mt-1 break-words whitespace-pre-wrap">${detail}</div>` : ""}
+                `;
+                listContainer.appendChild(child);
+            });
+        }
+        root.appendChild(listContainer);
+        this._core.open({
+            title: "USER HISTORY",
+            content: root,
+            theme: "admin",
+            help: "ユーザーの行動履歴やアクセスログを表示します。",
+            buttons: []
         });
     },
 };

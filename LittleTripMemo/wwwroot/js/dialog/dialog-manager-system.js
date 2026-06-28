@@ -615,7 +615,6 @@ export default {
             target.innerHTML = `
                 <div class="flex justify-between"><span>Archives:</span><span class="font-black">${stats.archive_count}</span></div>
                 <div class="flex justify-between"><span>Memos:</span><span class="font-black">${stats.detail_count}</span></div>
-                <div class="flex justify-between"><span>Price:</span><span class="font-black ${stats.total_price < 0 ? 'text-red-500' : 'text-blue-500'}">${stats.total_price.toLocaleString()}</span></div>
             `;
         };
         renderStats(".js-private-stats", profile.info_stats);
@@ -644,14 +643,12 @@ export default {
     ShowUserClickStats(profile) {
         const el = $Dom.GenerateTemplate("tpl-user-click-stats");
         // 1. ユーザバッジ & 通報数
-        // const badge = $UI.Generator.UserBadge(profile, { type: 'badge' });
-        // $Dom.QuerySelector(".js-user-badge-container", el).appendChild(badge);
         $UI.Generator.UserBadge($Dom.QuerySelector(".js-user-badge-container", el), profile, { type: 'badge' });
         $Dom.QuerySelector(".js-report-count", el).textContent = profile.report_count || 0;
         // 2. 実績解析（Private/Public共通ヘルパー）
         const fillStats = (selector, data) => {
             const target = $Dom.QuerySelector(selector, el);
-            target.innerHTML = ""; 
+            target.innerHTML = ""; // クリア
             if (!data) {
                 target.innerHTML = `<span class="text-slate-300 italic">No Data</span>`;
                 return;
@@ -659,10 +656,6 @@ export default {
             const child = $Dom.GenerateTemplate("tpl-user-activity-summary");
             $Dom.QuerySelector(".js-archive-count", child).textContent = data.archive_count;
             $Dom.QuerySelector(".js-memo-count", child).textContent = data.detail_count;
-            const valEl = $Dom.QuerySelector(".js-value", child);
-            valEl.textContent = data.total_price.toLocaleString();
-            // 金額の色分け（text-[1.1rem] などのサイズ指定を消さないように注意）
-            valEl.classList.add(data.total_price < 0 ? 'text-red-500' : 'text-blue-500');
             target.appendChild(child);
         };
         fillStats(".js-stats-pvt", profile.info_stats);
@@ -684,12 +677,25 @@ export default {
             $Dom.QuerySelector(".js-guest", child).textContent = stats.g;
             container.appendChild(child);
         });
+        // ▼ ヘッダーボタンの追加（管理者の場合のみ）
+        const headerButtons = [];
+        if ($App.AppData.Owner.plan === "Admin") {
+            headerButtons.push({
+                label: "🕒",
+                handler: () => this.ShowUserHistory(profile) // 行動履歴画面の呼び出し
+            });
+            headerButtons.push({
+                label: "✉️",
+                handler: () => this.ShowAdminSendUserNotification(profile) // 個別通知送信画面の呼び出し
+            });
+        }
         //
         this._core.open({
             title: "USER CLICK STATS",
             content: el,
             theme: profile.is_owner ? "user" : "admin", // 閲覧者が本人の場合は通常、管理者の場合はAdminテーマ
-            size: "lg"
+            size: "lg",
+            headerButtons: headerButtons
         });
     },
 };
