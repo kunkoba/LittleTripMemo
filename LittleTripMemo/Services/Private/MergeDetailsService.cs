@@ -25,7 +25,7 @@ public class MergeDetailsService(
     /// <param name="title">まとめのタイトル（未指定の場合はサーバー側で自動生成）</param>
     public record MergeDetailsReq(
         [Required] Guid login_user_id,
-        [Required(ErrorMessage = "対象の明細が選択されていません")] int[] seqs,
+        [Required(ErrorMessage = "対象の明細が選択されていません")] long[] seqs,
         string? title
     ) : ILoginUserRequest;
 

@@ -198,7 +198,7 @@
 	</div>
 </template>
 
-<template id="tpl-view-archive">
+<template id="tpl-view-archive_2">
 	<div class="relative min-h-full flex flex-col bg-white">
         <!-- ユーザー情報と件数 -->
         <div class="flex items-center justify-between gap-2 mb-3">
@@ -250,6 +250,48 @@
             </button>
         </div>
 	</div>
+</template>
+<template id="tpl-view-archive">
+    <div class="relative min-h-full flex flex-col bg-white p-1 gap-4">
+        <!-- 1. ユーザバッヂ -->
+        <div id="view-mem-user-wrapper" class="w-fit"></div>
+        <!-- 2. タイトル -->
+        <div>
+            <h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight border-l-4 border-brand-3 pl-3"></h1>
+        </div>
+        <!-- 3. 本文（本文＋リンク） -->
+        <div class="bg-brand-1 rounded-xl p-3 flex flex-col gap-3">
+            <div id="view-mem-body" class="text-[1rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-words"></div>
+            <div id="view-mem-url-wrapper" class="flex flex-wrap gap-2"></div>
+        </div>
+        <!-- 4. 金額 & 5. 距離（画像に基づいたデザイン） -->
+        <div class="flex flex-col border-t border-slate-200 mt-2">
+            <div class="flex justify-between items-center py-3 border-b border-slate-200 px-2">
+                <span class="text-[1rem] text-slate-600">金額</span>
+                <span class="text-[1.1rem] font-bold text-slate-800">
+                    <span id="mem-stat-price"></span> <span id="view-mem-price-unit"></span>
+                </span>
+            </div>
+            <div class="flex justify-between items-center py-3 border-b border-slate-200 px-2">
+                <span class="text-[1rem] text-slate-600">距離</span>
+                <span id="mem-stat-distance" class="text-[1.1rem] font-bold text-slate-800"></span>
+            </div>
+        </div>
+        <!-- 7. ステータス変更ボタン群（四つ） -->
+        <div id="archive-status-bar" class="mt-auto pt-4 flex gap-2">
+            <button id="btn-status-memo" class="flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none">memo</button>
+            <button id="btn-status-private" class="flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none">private</button>
+            <button id="btn-status-close" class="flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none">public</button>
+            <button id="btn-status-open" class="flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none">open</button>
+        </div>
+        <!-- 6. 限定公開にするボタン（四つのボタンの下・横幅いっぱい） -->
+        <div id="archive-limit-btn-area" class="pb-2">
+            <button id="btn-toggle-limited" class="w-full h-12 bg-slate-100 text-slate-700 font-black rounded-lg border-2 border-slate-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                <span class="js-check-icon text-[1.2rem]">☐</span>
+                <span class="js-label-text">限定公開に変更する</span>
+            </button>
+        </div>
+    </div>
 </template>
 
 <template id="tpl-edit-archive">

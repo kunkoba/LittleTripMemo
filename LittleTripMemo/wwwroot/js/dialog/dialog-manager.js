@@ -239,7 +239,10 @@ const DialogController = {
                 {
                     label: "refresh",
                     className: "bg-brand-5 text-white w-full",
-                    handler: () => $App.RefreshScreen()
+                    handler: () => {
+                        this._core.closeAll();
+                        $App.RefreshScreen();
+                    }
                 }
             ]]
         });

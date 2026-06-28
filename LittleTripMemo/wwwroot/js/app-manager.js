@@ -163,10 +163,7 @@ const AppManager = {
                 this.AppData.Context.IsLoggedIn = true;
                 // ユーザ存在チェック＆最終ログイン日時設定
                 let isSuccess = await this.SyncActivityLog();
-                if (!isSuccess) {
-                    $Dialog.ShowLoginDialog();
-                    return;
-                }
+                if (!isSuccess) return;
                 // システム情報取得
                 $Data.Access.GetSystemInfo();
             }

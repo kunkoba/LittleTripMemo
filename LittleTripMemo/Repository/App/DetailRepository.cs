@@ -87,7 +87,7 @@ public class DetailRepository : _BaseRepository
     /// 指定された seq リストの明細に archive_id をセット。
     /// 条件：seq IN (@seqs) AND archive_id = 0 AND user_id = @user_id
     /// </summary>
-    public async Task<int> UpdateArchiveIdBySeqsAsync(int archiveId, int[] seqs)
+    public async Task<int> UpdateArchiveIdBySeqsAsync(int archiveId, long[] seqs)
     {
         string sql = $@"
         UPDATE t_memo_detail_{_user.table_id} SET
