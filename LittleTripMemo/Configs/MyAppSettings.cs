@@ -19,6 +19,7 @@ public class MyAppSettings
     public int ClickAggregateIntervalMinutes { get; set; } = -1;    // クリック数の集計
     public int UserSummaryUpdateIntervalMinutes { get; set; } = -1;     // ユーザー関連情報の集計の更新
     public int ReportStatsUpdateIntervalMinutes { get; set; } = -1;     // レポート関連情報の集計の更新
+    public int AppInfoUpdateIntervalMinutes { get; set; } = -1;     // アプリ情報の集計の更新
     public string DailyMaintenanceTime { get; set; } = "00:00";     // 日次メンテナンスの実行時刻（HH:mm形式）
 
 

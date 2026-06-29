@@ -100,7 +100,7 @@ export default {
         // プレビュー用バーを0-5までループ生成
         let previewItems = '';
         for (let i = 0; i <= 5; i++) {
-            const textColor = i > 2 ? 'text-white' : 'text-black-3';
+            const textColor = i > 2 ? 'text-white' : 'text-slate-400';
             previewItems += `<div class="w-full h-10 bg-brand-${i} border border-brand-2 flex items-center px-4 text-[0.8rem] font-bold ${textColor}">LEVEL ${i} PREVIEW</div>`;
         }
         const html = `
@@ -159,7 +159,7 @@ export default {
         let listHtml = '';
         Object.values($Map.MAP_STYLE).forEach(style => {
             listHtml += `
-                <button id="ms-btn-${style.key}" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+                <button id="ms-btn-${style.key}" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
                     <span class="col-span-1 flex justify-center text-[1.2rem]">🗺️</span>
                     <span class="col-span-1"></span>
                     <span class="col-span-8 text-left font-bold text-[1rem] uppercase">${style.name}</span>
@@ -305,7 +305,7 @@ export default {
             el.innerHTML = options.map(opt => `
                 <button data-key="${opt.key}" class="js-font-btn w-full h-14 flex items-center justify-between px-6 border-b border-brand-2 active:bg-brand-1">
                     <span class="font-bold text-[1rem]">${opt.label}</span>
-                    <span class="js-check text-brand-5 font-black text-[1.2rem]">${current === opt.key ? '●' : '○'}</span>
+                    <span class="js-check text-brand-5 font-bold text-[1.2rem]">${current === opt.key ? '●' : '○'}</span>
                 </button>
             `).join('');
             // ボタンクリックで「一時適用」
@@ -606,8 +606,8 @@ export default {
             const target = $Dom.QuerySelector(containerSelector, el);
             if (!stats) return target.innerHTML = "No Data";
             target.innerHTML = `
-                <div class="flex justify-between"><span>Archives:</span><span class="font-black">${stats.archive_count}</span></div>
-                <div class="flex justify-between"><span>Memos:</span><span class="font-black">${stats.detail_count}</span></div>
+                <div class="flex justify-between"><span>Archives:</span><span class="font-bold">${stats.archive_count}</span></div>
+                <div class="flex justify-between"><span>Memos:</span><span class="font-bold">${stats.detail_count}</span></div>
             `;
         };
         renderStats(".js-private-stats", profile.info_stats);
@@ -623,9 +623,9 @@ export default {
             row.innerHTML = `
                 <div class="truncate text-blue-500 italic mb-1">🔗 ${l.url}</div>
                 <div class="flex gap-4">
-                    <span>🖱️ <b class="text-brand-5">${s.t}</b> <small class="text-slate-300">TTL</small></span>
-                    <span>👤 <b class="text-slate-600">${s.u}</b> <small class="text-slate-300">UNIQ</small></span>
-                    <span>👻 <b class="text-slate-400">${s.g}</b> <small class="text-slate-300">GST</small></span>
+                    <span>🖱️ <b class="text-brand-5">${s.t}</b> <small class="text-slate-400">TTL</small></span>
+                    <span>👤 <b class="text-slate-900">${s.u}</b> <small class="text-slate-400">UNIQ</small></span>
+                    <span>👻 <b class="text-slate-400">${s.g}</b> <small class="text-slate-400">GST</small></span>
                 </div>
             `;
             clickList.appendChild(row);
@@ -643,7 +643,7 @@ export default {
             const target = $Dom.QuerySelector(selector, el);
             target.innerHTML = ""; // クリア
             if (!data) {
-                target.innerHTML = `<span class="text-slate-300 italic">No Data</span>`;
+                target.innerHTML = `<span class="text-slate-400 italic">No Data</span>`;
                 return;
             }
             const child = $Dom.GenerateTemplate("tpl-user-activity-summary");
@@ -719,7 +719,6 @@ export default {
             title: "USER CLICK STATS",
             content: el,
             theme: profile.is_owner ? "user" : "admin", // 閲覧者が本人の場合は通常、管理者の場合はAdminテーマ
-            size: "lg",
             headerButtons: headerButtons
         });
     },

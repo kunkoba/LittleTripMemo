@@ -239,7 +239,7 @@ export default {
             const isSuccess = await $Data.Access.GetArchiveList();
             if (!isSuccess) return;
             const root = $Dom.GenerateTemplate("tpl-list-parent");
-            // root.className = "w-full text-black-3 mb-2 px-1";
+            // root.className = "w-full text-slate-400 mb-2 px-1";
             const archives = $Data.Store.GetArchiveList() ||[];
             // プライベートデータのみに絞る
             const privateList = archives.filter(item => !item.is_public);
@@ -460,10 +460,10 @@ export default {
         const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.plan === "Admin";
         const el = $Dom.GenerateTemplate('tpl-view-archive');
         // ── スタイル定義（ボタンの状態別クラス） ──────────────────
-        const STYLE_BASE = "flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none";
-        const STYLE_ACTIVE = " bg-white text-slate-600 shadow-md border border-slate-200 active:scale-95 transition-all";
+        const STYLE_BASE = "flex-1 h-11 font-bold text-[0.8rem] rounded-lg tracking-wider outline-none";
+        const STYLE_ACTIVE = " bg-white text-slate-900 shadow-md border border-slate-200 active:scale-95 transition-all";
         const STYLE_CURRENT = " bg-brand-5 text-white shadow-inner border border-brand-5 cursor-default pointer-events-none";
-        const STYLE_DISABLED = " bg-slate-100 text-slate-300 border border-slate-100 cursor-not-allowed pointer-events-none";
+        const STYLE_DISABLED = " bg-slate-100 text-slate-400 border border-slate-100 cursor-not-allowed pointer-events-none";
         // ── 1. タイトルと本文 ──────────────────────────────────
         const renderTitleAndBody = (arc) => {
             $Dom.QuerySelector('#view-mem-title', el).textContent = arc.title || "";
@@ -495,7 +495,7 @@ export default {
             priceVal.className = "font-bold text-[1.1rem]";
             if (totalPrice > 0) priceVal.classList.add("text-blue-500");
             else if (totalPrice < 0) priceVal.classList.add("text-red-500");
-            else priceVal.classList.add("text-slate-800");
+            else priceVal.classList.add("text-slate-900");
             $Dom.QuerySelector('#view-mem-price-unit', el).textContent =
                 arc.currency_unit || $App.AppData.Owner.Currency_unit || 'JPY';
             // 距離
@@ -584,7 +584,7 @@ export default {
             const label = $Dom.QuerySelector('.js-label-text', btnLimit);
             icon.textContent = isLimited ? "☑" : "☐";
             label.textContent = isLimited ? "限定公開中（URLのみ）" : "限定公開に変更する";
-            btnLimit.className = "w-full h-12 font-black rounded-lg border-2 active:scale-[0.98] transition-all flex items-center justify-center gap-2";
+            btnLimit.className = "w-full h-12 font-bold rounded-lg border-2 active:scale-[0.98] transition-all flex items-center justify-center gap-2";
             btnLimit.classList.add(...(isLimited
                 ? ["bg-brand-1", "border-brand-3", "text-brand-5"]
                 : ["bg-slate-50", "border-slate-200", "text-slate-400"]));
@@ -708,7 +708,7 @@ export default {
         const descEl = $Dom.QuerySelector("#status-change-desc", el);
         let title, desc, icon, buttons = [];
         const btnMainClass = "bg-brand-5 text-white shadow-md font-bold";
-        const btnSubClass = "bg-white text-slate-600 border border-slate-300 shadow-md font-bold";
+        const btnSubClass = "bg-white text-slate-900 border border-slate-300 shadow-md font-bold";
         const btnDangerClass = "bg-red-50 text-red-500 border border-red-300 shadow-md font-bold";
         if (!archive.is_public) {
             // ===================================
@@ -896,7 +896,7 @@ export default {
         const statusBadge = $Dom.QuerySelector('.js-arc-status-badge', el);
         if (!archive.is_public) {
             statusBadge.textContent = "非公開";
-            statusBadge.className += " bg-slate-200 text-slate-600";
+            statusBadge.className += " bg-slate-200 text-slate-900";
         } else if (archive.closed_flg) {
             statusBadge.textContent = "CLOSE";
             statusBadge.className += " bg-slate-400 text-white";
@@ -925,7 +925,7 @@ export default {
                     const count = dtl[countProp] || 0;
                     const div = document.createElement("div");
                     div.className = "flex items-center gap-1 text-[0.8rem]";
-                    div.innerHTML = `<span>${type.emoji}</span><span class="font-black text-slate-500">${count}</span>`;
+                    div.innerHTML = `<span>${type.emoji}</span><span class="font-bold text-slate-400">${count}</span>`;
                     reactContainer.appendChild(div);
                 });
                 // --- 2.2 クリック統計の反映 ---
@@ -933,7 +933,7 @@ export default {
                 const statsBox = $Dom.QuerySelector('.js-dtl-stats-box', child);
                 if (dtl.link_url && dtl.link_url.trim() !== "") {
                     urlEl.textContent = dtl.link_url;
-                    urlEl.classList.replace("text-slate-500", "text-blue-500");
+                    urlEl.classList.replace("text-slate-400", "text-blue-500");
                     const dStats = (dtl.click_stats && dtl.click_stats.link_url) ? dtl.click_stats.link_url : { t: 0, u: 0, g: 0 };
                     $Dom.QuerySelector('.js-dtl-total', child).textContent = dStats.t || 0;
                     $Dom.QuerySelector('.js-dtl-unique', child).textContent = dStats.u || 0;
@@ -941,7 +941,7 @@ export default {
                     $Dom.ToggleShow(statsBox, true);
                 } else {
                     urlEl.textContent = "リンクなし";
-                    urlEl.classList.add("text-slate-300", "italic");
+                    urlEl.classList.add("text-slate-400", "italic");
                     $Dom.ToggleShow(statsBox, false);
                 }
                 detailsContainer.appendChild(child);

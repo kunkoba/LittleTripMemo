@@ -5,59 +5,48 @@ using LittleTripMemo.Repository.Sys;
 
 namespace LittleTripMemo.Services.Account;
 
-public class GetUserProfileService : _BaseService
+public class GetUserProfileService(
+    UserContext userContext,
+    AppUserRepository appUserRepository
+) : _BaseService(userContext)
 {
-    private readonly AppUserRepository _appUserRepo;
-
     public record GetUserProfileReq(Guid target_user_id);
 
-    public record Response(
-        Guid user_id,
-        string? icon,
-        string? nick_name,
-        string? description,
-        string? link_1, string? link_2, string? link_3,
-        bool is_owner,
-        Dictionary<string, ClickCountData> click_stats, 
-        Dictionary<string, object> info_stats, 
-        Dictionary<string, object> info_stats_pub
-    );
+    public record Response(DtoUserProfile user_profile);
 
-    public GetUserProfileService(UserContext userContext, AppUserRepository appUserRepository)
-        : base(userContext) => _appUserRepo = appUserRepository;
-
-    public async Task<Response> ExecuteAsync(Guid target_user_id)
+    public async Task<Response> ExecuteAsync(GetUserProfileReq req)
     {
-        await ValidateAsync(target_user_id);
+        await ValidateAsync(req.target_user_id);
 
-        // 1. ターゲットユーザー（対象者）の情報をDBから取得
-        var targetUser = await _appUserRepo.GetByUserIdAsync(target_user_id);
+        // 1. ターゲットユーザーの情報を取得
+        var targetUser = await appUserRepository.GetByUserIdAsync(req.target_user_id);
         BusinessException.ThrowIf(targetUser == null, "ユーザーが存在しません", "USER_NOT_FOUND");
 
-        // 2. 所有者判定: 対象者が自分（_user.user_id）自身かどうかを判定
-        bool is_owner = (targetUser.user_id == _user.login_user_id);
-
-        return new Response(
+        // 2. 共通DTOへマッピング（member_no, user_category, user_rank を含む最新版）
+        var profile = new DtoUserProfile(
             targetUser.user_id,
+            targetUser.member_no,
+            targetUser.user_category,
+            targetUser.user_rank,
             targetUser.icon,
             targetUser.nick_name,
             targetUser.description,
             targetUser.link_1,
             targetUser.link_2,
             targetUser.link_3,
-            is_owner,
+            is_owner: (targetUser.user_id == _user.login_user_id),
             targetUser.click_stats,
             targetUser.info_stats,
-            targetUser.info_stats_pub 
+            targetUser.info_stats_pub,
+            targetUser.report_count
         );
+
+        return new Response(profile);
     }
 
     private async Task ValidateAsync(Guid userId)
     {
-        // 他のサービス同様、コンテキストと引数のチェックを徹底
         BusinessException.ThrowIf(userId == Guid.Empty, "対象のユーザーIDが指定されていません");
-
         await Task.CompletedTask;
     }
-
 }

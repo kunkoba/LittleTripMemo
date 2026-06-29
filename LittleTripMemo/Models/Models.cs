@@ -11,6 +11,9 @@ public class TAppUser
     public Guid user_id { get; set; }
     public int table_id { get; set; }
     public string plan_type { get; set; } = "Free";
+    public long member_no { get; set; }
+    public string? user_category { get; set; }
+    public int user_rank { get; set; } = 0;
     public string? icon { get; set; }
     public string? nick_name { get; set; }
     public string? description { get; set; }
@@ -38,6 +41,7 @@ public class TMemoArchive : IAppRecord
 {
     public int archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
+    public string? category { get; set; }
     public string title { get; set; } = "仮のタイトル";
     public string memo { get; set; } = "仮の本文";
     public string link_url { get; set; } = string.Empty;
@@ -55,6 +59,7 @@ public class TMemoArchivePub : IAppRecord
 {
     public int archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
+    public string? category { get; set; }
     public string title { get; set; } = string.Empty;
     public string memo { get; set; } = string.Empty;
     public string link_url { get; set; } = string.Empty;
@@ -197,6 +202,17 @@ public class TSysUserHistory
     public DateTime create_tim { get; set; }
 }
 
+// アプリ情報集約テーブル
+public class TAppInfo
+{
+    public double avg_score { get; set; }
+    public long total_feedback_count { get; set; }
+    public long total_user_count { get; set; }
+    public long total_archive_pub_count { get; set; }
+    public long total_detail_pub_count { get; set; }
+    public DateTime last_aggregate_tim { get; set; }
+}
+
 #endregion
 
 #region "DTO"
@@ -208,6 +224,7 @@ public class DtoArchive
 {
     public long archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
+    public string? category { get; set; }
     public string title { get; set; } = string.Empty;
     public string memo { get; set; } = string.Empty;
     public string link_url { get; set; } = string.Empty;
@@ -324,6 +341,9 @@ public class DtoMyReportDetail
 /// </summary>
 public record DtoUserProfile(
     Guid user_id,
+    long member_no,
+    string? user_category,
+    int user_rank,
     string? icon,
     string? nick_name,
     string? description,
@@ -332,7 +352,7 @@ public record DtoUserProfile(
     Dictionary<string, ClickCountData> click_stats,
     Dictionary<string, object> info_stats,    
     Dictionary<string, object> info_stats_pub,
-    int report_count // ★追加：そのユーザーの通報送信累計数 
+    int report_count
 );
 
 /// <summary>

@@ -1,12 +1,12 @@
 <!-- 【リスト親】フレーム -->
 <template id="tpl-list-parent">
-    <div class="w-full text-black-3 mb-4"></div>
+    <div class="w-full text-slate-400 mb-4"></div>
 </template>
 
 <!-- 【リスト親】グループヘッダー -->
 <template id="tpl-list-group-header">
     <div class="flex items-center gap-2 mt-2 mb-3">
-        <div class="px-3 py-1 rounded-full text-[0.5rem] font-black text-white flex items-center gap-1.5 shadow-md js-header-badge">
+        <div class="px-3 py-1 rounded-full text-[0.5rem] font-bold text-white flex items-center gap-1.5 shadow-md js-header-badge">
             <span class="js-header-icon text-[0.8rem]"></span>
             <span class="js-header-title uppercase tracking-widest"></span>
         </div>
@@ -16,7 +16,7 @@
 
 <!-- 【リスト親】タイムラインコンテナ -->
 <template id="tpl-timeline-container">
-    <div class="relative w-full text-black-3 mb-2 px-1">
+    <div class="relative w-full text-slate-400 mb-2 px-1">
         <div class="absolute left-[22px] top-0 bottom-0 w-px bg-slate-200 z-0"></div>
         <div class="js-list-container relative z-10 space-y-4"></div>
     </div>
@@ -37,17 +37,17 @@
     <div class="relative flex items-stretch gap-2 group cursor-pointer active:scale-[0.98] transition-transform mb-2 mt-1">
         <div class="shrink-0 w-10 flex flex-col items-center pt-2 z-10">
             <div class="js-face text-[24px] bg-brand-0 pb-1"></div>
-            <div class="text-[0.5rem] font-black text-black-5 js-time tracking-wider bg-brand-0 px-1"></div>
+            <div class="text-[0.5rem] font-bold text-slate-900 js-time tracking-wider bg-brand-0 px-1"></div>
         </div>
         <div class="flex-1 bg-white rounded-[1rem] p-3 border border-slate-200 shadow-md relative overflow-hidden flex flex-col items-start gap-2">
-            <div class="js-index-badge absolute top-2 right-2 w-7 h-7 rounded-full bg-brand-4 text-white font-black text-[0.8rem] flex items-center justify-center shadow-sm z-20"></div>
+            <div class="js-index-badge absolute top-2 right-2 w-7 h-7 rounded-full bg-brand-4 text-white font-bold text-[0.8rem] flex items-center justify-center shadow-sm z-20"></div>
             
             <!-- ▼ 追加：野良化（Detach）ボタン（デフォルトは hidden） -->
-            <button class="js-btn-detach hidden absolute top-2 right-10 w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-500 flex items-center justify-center shadow-sm z-20 hover:bg-slate-100 active:scale-95 transition-all text-[0.8rem]">🗑</button>
+            <button class="js-btn-detach hidden absolute top-2 right-10 w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-400 flex items-center justify-center shadow-sm z-20 hover:bg-slate-100 active:scale-95 transition-all text-[0.8rem]">🗑</button>
             
-            <div class="border-l-4 border-brand-3 pl-2 py-0.5 w-full"><div class="js-title text-[0.8rem] font-black text-black-5 break-words "></div></div>
-            <div class="js-price-wrapper pl-3 flex items-baseline italic w-full hidden"><span class="js-price text-[1rem] font-black italic "></span><span class="js-price-unit text-[0.5rem] font-bold text-slate-400 ml-1.5 uppercase"></span></div>
-            <div class="js-body text-[0.8rem] text-black-4 whitespace-pre-wrap break-words w-full"></div>
+            <div class="border-l-4 border-brand-3 pl-2 py-0.5 w-full"><div class="js-title text-[0.8rem] font-bold text-slate-900 break-words "></div></div>
+            <div class="js-price-wrapper pl-3 flex items-baseline italic w-full hidden"><span class="js-price text-[1rem] font-bold italic "></span><span class="js-price-unit text-[0.5rem] font-bold text-slate-400 ml-1.5 uppercase"></span></div>
+            <div class="js-body text-[0.8rem] text-slate-900 whitespace-pre-wrap break-words w-full"></div>
         </div>
     </div>
 </template>
@@ -57,7 +57,7 @@
     <div class="js-item-card relative flex flex-col p-4 rounded-[1rem] border border-slate-200 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3">
         <div class="flex justify-between items-center mb-2">
             <div class="flex items-center gap-2">
-                <span class="js-index w-6 h-6 bg-slate-800 text-white text-[0.8rem] font-black rounded-full flex items-center justify-center"></span>
+                <span class="js-index w-6 h-6 bg-slate-800 text-white text-[0.8rem] font-bold rounded-full flex items-center justify-center"></span>
                 <!-- 【変更】作成日時表示用spanをコンテナに変更 -->
                 <div class="js-date-container"></div>
             </div>
@@ -66,27 +66,27 @@
         <!-- 2. 所属まとめタイトル -->
         <div class="flex items-center gap-1.5 mb-1.5">
             <span class="text-[0.8rem] opacity-50">🗂️</span>
-            <span class="js-archive-title text-[0.8rem] font-black text-brand-5 truncate"></span>
+            <span class="js-archive-title text-[0.8rem] font-bold text-brand-5 truncate"></span>
         </div>
         <!-- 3. 地点タイトル -->
-        <div class="js-title text-[0.95rem] font-black text-slate-800 truncate mb-1"></div>
+        <div class="js-title text-[1rem] font-bold text-slate-900 truncate mb-1"></div>
         <!-- 4. 本文 (2行まで許容) -->
-        <div class="js-body text-[0.8rem] text-slate-500 line-clamp-2 leading-relaxed mb-3"></div>
+        <div class="js-body text-[0.8rem] text-slate-400 line-clamp-2  mb-3"></div>
         <!-- 5. 金額表示（既存ロジック用） -->
         <div class="js-price-wrapper hidden flex items-baseline gap-1 mb-3 bg-slate-50 w-fit px-2 py-0.5 rounded-md border border-slate-100">
-            <span class="js-memo-price text-[0.8rem] font-black italic"></span>
+            <span class="js-memo-price text-[0.8rem] font-bold italic"></span>
             <span class="js-memo-currency text-[0.5rem] font-bold text-slate-400"></span>
         </div>
         <!-- 6. フッター：リアクション統計 ＆ 更新日 -->
         <div class="flex justify-between items-end mt-auto pt-2 border-t border-slate-50">
             <div class="flex gap-2.5">
-                <div class="flex items-center gap-1"><span class="js-icon-funny text-[0.8rem]"></span><span class="js-count-funny text-[0.8rem] font-black text-slate-400">0</span></div>
-                <div class="flex items-center gap-1"><span class="js-icon-love text-[0.8rem]"></span><span class="js-count-love text-[0.8rem] font-black text-slate-400">0</span></div>
-                <div class="flex items-center gap-1"><span class="js-icon-surprise text-[0.8rem]"></span><span class="js-count-surprise text-[0.8rem] font-black text-slate-400">0</span></div>
-                <div class="flex items-center gap-1"><span class="js-icon-sad text-[0.8rem]"></span><span class="js-count-sad text-[0.8rem] font-black text-slate-400">0</span></div>
+                <div class="flex items-center gap-1"><span class="js-icon-funny text-[0.8rem]"></span><span class="js-count-funny text-[0.8rem] font-bold text-slate-400">0</span></div>
+                <div class="flex items-center gap-1"><span class="js-icon-love text-[0.8rem]"></span><span class="js-count-love text-[0.8rem] font-bold text-slate-400">0</span></div>
+                <div class="flex items-center gap-1"><span class="js-icon-surprise text-[0.8rem]"></span><span class="js-count-surprise text-[0.8rem] font-bold text-slate-400">0</span></div>
+                <div class="flex items-center gap-1"><span class="js-icon-sad text-[0.8rem]"></span><span class="js-count-sad text-[0.8rem] font-bold text-slate-400">0</span></div>
             </div>
             <div class="text-right">
-                <div class="text-[9px] font-black text-slate-300 uppercase tracking-tighter leading-none mb-1">Last Update</div>
+                <div class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter  mb-1">Last Update</div>
                 <div class="js-update-tim kb-date-tim-sm"></div>
             </div>
         </div>
@@ -102,12 +102,12 @@
                 <!-- 左：日付のみ -->
                 <span class="js-update-tim kb-date-tim-sm"></span>
                 <!-- 右：件数バッジ（背景色はJSで設定） -->
-                <div class="js-count-badge px-2.5 py-0.5 rounded-md text-[0.8rem] font-black text-white shadow-sm italic tracking-tight">
+                <div class="js-count-badge px-2.5 py-0.5 rounded-md text-[0.8rem] font-bold text-white shadow-sm italic tracking-tight">
                     <span class="js-count">0</span> memos
                 </div>
             </div>
-            <div class="js-title text-[0.8rem] font-black text-black-5 truncate mb-1"></div>
-            <div class="js-memo text-[0.8rem] text-black-3 line-clamp-1"></div>
+            <div class="js-title text-[0.8rem] font-bold text-slate-900 truncate mb-1"></div>
+            <div class="js-memo text-[0.8rem] text-slate-400 line-clamp-1"></div>
         </div>
     </div>
 </template>
@@ -124,11 +124,11 @@
 <template id="tpl-multi-select-item">
     <div class="js-item-card flex items-center gap-3 p-2.5 rounded-[1rem] border border-brand-2 bg-white cursor-pointer active:scale-[0.98] transition-all shadow-md mb-2">
         <div class="shrink-0 w-5 h-5 rounded border border-brand-3 flex items-center justify-center js-checkbox transition-colors">
-            <span class="text-white text-[0.8rem] font-black js-check-mark hidden">✓</span>
+            <span class="text-white text-[0.8rem] font-bold js-check-mark hidden">✓</span>
         </div>
         <div class="flex-1 min-w-0">
-            <div class="flex items-baseline gap-2"><span class="shrink-0 text-[0.5rem] font-black text-black-3 js-time"></span><span class="flex-1 text-[0.8rem] font-black text-black-5 truncate js-title"></span></div>
-            <div class="text-[0.5rem] text-black-3 line-clamp-1 mt-0.5 js-body"></div>
+            <div class="flex items-baseline gap-2"><span class="shrink-0 text-[0.5rem] font-bold text-slate-400 js-time"></span><span class="flex-1 text-[0.8rem] font-bold text-slate-900 truncate js-title"></span></div>
+            <div class="text-[0.5rem] text-slate-400 line-clamp-1 mt-0.5 js-body"></div>
         </div>
         <div class="shrink-0 ml-1 text-[1.2rem] js-emoji"></div>
     </div>
@@ -140,16 +140,16 @@
     <div class="js-item-card flex p-4 cursor-pointer active:scale-[0.98] transition-all overflow-hidden mb-3 relative border-2">
         <!-- 右上の固定アイコンエリア -->
         <div class="absolute top-2 right-2 flex flex-col items-end gap-1 z-10">
-            <span class="js-icon text-[1.5rem] leading-none drop-shadow-sm"></span>
+            <span class="js-icon text-[1.5rem]  drop-shadow-sm"></span>
         </div>
         <!-- テキストエリア -->
         <div class="flex-1 min-w-0 pr-4 flex flex-col justify-center">
             <div>
                 <span class="js-date kb-date-tim-sm"></span>
-                <span class="hidden ml-3 js-badge-new bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">NEW</span>
+                <span class="hidden ml-3 js-badge-new bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">NEW</span>
             </div>
-            <div class="text-[0.8rem] font-black text-black-5 truncate js-title mt-2"></div>
-            <div class="mt-2 text-[0.8rem] text-black-4 line-clamp-1 js-body break-words leading-relaxed"></div>
+            <div class="text-[0.8rem] font-bold text-slate-900 truncate js-title mt-2"></div>
+            <div class="mt-2 text-[0.8rem] text-slate-900 line-clamp-1 js-body break-words "></div>
         </div>
     </div>
 </template>
@@ -159,9 +159,9 @@
     <div class="p-4 flex flex-col">
         <div class="flex justify-between items-center mb-1.5">
             <div class="js-date kb-date-tim-sm"></div>
-            <div class="js-stars text-[1rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></div>
+            <div class="js-stars text-[1rem] text-yellow-500 tracking-widest  drop-shadow-sm"></div>
         </div>
-        <div class="js-body text-[0.8rem] text-slate-700 leading-relaxed line-clamp-1 break-words"></div>
+        <div class="js-body text-[0.8rem] text-slate-900  line-clamp-1 break-words"></div>
     </div>
 </template>
 
@@ -183,9 +183,9 @@
                     <img src="" class="js-memo-price w-6 h-6 object-contain">
                 </div>
             </div>
-            <div class="text-[1rem] font-bold text-black-5 truncate js-title"></div>
+            <div class="text-[1rem] font-bold text-slate-900 truncate js-title"></div>
             <!-- ② break-words を追加し、pb-4 を削除 -->
-            <div class="text-[0.8rem] text-black-3 line-clamp-2 js-body break-words"></div>
+            <div class="text-[0.8rem] text-slate-400 line-clamp-2 js-body break-words"></div>
         </div>
     </div>
 </template>
@@ -196,10 +196,10 @@
         <!-- 1. 明細No、タイトル、絵文字 -->
         <div class="flex justify-between items-start mb-2">
             <div class="flex items-center gap-2">
-                <span class="js-index w-6 h-6 bg-slate-800 text-white text-[0.8rem] font-black rounded-full flex items-center justify-center shrink-0"></span>
-                <div class="js-title text-[0.95rem] font-black text-slate-800 truncate"></div>
+                <span class="js-index w-6 h-6 bg-slate-800 text-white text-[0.8rem] font-bold rounded-full flex items-center justify-center shrink-0"></span>
+                <div class="js-title text-[1rem] font-bold text-slate-900 truncate"></div>
             </div>
-            <div class="js-face text-[1.5rem] leading-none shrink-0"></div>
+            <div class="js-face text-[1.5rem]  shrink-0"></div>
         </div>
         <!-- 2. リアクション集計 -->
         <div class="js-reaction-container flex gap-3 mb-3 bg-slate-50 p-2 rounded-lg border border-slate-100">
@@ -215,7 +215,7 @@
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
                 <span class="text-[0.8rem] opacity-50">🖱️</span>
-                <span class="js-click-count text-[0.8rem] font-black text-brand-5">0</span>
+                <span class="js-click-count text-[0.8rem] font-bold text-brand-5">0</span>
             </div>
         </div>
     </div>
@@ -227,16 +227,16 @@
         <div class="js-url text-blue-500 italic truncate mb-2 pb-1 border-b border-slate-50"></div>
         <div class="flex justify-around text-[0.8rem]">
             <div class="flex flex-col items-center">
-                <span class="js-total font-black text-brand-5 text-[1rem]">0</span>
-                <span class="text-[0.5rem] text-slate-300 uppercase leading-none">Total</span>
+                <span class="js-total font-bold text-brand-5 text-[1rem]">0</span>
+                <span class="text-[0.5rem] text-slate-400 uppercase ">Total</span>
             </div>
             <div class="flex flex-col items-center">
-                <span class="js-unique font-black text-slate-600 text-[1rem]">0</span>
-                <span class="text-[0.5rem] text-slate-300 uppercase leading-none">Unique</span>
+                <span class="js-unique font-bold text-slate-900 text-[1rem]">0</span>
+                <span class="text-[0.5rem] text-slate-400 uppercase ">Unique</span>
             </div>
             <div class="flex flex-col items-center">
-                <span class="js-guest font-black text-slate-400 text-[1rem]">0</span>
-                <span class="text-[0.5rem] text-slate-300 uppercase leading-none">Guest</span>
+                <span class="js-guest font-bold text-slate-400 text-[1rem]">0</span>
+                <span class="text-[0.5rem] text-slate-400 uppercase ">Guest</span>
             </div>
         </div>
     </div>
@@ -248,9 +248,9 @@
         <!-- 上段：No、アイコン、タイトル -->
         <div class="flex justify-between items-start mb-2">
             <div class="flex items-center gap-2">
-                <span class="js-dtl-seq w-6 h-6 bg-slate-800 text-white text-[0.8rem] font-black rounded-full flex items-center justify-center">
+                <span class="js-dtl-seq w-6 h-6 bg-slate-800 text-white text-[0.8rem] font-bold rounded-full flex items-center justify-center">
                 </span>
-                <span class="js-dtl-title text-[1rem] font-black text-slate-800 truncate max-w-[200px]">
+                <span class="js-dtl-title text-[1rem] font-bold text-slate-900 truncate max-w-[200px]">
                 </span>
             </div>
             <span class="js-dtl-icon text-[1.5rem]">
@@ -262,22 +262,22 @@
         </div>
         <!-- 下段：URLとクリック統計 -->
         <div class="pt-2 border-t border-slate-50">
-            <div class="js-dtl-url text-[0.8rem] truncate mb-2 text-slate-500">
+            <div class="js-dtl-url text-[0.8rem] truncate mb-2 text-slate-400">
             </div>
             <div class="js-dtl-stats-box hidden flex gap-4 text-[0.8rem]">
                 <div class="flex items-center gap-1.5">
                     <span class="opacity-50">🖱️</span>
-                    <span class="js-dtl-total font-black text-brand-5">0</span>
-                    <span class="text-slate-300 text-[0.6rem] uppercase">Total</span>
+                    <span class="js-dtl-total font-bold text-brand-5">0</span>
+                    <span class="text-slate-400 text-[0.6rem] uppercase">Total</span>
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <span class="js-dtl-unique font-black text-slate-500">0</span>
-                    <span class="text-slate-300 text-[0.6rem] uppercase">Unique</span>
+                    <span class="js-dtl-unique font-bold text-slate-400">0</span>
+                    <span class="text-slate-400 text-[0.6rem] uppercase">Unique</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="opacity-50">👤</span>
-                    <span class="js-dtl-guest font-black text-slate-500">0</span>
-                    <span class="text-slate-300 text-[0.6rem] uppercase">Guest</span>
+                    <span class="js-dtl-guest font-bold text-slate-400">0</span>
+                    <span class="text-slate-400 text-[0.6rem] uppercase">Guest</span>
                 </div>
             </div>
         </div>

@@ -20,7 +20,7 @@ export default {
         if (!isSuccess) return;
         const notices = $App.AppData.Admin.notifications ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
-        // root.className = "w-full text-black-3 mb-2 px-1";
+        // root.className = "w-full text-slate-400 mb-2 px-1";
         const renderList = async () => {
             root.innerHTML = "";
             if (notices.length === 0) {
@@ -44,7 +44,7 @@ export default {
                     badge.className += " border-brand-3 bg-brand-5 text-white";
                 } else if (now < fromDate) {
                     badge.textContent = "公開前";
-                    badge.className += " border-slate-300 bg-slate-100 text-slate-500";
+                    badge.className += " border-slate-300 bg-slate-100 text-slate-400";
                 } else {
                     badge.textContent = "公開終了";
                     badge.className += " border-slate-300 bg-slate-500 text-white";
@@ -70,7 +70,7 @@ export default {
             buttons: [
                 {
                     label: "＋ CREATE",
-                    className: "w-full bg-brand-5 text-white shadow-md font-black",
+                    className: "w-full bg-brand-5 text-white shadow-md font-bold",
                     handler: () => {
                         this.ShowAdminNoticeEdit(null, () => {
                             this._core.close(); // 一覧を閉じる
@@ -578,58 +578,6 @@ export default {
             headerButtons: []
         });
     },
-    // 【管理者機能】ユーザー操作履歴一覧
-    async ShowAdminUserHistory(profile) {
-        const isSuccess = await $Data.Access.GetUserHistory({ target_user_id: profile.user_id });
-        if (!isSuccess) return;
-        const historyList = $Data.resData.historyList || [];
-        const root = $Dom.GenerateTemplate("tpl-list-parent");
-        if (historyList.length === 0) {
-            root.innerHTML = `<div class="text-center py-10 text-slate-400 font-bold">履歴データはありません</div>`;
-        } else {
-            historyList.forEach(item => {
-                // ※リスト子テンプレートは既存の汎用的なもの（tpl-admin-list-child-notice等）を流用するか作成
-                const child = document.createElement("button");
-                child.className = "w-full text-left p-3 border-b border-slate-100 active:bg-slate-50 flex justify-between items-center";
-                child.innerHTML = `
-                    <div>
-                        <div class="text-[0.7rem] text-slate-400 font-mono">${$Util.FormatDate(item.create_tim)}</div>
-                        <div class="text-[0.85rem] font-black text-slate-700">${item.action_kind}</div>
-                    </div>
-                    <span class="text-slate-300 text-[1.2rem]">›</span>
-                `;
-                // クリックで詳細を表示
-                child.onclick = () => this.ShowAdminUserHistoryDetail(item);
-                root.appendChild(child);
-            });
-        }
-        this._core.open({ title: "USER HISTORY", content: root, theme: "admin", size: "lg" });
-    },
-    // 【管理者機能】操作履歴の詳細表示
-    ShowAdminUserHistoryDetail(item) {
-        console.log("item:", item);
-        const el = $Dom.GenerateTemplate("tpl-admin-user-history-detail");
-        $Dom.QuerySelector(".js-tim", el).textContent = $Util.FormatDate(item.create_tim);
-        $Dom.QuerySelector(".js-action", el).textContent = item.action_kind;
-        $Dom.QuerySelector(".js-target-type", el).textContent = item.body || "N/A";
-        $Dom.QuerySelector(".js-target-id", el).textContent = item.user_id || "-";
-        // ペイロード（詳細データ）の整形表示
-        const payloadEl = $Dom.QuerySelector(".js-payload", el);
-        try {
-            // JSON文字列であればインデントを付けて整形
-            // const data = JSON.parse(item.memo_json);
-            payloadEl.textContent = JSON.stringify(item.memo_json, null, 4);
-        } catch (e) {
-            // 文字列ならそのまま表示
-            payloadEl.textContent = item.payload || "No detailed data.";
-        }
-        this._core.open({
-            title: "HISTORY DETAIL",
-            content: el,
-            theme: "admin",
-            size: "md"
-        });
-    },
     // 【管理者機能】システム設定の取得と編集
     async ShowAdminCoreConfig() {
         const isSuccess = await $Data.Access.GetCoreConfig();
@@ -689,6 +637,52 @@ export default {
                     }
                 }
             ]]
+        });
+    },
+    // 【管理者機能】ユーザー操作履歴一覧
+    async ShowAdminUserHistory(item) {
+        const isSuccess = await $Data.Access.GetUserHistory({ target_user_id: item.user_id });
+        if (!isSuccess) return;
+        // historyList から取得
+        const historyList = $Data.resData.historyList || [];
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        if (historyList.length === 0) {
+            root.innerHTML = `<div class="text-center py-10 text-slate-400 font-bold">履歴データはありません</div>`;
+        } else {
+            historyList.forEach(item => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-history");
+                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim);
+                $Dom.QuerySelector(".js-action", child).textContent = item.action_kind;
+                $Dom.QuerySelector(".js-body", child).textContent = item.body || "（説明なし）";
+                child.onclick = () => this.ShowAdminUserHistoryDetail(item);
+                root.appendChild(child);
+            });
+        }
+        this._core.open({ title: "USER HISTORY", content: root, theme: "admin", size: "lg" });
+    },
+    // 【管理者機能】操作履歴の詳細表示
+    ShowAdminUserHistoryDetail(item) {
+        const el = $Dom.GenerateTemplate("tpl-admin-user-history-detail");
+        $Dom.QuerySelector(".js-tim", el).textContent = $Util.FormatDate(item.create_tim);
+        $Dom.QuerySelector(".js-action", el).textContent = item.action_kind;
+        $Dom.QuerySelector(".js-body", el).textContent = item.body || "N/A";
+        $Dom.QuerySelector(".js-user-id", el).textContent = item.user_id;
+        // memo_json の表示
+        const payloadEl = $Dom.QuerySelector(".js-payload", el);
+        if (item.memo_json) {
+            // オブジェクトなら整形、文字列ならそのまま
+            const content = (typeof item.memo_json === 'object') 
+                ? JSON.stringify(item.memo_json, null, 4) 
+                : item.memo_json;
+            payloadEl.textContent = content;
+        } else {
+            payloadEl.textContent = "No detailed payload.";
+        }
+        this._core.open({
+            title: "HISTORY DETAIL",
+            content: el,
+            theme: "admin",
+            size: "lg" // 縦に並ぶのでサイズを大きく確保
         });
     }
 };

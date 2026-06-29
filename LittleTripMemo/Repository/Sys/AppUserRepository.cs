@@ -24,31 +24,13 @@ public class AppUserRepository : _BaseRepository
     public async Task<int> InsertAsync(TAppUser user)
     {
         const string sql = @"
-            INSERT INTO t_app_user (
-                user_id, 
-                table_id, 
-                plan_type, 
-                icon, 
-                nick_name, 
-                description, 
-                link_1, 
-                link_2, 
-                link_3,
-                create_tim,
-                update_tim
-            ) VALUES (
-                @user_id, 
-                @table_id, 
-                @plan_type, 
-                @icon, 
-                @nick_name, 
-                @description, 
-                @link_1, 
-                @link_2, 
-                @link_3,
-                CURRENT_TIMESTAMP,
-                CURRENT_TIMESTAMP
-            )";
+        INSERT INTO t_app_user (
+            user_id, table_id, plan_type, icon, nick_name, 
+            member_no, user_rank
+        ) VALUES (
+            @user_id, @table_id, @plan_type, @icon, @nick_name, 
+            nextval('t_app_user_member_no_seq'), 1
+        )";
         return await ExecuteAsync(sql, user);
     }
 
@@ -69,6 +51,7 @@ public class AppUserRepository : _BaseRepository
         const string sql = @"
             UPDATE t_app_user SET
                 nick_name   = @nick_name,
+                user_category = @user_category,
                 icon        = @icon,
                 description = @description,
                 link_1      = @link_1,

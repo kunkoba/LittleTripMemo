@@ -1,46 +1,46 @@
 <!-- 【ダイアログ子】ログイン -->
 <template id="tpl-login">
-    <div class="w-full text-black-5 my-3 space-y-5 px-2">
+    <div class="w-full text-slate-900 my-3 space-y-5 px-2">
         <div class="border-l-4 border-brand-3 pl-3">
             <strong class="text-[1rem] tracking-wide">ログイン</strong>
         </div>
         <div class="text-[0.8rem] space-y-2">
             <p>ログインするとすべての機能が使えます。</p>
         </div>
-        <button id="btn-login-google" class="w-full flex items-center justify-center gap-3 border-2 border-brand-3 bg-white px-3 py-3 text-[1rem] text-black-5 font-bold hover:bg-brand-1 active:bg-brand-2">
+        <button id="btn-login-google" class="w-full flex items-center justify-center gap-3 border-2 border-brand-3 bg-white px-3 py-3 text-[1rem] text-slate-900 font-bold hover:bg-brand-1 active:bg-brand-2">
             Googleでログイン
         </button>
-        <p class="text-[0.8rem] text-black-2 text-center">※ログインにはGoogleアカウントが必要です</p>
+        <p class="text-[0.8rem] text-slate-400 text-center">※ログインにはGoogleアカウントが必要です</p>
     </div>
 </template>
 
 <template id="tpl-menu-user-settings">
     <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-set-theme" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-set-theme" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">🎨</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Theme Config</span>
         </button>
-        <button id="btn-set-map" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-set-map" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">🗺️</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Map Style Config</span>
         </button>
-        <button id="btn-set-currency" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-set-currency" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">💰</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Currency Config</span>
         </button>
-        <button id="btn-set-gps" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-set-gps" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">📍</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">GPS Tracking</span>
         </button>
-        <button id="btn-set-font" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-set-font" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">Aa</span>
             <span class="col-span-1">
             </span>
@@ -51,12 +51,12 @@
 
 <!-- 【ダイアログ子】設定系画面 -->
 <template id="tpl-config-gps">
-    <div class="w-full text-black-5 space-y-6 px-6 py-8 bg-brand-0">
+    <div class="w-full text-slate-900 space-y-6 px-6 py-8 bg-brand-0">
         <div class="flex flex-col items-center gap-4">
-            <label class="block font-black text-slate-400 text-[0.5rem] uppercase tracking-widest">Update Interval</label>
+            <label class="block font-bold text-slate-400 text-[0.5rem] uppercase tracking-widest">Update Interval</label>
             <!-- 秒数表示エリア -->
             <div class="flex items-baseline gap-1 h-24">
-                <span id="gps-val-display" class="text-[3.5rem] font-black text-brand-5 leading-none">0</span>
+                <span id="gps-val-display" class="text-[3.5rem] font-bold text-brand-5 ">0</span>
                 <span id="gps-unit-display" class="text-[0.8rem] font-bold text-slate-400 uppercase">sec</span>
             </div>
             <!-- 水平スライダー -->
@@ -65,7 +65,7 @@
                     class="w-full h-2 bg-brand-2 rounded-lg appearance-none cursor-pointer accent-brand-5 shadow-inner">
             </div>
             <!-- 目盛りラベル -->
-            <div class="w-full flex justify-between px-1 text-[0.5rem] font-bold text-slate-300 uppercase">
+            <div class="w-full flex justify-between px-1 text-[0.5rem] font-bold text-slate-400 uppercase">
                 <span>Off</span>
                 <span>60s</span>
                 <span>120s</span>
@@ -75,80 +75,155 @@
 </template>
 
 <template id="tpl-config-currency">
-    <div class="w-full text-black-5 my-3 space-y-4 px-4">
+    <div class="w-full text-slate-900 my-3 space-y-4 px-4">
         <div>
-            <label class="block font-bold text-black-3 text-[0.5rem] mb-1">CURRENCY UNIT</label>
-            <input id="input-currency" type="text" maxlength="5" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] text-black-5 focus:outline-none focus:border-brand-5 bg-white uppercase" placeholder="e.g. JPY, USD, €">
+            <label class="block font-bold text-slate-400 text-[0.5rem] mb-1">CURRENCY UNIT</label>
+            <input id="input-currency" type="text" maxlength="5" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] text-slate-900 focus:outline-none focus:border-brand-5 bg-white uppercase" placeholder="e.g. JPY, USD, €">
         </div>
-        <p class="text-[0.5rem] text-black-3 ">※入力した文字列が金額の単位として表示されます。</p>
+        <p class="text-[0.5rem] text-slate-400 ">※入力した文字列が金額の単位として表示されます。</p>
     </div>
 </template>
 
 <template id="tpl-mode-select">
     <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-mode-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">➕</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Create Mode</span></button>
-        <button id="btn-mode-archive" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">📚</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Archive Mode</span></button>
-        <button id="btn-mode-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">🔍</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Search Mode</span></button>
-        <button id="btn-mode-anon" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5"><span class="col-span-1 flex justify-center text-[1rem]">👻</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Anonymous Mode</span></button>
+        <button id="btn-mode-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900"><span class="col-span-1 flex justify-center text-[1rem]">➕</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Create Mode</span></button>
+        <button id="btn-mode-archive" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900"><span class="col-span-1 flex justify-center text-[1rem]">📚</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Archive Mode</span></button>
+        <button id="btn-mode-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900"><span class="col-span-1 flex justify-center text-[1rem]">🔍</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Search Mode</span></button>
+        <button id="btn-mode-anon" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900"><span class="col-span-1 flex justify-center text-[1rem]">👻</span><span class="col-span-1"></span><span class="col-span-8 text-left font-bold text-[1rem] uppercase">Anonymous Mode</span></button>
     </div>
 </template>
 
 <!-- 【ダイアログ子】アプリ情報 / プロフィール / アーカイブ -->
-<template id="tpl-app-info">
+<template id="tpl-app-info_2">
     <div class="w-full flex flex-col h-full bg-slate-50/50 pb-6">
         <div class="flex flex-col items-center justify-center pt-10 pb-8">
-            <div class="w-24 h-24 bg-gradient-to-br from-brand-4 to-brand-5 rounded-[1.5rem] shadow-lg flex items-center justify-center text-white text-[2.5rem] font-black mb-5"><span class="drop-shadow-sm leading-none mt-1">LM</span></div>
-            <h3 class="text-[1.1rem] font-black uppercase tracking-widest text-slate-800 js-app-name text-center leading-tight px-4"></h3>
+            <div class="w-24 h-24 bg-gradient-to-br from-brand-4 to-brand-5 rounded-[1.5rem] shadow-lg flex items-center justify-center text-white text-[2.5rem] font-bold mb-5"><span class="drop-shadow-sm  mt-1">LM</span></div>
+            <h3 class="text-[1.1rem] font-bold uppercase tracking-widest text-slate-900 js-app-name text-center  px-4"></h3>
             <p class="text-[0.8rem] text-slate-400 font-bold tracking-widest mt-2 js-app-version"></p>
         </div>
         <div class="px-4 w-full">
             <div class="bg-white rounded-[1rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                 <div class="flex justify-between items-center p-4 border-b border-slate-100">
                     <div class="flex items-center gap-3">
-                        <span class="text-[1.5rem] drop-shadow-md leading-none">🛠️</span>
-                        <span class="text-[0.8rem] font-black text-slate-400 uppercase tracking-widest">Developer</span>
+                        <span class="text-[1.5rem] drop-shadow-md ">🛠️</span>
+                        <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Developer</span>
                     </div>
-                    <span class="text-[1rem] font-black text-slate-800 js-app-developer">
+                    <span class="text-[1rem] font-bold text-slate-900 js-app-developer">
                     </span>
                 </div>
                 <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
                     <div class="flex items-center gap-3">
-                        <span class="text-[1.5rem] drop-shadow-md leading-none">⭐</span>
-                        <span class="text-[0.8rem] font-black text-slate-400 uppercase tracking-widest">Feedback</span>
+                        <span class="text-[1.5rem] drop-shadow-md ">⭐</span>
+                        <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Feedback</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="text-[1rem] font-black text-yellow-500 leading-none js-app-score">★ 0.0</span>
-                        <span class="text-slate-300 text-[1.5rem] font-normal leading-none -mt-0.5">›</span>
+                        <span class="text-[1rem] font-bold text-yellow-500  js-app-score">★ 0.0</span>
+                        <span class="text-slate-400 text-[1.5rem] font-normal  -mt-0.5">›</span>
                     </div>
                 </button>
                 <button id="link-info-official" type="button"
                     class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
                     <div class="flex items-center gap-3">
-                        <span class="text-[1.5rem] drop-shadow-md leading-none">🌍</span>
-                        <span class="text-[0.8rem] font-black text-slate-400 uppercase tracking-widest">Official Site</span>
+                        <span class="text-[1.5rem] drop-shadow-md ">🌍</span>
+                        <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Official Site</span>
                     </div>
                     <div class="flex items-center gap-1 bg-blue-50 text-blue-500 px-3 py-1 rounded-full border border-blue-100">
                         <span class="text-[0.8rem] uppercase">Open</span>
-                        <span class="text-[0.8rem] leading-none">↗</span>
+                        <span class="text-[0.8rem] ">↗</span>
                     </div>
                 </a>
                 <button id="btn-info-license" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors">
                     <div class="flex items-center gap-3">
-                        <span class="text-[1.5rem] drop-shadow-md leading-none">📜</span>
-                        <span class="text-[0.8rem] font-black text-slate-400 uppercase tracking-widest">License</span>
+                        <span class="text-[1.5rem] drop-shadow-md ">📜</span>
+                        <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">License</span>
                     </div>
-                    <span class="text-slate-300 text-[1.5rem] font-normal leading-none -mt-0.5">›</span>
+                    <span class="text-slate-400 text-[1.5rem] font-normal  -mt-0.5">›</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】アプリ情報 / プロフィール / アーカイブ -->
+<template id="tpl-app-info">
+    <div class="w-full flex flex-col h-full bg-slate-50 overflow-y-auto pb-4">
+        <!-- トップヘッダー -->
+        <div class="flex flex-col items-center justify-center pt-8 pb-6 bg-white border-b border-slate-200 shadow-sm relative overflow-hidden">
+            <!-- 背景装飾 -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-1 rounded-full opacity-50"></div>
+            <div class="absolute -bottom-10 -left-10 w-24 h-24 bg-brand-2 rounded-full opacity-50"></div>
+            <div class="w-20 h-20 bg-gradient-to-br from-brand-4 to-brand-5 rounded-2xl shadow-lg flex items-center justify-center text-white text-[2rem] font-black mb-4 z-10">
+                <span class="drop-shadow-sm leading-none mt-1">LM</span>
+            </div>
+            <h3 class="text-[1.1rem] font-black uppercase tracking-widest text-slate-800 js-app-name text-center leading-tight px-4 z-10"></h3>
+            <p class="text-[0.7rem] text-slate-400 font-bold tracking-widest mt-1.5 js-app-version z-10"></p>
+        </div>
+        <div class="p-4 space-y-4">
+            <!-- アプリの利用統計 -->
+            <div class="bg-white rounded-[1rem] border border-slate-200 shadow-sm p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Global Stats</span>
+                    <span class="text-[0.5rem] text-slate-400 font-bold js-last-update"></span>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="flex flex-col items-center justify-center bg-slate-50 rounded-lg py-2 border border-slate-100">
+                        <span class="text-[0.55rem] font-bold text-slate-400 uppercase mb-0.5">Users</span>
+                        <span class="text-[1.2rem] font-black text-slate-600 leading-none js-stat-users">0</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center bg-brand-1 rounded-lg py-2 border border-brand-2">
+                        <span class="text-[0.55rem] font-bold text-brand-5 uppercase mb-0.5">Archives</span>
+                        <span class="text-[1.2rem] font-black text-brand-5 leading-none js-stat-archives">0</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center bg-amber-50 rounded-lg py-2 border border-amber-100">
+                        <span class="text-[0.55rem] font-bold text-amber-500 uppercase mb-0.5">Memos</span>
+                        <span class="text-[1.2rem] font-black text-amber-500 leading-none js-stat-memos">0</span>
+                    </div>
+                </div>
+            </div>
+            <!-- リンク / アクション -->
+            <div class="bg-white rounded-[1rem] border border-slate-200 shadow-sm overflow-hidden">
+                <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1.2rem] drop-shadow-sm leading-none">⭐</span>
+                        <span class="text-[0.75rem] font-black text-slate-600 uppercase tracking-wider">Feedback</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[0.8rem] font-black text-yellow-500 leading-none js-app-score">★ 0.0</span>
+                        <span class="text-[0.6rem] text-slate-400 font-bold">(<span class="js-app-feedback-count">0</span>)</span>
+                        <span class="text-slate-300 text-[1.2rem] font-normal leading-none ml-1">›</span>
+                    </div>
+                </button>
+                <div class="flex justify-between items-center p-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1.2rem] drop-shadow-sm leading-none">🛠️</span>
+                        <span class="text-[0.75rem] font-black text-slate-600 uppercase tracking-wider">Developer</span>
+                    </div>
+                    <span class="text-[0.8rem] font-black text-slate-500 js-app-developer"></span>
+                </div>
+                <button id="link-info-official" type="button" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1.2rem] drop-shadow-sm leading-none">🌍</span>
+                        <span class="text-[0.75rem] font-black text-slate-600 uppercase tracking-wider">Official Site</span>
+                    </div>
+                    <span class="text-[0.6rem] font-black text-blue-500 bg-blue-50 px-2 py-0.5 rounded uppercase border border-blue-100">Open ↗</span>
+                </button>
+                <button id="btn-info-license" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[1.2rem] drop-shadow-sm leading-none">📜</span>
+                        <span class="text-[0.75rem] font-black text-slate-600 uppercase tracking-wider">License</span>
+                    </div>
+                    <span class="text-slate-300 text-[1.2rem] font-normal leading-none">›</span>
                 </button>
             </div>
         </div>
     </div>
 </template>
 
+
 <template id="tpl-review-list">
     <div class="w-full flex flex-col h-full bg-slate-50 pb-2">
         <div class="shrink-0 flex flex-col items-center justify-center py-6 bg-white border-b border-slate-200 shadow-sm z-10">
-            <span class="text-[0.5rem] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Average Rating</span>
-            <span class="text-[4rem] font-black text-slate-800 leading-none js-avg-score tracking-tighter">0.0</span>
+            <span class="text-[0.5rem] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2">Average Rating</span>
+            <span class="text-[4rem] font-bold text-slate-900  js-avg-score tracking-tighter">0.0</span>
             <span class="text-[1.2rem] text-yellow-500 tracking-widest mt-2 js-avg-stars drop-shadow-sm"></span>
         </div>
         <div class="flex-1 overflow-y-auto p-4">
@@ -162,12 +237,12 @@
         <!-- アイコン・ニックネーム -->
 		<div class="flex items-center gap-4 mb-3">
 			<div id="view-profile-icon" class="text-[4rem] drop-shadow-md shrink-0"></div>
-			<div class="flex flex-col flex-1 min-w-0"><h1 id="view-profile-nickname" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight"></h1></div>
+			<div class="flex flex-col flex-1 min-w-0"><h1 id="view-profile-nickname" class="text-[1.2rem] font-bold text-slate-900 break-words "></h1></div>
 		</div>
         <!-- 本文・リンク -->
         <div class="bg-brand-1 overflow-y-auto ">
             <div id="view-profile-description"
-                class="flex-1 min-h-[200px] p-2 text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words">
+                class="flex-1 min-h-[200px] p-2 text-[1rem] text-slate-900 leading-[2] whitespace-pre-wrap break-words">
             </div>
             <div id="view-profile-links" class="gap-3 flex m-2"></div>
         </div>
@@ -175,18 +250,18 @@
 </template>
 
 <template id="tpl-edit-profile">
-	<div class="w-full text-black-5 space-y-3 px-1 pb-4">
+	<div class="w-full text-slate-900 space-y-3 px-1 pb-4">
 		<div class="flex items-end gap-3 py-1">
 			<div class="shrink-0 flex flex-col items-center">
 				<button id="btn-profile-icon-trigger" class="w-14 h-14 bg-white rounded-full shadow-md flex items-center justify-center text-[2rem] active:scale-95 transition-transform outline-none"><span id="edit-profile-icon-preview">😀</span><input type="hidden" id="edit-profile-icon"></button>
 			</div>
             <div class="flex-1">
-				<div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Nickname</label><span class="text-[0.5rem] font-bold text-slate-300"><span id="edit-profile-nickname-count">0</span>/20</span></div>
+				<div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Nickname</label><span class="text-[0.5rem] font-bold text-slate-400"><span id="edit-profile-nickname-count">0</span>/20</span></div>
 				<input id="edit-profile-nickname" type="text" maxlength="20" class="w-full border-2 border-brand-3 px-4 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
 			</div>
 		</div>
 		<div>
-			<div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Description</label><span class="text-[0.5rem] font-bold text-slate-300"><span id="edit-profile-description-count">0</span>/300</span></div>
+			<div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Description</label><span class="text-[0.5rem] font-bold text-slate-400"><span id="edit-profile-description-count">0</span>/300</span></div>
 			<textarea id="edit-profile-description" maxlength="300" class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
 		</div>
 		<div class="space-y-2">
@@ -205,42 +280,42 @@
             <div id="view-mem-user-wrapper" class="w-fit"></div>
             <!-- 元に戻したボタン -->
             <button id="btn-view-mem-timeline" class="h-10 shadow-md rounded-[1rem] flex items-center justify-center gap-2 active:scale-95 transition-transform px-4 outline-none bg-white border border-slate-200">
-                <span id="mem-stat-count" class="text-[1.1rem] font-black text-slate-800">0</span>
+                <span id="mem-stat-count" class="text-[1.1rem] font-bold text-slate-900">0</span>
                 <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-wider">memos</span>
             </button>
         </div>
         <!-- 2. タイトル -->
         <div class="shrink-0">
-            <h1 id="view-mem-title" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight border-l-4 border-brand-3 pl-3"></h1>
+            <h1 id="view-mem-title" class="text-[1.2rem] font-bold text-slate-900 break-words  border-l-4 border-brand-3 pl-3"></h1>
         </div>
         <!-- 3. 本文 (残りいっぱい) -->
         <div class="flex-1 min-h-0 bg-brand-1 rounded-xl p-3 flex flex-col gap-3 overflow-y-auto">
-            <div id="view-mem-body" class="text-[1rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-words"></div>
+            <div id="view-mem-body" class="text-[1rem] text-slate-900 leading-[2] whitespace-pre-wrap break-words"></div>
             <div id="view-mem-url-wrapper" class="flex flex-wrap gap-2 mt-auto pt-2"></div>
         </div>
         <!-- 4. 金額 & 5. 距離 -->
         <div class="shrink-0 flex flex-col mb-2">
             <div class="flex justify-between items-center pt-3 border-b border-slate-200 px-2">
-                <span class="text-[1rem] text-slate-600">金額</span>
-                <span class="text-[1.1rem] font-bold text-slate-800">
+                <span class="text-[1rem] text-slate-900">金額</span>
+                <span class="text-[1.1rem] font-bold text-slate-900">
                     <span id="mem-stat-price"></span> <span id="view-mem-price-unit"></span>
                 </span>
             </div>
             <div class="flex justify-between items-center pt-3 border-b border-slate-200 px-2">
-                <span class="text-[1rem] text-slate-600">距離</span>
-                <span id="mem-stat-distance" class="text-[1.1rem] font-bold text-slate-800"></span>
+                <span class="text-[1rem] text-slate-900">距離</span>
+                <span id="mem-stat-distance" class="text-[1.1rem] font-bold text-slate-900"></span>
             </div>
         </div>
         <!-- 7. ステータス変更ボタン群 -->
         <div id="archive-status-bar" class="shrink-0 pt-2 flex gap-2">
-            <button id="btn-status-memo" class="flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none">memo</button>
-            <button id="btn-status-private" class="flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none">private</button>
-            <button id="btn-status-close" class="flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none">public</button>
-            <button id="btn-status-open" class="flex-1 h-11 font-black text-[0.8rem] rounded-lg tracking-wider outline-none">open</button>
+            <button id="btn-status-memo" class="flex-1 h-11 font-bold text-[0.8rem] rounded-lg tracking-wider outline-none">memo</button>
+            <button id="btn-status-private" class="flex-1 h-11 font-bold text-[0.8rem] rounded-lg tracking-wider outline-none">private</button>
+            <button id="btn-status-close" class="flex-1 h-11 font-bold text-[0.8rem] rounded-lg tracking-wider outline-none">public</button>
+            <button id="btn-status-open" class="flex-1 h-11 font-bold text-[0.8rem] rounded-lg tracking-wider outline-none">open</button>
         </div>
         <!-- 6. 限定公開ボタン -->
         <div id="archive-limit-btn-area" class="shrink-0 pb-2">
-            <button id="btn-toggle-limited" class="w-full h-12 font-black rounded-lg border-2 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+            <button id="btn-toggle-limited" class="w-full h-12 font-bold rounded-lg border-2 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                 <span class="js-check-icon text-[1.2rem]">☐</span>
                 <span class="js-label-text">限定公開に変更する</span>
             </button>
@@ -249,31 +324,31 @@
 </template>
 
 <template id="tpl-edit-archive">
-    <div class="w-full text-black-5 space-y-4 mb-4">
+    <div class="w-full text-slate-900 space-y-4 mb-4">
         <div>
-            <div class="flex justify-between items-end mb-1"><label class="text-black-3 block text-[0.8rem] font-bold uppercase">Trip Title</label><span class="text-[0.5rem] text-slate-300 font-bold"><span id="edit-mem-title-count">0</span>/30</span></div>
+            <div class="flex justify-between items-end mb-1"><label class="text-slate-400 block text-[0.8rem] font-bold uppercase">Trip Title</label><span class="text-[0.5rem] text-slate-400 font-bold"><span id="edit-mem-title-count">0</span>/30</span></div>
             <input id="edit-mem-title" type="text" maxlength="30" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
         </div>
         <div>
-            <div class="flex justify-between items-end mb-1"><label class="text-black-3 block text-[0.8rem] font-bold uppercase">Description / Memo</label><span class="text-[0.5rem] text-slate-300 font-bold"><span id="edit-mem-body-count">0</span>/300</span></div>
+            <div class="flex justify-between items-end mb-1"><label class="text-slate-400 block text-[0.8rem] font-bold uppercase">Description / Memo</label><span class="text-[0.5rem] text-slate-400 font-bold"><span id="edit-mem-body-count">0</span>/300</span></div>
             <textarea id="edit-mem-body" maxlength="300" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
         <div>
-            <label class="text-black-3 block text-[0.8rem] font-bold mb-1 uppercase">Link URL</label>
+            <label class="text-slate-400 block text-[0.8rem] font-bold mb-1 uppercase">Link URL</label>
             <input id="edit-mem-url" type="url" placeholder="https://..." class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
         </div>
         <div>
-            <label class="text-black-3 block text-[0.8rem] font-bold mb-1 uppercase">Currency</label>
-            <input id="edit-mem-currency" type="text" maxlength="5" placeholder="JPY, USD..." class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white uppercase text-black-5">
+            <label class="text-slate-400 block text-[0.8rem] font-bold mb-1 uppercase">Currency</label>
+            <input id="edit-mem-currency" type="text" maxlength="5" placeholder="JPY, USD..." class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white uppercase text-slate-900">
         </div>
     </div>
 </template>
 
 <template id="tpl-share-archive">
-    <div class="w-full text-black-5 flex flex-col items-center">
-        <div class="w-full px-4 mt-2"><div id="share-archive-title" class="text-[1.2rem] font-black text-black-5 text-center break-words "></div></div>
+    <div class="w-full text-slate-900 flex flex-col items-center">
+        <div class="w-full px-4 mt-2"><div id="share-archive-title" class="text-[1.2rem] font-bold text-slate-900 text-center break-words "></div></div>
         <div class="w-full flex justify-center my-6">
-            <button id="btn-share-copy" class="shadow-brand w-48 h-48 p-3 bg-brand-0 text-white font-black rounded-[1rem] shadow-md active:scale-95 transition-transform flex items-center justify-center">
+            <button id="btn-share-copy" class="shadow-brand w-48 h-48 p-3 bg-brand-0 text-white font-bold rounded-[1rem] shadow-md active:scale-95 transition-transform flex items-center justify-center">
                 <img id="share-qr-image" src="" alt="QR Code" class="w-48 h-[200px] object-contain">
             </button>
         </div>
@@ -295,12 +370,12 @@
         <!-- ユーザー情報ボタン（Generator用コンテナ） -->
         <div id="view-notice-user-wrapper" class="hidden mb-3"></div>
         <div id="view-notice-title-area" class="border-l-4 border-brand-3 pl-3 py-0.5 mb-3">
-            <h1 id="view-notice-title" class="text-[1.2rem] font-black text-slate-800 break-words"></h1>
+            <h1 id="view-notice-title" class="text-[1.2rem] font-bold text-slate-900 break-words"></h1>
         </div>
 		<!-- 3. 本文（ で統一） -->
         <div class="bg-brand-1 overflow-y-auto pr-2">
             <div id="view-notice-body" 
-                class="flex-1 p-2 min-h-[200px] text-[1rem] text-slate-600 leading-[2] whitespace-pre-wrap break-words pt-2"></div>
+                class="flex-1 p-2 min-h-[200px] text-[1rem] text-slate-900 leading-[2] whitespace-pre-wrap break-words pt-2"></div>
             <!-- 4. リンク表示エリア -->
             <div id="view-notice-url-wrapper" class="hidden mt-auto flex m-2">
             </div>
@@ -318,7 +393,7 @@
 
 <!-- 【ダイアログ子】自分の通報詳細 -->
 <template id="tpl-my-report-detail">
-    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden">
+    <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden">
         <div class="flex justify-between items-center pb-2 px-1">
             <span class="js-report-tim kb-date-tim-md"></span>
         </div>
@@ -336,7 +411,7 @@
         </div>
         <!-- 通報内容 -->
         <div class="h-[200px] bg-brand-1 rounded-lg p-2 overflow-y-auto">
-            <div id="view-report-body" class="text-[1rem] text-slate-700 leading-[2] whitespace-pre-wrap break-words"></div>
+            <div id="view-report-body" class="text-[1rem] text-slate-900 leading-[2] whitespace-pre-wrap break-words"></div>
         </div>
     </div>
 </template>
@@ -344,19 +419,19 @@
 <!-- ⚙️ システムメニュー用 -->
 <template id="tpl-menu-sys">
     <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-sys-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-sys-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">📢</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Notifications</span>
         </button>
-        <button id="btn-sys-version" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-sys-version" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">ℹ️</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">App Information</span>
         </button>
-        <button id="btn-sys-auth" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-sys-auth" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">🚪</span>
             <span class="col-span-1">
             </span>
@@ -374,22 +449,22 @@
 <!-- 👤 ユーザーメニュー用 -->
 <template id="tpl-menu-user">
     <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-sys-user-profile" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-sys-user-profile" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">👤</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">User Profile</span>
         </button>
-        <button id="btn-user-mail" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-user-mail" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">📩</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Messages</span>
         </button>
-        <button id="btn-sys-my-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-sys-my-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">🚫</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">My Reports</span>
         </button>
-        <button id="btn-sys-user-config" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-sys-user-config" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">⚙️</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">User Settings</span>
@@ -400,37 +475,37 @@
 <!-- 🗺️ データメニュー用 -->
 <template id="tpl-menu-data">
     <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-app-archive-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-archive-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">📚</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Archive List</span>
         </button>
-        <button id="btn-app-info" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-info" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">📖</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Archive Info</span>
         </button>
-        <button id="btn-app-point-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-point-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">☰</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Point List</span>
         </button>
-        <button id="btn-app-batch" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-batch" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">📦</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Point >> Archive</span>
         </button>
-        <button id="btn-app-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">🔎</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Map Search</span>
         </button>
-        <button id="btn-app-point-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-point-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">👇</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Word Search</span>
         </button>
-        <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">➕</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Create Memo</span>
@@ -441,22 +516,22 @@
 <!-- 👆 アクションメニュー用 -->
 <template id="tpl-menu-action">
     <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-app-reload" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-reload" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">🌐</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Reload App</span>
         </button>
-        <button id="btn-app-refresh" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-refresh" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">🔄</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Refresh Screen</span>
         </button>
-        <button id="btn-app-current" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-current" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">📍</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Focus to Current</span>
         </button>
-        <button id="btn-app-restore" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-app-restore" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">♻️</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Restore Map</span>
@@ -470,7 +545,7 @@
         <!-- ユーザー情報 -->
         <div class="bg-white border-b border-slate-200 p-4 mb-4 shadow-sm">
             <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2 text-slate-700 font-black">
+                <div class="flex items-center gap-2 text-slate-900 font-bold">
                     <span class="text-[1.5rem]">👤</span>
                     <span class="text-[0.8rem]">ユーザー情報</span>
                 </div>
@@ -478,7 +553,7 @@
             </div>
             <div>
                 <label class="block text-[0.5rem] font-bold text-slate-400 mb-1">ニックネーム</label>
-                <div class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-1.5 rounded-md font-black border border-amber-100 text-[0.8rem]">
+                <div class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-1.5 rounded-md font-bold border border-amber-100 text-[0.8rem]">
                     <span>📁</span> <span class="js-nickname"></span>
                 </div>
             </div>
@@ -491,23 +566,23 @@
 <!-- 【ダイアログ子】リンク1件分のアイテム -->
 <template id="tpl-click-stats-item">
     <div class="bg-white rounded-[1rem] shadow-sm border border-slate-200 p-4">
-        <label class="block text-[0.8rem] font-black text-slate-500 mb-2 js-link-title"></label>
-        <div class="bg-slate-50 border border-slate-200 rounded-md px-3 py-2 mb-3 text-[0.8rem] text-slate-500 truncate js-link-url"></div>
+        <label class="block text-[0.8rem] font-bold text-slate-400 mb-2 js-link-title"></label>
+        <div class="bg-slate-50 border border-slate-200 rounded-md px-3 py-2 mb-3 text-[0.8rem] text-slate-400 truncate js-link-url"></div>
         <div class="grid grid-cols-3 gap-2">
             <!-- Total -->
             <div class="flex flex-col items-center justify-center border border-amber-200 bg-amber-50/50 rounded-md py-2">
-                <span class="text-[0.55rem] font-bold text-slate-500 mb-0.5">Total</span>
-                <div class="font-black text-indigo-600 text-[1rem] leading-none mt-1"><span class="js-total">0</span><span class="text-[0.5rem] text-slate-500 ml-0.5">回</span></div>
+                <span class="text-[0.55rem] font-bold text-slate-400 mb-0.5">Total</span>
+                <div class="font-bold text-indigo-600 text-[1rem]  mt-1"><span class="js-total">0</span><span class="text-[0.5rem] text-slate-400 ml-0.5">回</span></div>
             </div>
             <!-- Unique -->
             <div class="flex flex-col items-center justify-center border border-slate-200 rounded-md py-2">
-                <span class="text-[0.55rem] font-bold text-slate-500 mb-0.5">Unique</span>
-                <div class="font-black text-emerald-500 text-[1rem] leading-none mt-1"><span class="js-unique">0</span><span class="text-[0.5rem] text-slate-500 ml-0.5">人</span></div>
+                <span class="text-[0.55rem] font-bold text-slate-400 mb-0.5">Unique</span>
+                <div class="font-bold text-emerald-500 text-[1rem]  mt-1"><span class="js-unique">0</span><span class="text-[0.5rem] text-slate-400 ml-0.5">人</span></div>
             </div>
             <!-- Guest -->
             <div class="flex flex-col items-center justify-center border border-slate-200 rounded-md py-2">
-                <span class="text-[0.55rem] font-bold text-slate-500 mb-0.5">Guest</span>
-                <div class="font-black text-slate-600 text-[1rem] leading-none mt-1"><span class="js-guest">0</span><span class="text-[0.5rem] text-slate-500 ml-0.5">回</span></div>
+                <span class="text-[0.55rem] font-bold text-slate-400 mb-0.5">Guest</span>
+                <div class="font-bold text-slate-900 text-[1rem]  mt-1"><span class="js-guest">0</span><span class="text-[0.5rem] text-slate-400 ml-0.5">回</span></div>
             </div>
         </div>
     </div>
@@ -518,53 +593,53 @@
     <div class="w-full flex flex-col bg-slate-50 min-h-full pb-4 px-2 pt-2">
         <!-- アーカイブ情報 -->
         <div class="bg-white border border-slate-200 p-4 mb-4 shadow-sm rounded-lg">
-            <div class="flex items-center gap-2 text-slate-700 font-black mb-4">
+            <div class="flex items-center gap-2 text-slate-900 font-bold mb-4">
                 <span class="text-[1.5rem]">📁</span>
                 <span class="text-[0.8rem]">アーカイブ情報</span>
             </div>
             <div class="mb-3">
                 <label class="block text-[0.5rem] font-bold text-slate-400 mb-1">タイトル</label>
-                <div class="font-black text-slate-800 text-[1rem] js-arc-title"></div>
+                <div class="font-bold text-slate-900 text-[1rem] js-arc-title"></div>
             </div>
             <div class="mb-3">
                 <label class="block text-[0.5rem] font-bold text-slate-400 mb-1">リンクURL</label>
-                <div class="bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[0.8rem] text-slate-500 truncate js-arc-url"></div>
+                <div class="bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[0.8rem] text-slate-400 truncate js-arc-url"></div>
             </div>
             <div class="mb-3 mt-4">
-                <label class="flex items-center gap-1 text-[0.5rem] font-bold text-slate-500 mb-2">
+                <label class="flex items-center gap-1 text-[0.5rem] font-bold text-slate-400 mb-2">
                     <span class="text-[0.8rem]">🔗</span> リンククリック数 (click_stats)
                 </label>
                 <div class="grid grid-cols-3 gap-2">
                     <div class="flex flex-col items-center justify-center border border-indigo-100 bg-white rounded-md py-2 shadow-sm">
                         <span class="text-[0.55rem] font-bold text-slate-400 mb-0.5">Total</span>
-                        <div class="font-black text-indigo-600 text-[0.8rem] leading-none mt-1"><span class="js-arc-total">0</span><span class="text-[0.5rem] text-slate-500 ml-0.5">回</span></div>
+                        <div class="font-bold text-indigo-600 text-[0.8rem]  mt-1"><span class="js-arc-total">0</span><span class="text-[0.5rem] text-slate-400 ml-0.5">回</span></div>
                     </div>
                     <div class="flex flex-col items-center justify-center border border-emerald-100 bg-white rounded-md py-2 shadow-sm">
                         <span class="text-[0.55rem] font-bold text-slate-400 mb-0.5">Unique</span>
-                        <div class="font-black text-emerald-500 text-[0.8rem] leading-none mt-1"><span class="js-arc-unique">0</span><span class="text-[0.5rem] text-slate-500 ml-0.5">人</span></div>
+                        <div class="font-bold text-emerald-500 text-[0.8rem]  mt-1"><span class="js-arc-unique">0</span><span class="text-[0.5rem] text-slate-400 ml-0.5">人</span></div>
                     </div>
                     <div class="flex flex-col items-center justify-center border border-slate-200 bg-white rounded-md py-2 shadow-sm">
                         <span class="text-[0.55rem] font-bold text-slate-400 mb-0.5">Guest</span>
-                        <div class="font-black text-slate-600 text-[0.8rem] leading-none mt-1"><span class="js-arc-guest">0</span><span class="text-[0.5rem] text-slate-500 ml-0.5">回</span></div>
+                        <div class="font-bold text-slate-900 text-[0.8rem]  mt-1"><span class="js-arc-guest">0</span><span class="text-[0.5rem] text-slate-400 ml-0.5">回</span></div>
                     </div>
                 </div>
             </div>
             <!-- アーカイブの閲覧数追加 -->
             <div class="flex items-center justify-between mb-3 mt-4">
-                <label class="flex items-center gap-1 text-[0.5rem] font-bold text-slate-500">
+                <label class="flex items-center gap-1 text-[0.5rem] font-bold text-slate-400">
                     <span class="text-[0.8rem]">👁️</span> 閲覧数 (Views)
                 </label>
-                <div class="font-black text-indigo-600 text-[1.2rem] js-arc-view-count">0</div>
+                <div class="font-bold text-indigo-600 text-[1.2rem] js-arc-view-count">0</div>
             </div>
             <div class="flex items-center gap-2 mt-5 pt-4 border-t border-slate-100">
-                <span class="text-[0.5rem] font-bold text-slate-500 mr-1">ステータス</span>
-                <span class="px-2 py-0.5 rounded text-[0.5rem] font-black js-arc-status-badge"></span>
-                <span class="px-2 py-0.5 rounded text-[0.5rem] font-black bg-blue-100 text-blue-600 js-arc-owner-badge hidden">オーナー</span>
+                <span class="text-[0.5rem] font-bold text-slate-400 mr-1">ステータス</span>
+                <span class="px-2 py-0.5 rounded text-[0.5rem] font-bold js-arc-status-badge"></span>
+                <span class="px-2 py-0.5 rounded text-[0.5rem] font-bold bg-blue-100 text-blue-600 js-arc-owner-badge hidden">オーナー</span>
             </div>
         </div>
         <!-- 各明細情報 -->
         <div class="bg-white border border-slate-200 p-4 rounded-lg shadow-sm">
-            <div class="flex items-center gap-2 text-slate-700 font-black mb-4">
+            <div class="flex items-center gap-2 text-slate-900 font-bold mb-4">
                 <span class="text-[1.5rem]">📋</span>
                 <span class="text-[0.8rem]">各明細情報</span>
             </div>
@@ -579,9 +654,9 @@
         <!-- 上段：No、アイコン、タイトル -->
         <div class="flex justify-between items-start mb-2">
             <div class="flex items-center gap-2">
-                <span class="js-dtl-seq w-6 h-6 bg-slate-800 text-white text-[0.8rem] font-black rounded-full flex items-center justify-center shrink-0">
+                <span class="js-dtl-seq w-6 h-6 bg-slate-800 text-white text-[0.8rem] font-bold rounded-full flex items-center justify-center shrink-0">
                 </span>
-                <span class="js-dtl-title text-[1rem] font-black text-slate-800 truncate max-w-[200px]">
+                <span class="js-dtl-title text-[1rem] font-bold text-slate-900 truncate max-w-[200px]">
                 </span>
             </div>
             <span class="js-dtl-icon text-[1.5rem] shrink-0">
@@ -595,21 +670,21 @@
         </div>
         <!-- 下段：URLとクリック統計 -->
         <div class="pt-2 border-t border-slate-50">
-            <div class="js-dtl-url text-[0.8rem] truncate mb-2 text-slate-500">
+            <div class="js-dtl-url text-[0.8rem] truncate mb-2 text-slate-400">
             </div>
             <div class="js-dtl-stats-box hidden flex gap-4 text-[0.8rem]">
                 <div class="flex items-center gap-1.5">
                     <span class="opacity-50">🖱️</span>
-                    <span class="js-dtl-total font-black text-brand-5">0</span>
+                    <span class="js-dtl-total font-bold text-brand-5">0</span>
                     <span class="text-[0.6rem] uppercase text-slate-400 font-bold">Total</span>
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <span class="js-dtl-unique font-black text-slate-500">0</span>
+                    <span class="js-dtl-unique font-bold text-slate-400">0</span>
                     <span class="text-[0.6rem] uppercase text-slate-400 font-bold">Unique</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="opacity-50">👤</span>
-                    <span class="js-dtl-guest font-black text-slate-500">0</span>
+                    <span class="js-dtl-guest font-bold text-slate-400">0</span>
                     <span class="text-[0.6rem] uppercase text-slate-400 font-bold">Guest</span>
                 </div>
             </div>

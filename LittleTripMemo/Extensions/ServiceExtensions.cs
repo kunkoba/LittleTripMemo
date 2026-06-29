@@ -36,6 +36,7 @@ public static class ServiceExtensions
         services.AddScoped<TableStatisticsRepository>();
         services.AddScoped<CoreConfigRepository>();
         services.AddScoped<SysUserHistoryRepository>();
+        services.AddScoped<AppInfoRepository>();
 
         // Batch (Worker用)
         services.AddScoped<TableStatisticsTaskRepository>();

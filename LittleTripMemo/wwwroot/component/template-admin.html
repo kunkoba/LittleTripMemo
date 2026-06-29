@@ -1,31 +1,31 @@
 <!-- 【ダイアログ子】管理者メニュー -->
 <template id="tpl-menu-admin">
     <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-admin-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-admin-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">📢</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Notice</span>
         </button>
-        <button id="btn-admin-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-admin-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">🚫</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Report</span>
         </button>
-        <button id="btn-admin-feedback" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-admin-feedback" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">💡</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">Feedback</span>
         </button>
-        <button id="btn-admin-user-mail" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-admin-user-mail" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">✉️️</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">User Message</span>
         </button>
-        <button id="btn-admin-core-cfg" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-black-5">
+        <button id="btn-admin-core-cfg" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 flex justify-center text-[1.5rem]">⚙️</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">System Config</span>
@@ -39,42 +39,42 @@
         <div class="flex-1 min-w-0 p-3 pl-4">
             <div class="flex justify-between items-start mb-1">
                 <div class="js-date kb-date-tim-sm"></div>
-                <span class="js-badge-status text-[9px] font-black px-2 py-0.5 uppercase tracking-wider shadow-md border"></span>
+                <span class="js-badge-status text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-md border"></span>
             </div>
-            <div class="text-[0.8rem] font-black text-black-5 truncate pr-2 mb-1 js-title"></div>
-            <div class="text-[0.8rem] text-black-3 line-clamp-1 js-body "></div>
+            <div class="text-[0.8rem] font-bold text-slate-900 truncate pr-2 mb-1 js-title"></div>
+            <div class="text-[0.8rem] text-slate-400 line-clamp-1 js-body "></div>
         </div>
     </div>
 </template>
 
 <!-- 【ダイアログ子】管理者通知編集 -->
 <template id="tpl-admin-notice-edit">
-    <div class="w-full text-black-5 space-y-4 pt-2 px-2">
+    <div class="w-full text-slate-900 space-y-4 pt-2 px-2">
         <div>
-            <label class="block text-[0.8rem] font-bold mb-1 uppercase text-black-3">Kind</label>
+            <label class="block text-[0.8rem] font-bold mb-1 uppercase text-slate-400">Kind</label>
             <select id="edit-notice-kind" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white"></select>
         </div>
         <div>
-            <div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-black-3">Title</label><span class="text-[0.5rem] text-black-2 font-bold"><span id="edit-notice-title-count">0</span>/30</span></div>
+            <div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Title</label><span class="text-[0.5rem] text-slate-400 font-bold"><span id="edit-notice-title-count">0</span>/30</span></div>
             <input id="edit-notice-title" type="text" maxlength="30" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
         </div>
         <div>
-            <div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-black-3">Body</label><span class="text-[0.5rem] text-black-2 font-bold"><span id="edit-notice-body-count">0</span>/300</span></div>
+            <div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Body</label><span class="text-[0.5rem] text-slate-400 font-bold"><span id="edit-notice-body-count">0</span>/300</span></div>
             <textarea id="edit-notice-body" maxlength="300" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
         <div>
-            <label class="block text-[0.8rem] font-bold mb-1 uppercase text-black-3">Link URL</label>
+            <label class="block text-[0.8rem] font-bold mb-1 uppercase text-slate-400">Link URL</label>
             <input id="edit-notice-url" type="url" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-500" placeholder="https://...">
         </div>
         <div>
-            <label class="block text-[0.5rem] font-bold mb-1 uppercase text-black-3">Disp From</label>
+            <label class="block text-[0.5rem] font-bold mb-1 uppercase text-slate-400">Disp From</label>
             <div class="flex items-center gap-2">
                 <input id="edit-notice-from" type="date" class="flex-1 border-2 border-brand-3 px-2 py-1 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
                 <button id="btn-clear-notice-from" type="button" class="w-8 h-8 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95">✕</button>
             </div>
         </div>
         <div>
-            <label class="block text-[0.5rem] font-bold mb-1 uppercase text-black-3">Disp To</label>
+            <label class="block text-[0.5rem] font-bold mb-1 uppercase text-slate-400">Disp To</label>
             <div class="flex items-center gap-2">
                 <input id="edit-notice-to" type="date" class="flex-1 border-2 border-brand-3 px-2 py-1 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
                 <button id="btn-clear-notice-to" type="button" class="w-8 h-8 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95">✕</button>
@@ -88,25 +88,25 @@
     <button class="js-item-card w-full flex flex-col p-4 rounded-[1rem] border border-brand-1 bg-white mb-3 shadow-md">
         <div class="flex justify-between items-center mb-2">
             <span class="js-date kb-date-tim-sm"></span>
-            <span class="js-score text-[0.8rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
+            <span class="js-score text-[0.8rem] text-yellow-500 tracking-widest  drop-shadow-sm"></span>
         </div>
-        <div class="text-left text-[0.8rem] text-slate-700 break-words js-body line-clamp-1"></div>
+        <div class="text-left text-[0.8rem] text-slate-900 break-words js-body line-clamp-1"></div>
     </button>
 </template>
 
 <!-- 【ダイアログ子】管理者フィードバック詳細 -->
 <template id="tpl-admin-feedback-detail">
-    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden bg-white">
+    <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden bg-white">
         <div class="flex justify-between items-center mb-4">
-            <span class="text-[1rem] font-black text-slate-400 tracking-wider js-date italic"></span>
-            <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
+            <span class="text-[1rem] font-bold text-slate-400 tracking-wider js-date italic"></span>
+            <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest  drop-shadow-sm"></span>
         </div>
         <!-- ▼ 修正：ジェネレータ用の空のラッパーに変更 -->
         <div class="mb-4">
             <div id="view-feedback-user-wrapper"></div>
         </div>
         <div class="bg-brand-1 rounded-lg p-2">
-            <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-words js-body mt-2 h-[200px] overflow-y-auto pr-2"></div>
+            <div class="text-[1rem] text-slate-900  whitespace-pre-wrap break-words js-body mt-2 h-[200px] overflow-y-auto pr-2"></div>
         </div>
     </div>
 </template>
@@ -115,14 +115,14 @@
 <template id="tpl-admin-list-child-report-summary">
     <div class="relative bg-white border border-brand-1 shadow-md p-3 flex flex-col gap-2 cursor-pointer active:bg-slate-50 mb-3 rounded-[1rem]">
         <!-- 右上：通報件数バッジ -->
-        <div class="absolute top-3 right-3 bg-red-500 text-white text-[0.8rem] font-black px-2.5 py-1 rounded-full shadow-sm">
+        <div class="absolute top-3 right-3 bg-red-500 text-white text-[0.8rem] font-bold px-2.5 py-1 rounded-full shadow-sm">
             <span class="js-report-count js-badge-count">0</span>
         </div>
         <!-- 最終更新日 -->
         <div class="js-update-tim kb-date-tim-sm">
         </div>
         <!-- まとめタイトル -->
-        <div class="text-[0.95rem] font-black text-slate-800 pr-10 line-clamp-2">
+        <div class="text-[1rem] font-bold text-slate-900 pr-10 line-clamp-2">
             <span class="js-archive-title">タイトル</span>
         </div>
         <!-- ユーザーバッジ領域（JSで生成して流し込む） -->
@@ -137,24 +137,24 @@
 
 <!-- 【ダイアログ子】管理者通報詳細 -->
 <template id="tpl-admin-report-detail">
-    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden">
+    <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden">
         <div class="shrink-0 p-4 border-b border-brand-2 bg-slate-50 relative mb-3">
             <!-- まとめタイトル (全体をボタン化) -->
             <button id="btn-admin-report-open-archive" class="w-full text-left active:scale-[0.98] transition-transform mb-4 bg-white p-3 rounded-[1rem] border border-slate-200 shadow-sm flex items-center justify-between">
                 <div class="flex-1 min-w-0 pr-2">
-                    <div class="text-[0.5rem] font-black text-slate-400 uppercase tracking-widest mb-1">Target Archive</div>
-                    <div class="text-[0.8rem] font-black text-brand-5 js-archive-title break-words line-clamp-2"></div>
+                    <div class="text-[0.5rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Target Archive</div>
+                    <div class="text-[0.8rem] font-bold text-brand-5 js-archive-title break-words line-clamp-2"></div>
                 </div>
                 <div class="text-[1.5rem] ml-2 drop-shadow-sm">🗺️</div>
             </button>
             <!-- ユーザ情報アイコン -->
-            <div class="text-[0.5rem] font-black text-slate-400 uppercase tracking-widest mb-1">Target User</div>
+            <div class="text-[0.5rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Target User</div>
             <div id="view-report-target-user-wrapper">
             </div>
             <!-- 追加：管理者用アクションボタン -->
             <div class="flex gap-3 mt-5">
-                <button id="btn-admin-report-close" class="flex-1 h-11 bg-slate-500 text-white text-[0.8rem] font-black rounded-lg shadow-md active:scale-95 transition-all uppercase tracking-wider">Close</button>
-                <button id="btn-admin-report-private" class="flex-1 h-11 bg-slate-800 text-white text-[0.8rem] font-black rounded-lg shadow-md active:scale-95 transition-all uppercase tracking-wider">Delete</button>
+                <button id="btn-admin-report-close" class="flex-1 h-11 bg-slate-500 text-white text-[0.8rem] font-bold rounded-lg shadow-md active:scale-95 transition-all uppercase tracking-wider">Close</button>
+                <button id="btn-admin-report-private" class="flex-1 h-11 bg-slate-800 text-white text-[0.8rem] font-bold rounded-lg shadow-md active:scale-95 transition-all uppercase tracking-wider">Delete</button>
             </div>
         </div>
         <div class="flex-1 overflow-y-auto p-2 bg-brand-0">
@@ -171,7 +171,7 @@
             <div class="flex justify-between items-center mb-1">
                 <div class="js-report-tim kb-date-tim-sm"></div>
             </div>
-            <div class="text-[0.5rem] text-black-5 break-words js-report-body line-clamp-1"></div>
+            <div class="text-[0.5rem] text-slate-900 break-words js-report-body line-clamp-1"></div>
         </div>
     </div>
 </template>
@@ -183,27 +183,27 @@
             <div class="flex justify-between items-start mb-1">
                 <div class="js-date kb-date-tim-sm"></div>
             </div>
-            <div class="absolute top-0 right-2 text-[1.5rem] font-black">
+            <div class="absolute top-0 right-2 text-[1.5rem] font-bold">
                 <span class="js-emoji mr-2"></span>
             </div>
             <!-- 宛先表示（Generator注入用コンテナ） -->
             <div class="js-user-wrapper mt-2"></div>
-            <div class="text-[0.8rem] text-black-3 line-clamp-1 js-body mt-2"></div>
+            <div class="text-[0.8rem] text-slate-400 line-clamp-1 js-body mt-2"></div>
         </div>
     </div>
 </template>
 
 <!-- 【ダイアログ子】管理者：ユーザー個別通知送信 (完全改修版) -->
 <template id="tpl-admin-send-user-notification">
-    <div class="w-full text-black-5 space-y-6 pt-2 px-2">
+    <div class="w-full text-slate-900 space-y-6 pt-2 px-2">
         <!-- ▼ 修正：ジェネレータ用の空のラッパーに変更 -->
         <div class="px-1">
-            <label class="block font-black text-black-3 text-[0.5rem] mb-2 uppercase tracking-widest">To Recipient</label>
+            <label class="block font-bold text-slate-400 text-[0.5rem] mb-2 uppercase tracking-widest">To Recipient</label>
             <div id="admin-send-target-user-wrapper"></div>
         </div>
         <!-- 2. メッセージアイコン入力 (明細画面の MARKER レイアウト) -->
         <div class="px-1 w-[50%]">
-            <label class="block font-black text-black-3 text-[0.5rem] mb-1 uppercase tracking-wider">Message Icon</label>
+            <label class="block font-bold text-slate-400 text-[0.5rem] mb-1 uppercase tracking-wider">Message Icon</label>
             <div class="flex items-center justify-between pb-1">
                 <button id="btn-admin-send-emoji-trigger" type="button" 
                     class="h-[36px] w-full text-left text-[1.8rem] outline-none active:scale-95">
@@ -216,20 +216,20 @@
         <div>
             <div class="flex justify-between items-end mb-1">
                 <label class="block text-[0.8rem] font-bold uppercase text-slate-400">Message Body</label>
-                <span class="text-[0.5rem] font-bold text-slate-300"><span id="admin-send-body-count">0</span>/300</span>
+                <span class="text-[0.5rem] font-bold text-slate-400"><span id="admin-send-body-count">0</span>/300</span>
             </div>
             <textarea id="admin-send-body" maxlength="300" placeholder="ユーザーへのメッセージを入力してください" 
-                class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none leading-relaxed"></textarea>
+                class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none "></textarea>
         </div>
     </div>
 </template>
 
 <!-- 【ダイアログ子】管理者フィードバック詳細 -->
 <template id="tpl-admin-feedback-detail">
-    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden bg-white">
+    <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden bg-white">
         <div class="flex justify-between items-center mb-4">
-            <span class="text-[1rem] font-black text-slate-400 tracking-wider js-date italic"></span>
-            <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest leading-none drop-shadow-sm"></span>
+            <span class="text-[1rem] font-bold text-slate-400 tracking-wider js-date italic"></span>
+            <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest  drop-shadow-sm"></span>
         </div>
         
         <!-- ▼ 修正：ジェネレータ用の空のラッパーに変更 -->
@@ -238,24 +238,24 @@
         </div>
 
         <div class="bg-brand-1 rounded-lg p-2">
-            <div class="text-[1rem] text-slate-700 leading-relaxed whitespace-pre-wrap break-words js-body mt-2 h-[200px] overflow-y-auto pr-2"></div>
+            <div class="text-[1rem] text-slate-900  whitespace-pre-wrap break-words js-body mt-2 h-[200px] overflow-y-auto pr-2"></div>
         </div>
     </div>
 </template>
 
 <!-- 【ダイアログ子】管理者：ユーザー個別通知送信 (完全改修版) -->
 <template id="tpl-admin-send-user-notification">
-    <div class="w-full text-black-5 space-y-6 pt-2 px-2">
+    <div class="w-full text-slate-900 space-y-6 pt-2 px-2">
         
         <!-- ▼ 修正：ジェネレータ用の空のラッパーに変更 -->
         <div class="px-1">
-            <label class="block font-black text-black-3 text-[0.5rem] mb-2 uppercase tracking-widest">To Recipient</label>
+            <label class="block font-bold text-slate-400 text-[0.5rem] mb-2 uppercase tracking-widest">To Recipient</label>
             <div id="admin-send-target-user-wrapper"></div>
         </div>
 
         <!-- 2. メッセージアイコン入力 (明細画面の MARKER レイアウト) -->
         <div class="px-1 w-[50%]">
-            <label class="block font-black text-black-3 text-[0.5rem] mb-1 uppercase tracking-wider">Message Icon</label>
+            <label class="block font-bold text-slate-400 text-[0.5rem] mb-1 uppercase tracking-wider">Message Icon</label>
             <div class="flex items-center justify-between pb-1">
                 <button id="btn-admin-send-emoji-trigger" type="button" 
                     class="h-[36px] w-full text-left text-[1.8rem] outline-none active:scale-95">
@@ -268,17 +268,17 @@
         <div>
             <div class="flex justify-between items-end mb-1">
                 <label class="block text-[0.8rem] font-bold uppercase text-slate-400">Message Body</label>
-                <span class="text-[0.5rem] font-bold text-slate-300"><span id="admin-send-body-count">0</span>/300</span>
+                <span class="text-[0.5rem] font-bold text-slate-400"><span id="admin-send-body-count">0</span>/300</span>
             </div>
             <textarea id="admin-send-body" maxlength="300" placeholder="ユーザーへのメッセージを入力してください" 
-                class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none leading-relaxed"></textarea>
+                class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none "></textarea>
         </div>
     </div>
 </template>
 
 <!-- 【ダイアログ子】管理者：通報内容の全文詳細 -->
 <template id="tpl-admin-report-item-detail">
-    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden bg-white">
+    <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden bg-white">
         <div class="flex justify-between items-center pb-2">
             <span class="js-report-tim kb-date-tim-md"></span>
         </div>
@@ -287,7 +287,7 @@
             <div id="view-report-user-wrapper" class="mt-1"></div>
         </div>
         <div class="flex-1 bg-brand-1 rounded-lg p-2 h-[200px] overflow-y-auto">
-            <div class="text-[1rem] text-slate-700 leading-[2] whitespace-pre-wrap break-words js-report-body mt-2"></div>
+            <div class="text-[1rem] text-slate-900 leading-[2] whitespace-pre-wrap break-words js-report-body mt-2"></div>
         </div>
     </div>
 </template>
@@ -297,14 +297,14 @@
     <div class="flex flex-col h-full w-full min-h-[200px]">
         <!-- 上部固定のスコアフィルタバー -->
         <div class="sticky top-0 z-10 bg-brand-0 pb-3 flex flex-col gap-2">
-            <div class="text-[0.5rem] font-black text-slate-400 uppercase tracking-widest pl-1">Filter by Score</div>
+            <div class="text-[0.5rem] font-bold text-slate-400 uppercase tracking-widest pl-1">Filter by Score</div>
             <div id="feedback-score-filter" class="flex justify-between bg-white">
-                <button data-score="0" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">ALL</button>
-                <button data-score="1" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">1</button>
-                <button data-score="2" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">2</button>
-                <button data-score="3" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">3</button>
-                <button data-score="4" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">4</button>
-                <button data-score="5" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-black rounded-lg transition-all">5</button>
+                <button data-score="0" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-bold rounded-lg transition-all">ALL</button>
+                <button data-score="1" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-bold rounded-lg transition-all">1</button>
+                <button data-score="2" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-bold rounded-lg transition-all">2</button>
+                <button data-score="3" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-bold rounded-lg transition-all">3</button>
+                <button data-score="4" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-bold rounded-lg transition-all">4</button>
+                <button data-score="5" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-bold rounded-lg transition-all">5</button>
             </div>
         </div>
         <!-- リスト本体の挿入先 -->
@@ -324,7 +324,7 @@
         </div>
         <!-- 宛先表示をアイコン＋ニックネームに変更 -->
         <div class="js-target-wrapper mt-1"></div>
-        <div class="text-[0.8rem] text-slate-500 line-clamp-1 mt-2">
+        <div class="text-[0.8rem] text-slate-400 line-clamp-1 mt-2">
             <span class="js-body"></span>
         </div>
     </div>
@@ -337,66 +337,108 @@
         <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-200">
             <div id="js-analytics-user-badge"></div>
             <div class="flex flex-col items-end">
-                <span class="text-[0.6rem] font-black text-slate-400 uppercase">Reports</span>
-                <span class="js-report-count text-[1.2rem] font-black text-red-500">0</span>
+                <span class="text-[0.6rem] font-bold text-slate-400 uppercase">Reports</span>
+                <span class="js-report-count text-[1.2rem] font-bold text-red-500">0</span>
             </div>
         </div>
         <!-- 統計：Private / Public -->
         <div class="grid grid-cols-2 gap-3">
             <!-- Private Card -->
             <div class="bg-white border-2 border-slate-100 rounded-xl p-3 shadow-sm">
-                <div class="text-[0.6rem] font-black text-slate-400 uppercase mb-2 border-b border-slate-50">Private Stats</div>
+                <div class="text-[0.6rem] font-bold text-slate-400 uppercase mb-2 border-b border-slate-50">Private Stats</div>
                 <div class="js-private-stats space-y-1"></div>
             </div>
             <!-- Public Card -->
             <div class="bg-white border-2 border-brand-2 rounded-xl p-3 shadow-md">
-                <div class="text-[0.6rem] font-black text-brand-5 uppercase mb-2 border-b border-brand-5">Public Stats</div>
+                <div class="text-[0.6rem] font-bold text-brand-5 uppercase mb-2 border-b border-brand-5">Public Stats</div>
                 <div class="js-public-stats space-y-1"></div>
             </div>
         </div>
         <!-- クリック解析 -->
         <div class="bg-white border border-slate-200 rounded-xl p-3">
-            <div class="text-[0.6rem] font-black text-slate-400 uppercase mb-3">Link Click Stats</div>
+            <div class="text-[0.6rem] font-bold text-slate-400 uppercase mb-3">Link Click Stats</div>
             <div class="js-click-list space-y-2"></div>
         </div>
     </div>
 </template>
 
 <!-- 【修正】ユーザ解析：外枠テンプレート -->
-<template id="tpl-user-click-stats">
+<template id="tpl-user-click-stats_2">
     <div class="w-full flex flex-col gap-4 text-[0.8rem]">
         <!-- ① ユーザ基本情報 & 通報リスク -->
         <div class="flex justify-between items-center bg-slate-50 p-3 rounded-[1rem] border border-slate-200">
             <div class="js-user-badge-container"></div>
             <div class="flex flex-col items-end px-2">
-                <span class="text-[0.6rem] font-black text-slate-400 uppercase">Reported</span>
-                <span class="js-report-count text-[1.2rem] font-black text-red-500 leading-none">0</span>
+                <span class="text-[0.6rem] font-bold text-slate-400 uppercase">Reported</span>
+                <span class="js-report-count text-[1.2rem] font-bold text-red-500 ">0</span>
             </div>
         </div>
         <!-- ② 解析情報（非公開 vs 公開）: 横並び grid-cols-2 を flex-col に変更 -->
         <div class="flex flex-col gap-3">
             <!-- Private Activity -->
             <div class="bg-white border-2 border-slate-100 rounded-[1rem] p-4 shadow-sm">
-                <div class="text-[0.6rem] font-black text-slate-400 uppercase mb-3 border-b border-slate-50 pb-1">Private Activity</div>
+                <div class="text-[0.6rem] font-bold text-slate-400 uppercase mb-3 border-b border-slate-50 pb-1">Private Activity</div>
                 <div class="js-stats-pvt"></div>
             </div>
             <!-- Public Activity -->
             <div class="bg-white border-2 border-brand-2 rounded-[1rem] p-4 shadow-sm">
-                <div class="text-[0.6rem] font-black text-brand-5 uppercase mb-3 border-b border-brand-5 pb-1">Public Activity</div>
+                <div class="text-[0.6rem] font-bold text-brand-5 uppercase mb-3 border-b border-brand-5 pb-1">Public Activity</div>
                 <div class="js-stats-pub"></div>
             </div>
         </div>
         <!-- ③ クリック集計情報（リスト） -->
         <div class="flex flex-col gap-2">
-            <div class="text-[0.6rem] font-black text-slate-400 uppercase pl-1">Profile Link Performance</div>
+            <div class="text-[0.6rem] font-bold text-slate-400 uppercase pl-1">Profile Link Performance</div>
             <div class="js-click-container space-y-2"></div>
         </div>
         <!-- ④ 強制アクション -->
         <div id="admin-ban-control" class="hidden mt-2 pb-4 flex flex-col">
-            <button id="btn-admin-ban" class="w-full h-12 bg-red-50 text-red-600 font-black rounded-[1rem] border-2 border-red-200 active:scale-95 transition-all flex items-center justify-center gap-2">
+            <button id="btn-admin-ban" class="w-full h-12 bg-red-50 text-red-600 font-bold rounded-[1rem] border-2 border-red-200 active:scale-95 transition-all flex items-center justify-center gap-2">
                 🚫 SHADOW BAN USER
             </button>
-            <button id="btn-admin-unban" class="w-full h-12 bg-slate-100 text-slate-500 font-black rounded-[1rem] border-2 border-slate-200 active:scale-95 transition-all flex items-center justify-center gap-2">
+            <button id="btn-admin-unban" class="w-full h-12 bg-slate-100 text-slate-400 font-bold rounded-[1rem] border-2 border-slate-200 active:scale-95 transition-all flex items-center justify-center gap-2">
+                ✅ LIFT BAN STATUS
+            </button>
+        </div>
+    </div>
+</template>
+<template id="tpl-user-click-stats">
+    <div class="w-full flex flex-col gap-2 text-[0.8rem]">
+        <!-- ユーザー情報、通報数、Private/Public実績を1枚のカードに統合 -->
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-3">
+            <!-- ユーザー ＆ 通報数 -->
+            <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
+                <div class="js-user-badge-container scale-90 origin-left -my-1"></div>
+                <div class="flex items-center gap-1.5 bg-red-50 px-2 py-0.5 rounded border border-red-100">
+                    <span class="text-[0.5rem] font-bold text-red-400 uppercase">Reported</span>
+                    <span class="js-report-count text-[0.9rem] font-bold text-red-500  mt-0.5">0</span>
+                </div>
+            </div>
+            <!-- Activity 統計 -->
+            <div class="grid grid-cols-2 gap-4 divide-x divide-slate-100">
+                <!-- Private -->
+                <div class="pr-2">
+                    <div class="text-[0.55rem] font-bold text-slate-400 uppercase mb-2">🔒 Private</div>
+                    <div class="js-stats-pvt"></div>
+                </div>
+                <!-- Public -->
+                <div class="pl-2">
+                    <div class="text-[0.55rem] font-bold text-brand-5 uppercase mb-2">◎ Public</div>
+                    <div class="js-stats-pub"></div>
+                </div>
+            </div>
+        </div>
+        <!-- プロフィールリンク実績 -->
+        <div class="mt-2">
+            <div class="text-[0.6rem] font-bold text-slate-400 uppercase pl-1 mb-1">Profile Links</div>
+            <div class="js-click-container space-y-2"></div>
+        </div>
+        <!-- ④ 強制アクション -->
+        <div id="admin-ban-control" class="hidden mt-2 pb-4 flex flex-col">
+            <button id="btn-admin-ban" class="w-full h-12 bg-red-50 text-red-600 font-bold rounded-[1rem] border-2 border-red-200 active:scale-95 transition-all flex items-center justify-center gap-2">
+                🚫 SHADOW BAN USER
+            </button>
+            <button id="btn-admin-unban" class="w-full h-12 bg-slate-100 text-slate-400 font-bold rounded-[1rem] border-2 border-slate-200 active:scale-95 transition-all flex items-center justify-center gap-2">
                 ✅ LIFT BAN STATUS
             </button>
         </div>
@@ -408,29 +450,29 @@
     <div class="space-y-2">
         <div class="flex justify-between items-center">
             <span class="text-slate-400 text-[0.7rem]">Archives</span>
-            <b class="js-archive-count font-black text-slate-700 text-[1rem]">0</b>
+            <b class="js-archive-count font-bold text-slate-900 text-[1rem]">0</b>
         </div>
         <div class="flex justify-between items-center">
             <span class="text-slate-400 text-[0.7rem]">Memos</span>
-            <b class="js-memo-count font-black text-slate-700 text-[1rem]">0</b>
+            <b class="js-memo-count font-bold text-slate-900 text-[1rem]">0</b>
         </div>
     </div>
 </template>
 
 <!-- 【ダイアログ子】システム設定（Core Config）編集 -->
 <template id="tpl-admin-core-config">
-    <div class="w-full text-black-5 space-y-5 pt-2 px-2">
+    <div class="w-full text-slate-900 space-y-5 pt-2 px-2">
         <div class="bg-red-50 border-l-4 border-red-500 p-3">
             <p class="text-[0.7rem] text-red-700 font-bold">※システム基幹設定です。慎重に操作してください。</p>
         </div>
         <!-- アプリバージョン管理 -->
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-[0.6rem] font-black text-slate-400 uppercase mb-1">Latest Version</label>
+                <label class="block text-[0.6rem] font-bold text-slate-400 uppercase mb-1">Latest Version</label>
                 <input id="cfg-ver-latest" type="text" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-lg focus:border-brand-5 outline-none font-bold">
             </div>
             <div>
-                <label class="block text-[0.6rem] font-black text-slate-400 uppercase mb-1">Min Version</label>
+                <label class="block text-[0.6rem] font-bold text-slate-400 uppercase mb-1">Min Version</label>
                 <input id="cfg-ver-min" type="text" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-lg focus:border-brand-5 outline-none font-bold">
             </div>
         </div>
@@ -438,7 +480,7 @@
         <div class="space-y-3 pt-2 border-t border-slate-100">
             <div class="flex justify-between items-center">
                 <div>
-                    <span class="block text-[0.8rem] font-black text-slate-700">Maintenance Mode</span>
+                    <span class="block text-[0.8rem] font-bold text-slate-900">Maintenance Mode</span>
                     <span id="desc-MaintenanceMode" class="text-[0.6rem] text-slate-400 italic"></span>
                 </div>
                 <button id="btn-cfg-maint" class="w-14 h-8 rounded-full bg-slate-300 relative transition-colors shrink-0">
@@ -447,43 +489,53 @@
                 <input type="hidden" id="val-cfg-maint" value="false">
             </div>
             <div>
-                <label class="block text-[0.6rem] font-black text-slate-400 uppercase mb-1">Maintenance Message</label>
-                <textarea id="cfg-maint-msg" class="w-full border-2 border-brand-3 px-3 py-2 text-[0.8rem] h-24 rounded-lg focus:border-brand-5 outline-none resize-none leading-relaxed"></textarea>
+                <label class="block text-[0.6rem] font-bold text-slate-400 uppercase mb-1">Maintenance Message</label>
+                <textarea id="cfg-maint-msg" class="w-full border-2 border-brand-3 px-3 py-2 text-[0.8rem] h-24 rounded-lg focus:border-brand-5 outline-none resize-none "></textarea>
             </div>
         </div>
     </div>
 </template>
 
-<!-- 【追加】管理者：ユーザー操作履歴詳細 -->
+<!-- 【追加】管理者：ユーザー操作履歴リスト用（子） -->
+<template id="tpl-admin-list-child-history">
+    <button class="js-item-card w-full text-left p-4 border-b border-slate-100 active:bg-slate-50 flex flex-col gap-1 transition-colors">
+        <div class="flex justify-between items-center mb-1">
+            <span class="js-date kb-date-tim-sm"></span>
+            <span class="js-action text-[0.7rem] font-bold text-brand-5 px-2 py-0.5 bg-brand-1 rounded uppercase"></span>
+        </div>
+        <div class="text-[0.9rem] font-bold text-slate-900 line-clamp-2 js-body"></div>
+        <div class="text-right"><span class="text-slate-400 text-[1.2rem]">›</span></div>
+    </button>
+</template>
+
+<!-- 【修正】管理者：ユーザー操作履歴詳細 -->
 <template id="tpl-admin-user-history-detail">
-    <div class="w-full text-black-5 flex flex-col h-full overflow-hidden bg-white">
-        <!-- ヘッダー：日時とアクション -->
-        <div class="flex justify-between items-start border-b border-slate-100 pb-3 mb-4">
-            <div>
-                <div class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Timestamp</div>
-                <div class="js-tim kb-date-tim-md"></div>
-            </div>
-            <div class="text-right">
-                <div class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Action</div>
-                <div class="js-action text-[1rem] font-black text-brand-5 italic"></div>
-            </div>
+    <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden bg-white gap-5 pt-2">
+        <!-- 日時 -->
+        <div class="border-b border-slate-50 pb-2">
+            <label class="block text-[0.6rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Timestamp</label>
+            <div class="js-tim text-[1.1rem] font-bold text-slate-900 italic"></div>
         </div>
-        <!-- ターゲット情報 -->
-        <div class="grid grid-cols-2 gap-4 mb-4">
-            <div class="p-2 bg-slate-50 rounded-lg">
-                <div class="text-[0.5rem] font-bold text-slate-400 uppercase">Target Type</div>
-                <div class="js-target-type font-bold text-[0.8rem]"></div>
-            </div>
-            <div class="p-2 bg-slate-50 rounded-lg">
-                <div class="text-[0.5rem] font-bold text-slate-400 uppercase">Target ID</div>
-                <div class="js-target-id font-bold text-[0.8rem]"></div>
-            </div>
+        <!-- 操作種別 -->
+        <div class="border-b border-slate-50 pb-2">
+            <label class="block text-[0.6rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Action Kind</label>
+            <div class="js-action text-[1.2rem] font-bold text-brand-5"></div>
         </div>
-        <!-- 操作内容（JSONなどの詳細テキスト） -->
+        <!-- 本文 (body) -->
+        <div class="border-b border-slate-50 pb-2">
+            <label class="block text-[0.6rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Message / Reason</label>
+            <div class="js-body text-[1.1rem] font-bold text-slate-900  whitespace-pre-wrap"></div>
+        </div>
+        <!-- ターゲットユーザID -->
+        <div class="border-b border-slate-50 pb-2">
+            <label class="block text-[0.6rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Target User ID</label>
+            <div class="js-user-id text-[1rem] font-mono text-slate-400 break-all"></div>
+        </div>
+        <!-- 操作詳細 (JSON) -->
         <div class="flex-1 flex flex-col min-h-0">
-            <label class="block text-[0.6rem] font-black text-slate-400 uppercase mb-1 pl-1">Operation Payload</label>
+            <label class="block text-[0.6rem] font-bold text-slate-400 uppercase mb-1 pl-1">Operation Payload (JSON)</label>
             <div class="flex-1 bg-slate-900 rounded-xl p-4 overflow-y-auto">
-                <pre class="js-payload text-[0.75rem] text-emerald-400 font-mono whitespace-pre-wrap break-all leading-relaxed"></pre>
+                <pre class="js-payload text-[0.9rem] text-emerald-400 font-mono whitespace-pre-wrap break-all "></pre>
             </div>
         </div>
     </div>

@@ -42,7 +42,10 @@ public class GetReportDetailsService : _BaseService
 
 		var targetProfile = new DtoUserProfile(
 			user.user_id,
-			user.icon,
+            user.member_no,
+            user.user_category,
+            user.user_rank,
+            user.icon,
 			user.nick_name,
 			user.description,
 			user.link_1, user.link_2, user.link_3,

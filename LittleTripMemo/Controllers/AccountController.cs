@@ -56,7 +56,7 @@ public class AccountController(
     /// </summary>
     [HttpPost("GetUserProfile")]
     public async Task<IActionResult> GetUserProfile([FromBody] GetUserProfileService.GetUserProfileReq req)
-        => OkWithBase(await getUserProfileService.ExecuteAsync(req.target_user_id));
+        => OkWithBase(await getUserProfileService.ExecuteAsync(req));
 
     /// <summary>
     /// ユーザーの退会処理を行い、データを論理削除する

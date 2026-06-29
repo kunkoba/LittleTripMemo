@@ -16,9 +16,8 @@ public class UpdateUserProfileService : _BaseService
         string icon,
         string nick_name,
         string description,
-        string link_1,
-        string link_2,
-        string link_3
+        string? user_category,
+        string link_1, string link_2, string link_3
     );
 
     public record Response();
@@ -42,6 +41,7 @@ public class UpdateUserProfileService : _BaseService
             icon = req.icon,
             nick_name = req.nick_name,
             description = req.description,
+            user_category = req.user_category,
             link_1 = req.link_1,
             link_2 = req.link_2,
             link_3 = req.link_3

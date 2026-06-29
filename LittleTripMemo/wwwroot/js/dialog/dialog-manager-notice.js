@@ -1,6 +1,6 @@
 export default {
     // （システム）アプリ情報
-    ShowAppInfo() {
+    ShowAppInfo_2() {
         const el = $Dom.GenerateTemplate("tpl-app-info");
         // $Const.APP_INFO から情報を埋め込む
         $Dom.QuerySelector('.js-app-name', el).textContent = $Const.APP_INFO.NAME;
@@ -26,6 +26,45 @@ export default {
             buttons:[]
         });
     },
+    // （システム）アプリ情報
+    ShowAppInfo() {
+        const el = $Dom.GenerateTemplate("tpl-app-info");
+        // --- 1. アプリ定数からの基本情報 ---
+        $Dom.QuerySelector('.js-app-name', el).textContent = $Const.APP_INFO.NAME;
+        $Dom.QuerySelector('.js-app-version', el).textContent = `Version ${$Const.APP_INFO.VERSION}`;
+        $Dom.QuerySelector('.js-app-developer', el).textContent = $Const.APP_INFO.DEVELOPER;
+        const linkOfficial = $Dom.QuerySelector('#link-info-official', el);
+        if ($Const.APP_INFO.OFFICIAL_SITE) {
+            linkOfficial.onclick = () => window.open($Const.APP_INFO.OFFICIAL_SITE, '_blank');
+        } else {
+            $Dom.ToggleShow(linkOfficial, false);
+        }
+        // --- 2. API（systemInfo）からの統計情報 ---
+        const sysInfo = $App.AppData.Owner.SystemInfo || {};
+        const appInfo = sysInfo.app_info || {};
+        // 数字の反映 (3桁区切り)
+        $Dom.QuerySelector('.js-stat-users', el).textContent = (appInfo.total_user_count || 0).toLocaleString();
+        $Dom.QuerySelector('.js-stat-archives', el).textContent = (appInfo.total_archive_pub_count || 0).toLocaleString();
+        $Dom.QuerySelector('.js-stat-memos', el).textContent = (appInfo.total_detail_pub_count || 0).toLocaleString();
+        // 最終集計日時
+        if (appInfo.last_aggregate_tim) {
+            $Dom.QuerySelector('.js-last-update', el).textContent = "Update: " + $Util.FormatDate(appInfo.last_aggregate_tim);
+        }
+        // --- 3. スコア・フィードバック数の反映 ---
+        const scoreAvg = appInfo.avg_score ?? sysInfo.score_avg ?? 0;
+        const feedbackCount = appInfo.total_feedback_count || 0;
+        $Dom.QuerySelector('.js-app-score', el).textContent = `★ ${scoreAvg.toFixed(1)}`;
+        $Dom.QuerySelector('.js-app-feedback-count', el).textContent = feedbackCount;
+        // --- 4. ボタンアクション設定 ---
+        $Dom.QuerySelector('#btn-info-review', el).onclick = () => this.ShowReviewList();
+        $Dom.QuerySelector('#btn-info-license', el).onclick = () => $Notice.Info($Const.APP_INFO.LICENSE || "ライセンス情報がありません。");
+        this._core.open({
+            title: "APP INFO",
+            content: el,
+            help: "アプリの基本情報と、公開されているまとめやメモの全体統計を表示します。",
+            buttons:[]
+        });
+    },
     // アプリ評価・レビュー一覧（フィードバック一覧）
     ShowReviewList() {
         const el = $Dom.GenerateTemplate("tpl-review-list");
@@ -33,7 +72,7 @@ export default {
         // systemInfo からフィードバック情報を取得
         const sysInfo = $App.AppData.Owner.SystemInfo || {};
         const feedbackList = sysInfo.feedbacks ||[];
-        const scoreAvg = sysInfo.score_avg || 0;
+        const scoreAvg = sysInfo.app_info.score_avg || 0;
         $Dom.QuerySelector(".js-avg-score", el).textContent = scoreAvg.toFixed(1);
         $Dom.QuerySelector(".js-avg-stars", el).textContent = "★".repeat(Math.round(scoreAvg)) + "☆".repeat(5 - Math.round(scoreAvg));
         if (feedbackList.length === 0) {
@@ -90,8 +129,8 @@ export default {
             if (i <= currentRating) {
                 star.className = "text-yellow-500";
             } else {
-                // star.className = "outline-none transition-colors active:scale-90 text-slate-200";
-                star.className = "text-slate-200";
+                // star.className = "outline-none transition-colors active:scale-90 text-slate-400";
+                star.className = "text-slate-400";
             }
             star.onclick = () => {
                 currentRating = i;
@@ -99,9 +138,9 @@ export default {
                 stars.forEach((s, idx) => {
                     if (idx < currentRating) {
                         s.classList.add("text-yellow-500");
-                        s.classList.remove("text-slate-200");
+                        s.classList.remove("text-slate-400");
                     } else {
-                        s.classList.add("text-slate-200");
+                        s.classList.add("text-slate-400");
                         s.classList.remove("text-yellow-500");
                     }
                 });
@@ -184,7 +223,7 @@ export default {
             return;
         }
         const root = $Dom.GenerateTemplate("tpl-list-parent");
-        // root.className = "w-full text-black-3 mb-2 px-1";
+        // root.className = "w-full text-slate-400 mb-2 px-1";
         const setNoticeStyle = (el, isNew) => {
             const badge = $Dom.QuerySelector(".js-badge-new", el);
             $Dom.ToggleShow(badge, isNew);
@@ -282,7 +321,7 @@ export default {
         if (myReport) {
             dialogButtons.push([{
                 label: "取り消す (DELETE)",
-                className: "bg-white !text-slate-800 border-2 border-slate-800 shadow-none rounded-none",
+                className: "bg-white !text-slate-900 border-2 border-slate-800 shadow-none rounded-none",
                 handler: async () => {
                     const isOk = await this.ShowConfirm({
                         title: "DELETE REPORT",
@@ -314,7 +353,7 @@ export default {
             return;
         }
         const root = $Dom.GenerateTemplate("tpl-list-parent");
-        root.className = "w-full text-black-3 mb-2 px-1";
+        root.className = "w-full text-slate-400 mb-2 px-1";
         // システム通知と同様のスタイル制御（未読：太枠＋影 / 既読：薄枠）
         const setMailStyle = (el, isNew) => {
             const badge = $Dom.QuerySelector(".js-badge-new", el);

@@ -4,6 +4,7 @@ using LittleTripMemo.Models;
 using LittleTripMemo.Repository.App;
 using LittleTripMemo.Repository.Batch;
 using LittleTripMemo.Repository.Core;
+using LittleTripMemo.Repository.Sys;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 using System.Text.Json;
@@ -13,20 +14,85 @@ namespace LittleTripMemo.Worker;
 /// <summary>
 /// 統計集計やゴミ掃除など、定期的なシステムメンテナンス処理を実行するバックグラウンドサービス
 /// </summary>
-public class SystemMaintenanceWorker(
-    ILogger<SystemMaintenanceWorker> logger,
-    IServiceScopeFactory serviceScopeFactory,
-    IOptionsMonitor<MyAppSettings> optionsMonitor,
-    SystemStatus systemStatus
-) : BackgroundService
+public class SystemMaintenanceWorker : BackgroundService
 {
+    private readonly ILogger<SystemMaintenanceWorker> logger;
+    private readonly IServiceScopeFactory serviceScopeFactory;
+    private readonly IOptionsMonitor<MyAppSettings> optionsMonitor;
+    private readonly SystemStatus systemStatus;
+
+    private MyAppSettings _prev; // 前回の設定値を保持する変数
+
+    public SystemMaintenanceWorker(
+        ILogger<SystemMaintenanceWorker> logger,
+        IServiceScopeFactory serviceScopeFactory,
+        IOptionsMonitor<MyAppSettings> optionsMonitor,
+        SystemStatus systemStatus
+    )
+    {
+        this.logger = logger;
+        this.serviceScopeFactory = serviceScopeFactory;
+        this.optionsMonitor = optionsMonitor;
+        this.systemStatus = systemStatus;
+
+        // 初回の値を保存
+        this._prev = optionsMonitor.CurrentValue;
+
+        // ★ 設定変更を監視し、差分がある項目だけログに出す
+        this.optionsMonitor.OnChange(next =>
+        {
+            var changes = new List<string>();
+
+            if (next.TableStatsUpdateIntervalMinutes != _prev.TableStatsUpdateIntervalMinutes)
+                changes.Add($"TableStats: {_prev.TableStatsUpdateIntervalMinutes} -> {next.TableStatsUpdateIntervalMinutes}");
+
+            if (next.ReactionCountUpdateIntervalMinutes != _prev.ReactionCountUpdateIntervalMinutes)
+                changes.Add($"Reaction: {_prev.ReactionCountUpdateIntervalMinutes} -> {next.ReactionCountUpdateIntervalMinutes}");
+
+            if (next.GarbageCleanupIntervalMinutes != _prev.GarbageCleanupIntervalMinutes)
+                changes.Add($"Garbage: {_prev.GarbageCleanupIntervalMinutes} -> {next.GarbageCleanupIntervalMinutes}");
+
+            if (next.ClickAggregateIntervalMinutes != _prev.ClickAggregateIntervalMinutes)
+                changes.Add($"Click: {_prev.ClickAggregateIntervalMinutes} -> {next.ClickAggregateIntervalMinutes}");
+
+            if (next.UserSummaryUpdateIntervalMinutes != _prev.UserSummaryUpdateIntervalMinutes)
+                changes.Add($"UserSummary: {_prev.UserSummaryUpdateIntervalMinutes} -> {next.UserSummaryUpdateIntervalMinutes}");
+
+            if (next.ReportStatsUpdateIntervalMinutes != _prev.ReportStatsUpdateIntervalMinutes)
+                changes.Add($"ReportStats: {_prev.ReportStatsUpdateIntervalMinutes} -> {next.ReportStatsUpdateIntervalMinutes}");
+
+            if (next.AppInfoUpdateIntervalMinutes != _prev.AppInfoUpdateIntervalMinutes)
+                changes.Add($"AppInfo: {_prev.AppInfoUpdateIntervalMinutes} -> {next.AppInfoUpdateIntervalMinutes}");
+
+            if (next.DailyMaintenanceTime != _prev.DailyMaintenanceTime)
+                changes.Add($"DailyTime: {_prev.DailyMaintenanceTime} -> {next.DailyMaintenanceTime}");
+
+            if (next.MaxTableNum != _prev.MaxTableNum)
+                changes.Add($"MaxTable: {_prev.MaxTableNum} -> {next.MaxTableNum}");
+
+            if (changes.Count > 0)
+            {
+                //logger.LogInformation("【設定更新検知】\n  " + string.Join("\n  ", changes));
+                logger.LogInformation("【設定更新検知】 " + string.Join(" | ", changes));
+            }
+
+            _prev = next; // 比較用データを更新
+        });
+    }
+
     private DateTime _nextReactionUpdateTime = DateTime.Now;
     private DateTime _nextTableStatsUpdateTime = DateTime.Now;
     private DateTime _nextGarbageCleanupTime = DateTime.Now;
     private DateTime _nextClickAggregateTime = DateTime.Now;
     private DateTime _nextUserSummaryUpdateTime = DateTime.Now;
-    private DateTime _nextReportStatsUpdateTime = DateTime.Now; 
+    private DateTime _nextReportStatsUpdateTime = DateTime.Now;
+    private DateTime _nextAppInfoUpdateTime = DateTime.Now;
 
+    /// <summary>
+    /// バッチ処理のメインループ。1分ごとに各タスクをチェックして必要に応じて実行する
+    /// </summary>
+    /// <param name="stoppingToken"></param>
+    /// <returns></returns>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("--- システムメンテナンス・バッチを稼働中 ---");
@@ -42,6 +108,7 @@ public class SystemMaintenanceWorker(
                 await TaskAggregateClickQueueAsync();   // クリック・閲覧数集計キューの処理
                 await TaskUpdateUserSummaryStatsAsync();    // ユーザー統計情報の更新（t_app_user_summary の集計）
                 await TaskUpdateReportStatsAsync(); // 通報実績統計の更新（アーカイブ受領数およびユーザー送信数の集計）
+                await TaskUpdateAppInfoStatsAsync();
             }
 
             // 1分間隔でチェック
@@ -59,7 +126,7 @@ public class SystemMaintenanceWorker(
     {
         try
         {
-            logger.LogInformation("【{TaskName}】を開始します...", taskName);
+            //logger.LogInformation("【{TaskName}】を開始します...", taskName);
             using (var scope = serviceScopeFactory.CreateScope())
             {
                 await action(scope);
@@ -306,6 +373,23 @@ public class SystemMaintenanceWorker(
         }
     }
 
+    /// <summary>
+    /// アプリ全体統計（ユーザー数・アーカイブ数・明細数など）の再集計を行うタスク
+    /// </summary>
+    /// <returns></returns>
+    private async Task TaskUpdateAppInfoStatsAsync()
+    {
+        var settings = optionsMonitor.CurrentValue;
+        if (settings.AppInfoUpdateIntervalMinutes > 0 && DateTime.Now >= _nextAppInfoUpdateTime)
+        {
+            await RunWithScopeAsync("アプリ全体統計集計", async (scope) =>
+            {
+                var repository = scope.ServiceProvider.GetRequiredService<AppInfoRepository>();
+                await repository.SyncAppInfoAsync();
+            });
+            _nextAppInfoUpdateTime = DateTime.Now.AddMinutes(settings.AppInfoUpdateIntervalMinutes);
+        }
+    }
 
     #endregion
 

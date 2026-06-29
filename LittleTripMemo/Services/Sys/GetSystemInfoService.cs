@@ -6,10 +6,11 @@ using LittleTripMemo.Repository.Sys;
 namespace LittleTripMemo.Services.Sys;
 
 /// <summary>
-/// システム全体の共通情報と、ログインユーザー固有のステータスを一括取得するサービス
+/// システム全体の共通統計（mgr_app_info）と、ログインユーザー固有のステータスを一括取得するサービス
 /// </summary>
 public class GetSystemInfoService(
     UserContext userContext,
+    AppInfoRepository appInfoRepository,
     SysFeedbackRepository sysFeedbackRepository,
     SysNotificationRepository sysNotificationRepository,
     SysUserNotificationRepository sysUserNotificationRepository,
@@ -21,16 +22,16 @@ public class GetSystemInfoService(
     /// システム情報のデータ構造
     /// </summary>
     public record SystemInfoData(
-        Guid login_user_id,
-        double score_avg,
-        IEnumerable<DtoFeedbackDetail> feedbacks,
-        IEnumerable<TSysNotification> notifications,
-        DtoUserProfile? ownerProfile,
-        IEnumerable<TSysUserNotification>? userNotifications,
-        IEnumerable<DtoMyReportDetail>? myReports
+    Guid login_user_id,
+    TAppInfo app_info,
+    IEnumerable<DtoFeedbackDetail> feedbacks,
+    IEnumerable<TSysNotification> notifications,
+    DtoUserProfile? ownerProfile,
+    IEnumerable<TSysUserNotification>? userNotifications,
+    IEnumerable<DtoMyReportDetail>? myReports
     );
 
-    public record Response(SystemInfoData systemInfo);
+public record Response(SystemInfoData systemInfo);
 
     /// <summary>
     /// システム情報の取得処理を実行する
@@ -40,17 +41,19 @@ public class GetSystemInfoService(
         // 1. バリデーション
         await ValidateAsync();
 
-        // 2. システム共通情報の取得（未ログインでも取得可能）
-        var averageScore = await sysFeedbackRepository.GetAverageScoreAsync();
+        // 2. 管理テーブルから集計済みアプリ統計情報を取得
+        var appInfo = await appInfoRepository.GetAsync() ?? new TAppInfo();
+
+        // 3. システム共通リストの取得（未ログインでも取得可能）
         var latestFeedbacks = await sysFeedbackRepository.GetAllFeedbacksAsync(0);
         var activeNotifications = await sysNotificationRepository.GetActiveNotificationsAsync();
 
-        // 3. ユーザー固有情報の初期化
+        // 4. ユーザー固有情報の初期化
         DtoUserProfile? ownerProfile = null;
         IEnumerable<TSysUserNotification>? userNotifications = null;
         IEnumerable<DtoMyReportDetail>? myReports = null;
 
-        // 4. ログイン済みの場合のみ、詳細情報を取得
+        // 5. ログイン済みの場合のみ、詳細情報を取得
         if (_user.login_user_id != Guid.Empty)
         {
             // ユーザープロフィールの取得（バッチ集計済みの統計情報を含む）
@@ -59,6 +62,9 @@ public class GetSystemInfoService(
             {
                 ownerProfile = new DtoUserProfile(
                     appUser.user_id,
+                    appUser.member_no,
+                    appUser.user_category,
+                    appUser.user_rank,
                     appUser.icon,
                     appUser.nick_name,
                     appUser.description,
@@ -79,10 +85,10 @@ public class GetSystemInfoService(
             myReports = await sysReportRepository.GetMyReportsWithDetailsAsync();
         }
 
-        // 5. 結果を集約して返却
+        // 6. 結果を集約して返却
         return new Response(new SystemInfoData(
             _user.login_user_id,
-            averageScore,
+            appInfo,
             latestFeedbacks,
             activeNotifications,
             ownerProfile,
@@ -92,11 +98,10 @@ public class GetSystemInfoService(
     }
 
     /// <summary>
-    /// 業務バリデーション（基本はスルーだが作法として定義）
+    /// 業務バリデーション
     /// </summary>
     private async Task ValidateAsync()
     {
-        // 特になし
         await Task.CompletedTask;
     }
 

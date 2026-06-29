@@ -73,6 +73,9 @@ public class GetArchiveDetailsPubService(
 
         var userProfile = new DtoUserProfile(
             ownerAppUser.user_id,
+            ownerAppUser.member_no,
+            ownerAppUser.user_category,
+            ownerAppUser.user_rank,
             ownerAppUser.icon,
             ownerAppUser.nick_name,
             ownerAppUser.description,

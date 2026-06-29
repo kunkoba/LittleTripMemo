@@ -54,6 +54,9 @@ public class GetArchiveDetailsService(
 
         var userProfile = new DtoUserProfile(
             ownerUser!.user_id,
+            ownerUser.member_no,
+            ownerUser.user_category,
+            ownerUser.user_rank,
             ownerUser.icon,
             ownerUser.nick_name,
             ownerUser.description,

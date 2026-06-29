@@ -13,7 +13,7 @@ const _DialogCore = {
     stack:[],
     // 共通クラス定数
     HEADER_BTN_CLASS: "w-9 h-9 bg-white rounded-full shadow-md flex items-center justify-center active:scale-95 border border-brand-2 transition-transform",
-    FOOTER_BTN_BASE:  "font-black text-[0.8rem] h-12 rounded-[1rem] uppercase active:scale-95 transition-transform",
+    FOOTER_BTN_BASE:  "font-bold text-[0.8rem] h-12 rounded-[1rem] uppercase active:scale-95 transition-transform",
     FOOTER_BTN_DEFAULT: "bg-brand-5 text-white shadow-md",
     // 初期化
     init() {
@@ -87,14 +87,15 @@ const _DialogCore = {
         } else if (size === 'md') {
             frameBg.classList.add("min-h-[50vh]");
         } else {
-            frameBg.classList.add("min-h-[30vh]");
+            console.log("confirm-sm");
+            frameBg.classList.add("min-h-[250px]");
         }
         titleEl.textContent = title;
         // --- 3. ヘッダーアクション（ヘルプ・カスタムボタン） ---
         headerActions.innerHTML = "";
         if (help) {
             const btnHelp = document.createElement("button");
-            btnHelp.className = `${this.HEADER_BTN_CLASS} text-brand-5 font-black`;
+            btnHelp.className = `${this.HEADER_BTN_CLASS} text-brand-5 font-bold`;
             btnHelp.textContent = "?";
             btnHelp.onclick = () => {
                 document.getElementById('ui-help-dialog-body').textContent = help;
@@ -259,7 +260,7 @@ const DialogController = {
             div.className = "w-full p-4 space-y-3";
             if (message) {
                 const msg = document.createElement('p');
-                msg.className = "text-[0.8rem] font-bold text-slate-600";
+                msg.className = "text-[0.8rem] font-bold text-slate-900";
                 msg.textContent = message;
                 div.appendChild(msg);
             }

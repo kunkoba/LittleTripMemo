@@ -47,14 +47,14 @@
 <div id="ad-space-pc" class="hidden lg:flex w-[250px] shrink-0 bg-slate-50 border-r border-brand-2 z-[2000] flex-col items-center justify-center shadow-md relative gap-8">
     <!-- 広告1 -->
     <div class="flex flex-col items-center">
-        <div class="text-slate-400 text-[0.5rem] font-black tracking-widest uppercase mb-2">Advertisement</div>
+        <div class="text-slate-400 text-[0.5rem] font-bold tracking-widest uppercase mb-2">Advertisement</div>
         <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-400 text-[0.8rem] font-bold shadow-inner">
             AD BANNER 1
         </div>
     </div>
     <!-- 広告2 -->
     <div class="flex flex-col items-center">
-        <div class="text-slate-400 text-[0.5rem] font-black tracking-widest uppercase mb-2">Advertisement</div>
+        <div class="text-slate-400 text-[0.5rem] font-bold tracking-widest uppercase mb-2">Advertisement</div>
         <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-400 text-[0.8rem] font-bold shadow-inner">
             AD BANNER 2
         </div>
@@ -111,7 +111,7 @@
                         </div>
                         <!-- 検索キーワード入力欄 -->
                         <div id="sort-word" class="hidden shadow-brand w-fit mb-2 h-10 flex text-black-0 rounded-full overflow-hidden bg-white pointer-events-auto">
-                            <input type="text" id="input-sort-word" class="h-full px-3 text-[1rem] text-black-5 outline-none bg-transparent w-40 placeholder-slate-300" placeholder="Keyword...">
+                            <input type="text" id="input-sort-word" class="h-full px-3 text-[1rem] text-slate-900 outline-none bg-transparent w-40 placeholder-slate-300" placeholder="Keyword...">
                         </div>
                     </div>
                 </div>
@@ -139,24 +139,24 @@
                 md:h-full md:w-0 transition-all duration-400 shadow-2xl z-[1002]">
                 <!-- 詳細パネルのヘッダー -->
                 <div class="bg-brand-5 h-14 px-6 flex justify-between items-center shrink-0 border-2 border-brand-5 z-[1000] shadow-md">
-                    <h2 id="detail-title" class="text-[1.2rem] font-black italic text-brand-0 uppercase tracking-wider">Details</h2>
+                    <h2 id="detail-title" class="text-[1.2rem] font-bold italic text-brand-0 uppercase tracking-wider">Details</h2>
                     <div class="flex gap-3">
-                        <button id="detail-btn-current" class="w-9 h-9 bg-white rounded-full shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">
+                        <button id="detail-btn-current" class="w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
                             📍
                         </button>
-                        <button id="detail-btn-earth" class="w-9 h-9 bg-white rounded-full shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">
+                        <button id="detail-btn-earth" class="w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
                             🌍
                         </button>
-                        <button id="detail-btn-map"   class="w-9 h-9 bg-white rounded-full shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">
+                        <button id="detail-btn-map"   class="w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
                             🗺️
                         </button>
-                        <button id="detail-btn-report" class="hidden w-9 h-9 bg-white rounded-full shadow-sm text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">
+                        <button id="detail-btn-report" class="hidden w-9 h-9 bg-white rounded-full shadow-sm text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
                             🚫
                         </button>
-                        <button id="detail-btn-edit"  class="w-9 h-9 bg-white rounded-full shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">
+                        <button id="detail-btn-edit"  class="w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
                             ✏️
                         </button>
-                        <button id="detail-btn-close" class="w-9 h-9 bg-white rounded-full shadow-md text-black-3 flex items-center justify-center active:scale-95 text-[1.2rem]">
+                        <button id="detail-btn-close" class="w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
                             ✖
                         </button>
                     </div>
@@ -166,7 +166,7 @@
                     <!-- ■ 参照用（表示モード）：縦並び・左揃え・1rem 統一版 -->
                     <div id="detail-display" class="hidden relative _min-h-full flex flex-col bg-white">
                         <!-- 右上の正円インデックスバッジ -->
-                        <div class="js-index-badge absolute top-0 right-0 w-10 h-10 rounded-full bg-brand-4 text-white font-black text-[1.2rem] flex items-center justify-center shadow-md z-20">
+                        <div class="js-index-badge absolute top-0 right-0 w-10 h-10 rounded-full bg-brand-4 text-white font-bold text-[1.2rem] flex items-center justify-center shadow-md z-20">
                         </div>
                         <!-- 背景用の巨大顔文字：上部に固定（スクロールしても動かない） -->
                         <div class="sticky top-[100px] w-full h-0 pointer-events-none z-0 flex justify-center">
@@ -176,7 +176,7 @@
                         <div class="relative z-10 flex flex-col items-start flex-1">
                             <!-- 1. 日付・時刻を部品化 -->
                             <div class="gap-4 w-fit">
-                                <div class="flex items-center gap-3 text-black font-bold text-[1rem] text-slate-500 italic">
+                                <div class="flex items-center gap-3 text-black font-bold text-[1rem] text-slate-400 italic">
                                     <!-- 部品注入用コンテナに変更 -->
                                     <div id="detail-display-date-container"></div>
                                     <!-- 顔文字（1rem） -->
@@ -185,15 +185,15 @@
                             </div>
                             <!-- 4. タイトル（左揃え・1rem・左アクセント） -->
                             <div class="border-l-4 border-brand-3 pl-3 py-0.5 mt-4">
-                                <h1 id="detail-display-title" class="text-[1.2rem] font-black text-slate-800  break-words"></h1>
+                                <h1 id="detail-display-title" class="text-[1.2rem] font-bold text-slate-900  break-words"></h1>
                             </div>
                             <!-- 2. 金額（左揃え・1rem） -->
                             <div id="detail-display-price-wrapper" class="hidden pl-3 mt-2 flex items-baseline italic">
-                                <span id="detail-display-memo_price" class="text-[1.2rem] font-black italic "></span>
+                                <span id="detail-display-memo_price" class="text-[1.2rem] font-bold italic "></span>
                                 <span id="detail-display-price-unit" class="text-[1rem] font-bold text-slate-400 ml-3 uppercase"></span>
                             </div>
                             <!-- 5. 本文（左揃え・1rem以下） -->
-                            <div id="detail-display-body" class="w-full rounded-lg p-2 text-[1rem] text-slate-800 whitespace-pre-wrap break-words leading-[2]"></div>
+                            <div id="detail-display-body" class="w-full rounded-lg p-2 text-[1rem] text-slate-900 whitespace-pre-wrap break-words leading-[2]"></div>
                             <!-- 隠し項目 -->
                             <span id="detail-display-weather_code" class="hidden"></span>
                             <!-- 下部：Locationカード風のURLリンク -->
@@ -202,26 +202,26 @@
                         </div>
                     </div>
                     <!-- ■ 編集用（編集モード） -->
-                    <form id="detail-edit" class="hidden space-y-6 text-black-4">
+                    <form id="detail-edit" class="hidden space-y-6 text-slate-900">
                         <!-- DATE & TIME -->
                         <div class="grid grid-cols-2 gap-6">
                             <div>
-                                <label class="block font-black text-black-3 text-[0.5rem] mb-1 uppercase tracking-wider">DATE</label>
+                                <label class="block font-bold text-slate-400 text-[0.5rem] mb-1 uppercase tracking-wider">DATE</label>
                                 <div class="flex items-center border-b-2 border-brand-2 pb-1">
-                                    <input name="memo_date" id="detail-edit-memo_date" type="date" class="w-full bg-transparent outline-none font-bold text-black-5 text-[1rem]">
+                                    <input name="memo_date" id="detail-edit-memo_date" type="date" class="w-full bg-transparent outline-none font-bold text-slate-900 text-[1rem]">
                                 </div>
                             </div>
                             <div>
-                                <label class="block font-black text-black-3 text-[0.5rem] mb-1 uppercase tracking-wider">TIME</label>
+                                <label class="block font-bold text-slate-400 text-[0.5rem] mb-1 uppercase tracking-wider">TIME</label>
                                 <div class="flex items-center border-b-2 border-brand-2 pb-1">
-                                    <input name="memo_time" id="detail-edit-memo_time" type="time" class="w-full bg-transparent outline-none font-bold text-black-5 text-[1rem]">
+                                    <input name="memo_time" id="detail-edit-memo_time" type="time" class="w-full bg-transparent outline-none font-bold text-slate-900 text-[1rem]">
                                 </div>
                             </div>
                         </div>
                         <!-- 編集用 (detail-edit) の MARKER & ATMOSPHERE エリア -->
                         <div class="grid grid-cols-2 gap-6">
                             <div>
-                                <label class="block font-black text-black-3 text-[0.5rem] mb-1 uppercase tracking-wider">MARKER</label>
+                                <label class="block font-bold text-slate-400 text-[0.5rem] mb-1 uppercase tracking-wider">MARKER</label>
                                 <div class="flex items-center justify-between border-b-2 border-brand-2 pb-1">
                                     <!-- 地点名取得 -->
                                     <button id="btn-face-trigger" type="button" class="h-[30px] w-full text-right text-[1.5rem] outline-none active:scale-95">
@@ -232,7 +232,7 @@
                             </div>
                             <div>
                                 <!-- WEATHER から ATMOSPHERE に変更、ボタンに戻す -->
-                                <label class="block font-black text-black-3 text-[0.5rem] mb-1 uppercase tracking-wider">ATMOSPHERE</label>
+                                <label class="block font-bold text-slate-400 text-[0.5rem] mb-1 uppercase tracking-wider">ATMOSPHERE</label>
                                 <div class="flex items-center justify-between border-b-2 border-brand-2 pb-1">
                                     <button id="btn-atmosphere-trigger" type="button" class="h-[30px] w-full text-right outline-none active:scale-95 font-bold text-brand-5 text-[1rem] tracking-widest">
                                         <span id="span-atmosphere-preview">0000</span>
@@ -249,10 +249,10 @@
                                 <div class="flex-1">
                                     <!-- タイトルとカウントを1行で、幅は入力欄と同じ -->
                                     <div class="flex justify-between items-center mb-1">
-                                        <label class="font-black text-black-3 text-[0.5rem] uppercase tracking-wider">
+                                        <label class="font-bold text-slate-400 text-[0.5rem] uppercase tracking-wider">
                                             TITLE
                                         </label>
-                                        <div class="text-[0.5rem] text-black-2 font-bold">
+                                        <div class="text-[0.5rem] text-slate-400 font-bold">
                                             <span id="detail-count-title">0</span>/30
                                         </div>
                                     </div>
@@ -276,8 +276,8 @@
                         <!-- BODY -->
                         <div>
                             <div class="flex justify-between items-end mb-1">
-                                <label class="font-black text-black-3 text-[0.5rem] uppercase tracking-wider">MEMORY DETAIL</label>
-                                <div class="text-[0.5rem] text-black-2 font-bold"><span id="detail-count-body">0</span>/300</div>
+                                <label class="font-bold text-slate-400 text-[0.5rem] uppercase tracking-wider">MEMORY DETAIL</label>
+                                <div class="text-[0.5rem] text-slate-400 font-bold"><span id="detail-count-body">0</span>/300</div>
                             </div>
                             <textarea name="body" id="detail-edit-body" maxlength="300" 
                                 class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
@@ -285,7 +285,7 @@
                         <!-- PRICE -->
                         <div>
                             <div class="flex justify-between items-end mb-1">
-                                <label class="font-black text-black-3 text-[0.5rem] uppercase tracking-wider">PRICE</label>
+                                <label class="font-bold text-slate-400 text-[0.5rem] uppercase tracking-wider">PRICE</label>
                             </div>
                             <div class="grid grid-cols-2 gap-6">
                                 <div>
@@ -307,8 +307,8 @@
                         <!-- URL -->
                         <div>
                             <div class="flex justify-between items-end mb-1">
-                                <label class="font-black text-black-3 text-[0.5rem] uppercase tracking-wider">URL</label>
-                                <div class="text-[0.5rem] text-black-2 font-bold"><span id="detail-count-url">0</span>/200</div>
+                                <label class="font-bold text-slate-400 text-[0.5rem] uppercase tracking-wider">URL</label>
+                                <div class="text-[0.5rem] text-slate-400 font-bold"><span id="detail-count-url">0</span>/200</div>
                             </div>
                             <div class="flex items-center border-brand-2 pb-1">
                                 <input name="link_url" id="detail-edit-link_url" type="url" maxlength="200" 
@@ -327,8 +327,8 @@
                     </form>
                     <!-- フォーム内ボタン（スクロールに含める） -->
                     <div class="flex gap-4 mt-6">
-                        <button id="detail-btn-cancel" type="button" class="flex-1 bg-slate-400 text-white font-black text-[0.8rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">CANCEL</button>
-                        <button id="detail-btn-save"   type="button" class="flex-1 bg-brand-5   text-white font-black text-[0.8rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">SAVE</button>
+                        <button id="detail-btn-cancel" type="button" class="flex-1 bg-slate-400 text-white font-bold text-[0.8rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">CANCEL</button>
+                        <button id="detail-btn-save"   type="button" class="flex-1 bg-brand-5   text-white font-bold text-[0.8rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">SAVE</button>
                     </div>
                 </div>
 
@@ -338,41 +338,41 @@
                     <div id="detail-group-reaction" class="flex justify-between gap-2 mb-4">
                         <button id="detail-btn-funny"    class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[2rem]">🤣</span>
-                            <span class="text-[0.8rem] font-black text-brand-5 js-count mt-0.5">0</span>
+                            <span class="text-[0.8rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
                         <button id="detail-btn-love"  class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[2rem]">😍</span>
-                            <span class="text-[0.8rem] font-black text-brand-5 js-count mt-0.5">0</span>
+                            <span class="text-[0.8rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
                         <button id="detail-btn-surprise" class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[2rem]">😲</span>
-                            <span class="text-[0.8rem] font-black text-brand-5 js-count mt-0.5">0</span>
+                            <span class="text-[0.8rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
                         <button id="detail-btn-sad"      class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[2rem]">😭</span>
-                            <span class="text-[0.8rem] font-black text-brand-5 js-count mt-0.5">0</span>
+                            <span class="text-[0.8rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
                     </div>
                     <!-- 詳細パネル移動ボタン群 -->
                     <div id="detail-group-move" class="hidden flex items-center justify-between px-6 bg-black/70 rounded-full px-2 py-1 shadow-md pointer-events-auto">
                         <button id="detail-btn-first"
-                            class="w-10 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
+                            class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                             |＜
                         </button>
                         <button id="detail-btn-prev"
-                            class="w-10 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
+                            class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                             ＜
                         </button>
                         <button id="detail-btn-cancel2"
-                            class="w-10 h-10 flex items-center justify-center text-brand-5 font-black text-[1.2rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full drop-shadow-md font-bold">
+                            class="w-10 h-10 flex items-center justify-center text-brand-5 font-bold text-[1.2rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full drop-shadow-md font-bold">
                             ✕
                         </button>
                         <button id="detail-btn-next"
-                            class="w-10 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
+                            class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                             ＞
                         </button>
                         <button id="detail-btn-last"
-                            class="w-10 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
+                            class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                             ＞|
                         </button>
                     </div>
@@ -420,19 +420,19 @@
                     <div id="bot-dynamic-area" class="w-full flex justify-center items-end min-h-[52px]">
                         <!-- ② 移動ボタン群（カプセル：高さ共通化のため py-1 / w-10） -->
                         <div id="bot-group-move" class="hidden w-full max-w-[500px] flex items-center justify-between bg-black/70 rounded-full px-6 py-1 shadow-md pointer-events-auto">
-                            <button id="btn-bot-move-first" class="w-10 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
+                            <button id="btn-bot-move-first" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                                 |＜
                             </button>
-                            <button id="btn-bot-move-prev" class="w-10 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
+                            <button id="btn-bot-move-prev" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                                 ＜
                             </button>
-                            <button id="btn-bot-move-open" class="w-10 h-10 flex items-center justify-center text-brand-5 font-black text-[1.2rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full drop-shadow-md">
+                            <button id="btn-bot-move-open" class="w-10 h-10 flex items-center justify-center text-brand-5 font-bold text-[1.2rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full drop-shadow-md">
                                 ●
                             </button>
-                            <button id="btn-bot-move-next" class="w-10 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
+                            <button id="btn-bot-move-next" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                                 ＞
                             </button>
-                            <button id="btn-bot-move-last" class="w-10 h-10 flex items-center justify-center text-white font-black text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
+                            <button id="btn-bot-move-last" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                                 ＞|
                             </button>
                         </div>
@@ -464,7 +464,7 @@
         <div id="ui-dialog-backdrop" class="z-[1999] absolute inset-0 hidden bg-black/40 flex flex-col items-center justify-end">
             <!-- 下部に「すべて閉じる」ボタンを設置 -->
             <button id="dialog-btn-close-all" 
-                class="mb-10 bg-white hover:bg-white/70 text-black text-[0.8rem] font-black tracking-widest px-8 py-3 rounded-full border border-white/40 backdrop-blur-md active:scale-95 transition-all shadow-brand">
+                class="mb-10 bg-white hover:bg-white/70 text-black text-[0.8rem] font-bold tracking-widest px-8 py-3 rounded-full border border-white/40 backdrop-blur-md active:scale-95 transition-all shadow-brand">
                 ✕ CLOSE ALL
             </button>
         </div>
@@ -488,7 +488,7 @@
                 </div>
                 <!-- 本文（流し込み前提） -->
                 <div id="ui-help-dialog-body"
-                    class="p-5 text-[1rem] text-slate-700  whitespace-pre-wrap max-h-[70vh] min-h-[30vh] overflow-y-auto bg-slate-50">
+                    class="p-5 text-[1rem] text-slate-900  whitespace-pre-wrap max-h-[70vh] min-h-[30vh] overflow-y-auto bg-slate-50">
                 </div>
             </div>
         </div>

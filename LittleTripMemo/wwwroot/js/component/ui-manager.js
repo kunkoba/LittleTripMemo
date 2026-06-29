@@ -103,7 +103,7 @@ const UI_Manager = {
 			if (isShow && !badge) {
 				targetEl.classList.add('relative');
 				badge = document.createElement('span');
-				badge.className = 'js-unread-badge absolute bg-red-500 text-white font-black flex items-center justify-center pointer-events-none shadow-sm whitespace-nowrap ';
+				badge.className = 'js-unread-badge absolute bg-red-500 text-white font-bold flex items-center justify-center pointer-events-none shadow-sm whitespace-nowrap ';
 				if (type === 'dot') {
 					badge.className += 'w-3 h-3 rounded-full top-1 right-1 border-2 border-brand-1';
 				} else {
@@ -123,13 +123,13 @@ const UI_Manager = {
 			if (size === 'lg') {
 				el.classList.add('gap-6');
 				$Dom.QuerySelector(".js-main-text", el).classList.add('text-[1.3rem]');
-				$Dom.QuerySelector(".js-time-text", el).classList.add('text-[1rem]');
+				$Dom.QuerySelector(".js-time-text", el).classList.add('text-[1.3rem]');
 				const badge = $Dom.QuerySelector(".js-day-badge", el);
 				badge.classList.add('w-20', 'h-10', 'text-[1.0rem]'); // テンプレート側のサイズクラスを上書き
 			} else {
 				el.classList.add('gap-4');
 				$Dom.QuerySelector(".js-main-text", el).classList.add('text-[1rem]');
-				$Dom.QuerySelector(".js-time-text", el).classList.add('text-[0.8rem]');
+				$Dom.QuerySelector(".js-time-text", el).classList.add('text-[1rem]');
 				const badge = $Dom.QuerySelector(".js-day-badge", el);
 				badge.classList.add('w-16', 'h-8', 'text-[0.8rem]'); // テンプレート側のサイズクラスを上書き
 			}
@@ -229,7 +229,7 @@ const UI_Manager = {
         if (!btn) return;
         if (isOn) {
             // ONのスタイル（発光する緑）
-            btn.classList.remove('bg-slate-700', 'text-slate-500', 'border-slate-600', 'shadow-md');
+            btn.classList.remove('bg-slate-700', 'text-slate-400', 'border-slate-600', 'shadow-md');
             btn.classList.add(
                 'bg-emerald-500', 
                 'text-white', 
@@ -244,7 +244,7 @@ const UI_Manager = {
                 'border-emerald-400', 
                 'shadow-[0_0_20px_rgba(16,185,129,0.8)]'
             );
-            btn.classList.add('bg-slate-700', 'text-slate-500', 'border-slate-600', 'shadow-md');
+            btn.classList.add('bg-slate-700', 'text-slate-400', 'border-slate-600', 'shadow-md');
         }
     },
 };
