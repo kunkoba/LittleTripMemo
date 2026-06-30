@@ -232,7 +232,7 @@
     </div>
 </template>
 
-<template id="tpl-view-profile">
+<template id="tpl-view-profile_2">
 	<div class="relative min-h-full flex flex-col bg-white px-1">
         <!-- アイコン・ニックネーム -->
 		<div class="flex items-center gap-4 mb-3">
@@ -245,6 +245,34 @@
                 class="flex-1 min-h-[200px] p-2 text-[1rem] text-slate-900 leading-[2] whitespace-pre-wrap break-words">
             </div>
             <div id="view-profile-links" class="gap-3 flex m-2"></div>
+        </div>
+	</div>
+</template>
+<template id="tpl-view-profile">
+	<div class="relative min-h-full flex flex-col bg-white px-1">
+        <!-- 上部：ステータス情報 -->
+        <div class="flex justify-between items-center px-1 pb-2">
+            <div class="flex items-center gap-2">
+                <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">No.<span id="view-profile-member-no" class="text-slate-700 text-[0.8rem]"></span></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <span id="view-profile-category" class="bg-brand-1 text-brand-5 border border-brand-2 px-2 py-0.5 rounded text-[0.6rem] font-black uppercase tracking-wider"></span>
+                <span class="bg-amber-100 text-amber-600 border border-amber-200 px-2 py-0.5 rounded text-[0.6rem] font-black uppercase tracking-wider">Rank <span id="view-profile-rank"></span></span>
+            </div>
+        </div>
+        <!-- アイコン・ニックネーム -->
+		<div class="flex items-center gap-4 mb-3 px-1">
+			<div id="view-profile-icon" class="text-[4rem] drop-shadow-md shrink-0"></div>
+			<div class="flex flex-col flex-1 min-w-0">
+                <h1 id="view-profile-nickname" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight"></h1>
+            </div>
+		</div>
+        <!-- 本文・リンク -->
+        <div class="bg-brand-1 overflow-y-auto rounded-lg">
+            <div id="view-profile-description"
+                class="flex-1 min-h-[200px] p-3 text-[0.95rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-words">
+            </div>
+            <div id="view-profile-links" class="gap-3 flex m-3 mt-0"></div>
         </div>
 	</div>
 </template>
@@ -296,13 +324,13 @@
         <!-- 4. 金額 & 5. 距離 -->
         <div class="shrink-0 flex flex-col mb-2">
             <div class="flex justify-between items-center pt-3 border-b border-slate-200 px-2">
-                <span class="text-[1rem] text-slate-900">金額</span>
+                <span class="text-[1rem] text-slate-900">金額合計</span>
                 <span class="text-[1.1rem] font-bold text-slate-900">
                     <span id="mem-stat-price"></span> <span id="view-mem-price-unit"></span>
                 </span>
             </div>
             <div class="flex justify-between items-center pt-3 border-b border-slate-200 px-2">
-                <span class="text-[1rem] text-slate-900">距離</span>
+                <span class="text-[1rem] text-slate-900">総移動距離</span>
                 <span id="mem-stat-distance" class="text-[1.1rem] font-bold text-slate-900"></span>
             </div>
         </div>

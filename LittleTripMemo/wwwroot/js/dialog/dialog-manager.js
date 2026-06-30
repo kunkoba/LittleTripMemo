@@ -88,7 +88,7 @@ const _DialogCore = {
             frameBg.classList.add("min-h-[50vh]");
         } else {
             console.log("confirm-sm");
-            frameBg.classList.add("min-h-[250px]");
+            frameBg.classList.add("min-h-[300px]");
         }
         titleEl.textContent = title;
         // --- 3. ヘッダーアクション（ヘルプ・カスタムボタン） ---

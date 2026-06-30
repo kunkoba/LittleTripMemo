@@ -345,7 +345,7 @@ export default {
         });
     },
     // プロフィール参照
-    async ShowUserProfile(profile, isOwner) {
+    async ShowUserProfile_2(profile, isOwner) {
         if (isOwner) profile = $App.AppData.Owner.SystemInfo.ownerProfile;
         if (!profile) return $Notice.Warn("ユーザー情報がありません");
         const el = $Dom.GenerateTemplate('tpl-view-profile');
@@ -394,6 +394,78 @@ export default {
             headerButtons.push({
                 label: "✏️",
                 handler: () => this.ShowEditProfile(profile, renderView)
+            });
+        }
+        //
+		this._core.open({
+			title: "USER PROFILE",
+			content: el,
+            help: "",
+			headerButtons: headerButtons
+		});
+    },
+    // プロフィール参照
+    async ShowUserProfile(profile, isOwner) {
+        if (isOwner) profile = $App.AppData.Owner.SystemInfo.ownerProfile;
+        if (!profile) return $Notice.Warn("ユーザー情報がありません");
+        const el = $Dom.GenerateTemplate('tpl-view-profile');
+        const renderView = () => {
+            const pIcon = profile.icon || "👤";
+            const pName = profile.nick_name || "No Name";
+            const pDesc  = profile.description || "";
+            const pL1   = profile.link_1 || "";
+            const pL2   = profile.link_2 || "";
+            const pL3   = profile.link_3 || "";
+            // 新規項目
+            const pMemberNo = profile.member_no || "---";
+            const pCategory = profile.user_category || "通りすがり";
+            const pRank = profile.user_rank || 0;
+            $Dom.QuerySelector('#view-profile-icon', el).textContent = pIcon;
+            $Dom.QuerySelector('#view-profile-nickname', el).textContent = pName;
+            $Dom.QuerySelector('#view-profile-description', el).textContent = pDesc;
+            $Dom.QuerySelector('#view-profile-member-no', el).textContent = pMemberNo;
+            $Dom.QuerySelector('#view-profile-category', el).textContent = pCategory;
+            $Dom.QuerySelector('#view-profile-rank', el).textContent = pRank;
+            const viewLinks = $Dom.QuerySelector('#view-profile-links', el);
+            // 【重要】追加前に既存のボタンをすべて削除してリセットする
+            viewLinks.innerHTML = '';
+            // 項目名と値のペアで定義し、入力があるもののみループ
+            [
+                { val: pL1, key: "link_1" },
+                { val: pL2, key: "link_2" },
+                { val: pL3, key: "link_3" }
+            ].forEach(item => {
+                if (!item.val || item.val.trim() === "") return;
+                // サーバー送信用パラメータ (AddClickReq 形式)
+                const params = {
+                    target_type: 1, // ClickTargetType.User
+                    target_user_id: profile.user_id,
+                    item_name: item.key
+                };
+                // ジェネレータでボタンを生成（第3引数は ShowUserProfile の引数 isOwner を使用）
+                $UI.Generator.LinkButton(viewLinks, item.val, params, isOwner);
+            });
+        };
+        renderView();
+		const headerButtons = [];
+        const isAdmin = $App.AppData.Owner.plan === "Admin"; // 管理者判定
+        if (isOwner || isAdmin) {
+            // 統計アイコン
+            headerButtons.push({
+                label: "📊",
+                handler: () => this.ShowUserClickStats(profile)
+            });
+        }
+        if (isOwner) {
+            headerButtons.push({
+                label: "✏️",
+                handler: () => this.ShowEditProfile(profile, renderView)
+            });
+        } else if (isAdmin) {
+            // 【自分が管理者 且つ 他人のプロフ】メッセージ送信（返信）ボタンを表示
+            headerButtons.push({
+                label: "✉️",
+                handler: () => this.ShowAdminSendUserNotification(profile)
             });
         }
         //

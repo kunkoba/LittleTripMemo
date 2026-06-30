@@ -12,7 +12,7 @@ public class TAppUser
     public int table_id { get; set; }
     public string plan_type { get; set; } = "Free";
     public long member_no { get; set; }
-    public string? user_category { get; set; }
+    public string user_category { get; set; } = "通りすがり";
     public int user_rank { get; set; } = 0;
     public string? icon { get; set; }
     public string? nick_name { get; set; }
@@ -41,7 +41,7 @@ public class TMemoArchive : IAppRecord
 {
     public int archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
-    public string? category { get; set; }
+    public string? category { get; set; } = "気まぐれ旅";
     public string title { get; set; } = "仮のタイトル";
     public string memo { get; set; } = "仮の本文";
     public string link_url { get; set; } = string.Empty;
@@ -59,7 +59,7 @@ public class TMemoArchivePub : IAppRecord
 {
     public int archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
-    public string? category { get; set; }
+    public string? category { get; set; } = "気まぐれ旅";
     public string title { get; set; } = string.Empty;
     public string memo { get; set; } = string.Empty;
     public string link_url { get; set; } = string.Empty;
@@ -224,7 +224,7 @@ public class DtoArchive
 {
     public long archive_id { get; set; } = 0;
     public Guid user_id { get; set; }
-    public string? category { get; set; }
+    public string? category { get; set; } = "気まぐれ旅";
     public string title { get; set; } = string.Empty;
     public string memo { get; set; } = string.Empty;
     public string link_url { get; set; } = string.Empty;

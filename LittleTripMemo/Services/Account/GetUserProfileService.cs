@@ -12,7 +12,7 @@ public class GetUserProfileService(
 {
     public record GetUserProfileReq(Guid target_user_id);
 
-    public record Response(DtoUserProfile user_profile);
+    public record Response(DtoUserProfile userProfile);
 
     public async Task<Response> ExecuteAsync(GetUserProfileReq req)
     {

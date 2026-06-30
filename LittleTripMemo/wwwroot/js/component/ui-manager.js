@@ -87,7 +87,7 @@ const UI_Manager = {
 					} else {
 						// 他人の場合はAPIで詳細を取得して表示
 						const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: profile.user_id });
-						if (isSuccess) $Dialog.ShowUserProfile($Data.resData, false);
+						if (isSuccess) $Dialog.ShowUserProfile($Data.Store.GetUserProfile(), false);
 					}
 				};
 			}
