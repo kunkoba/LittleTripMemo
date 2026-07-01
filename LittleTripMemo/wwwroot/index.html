@@ -44,7 +44,7 @@
 <body class="overflow-hidden bg-brand-1 fixed inset-0 touch-none flex">
 
 <!-- PC用広告サイドバー（左側に固定） -->
-<div id="ad-space-pc" class="hidden lg:flex w-[250px] shrink-0 bg-slate-50 border-r border-brand-2 z-[2000] flex-col items-center justify-center shadow-md relative gap-8">
+<div id="ad-space-pc" class="hidden lg:flex w-[250px] shrink-0 bg-slate-50 border-r border-brand-2 z-[2000] flex-col items-center justify-center shadow-brand relative gap-8">
     <!-- 広告1 -->
     <div class="flex flex-col items-center">
         <div class="text-slate-400 text-[0.5rem] font-bold tracking-widest uppercase mb-2">Advertisement</div>
@@ -80,7 +80,7 @@
                         <!-- 初期状態を黒背景にし、内部にアイコンとテキストの要素を分割 -->
                         <button id="ui-archive-title" class="hidden py-1 px-3 flex items-center gap-2 bg-slate-800/50 rounded-full 
                             text-white text-[0.8rem] font-bold shadow-brand max-w-full transition-colors pointer-events-auto">
-                            <span class="js-icon text-[1rem] shrink-0 drop-shadow-md">🔒</span>
+                            <span class="js-icon text-[1rem] shrink-0 drop-shadow-brand">🔒</span>
                             <span class="js-text truncate  pt-0.5">タイトル</span>
                         </button>
                     </div>
@@ -138,25 +138,25 @@
             <div id="ui-detail-frame-id" class="translate-y-full flex flex-col bg-brand-0 overflow-hidden shrink-0 h-0 w-full 
                 md:h-full md:w-0 transition-all duration-400 shadow-2xl z-[1002]">
                 <!-- 詳細パネルのヘッダー -->
-                <div class="bg-brand-5 h-14 px-6 flex justify-between items-center shrink-0 border-2 border-brand-5 z-[1000] shadow-md">
+                <div class="bg-brand-5 h-14 px-6 flex justify-between items-center shrink-0 border-2 border-brand-5 z-[1000] shadow-brand">
                     <h2 id="detail-title" class="text-[1.2rem] font-bold italic text-brand-0 uppercase tracking-wider">Details</h2>
                     <div class="flex gap-3">
-                        <button id="detail-btn-current" class="w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
+                        <button id="detail-btn-current" class="w-9 h-9 bg-white rounded-full shadow-brand text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
                             📍
                         </button>
-                        <button id="detail-btn-earth" class="w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
+                        <button id="detail-btn-earth" class="w-9 h-9 bg-white rounded-full shadow-brand text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
                             🌍
                         </button>
-                        <button id="detail-btn-map"   class="w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
+                        <button id="detail-btn-map"   class="w-9 h-9 bg-white rounded-full shadow-brand text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
                             🗺️
                         </button>
-                        <button id="detail-btn-report" class="hidden w-9 h-9 bg-white rounded-full shadow-sm text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
+                        <button id="detail-btn-report" class="hidden w-9 h-9 bg-white rounded-full  text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
                             🚫
                         </button>
-                        <button id="detail-btn-edit"  class="w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
+                        <button id="detail-btn-edit"  class="w-9 h-9 bg-white rounded-full shadow-brand text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
                             ✏️
                         </button>
-                        <button id="detail-btn-close" class="w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
+                        <button id="detail-btn-close" class="w-9 h-9 bg-white rounded-full shadow-brand text-slate-400 flex items-center justify-center active:scale-95 text-[1.2rem]">
                             ✖
                         </button>
                     </div>
@@ -166,7 +166,7 @@
                     <!-- ■ 参照用（表示モード）：縦並び・左揃え・1rem 統一版 -->
                     <div id="detail-display" class="hidden relative _min-h-full flex flex-col bg-white">
                         <!-- 右上の正円インデックスバッジ -->
-                        <div class="js-index-badge absolute top-0 right-0 w-10 h-10 rounded-full bg-brand-4 text-white font-bold text-[1.2rem] flex items-center justify-center shadow-md z-20">
+                        <div class="js-index-badge absolute top-0 right-0 w-10 h-10 rounded-full bg-brand-4 text-white font-bold text-[1.2rem] flex items-center justify-center shadow-brand z-20">
                         </div>
                         <!-- 背景用の巨大顔文字：上部に固定（スクロールしても動かない） -->
                         <div class="sticky top-[100px] w-full h-0 pointer-events-none z-0 flex justify-center">
@@ -327,8 +327,8 @@
                     </form>
                     <!-- フォーム内ボタン（スクロールに含める） -->
                     <div class="flex gap-4 mt-6">
-                        <button id="detail-btn-cancel" type="button" class="flex-1 bg-slate-400 text-white font-bold text-[0.8rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">CANCEL</button>
-                        <button id="detail-btn-save"   type="button" class="flex-1 bg-brand-5   text-white font-bold text-[0.8rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">SAVE</button>
+                        <button id="detail-btn-cancel" type="button" class="flex-1 bg-slate-400 text-white font-bold text-[0.8rem] h-12 rounded-[1rem] shadow-brand uppercase active:scale-95 transition-transform">CANCEL</button>
+                        <button id="detail-btn-save"   type="button" class="flex-1 bg-brand-5   text-white font-bold text-[0.8rem] h-12 rounded-[1rem] shadow-brand uppercase active:scale-95 transition-transform">SAVE</button>
                     </div>
                 </div>
 
@@ -336,25 +336,25 @@
                 <div id="detail-footer-id" class="shrink-0 px-4 pb-6 pt-4 bg-slate-50 border z-10">
                     <!-- （いいねボタン） -->
                     <div id="detail-group-reaction" class="flex justify-between gap-2 mb-4">
-                        <button id="detail-btn-funny"    class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                        <button id="detail-btn-funny"    class="flex-1 bg-white rounded-[1rem] py-2 shadow-brand border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[2rem]">🤣</span>
                             <span class="text-[0.8rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
-                        <button id="detail-btn-love"  class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                        <button id="detail-btn-love"  class="flex-1 bg-white rounded-[1rem] py-2 shadow-brand border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[2rem]">😍</span>
                             <span class="text-[0.8rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
-                        <button id="detail-btn-surprise" class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                        <button id="detail-btn-surprise" class="flex-1 bg-white rounded-[1rem] py-2 shadow-brand border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[2rem]">😲</span>
                             <span class="text-[0.8rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
-                        <button id="detail-btn-sad"      class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
+                        <button id="detail-btn-sad"      class="flex-1 bg-white rounded-[1rem] py-2 shadow-brand border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[2rem]">😭</span>
                             <span class="text-[0.8rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
                     </div>
                     <!-- 詳細パネル移動ボタン群 -->
-                    <div id="detail-group-move" class="hidden flex items-center justify-between px-6 bg-black/70 rounded-full px-2 py-1 shadow-md pointer-events-auto">
+                    <div id="detail-group-move" class="hidden flex items-center justify-between px-6 bg-black/70 rounded-full px-2 py-1 shadow-brand pointer-events-auto">
                         <button id="detail-btn-first"
                             class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                             |＜
@@ -364,7 +364,7 @@
                             ＜
                         </button>
                         <button id="detail-btn-cancel2"
-                            class="w-10 h-10 flex items-center justify-center text-brand-5 font-bold text-[1.2rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full drop-shadow-md font-bold">
+                            class="w-10 h-10 flex items-center justify-center text-brand-5 font-bold text-[1.2rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full drop-shadow-brand font-bold">
                             ✕
                         </button>
                         <button id="detail-btn-next"
@@ -398,35 +398,35 @@
                 <!-- アイコンバー -->
                 <div class="mx-6 bg-transparent mb-3 flex flex-col items-center gap-4">
                     <!-- 【下段】固定エリア：①メニューグループ（カプセル：装飾なしアイコンを4つ配置） -->
-                    <div id="bot-group-menu" class="w-full max-w-[500px] flex items-center justify-between bg-brand-1 rounded-full px-6 py-1 shadow-md border border-brand-2 pointer-events-auto">
+                    <div id="bot-group-menu" class="w-full max-w-[500px] flex items-center justify-between bg-brand-1 rounded-full px-6 py-1 shadow-brand border border-brand-2 pointer-events-auto">
                         <!-- システムメニュー -->
-                        <button id="btn-sys-menu" class="relative w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-md">
+                        <button id="btn-sys-menu" class="relative w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-brand">
                             ⚙️
                         </button>
                         <!-- ユーザメニュー -->
-                        <button id="btn-user-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-md">
+                        <button id="btn-user-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-brand">
                             👤
                         </button>
                         <!-- データメニュー― -->
-                        <button id="btn-data-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-md">
+                        <button id="btn-data-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-brand">
                             🗺️
                         </button>
                         <!-- アクションメニュー -->
-                        <button id="btn-app-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] text-brand-5 drop-shadow-md">
+                        <button id="btn-app-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] text-brand-5 drop-shadow-brand">
                             👆
                         </button>
                     </div>
                     <!-- 【上段】動的エリア：②移動カプセル または ③メインアクション（作成・検索） -->
                     <div id="bot-dynamic-area" class="w-full flex justify-center items-end min-h-[52px]">
                         <!-- ② 移動ボタン群（カプセル：高さ共通化のため py-1 / w-10） -->
-                        <div id="bot-group-move" class="hidden w-full max-w-[500px] flex items-center justify-between bg-black/70 rounded-full px-6 py-1 shadow-md pointer-events-auto">
+                        <div id="bot-group-move" class="hidden w-full max-w-[500px] flex items-center justify-between bg-black/70 rounded-full px-6 py-1 shadow-brand pointer-events-auto">
                             <button id="btn-bot-move-first" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                                 |＜
                             </button>
                             <button id="btn-bot-move-prev" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                                 ＜
                             </button>
-                            <button id="btn-bot-move-open" class="w-10 h-10 flex items-center justify-center text-brand-5 font-bold text-[1.2rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full drop-shadow-md">
+                            <button id="btn-bot-move-open" class="w-10 h-10 flex items-center justify-center text-brand-5 font-bold text-[1.2rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full drop-shadow-brand">
                                 ●
                             </button>
                             <button id="btn-bot-move-next" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">

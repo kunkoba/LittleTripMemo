@@ -336,7 +336,7 @@ export default {
                 const cardHtml = "js-item-card flex items-center gap-3 p-3 mb-2 rounded-[1rem] border-2 cursor-pointer active:scale-[0.98] transition-all";
                 const checkHtml = "shrink-0 w-6 h-6 rounded-[1rem] border-2 flex items-center justify-center js-checkbox transition-colors";
                 if (isSel) {
-                    card.className = cardHtml + " border-brand-5 bg-white shadow-md";
+                    card.className = cardHtml + " border-brand-5 bg-white shadow-brand";
                     checkbox.className = checkHtml + " border-brand-5 bg-brand-5";
                     mark.classList.remove("hidden");
                 } else {
@@ -461,7 +461,7 @@ export default {
         const el = $Dom.GenerateTemplate('tpl-view-archive');
         // ── スタイル定義（ボタンの状態別クラス） ──────────────────
         const STYLE_BASE = "flex-1 h-11 font-bold text-[0.8rem] rounded-lg tracking-wider outline-none";
-        const STYLE_ACTIVE = " bg-white text-slate-900 shadow-md border border-slate-200 active:scale-95 transition-all";
+        const STYLE_ACTIVE = " bg-white text-slate-900 shadow-brand border border-slate-200 active:scale-95 transition-all";
         const STYLE_CURRENT = " bg-brand-5 text-white shadow-inner border border-brand-5 cursor-default pointer-events-none";
         const STYLE_DISABLED = " bg-slate-100 text-slate-400 border border-slate-100 cursor-not-allowed pointer-events-none";
         // ── 1. タイトルと本文 ──────────────────────────────────
@@ -707,9 +707,9 @@ export default {
         const titleEl = $Dom.QuerySelector("#status-change-title", el);
         const descEl = $Dom.QuerySelector("#status-change-desc", el);
         let title, desc, icon, buttons = [];
-        const btnMainClass = "bg-brand-5 text-white shadow-md font-bold";
-        const btnSubClass = "bg-white text-slate-900 border border-slate-300 shadow-md font-bold";
-        const btnDangerClass = "bg-red-50 text-red-500 border border-red-300 shadow-md font-bold";
+        const btnMainClass = "bg-brand-5 text-white shadow-brand font-bold";
+        const btnSubClass = "bg-white text-slate-900 border border-slate-300 shadow-brand font-bold";
+        const btnDangerClass = "bg-red-50 text-red-500 border border-red-300 shadow-brand font-bold";
         if (!archive.is_public) {
             // ===================================
             // 【現在 PRIVATE の場合】 -> CLOSE または 解体
@@ -848,7 +848,7 @@ export default {
                 [
                     {
                         label: "CANCEL",
-                        className: "bg-slate-400 text-white shadow-md",
+                        className: "bg-slate-400 text-white shadow-brand",
                         handler: () => {
                             this._core.close();
                         },

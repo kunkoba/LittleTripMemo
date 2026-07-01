@@ -97,15 +97,15 @@
 <template id="tpl-app-info_2">
     <div class="w-full flex flex-col h-full bg-slate-50/50 pb-6">
         <div class="flex flex-col items-center justify-center pt-10 pb-8">
-            <div class="w-24 h-24 bg-gradient-to-br from-brand-4 to-brand-5 rounded-[1.5rem] shadow-lg flex items-center justify-center text-white text-[2.5rem] font-bold mb-5"><span class="drop-shadow-sm  mt-1">LM</span></div>
+            <div class="w-24 h-24 bg-gradient-to-br from-brand-4 to-brand-5 rounded-[1.5rem] shadow-brand flex items-center justify-center text-white text-[2.5rem] font-bold mb-5"><span class="drop-  mt-1">LM</span></div>
             <h3 class="text-[1.1rem] font-bold uppercase tracking-widest text-slate-900 js-app-name text-center  px-4"></h3>
             <p class="text-[0.8rem] text-slate-400 font-bold tracking-widest mt-2 js-app-version"></p>
         </div>
         <div class="px-4 w-full">
-            <div class="bg-white rounded-[1rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+            <div class="bg-white rounded-[1rem] border border-slate-200  overflow-hidden flex flex-col">
                 <div class="flex justify-between items-center p-4 border-b border-slate-100">
                     <div class="flex items-center gap-3">
-                        <span class="text-[1.5rem] drop-shadow-md ">🛠️</span>
+                        <span class="text-[1.5rem] drop-shadow-brand ">🛠️</span>
                         <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Developer</span>
                     </div>
                     <span class="text-[1rem] font-bold text-slate-900 js-app-developer">
@@ -113,7 +113,7 @@
                 </div>
                 <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
                     <div class="flex items-center gap-3">
-                        <span class="text-[1.5rem] drop-shadow-md ">⭐</span>
+                        <span class="text-[1.5rem] drop-shadow-brand ">⭐</span>
                         <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Feedback</span>
                     </div>
                     <div class="flex items-center gap-3">
@@ -124,7 +124,7 @@
                 <button id="link-info-official" type="button"
                     class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
                     <div class="flex items-center gap-3">
-                        <span class="text-[1.5rem] drop-shadow-md ">🌍</span>
+                        <span class="text-[1.5rem] drop-shadow-brand ">🌍</span>
                         <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Official Site</span>
                     </div>
                     <div class="flex items-center gap-1 bg-blue-50 text-blue-500 px-3 py-1 rounded-full border border-blue-100">
@@ -134,7 +134,7 @@
                 </a>
                 <button id="btn-info-license" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors">
                     <div class="flex items-center gap-3">
-                        <span class="text-[1.5rem] drop-shadow-md ">📜</span>
+                        <span class="text-[1.5rem] drop-shadow-brand ">📜</span>
                         <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">License</span>
                     </div>
                     <span class="text-slate-400 text-[1.5rem] font-normal  -mt-0.5">›</span>
@@ -147,19 +147,19 @@
 <template id="tpl-app-info">
     <div class="w-full flex flex-col h-full bg-slate-50 overflow-y-auto pb-4">
         <!-- トップヘッダー -->
-        <div class="flex flex-col items-center justify-center pt-8 pb-6 bg-white border-b border-slate-200 shadow-sm relative overflow-hidden">
+        <div class="flex flex-col items-center justify-center pt-8 pb-6 bg-white border-b border-slate-200  relative overflow-hidden">
             <!-- 背景装飾 -->
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-1 rounded-full opacity-50"></div>
             <div class="absolute -bottom-10 -left-10 w-24 h-24 bg-brand-2 rounded-full opacity-50"></div>
-            <div class="w-20 h-20 bg-gradient-to-br from-brand-4 to-brand-5 rounded-2xl shadow-lg flex items-center justify-center text-white text-[2rem] font-black mb-4 z-10">
-                <span class="drop-shadow-sm leading-none mt-1">LM</span>
+            <div class="w-20 h-20 bg-gradient-to-br from-brand-4 to-brand-5 rounded-2xl shadow-brand flex items-center justify-center text-white text-[2rem] font-black mb-4 z-10">
+                <span class="drop- leading-none mt-1">LM</span>
             </div>
             <h3 class="text-[1.1rem] font-black uppercase tracking-widest text-slate-800 js-app-name text-center leading-tight px-4 z-10"></h3>
             <p class="text-[0.7rem] text-slate-400 font-bold tracking-widest mt-1.5 js-app-version z-10"></p>
         </div>
         <div class="p-4 space-y-4">
             <!-- アプリの利用統計 -->
-            <div class="bg-white rounded-[1rem] border border-slate-200 shadow-sm p-4">
+            <div class="bg-white rounded-[1rem] border border-slate-200  p-4">
                 <div class="flex justify-between items-center mb-3">
                     <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">Global Stats</span>
                     <span class="text-[0.5rem] text-slate-400 font-bold js-last-update"></span>
@@ -180,10 +180,10 @@
                 </div>
             </div>
             <!-- リンク / アクション -->
-            <div class="bg-white rounded-[1rem] border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-[1rem] border border-slate-200  overflow-hidden">
                 <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
                     <div class="flex items-center gap-3">
-                        <span class="text-[1.2rem] drop-shadow-sm leading-none">⭐</span>
+                        <span class="text-[1.2rem] drop- leading-none">⭐</span>
                         <span class="text-[0.75rem] font-black text-slate-600 uppercase tracking-wider">Feedback</span>
                     </div>
                     <div class="flex items-center gap-2">
@@ -194,21 +194,21 @@
                 </button>
                 <div class="flex justify-between items-center p-4 border-b border-slate-100">
                     <div class="flex items-center gap-3">
-                        <span class="text-[1.2rem] drop-shadow-sm leading-none">🛠️</span>
+                        <span class="text-[1.2rem] drop- leading-none">🛠️</span>
                         <span class="text-[0.75rem] font-black text-slate-600 uppercase tracking-wider">Developer</span>
                     </div>
                     <span class="text-[0.8rem] font-black text-slate-500 js-app-developer"></span>
                 </div>
                 <button id="link-info-official" type="button" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
                     <div class="flex items-center gap-3">
-                        <span class="text-[1.2rem] drop-shadow-sm leading-none">🌍</span>
+                        <span class="text-[1.2rem] drop- leading-none">🌍</span>
                         <span class="text-[0.75rem] font-black text-slate-600 uppercase tracking-wider">Official Site</span>
                     </div>
                     <span class="text-[0.6rem] font-black text-blue-500 bg-blue-50 px-2 py-0.5 rounded uppercase border border-blue-100">Open ↗</span>
                 </button>
                 <button id="btn-info-license" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors">
                     <div class="flex items-center gap-3">
-                        <span class="text-[1.2rem] drop-shadow-sm leading-none">📜</span>
+                        <span class="text-[1.2rem] drop- leading-none">📜</span>
                         <span class="text-[0.75rem] font-black text-slate-600 uppercase tracking-wider">License</span>
                     </div>
                     <span class="text-slate-300 text-[1.2rem] font-normal leading-none">›</span>
@@ -221,13 +221,13 @@
 
 <template id="tpl-review-list">
     <div class="w-full flex flex-col h-full bg-slate-50 pb-2">
-        <div class="shrink-0 flex flex-col items-center justify-center py-6 bg-white border-b border-slate-200 shadow-sm z-10">
+        <div class="shrink-0 flex flex-col items-center justify-center py-6 bg-white border-b border-slate-200  z-10">
             <span class="text-[0.5rem] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2">Average Rating</span>
             <span class="text-[4rem] font-bold text-slate-900  js-avg-score tracking-tighter">0.0</span>
-            <span class="text-[1.2rem] text-yellow-500 tracking-widest mt-2 js-avg-stars drop-shadow-sm"></span>
+            <span class="text-[1.2rem] text-yellow-500 tracking-widest mt-2 js-avg-stars drop-"></span>
         </div>
         <div class="flex-1 overflow-y-auto p-4">
-            <div class="bg-white rounded-[1rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col js-review-container"></div>
+            <div class="bg-white rounded-[1rem] border border-slate-200  overflow-hidden flex flex-col js-review-container"></div>
         </div>
     </div>
 </template>
@@ -236,7 +236,7 @@
 	<div class="relative min-h-full flex flex-col bg-white px-1">
         <!-- アイコン・ニックネーム -->
 		<div class="flex items-center gap-4 mb-3">
-			<div id="view-profile-icon" class="text-[4rem] drop-shadow-md shrink-0"></div>
+			<div id="view-profile-icon" class="text-[4rem] drop-shadow-brand shrink-0"></div>
 			<div class="flex flex-col flex-1 min-w-0"><h1 id="view-profile-nickname" class="text-[1.2rem] font-bold text-slate-900 break-words "></h1></div>
 		</div>
         <!-- 本文・リンク -->
@@ -262,7 +262,7 @@
         </div>
         <!-- アイコン・ニックネーム -->
 		<div class="flex items-center gap-4 mb-3 px-1">
-			<div id="view-profile-icon" class="text-[4rem] drop-shadow-md shrink-0"></div>
+			<div id="view-profile-icon" class="text-[4rem] drop-shadow-brand shrink-0"></div>
 			<div class="flex flex-col flex-1 min-w-0">
                 <h1 id="view-profile-nickname" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight"></h1>
             </div>
@@ -281,7 +281,7 @@
 	<div class="w-full text-slate-900 space-y-3 px-1 pb-4">
 		<div class="flex items-end gap-3 py-1">
 			<div class="shrink-0 flex flex-col items-center">
-				<button id="btn-profile-icon-trigger" class="w-14 h-14 bg-white rounded-full shadow-md flex items-center justify-center text-[2rem] active:scale-95 transition-transform outline-none"><span id="edit-profile-icon-preview">😀</span><input type="hidden" id="edit-profile-icon"></button>
+				<button id="btn-profile-icon-trigger" class="w-14 h-14 bg-white rounded-full shadow-brand flex items-center justify-center text-[2rem] active:scale-95 transition-transform outline-none"><span id="edit-profile-icon-preview">😀</span><input type="hidden" id="edit-profile-icon"></button>
 			</div>
             <div class="flex-1">
 				<div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Nickname</label><span class="text-[0.5rem] font-bold text-slate-400"><span id="edit-profile-nickname-count">0</span>/20</span></div>
@@ -307,7 +307,7 @@
         <div class="shrink-0 flex justify-between items-center w-full px-1">
             <div id="view-mem-user-wrapper" class="w-fit"></div>
             <!-- 元に戻したボタン -->
-            <button id="btn-view-mem-timeline" class="h-10 shadow-md rounded-[1rem] flex items-center justify-center gap-2 active:scale-95 transition-transform px-4 outline-none bg-white border border-slate-200">
+            <button id="btn-view-mem-timeline" class="h-10 shadow-brand rounded-[1rem] flex items-center justify-center gap-2 active:scale-95 transition-transform px-4 outline-none bg-white border border-slate-200">
                 <span id="mem-stat-count" class="text-[1.1rem] font-bold text-slate-900">0</span>
                 <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-wider">memos</span>
             </button>
@@ -376,7 +376,7 @@
     <div class="w-full text-slate-900 flex flex-col items-center">
         <div class="w-full px-4 mt-2"><div id="share-archive-title" class="text-[1.2rem] font-bold text-slate-900 text-center break-words "></div></div>
         <div class="w-full flex justify-center my-6">
-            <button id="btn-share-copy" class="shadow-brand w-48 h-48 p-3 bg-brand-0 text-white font-bold rounded-[1rem] shadow-md active:scale-95 transition-transform flex items-center justify-center">
+            <button id="btn-share-copy" class="shadow-brand w-48 h-48 p-3 bg-brand-0 text-white font-bold rounded-[1rem] shadow-brand active:scale-95 transition-transform flex items-center justify-center">
                 <img id="share-qr-image" src="" alt="QR Code" class="w-48 h-[200px] object-contain">
             </button>
         </div>
@@ -388,7 +388,7 @@
 	<div class="relative min-h-full flex flex-col bg-white px-1">
 		<!-- 1. ヘッダー（日付とアイコンを横並びに） -->
         <div class="absolute top-0 right-2 ">
-            <span id="view-notice-icon" class="text-[2rem] drop-shadow-md"></span>
+            <span id="view-notice-icon" class="text-[2rem] drop-shadow-brand"></span>
         </div>
 		<div class="flex items-center gap-4 my-4">
             <div class="flex items-center gap-3 text-black font-bold text-[1rem]">
@@ -571,7 +571,7 @@
 <template id="tpl-click-stats">
     <div class="w-full flex flex-col bg-slate-50 min-h-full pb-4">
         <!-- ユーザー情報 -->
-        <div class="bg-white border-b border-slate-200 p-4 mb-4 shadow-sm">
+        <div class="bg-white border-b border-slate-200 p-4 mb-4 ">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2 text-slate-900 font-bold">
                     <span class="text-[1.5rem]">👤</span>
@@ -593,7 +593,7 @@
 
 <!-- 【ダイアログ子】リンク1件分のアイテム -->
 <template id="tpl-click-stats-item">
-    <div class="bg-white rounded-[1rem] shadow-sm border border-slate-200 p-4">
+    <div class="bg-white rounded-[1rem]  border border-slate-200 p-4">
         <label class="block text-[0.8rem] font-bold text-slate-400 mb-2 js-link-title"></label>
         <div class="bg-slate-50 border border-slate-200 rounded-md px-3 py-2 mb-3 text-[0.8rem] text-slate-400 truncate js-link-url"></div>
         <div class="grid grid-cols-3 gap-2">
@@ -620,7 +620,7 @@
 <template id="tpl-archive-click-stats">
     <div class="w-full flex flex-col bg-slate-50 min-h-full pb-4 px-2 pt-2">
         <!-- アーカイブ情報 -->
-        <div class="bg-white border border-slate-200 p-4 mb-4 shadow-sm rounded-lg">
+        <div class="bg-white border border-slate-200 p-4 mb-4  rounded-lg">
             <div class="flex items-center gap-2 text-slate-900 font-bold mb-4">
                 <span class="text-[1.5rem]">📁</span>
                 <span class="text-[0.8rem]">アーカイブ情報</span>
@@ -638,15 +638,15 @@
                     <span class="text-[0.8rem]">🔗</span> リンククリック数 (click_stats)
                 </label>
                 <div class="grid grid-cols-3 gap-2">
-                    <div class="flex flex-col items-center justify-center border border-indigo-100 bg-white rounded-md py-2 shadow-sm">
+                    <div class="flex flex-col items-center justify-center border border-indigo-100 bg-white rounded-md py-2 ">
                         <span class="text-[0.55rem] font-bold text-slate-400 mb-0.5">Total</span>
                         <div class="font-bold text-indigo-600 text-[0.8rem]  mt-1"><span class="js-arc-total">0</span><span class="text-[0.5rem] text-slate-400 ml-0.5">回</span></div>
                     </div>
-                    <div class="flex flex-col items-center justify-center border border-emerald-100 bg-white rounded-md py-2 shadow-sm">
+                    <div class="flex flex-col items-center justify-center border border-emerald-100 bg-white rounded-md py-2 ">
                         <span class="text-[0.55rem] font-bold text-slate-400 mb-0.5">Unique</span>
                         <div class="font-bold text-emerald-500 text-[0.8rem]  mt-1"><span class="js-arc-unique">0</span><span class="text-[0.5rem] text-slate-400 ml-0.5">人</span></div>
                     </div>
-                    <div class="flex flex-col items-center justify-center border border-slate-200 bg-white rounded-md py-2 shadow-sm">
+                    <div class="flex flex-col items-center justify-center border border-slate-200 bg-white rounded-md py-2 ">
                         <span class="text-[0.55rem] font-bold text-slate-400 mb-0.5">Guest</span>
                         <div class="font-bold text-slate-900 text-[0.8rem]  mt-1"><span class="js-arc-guest">0</span><span class="text-[0.5rem] text-slate-400 ml-0.5">回</span></div>
                     </div>
@@ -666,7 +666,7 @@
             </div>
         </div>
         <!-- 各明細情報 -->
-        <div class="bg-white border border-slate-200 p-4 rounded-lg shadow-sm">
+        <div class="bg-white border border-slate-200 p-4 rounded-lg ">
             <div class="flex items-center gap-2 text-slate-900 font-bold mb-4">
                 <span class="text-[1.5rem]">📋</span>
                 <span class="text-[0.8rem]">各明細情報</span>
@@ -678,7 +678,7 @@
 
 <!-- 【ダイアログ子】明細1件分のアイテム -->
 <template id="tpl-archive-click-stats-item">
-    <div class="p-4 bg-white border border-slate-200 rounded-[1rem] shadow-sm mb-3">
+    <div class="p-4 bg-white border border-slate-200 rounded-[1rem]  mb-3">
         <!-- 上段：No、アイコン、タイトル -->
         <div class="flex justify-between items-start mb-2">
             <div class="flex items-center gap-2">

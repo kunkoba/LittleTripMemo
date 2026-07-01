@@ -74,10 +74,9 @@
 
 .shadow-brand {
     /* 画像・SVG 用（marker, 矢印, 赤丸） */
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
     /* div 用（ポップアップ） */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 /* リスト項目（アクティブ状態） */

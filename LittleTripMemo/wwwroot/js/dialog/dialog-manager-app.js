@@ -191,7 +191,7 @@ export default {
                 }
             },
             buttons: [[
-                { label: "CANCEL", className: "bg-slate-400 text-white shadow-md", handler: () => this._core.close() },
+                { label: "CANCEL", className: "bg-slate-400 text-white shadow-brand", handler: () => this._core.close() },
                 { label: "OK", handler: () => { if (onOk) onOk(txtCode.textContent); this._core.close(); } }
             ]]
         });

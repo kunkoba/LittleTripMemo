@@ -70,7 +70,7 @@ export default {
             buttons: [
                 {
                     label: "＋ CREATE",
-                    className: "w-full bg-brand-5 text-white shadow-md font-bold",
+                    className: "w-full bg-brand-5 text-white shadow-brand font-bold",
                     handler: () => {
                         this.ShowAdminNoticeEdit(null, () => {
                             this._core.close(); // 一覧を閉じる
@@ -137,14 +137,14 @@ export default {
             buttons:[[
                 {
                     label: "CANCEL",
-                    className: "bg-slate-400 text-white shadow-md",
+                    className: "bg-slate-400 text-white shadow-brand",
                     handler: () => {
 						this._core.close();
                     },
                 },
                 {
                     label: "SAVE",
-                    className: "bg-brand-5 text-white shadow-md",
+                    className: "bg-brand-5 text-white shadow-brand",
                     handler: async () => {
                         // 確認画面
                         const isOk = await this.ShowConfirm({ 
@@ -363,11 +363,11 @@ export default {
             scoreButtons.forEach(btn => {
                 const score = parseInt(btn.dataset.score);
                 if (score === currentScore) {
-                    btn.classList.add("bg-brand-5", "text-white", "shadow-md");
+                    btn.classList.add("bg-brand-5", "text-white", "shadow-brand");
                     btn.classList.remove("text-slate-400");
                 } else {
                     btn.classList.add("text-slate-400");
-                    btn.classList.remove("bg-brand-5", "text-white", "shadow-md");
+                    btn.classList.remove("bg-brand-5", "text-white", "shadow-brand");
                 }
             });
             // フィルタリング処理（★数 ＆ ワード）
@@ -490,7 +490,7 @@ export default {
             buttons: [[
                 {
                     label: "CANCEL",
-                    className: "bg-slate-400 text-white shadow-md",
+                    className: "bg-slate-400 text-white shadow-brand",
                     handler: () => this._core.close()
                 },
                 {

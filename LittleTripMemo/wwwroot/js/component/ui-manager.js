@@ -103,7 +103,7 @@ const UI_Manager = {
 			if (isShow && !badge) {
 				targetEl.classList.add('relative');
 				badge = document.createElement('span');
-				badge.className = 'js-unread-badge absolute bg-red-500 text-white font-bold flex items-center justify-center pointer-events-none shadow-sm whitespace-nowrap ';
+				badge.className = 'js-unread-badge absolute bg-red-500 text-white font-bold flex items-center justify-center pointer-events-none  whitespace-nowrap ';
 				if (type === 'dot') {
 					badge.className += 'w-3 h-3 rounded-full top-1 right-1 border-2 border-brand-1';
 				} else {
@@ -229,7 +229,7 @@ const UI_Manager = {
         if (!btn) return;
         if (isOn) {
             // ONのスタイル（発光する緑）
-            btn.classList.remove('bg-slate-700', 'text-slate-400', 'border-slate-600', 'shadow-md');
+            btn.classList.remove('bg-slate-700', 'text-slate-400', 'border-slate-600', 'shadow-brand');
             btn.classList.add(
                 'bg-emerald-500', 
                 'text-white', 
@@ -244,7 +244,7 @@ const UI_Manager = {
                 'border-emerald-400', 
                 'shadow-[0_0_20px_rgba(16,185,129,0.8)]'
             );
-            btn.classList.add('bg-slate-700', 'text-slate-400', 'border-slate-600', 'shadow-md');
+            btn.classList.add('bg-slate-700', 'text-slate-400', 'border-slate-600', 'shadow-brand');
         }
     },
 };

@@ -6,7 +6,7 @@
 <!-- 【リスト親】グループヘッダー -->
 <template id="tpl-list-group-header">
     <div class="flex items-center gap-2 mt-2 mb-3">
-        <div class="px-3 py-1 rounded-full text-[0.5rem] font-bold text-white flex items-center gap-1.5 shadow-md js-header-badge">
+        <div class="px-3 py-1 rounded-full text-[0.5rem] font-bold text-white flex items-center gap-1.5 shadow-brand js-header-badge">
             <span class="js-header-icon text-[0.8rem]"></span>
             <span class="js-header-title uppercase tracking-widest"></span>
         </div>
@@ -39,11 +39,11 @@
             <div class="js-face text-[24px] bg-brand-0 pb-1"></div>
             <div class="text-[0.5rem] font-bold text-slate-900 js-time tracking-wider bg-brand-0 px-1"></div>
         </div>
-        <div class="flex-1 bg-white rounded-[1rem] p-3 border border-slate-200 shadow-md relative overflow-hidden flex flex-col items-start gap-2">
-            <div class="js-index-badge absolute top-2 right-2 w-7 h-7 rounded-full bg-brand-4 text-white font-bold text-[0.8rem] flex items-center justify-center shadow-sm z-20"></div>
+        <div class="flex-1 bg-white rounded-[1rem] p-3 border border-slate-200 shadow-brand relative overflow-hidden flex flex-col items-start gap-2">
+            <div class="js-index-badge absolute top-2 right-2 w-7 h-7 rounded-full bg-brand-4 text-white font-bold text-[0.8rem] flex items-center justify-center  z-20"></div>
             
             <!-- ▼ 追加：野良化（Detach）ボタン（デフォルトは hidden） -->
-            <button class="js-btn-detach hidden absolute top-2 right-10 w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-400 flex items-center justify-center shadow-sm z-20 hover:bg-slate-100 active:scale-95 transition-all text-[0.8rem]">🗑</button>
+            <button class="js-btn-detach hidden absolute top-2 right-10 w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-400 flex items-center justify-center  z-20 hover:bg-slate-100 active:scale-95 transition-all text-[0.8rem]">🗑</button>
             
             <div class="border-l-4 border-brand-3 pl-2 py-0.5 w-full"><div class="js-title text-[0.8rem] font-bold text-slate-900 break-words "></div></div>
             <div class="js-price-wrapper pl-3 flex items-baseline italic w-full hidden"><span class="js-price text-[1rem] font-bold italic "></span><span class="js-price-unit text-[0.5rem] font-bold text-slate-400 ml-1.5 uppercase"></span></div>
@@ -54,14 +54,14 @@
 
 <!-- 【リスト子】シンプルリスト（検索結果・単発リスト用） -->
 <template id="tpl-list-child-search">
-    <div class="js-item-card relative flex flex-col p-4 rounded-[1rem] border border-slate-200 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3">
+    <div class="js-item-card relative flex flex-col p-4 rounded-[1rem] border border-slate-200 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-brand overflow-hidden mb-3">
         <div class="flex justify-between items-center mb-2">
             <div class="flex items-center gap-2">
                 <span class="js-index w-6 h-6 bg-slate-800 text-white text-[0.8rem] font-bold rounded-full flex items-center justify-center"></span>
                 <!-- 【変更】作成日時表示用spanをコンテナに変更 -->
                 <div class="js-date-container"></div>
             </div>
-            <div class="shrink-0 text-[1.5rem] drop-shadow-md js-face"></div>
+            <div class="shrink-0 text-[1.5rem] drop-shadow-brand js-face"></div>
         </div>
         <!-- 2. 所属まとめタイトル -->
         <div class="flex items-center gap-1.5 mb-1.5">
@@ -95,14 +95,14 @@
 
 <!-- 【リスト子】まとめ親一覧 -->
 <template id="tpl-list-child-archive">
-    <div class="js-item-card relative bg-white rounded-[1rem] shadow-md border border-brand-1 mb-3 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform">
+    <div class="js-item-card relative bg-white rounded-[1rem] shadow-brand border border-brand-1 mb-3 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform">
         <div class="js-item-border absolute left-0 top-0 bottom-0 w-1"></div>
         <div class="p-3 pl-4 flex flex-col gap-1">
             <div class="flex justify-between items-start mb-1">
                 <!-- 左：日付のみ -->
                 <span class="js-update-tim kb-date-tim-sm"></span>
                 <!-- 右：件数バッジ（背景色はJSで設定） -->
-                <div class="js-count-badge px-2.5 py-0.5 rounded-md text-[0.8rem] font-bold text-white shadow-sm italic tracking-tight">
+                <div class="js-count-badge px-2.5 py-0.5 rounded-md text-[0.8rem] font-bold text-white  italic tracking-tight">
                     <span class="js-count">0</span> memos
                 </div>
             </div>
@@ -122,7 +122,7 @@
 </template>
 <!-- 【リスト子】マルチセレクト用 -->
 <template id="tpl-multi-select-item">
-    <div class="js-item-card flex items-center gap-3 p-2.5 rounded-[1rem] border border-brand-2 bg-white cursor-pointer active:scale-[0.98] transition-all shadow-md mb-2">
+    <div class="js-item-card flex items-center gap-3 p-2.5 rounded-[1rem] border border-brand-2 bg-white cursor-pointer active:scale-[0.98] transition-all shadow-brand mb-2">
         <div class="shrink-0 w-5 h-5 rounded border border-brand-3 flex items-center justify-center js-checkbox transition-colors">
             <span class="text-white text-[0.8rem] font-bold js-check-mark hidden">✓</span>
         </div>
@@ -140,13 +140,13 @@
     <div class="js-item-card flex p-4 cursor-pointer active:scale-[0.98] transition-all overflow-hidden mb-3 relative border-2">
         <!-- 右上の固定アイコンエリア -->
         <div class="absolute top-2 right-2 flex flex-col items-end gap-1 z-10">
-            <span class="js-icon text-[1.5rem]  drop-shadow-sm"></span>
+            <span class="js-icon text-[1.5rem]  drop-"></span>
         </div>
         <!-- テキストエリア -->
         <div class="flex-1 min-w-0 pr-4 flex flex-col justify-center">
             <div>
                 <span class="js-date kb-date-tim-sm"></span>
-                <span class="hidden ml-3 js-badge-new bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">NEW</span>
+                <span class="hidden ml-3 js-badge-new bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ">NEW</span>
             </div>
             <div class="text-[0.8rem] font-bold text-slate-900 truncate js-title mt-2"></div>
             <div class="mt-2 text-[0.8rem] text-slate-900 line-clamp-1 js-body break-words "></div>
@@ -159,7 +159,7 @@
     <div class="p-4 flex flex-col">
         <div class="flex justify-between items-center mb-1.5">
             <div class="js-date kb-date-tim-sm"></div>
-            <div class="js-stars text-[1rem] text-yellow-500 tracking-widest  drop-shadow-sm"></div>
+            <div class="js-stars text-[1rem] text-yellow-500 tracking-widest  drop-"></div>
         </div>
         <div class="js-body text-[0.8rem] text-slate-900  line-clamp-1 break-words"></div>
     </div>
@@ -192,7 +192,7 @@
 
 <!-- 【リスト子】ステータス情報用 -->
 <template id="tpl-list-child-stats">
-    <div class="js-item-card relative flex flex-col p-4 rounded-[1rem] border border-slate-200 bg-white mb-3 shadow-md">
+    <div class="js-item-card relative flex flex-col p-4 rounded-[1rem] border border-slate-200 bg-white mb-3 shadow-brand">
         <!-- 1. 明細No、タイトル、絵文字 -->
         <div class="flex justify-between items-start mb-2">
             <div class="flex items-center gap-2">
@@ -223,7 +223,7 @@
 
 <!-- 【リスト子】ユーザ解析用（クリック集計） -->
 <template id="tpl-user-click-stats-item">
-    <div class="bg-white p-3 rounded-[1rem] border border-slate-200 shadow-sm">
+    <div class="bg-white p-3 rounded-[1rem] border border-slate-200 ">
         <div class="js-url text-blue-500 italic truncate mb-2 pb-1 border-b border-slate-50"></div>
         <div class="flex justify-around text-[0.8rem]">
             <div class="flex flex-col items-center">
@@ -244,7 +244,7 @@
 
 <!-- 【ダイアログ子】明細1件分のアイテム -->
 <template id="tpl-archive-click-stats-item">
-    <div class="p-4 bg-white border border-slate-200 rounded-[1rem] shadow-sm mb-3">
+    <div class="p-4 bg-white border border-slate-200 rounded-[1rem]  mb-3">
         <!-- 上段：No、アイコン、タイトル -->
         <div class="flex justify-between items-start mb-2">
             <div class="flex items-center gap-2">

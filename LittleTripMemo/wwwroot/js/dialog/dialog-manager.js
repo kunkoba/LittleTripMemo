@@ -12,9 +12,10 @@ const _DialogCore = {
     backdrop: null,
     stack:[],
     // 共通クラス定数
-    HEADER_BTN_CLASS: "w-9 h-9 bg-white rounded-full shadow-md flex items-center justify-center active:scale-95 border border-brand-2 transition-transform",
+    // HEADER_BTN_CLASS: "w-9 h-9 bg-white rounded-full shadow-brand flex items-center justify-center active:scale-95 border border-brand-2 transition-transform",
+    HEADER_BTN_CLASS: "w-9 h-9 bg-white rounded-full flex items-center justify-center active:scale-95 transition-transform",
     FOOTER_BTN_BASE:  "font-bold text-[0.8rem] h-12 rounded-[1rem] uppercase active:scale-95 transition-transform",
-    FOOTER_BTN_DEFAULT: "bg-brand-5 text-white shadow-md",
+    FOOTER_BTN_DEFAULT: "bg-brand-5 text-white shadow-brand",
     // 初期化
     init() {
         this.dialogRoot = $Dom.GetElementById(this.elementId);
@@ -70,8 +71,9 @@ const _DialogCore = {
                 footer: ['bg-white', 'border-t', 'border-slate-300']
             },
             user: { // デフォルト
-                frame:  ['bg-brand-0', 'border-2', 'border-brand-5', 'rounded-[1rem]'],
-                header: ['bg-brand-1'],
+                // frame:  ['bg-brand-0', 'border-2', 'border-brand-5', 'rounded-[1rem]'],
+                frame:  ['bg-brand-0', 'rounded-[1rem]'],
+                header: ['bg-brand-0'],
                 title:  ['text-brand-5'],
                 footer: ['bg-brand-1', 'border-t', 'border-brand-2']
             }
@@ -215,7 +217,7 @@ const DialogController = {
                 size: 'sm',
                 onClose: () => { if (!isResolved) resolve(false); },
                 buttons: [[
-                    { label: "CANCEL", className: "bg-slate-400 text-white shadow-md", handler: () => { isResolved = true; resolve(false); this._core.close(); } },
+                    { label: "CANCEL", className: "bg-slate-400 text-white shadow-brand", handler: () => { isResolved = true; resolve(false); this._core.close(); } },
                     { label: label, handler: () => { isResolved = true; resolve(true); this._core.close(); } }
                 ]]
             });
@@ -283,7 +285,7 @@ const DialogController = {
                 content: div,
                 onClose: () => { if (!isResolved) resolve(null); },
                 buttons: [[
-                    { label: "CANCEL", className: "bg-slate-400 text-white shadow-md", handler: () => { isResolved = true; resolve(null); this._core.close(); } },
+                    { label: "CANCEL", className: "bg-slate-400 text-white shadow-brand", handler: () => { isResolved = true; resolve(null); this._core.close(); } },
                     { label: label, handler: () => { isResolved = true; resolve(input.value); this._core.close(); } }
                 ]]
             });
