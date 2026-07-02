@@ -80,13 +80,13 @@ public class SystemMaintenanceWorker : BackgroundService
         });
     }
 
-    private DateTime _nextReactionUpdateTime = DateTime.Now;
-    private DateTime _nextTableStatsUpdateTime = DateTime.Now;
-    private DateTime _nextGarbageCleanupTime = DateTime.Now;
-    private DateTime _nextClickAggregateTime = DateTime.Now;
-    private DateTime _nextUserSummaryUpdateTime = DateTime.Now;
-    private DateTime _nextReportStatsUpdateTime = DateTime.Now;
-    private DateTime _nextAppInfoUpdateTime = DateTime.Now;
+    private DateTime _nextReactionUpdateTime = DateTime.Now.AddMinutes(1);
+    private DateTime _nextTableStatsUpdateTime = DateTime.Now.AddMinutes(2);
+    private DateTime _nextGarbageCleanupTime = DateTime.Now.AddMinutes(3);
+    private DateTime _nextClickAggregateTime = DateTime.Now.AddMinutes(4);
+    private DateTime _nextUserSummaryUpdateTime = DateTime.Now.AddMinutes(5);
+    private DateTime _nextReportStatsUpdateTime = DateTime.Now.AddMinutes(6);
+    private DateTime _nextAppInfoUpdateTime = DateTime.Now.AddMinutes(7);
 
     /// <summary>
     /// バッチ処理のメインループ。1分ごとに各タスクをチェックして必要に応じて実行する

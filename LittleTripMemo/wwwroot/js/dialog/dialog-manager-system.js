@@ -27,7 +27,7 @@ export default {
     ShowSystemMenu() {
         const el = $Dom.GenerateTemplate('tpl-menu-sys');
         const isLoggedIn = $App.AppData.Context.IsLoggedIn;
-        const isAdmin = isLoggedIn && $App.AppData.Owner.plan === "Admin";
+        const isAdmin = isLoggedIn && $App.AppData.Owner.Plan === "Admin";
         const b = {
             notice:  $Dom.QuerySelector('#btn-sys-notice', el),
             version: $Dom.QuerySelector('#btn-sys-version', el),
@@ -381,7 +381,7 @@ export default {
         };
         renderView();
 		const headerButtons = [];
-        const isAdmin = $App.AppData.Owner.plan === "Admin"; // 管理者判定
+        const isAdmin = $App.AppData.Owner.Plan === "Admin"; // 管理者判定
         if (isOwner || isAdmin) {
             // 統計アイコン
             headerButtons.push({
@@ -448,7 +448,7 @@ export default {
         };
         renderView();
 		const headerButtons = [];
-        const isAdmin = $App.AppData.Owner.plan === "Admin"; // 管理者判定
+        const isAdmin = $App.AppData.Owner.Plan === "Admin"; // 管理者判定
         if (isOwner || isAdmin) {
             // 統計アイコン
             headerButtons.push({
@@ -744,7 +744,7 @@ export default {
         });
         // ▼ ヘッダーボタンの追加（管理者の場合のみ）
         const headerButtons = [];
-        if ($App.AppData.Owner.plan === "Admin") {
+        if ($App.AppData.Owner.Plan === "Admin") {
             headerButtons.push({
                 label: "🕒",
                 handler: () => this.ShowAdminUserHistory(profile) // 行動履歴画面の呼び出し
@@ -755,7 +755,7 @@ export default {
             });
         }
         // 強制アクション
-        const isAdmin = $App.AppData.Owner.plan === "Admin";
+        const isAdmin = $App.AppData.Owner.Plan === "Admin";
         if (isAdmin && !profile.is_owner) {
             const banCtrl = $Dom.QuerySelector('#admin-ban-control', el);
             const btnBan = $Dom.QuerySelector('#btn-admin-ban', el);

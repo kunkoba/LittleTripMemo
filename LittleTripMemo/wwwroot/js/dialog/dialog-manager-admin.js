@@ -18,7 +18,7 @@ export default {
     async ShowAdminNoticeList() {
         const isSuccess = await $Data.Access.GetAdminNotifications();
         if (!isSuccess) return;
-        const notices = $App.AppData.Admin.notifications ||[];
+        const notices = $App.AppData.Admin.Notifications ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         // root.className = "w-full text-slate-400 mb-2 px-1";
         const renderList = async () => {
@@ -180,7 +180,7 @@ export default {
     async ShowAdminReportList() {
         const isSuccess = await $Data.Access.GetReportSummary();
         if (!isSuccess) return;
-        const reportSummary = $App.AppData.Admin.reportSummary || [];
+        const reportSummary = $App.AppData.Admin.ReportSummary || [];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         if (reportSummary.length === 0) {
             root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">通報データはありません</div>`;
@@ -343,7 +343,7 @@ export default {
         const filterBar = $Dom.QuerySelector(".sticky", frame);
         filterBar.insertBefore(searchBar, filterBar.firstChild);
         // データと状態の初期化
-        const allData = $App.AppData.Admin.feedbackList || [];
+        const allData = $App.AppData.Admin.FeedbackList || [];
         let currentScore = 0;
         let filterText = "";
         // ★数の集計（件数計算）
@@ -519,7 +519,7 @@ export default {
     async ShowAdminUserMailList() {
         const isSuccess = await $Data.Access.GetSentUserMailList();
         if (!isSuccess) return;
-        const mails = $App.AppData.Admin.userMailList  || []; // API側で notifications に格納される想定
+        const mails = $App.AppData.Admin.UserMailList  || []; // API側で notifications に格納される想定
         const root = $Dom.GenerateTemplate("tpl-list-parent");
         if (mails.length === 0) {
             root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">送信済みメッセージはありません</div>`;

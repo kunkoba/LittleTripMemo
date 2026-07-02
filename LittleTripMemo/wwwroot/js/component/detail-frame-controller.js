@@ -162,7 +162,7 @@ const _DetailFrameCore = {
                         await $Data.Store.UpdateDetail(detail);
                         // 描画更新
                         $Marker.RefreshPointMarker();
-                        $Marker.RefreshCurrentLocation();
+                        // $Marker.RefreshCurrentLocation();
                         // パネルを閉じる
                         this.toggleDetailPanel(false);
                         // 通知

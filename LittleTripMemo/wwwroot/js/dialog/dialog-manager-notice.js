@@ -229,12 +229,12 @@ export default {
             $Dom.ToggleShow(badge, isNew);
             if (isNew) {
                 // 【未読】ブランドカラーの太枠 ＋ 強い影 ＋ 白背景
-                el.classList.remove("border-slate-200", "", "bg-slate-50");
+                el.classList.remove("border-slate-200", "shadow-brand", "bg-slate-50");
                 el.classList.add("border-brand-5", "shadow-brand", "bg-white");
             } else {
                 // 【既読】薄いグレー枠 ＋ 影なし ＋ わずかにグレー背景
                 el.classList.remove("border-brand-5", "shadow-brand", "bg-white");
-                el.classList.add("border-slate-200", "", "bg-slate-50");
+                el.classList.add("border-slate-200", "shadow-brand", "bg-slate-50");
                 // テキストも少し薄くする
                 el.style.opacity = "0.8";
             }
@@ -360,10 +360,10 @@ export default {
             $Dom.ToggleShow(badge, isNew);
             if (isNew) {
                 el.classList.add("border-brand-5", "shadow-xl", "bg-white");
-                el.classList.remove("border-slate-200", "", "bg-slate-50");
+                el.classList.remove("border-slate-200", "shadow-brand", "bg-slate-50");
             } else {
                 el.classList.remove("border-brand-5", "shadow-xl", "bg-white");
-                el.classList.add("border-slate-200", "", "bg-slate-50");
+                el.classList.add("border-slate-200", "shadow-brand", "bg-slate-50");
                 el.style.opacity = "0.8";
             }
         };

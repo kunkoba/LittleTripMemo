@@ -34,7 +34,7 @@ const UI_Manager = {
             // テンプレートからボタンDOMを生成
             const btn = $Dom.GenerateTemplate("tpl-link-button", "ui-template-root");
             // アイコンの注入（サイズは28px固定）
-            btn.innerHTML = $Util.GetUrlIconHtml(url, 28);
+            btn.innerHTML = $Util.GetUrlIconHtml(url, 36);
             // クリック時の振る舞いを定義
             btn.onclick = async (e) => {
                 e.stopPropagation();

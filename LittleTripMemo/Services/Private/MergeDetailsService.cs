@@ -29,7 +29,7 @@ public class MergeDetailsService(
         string? title
     ) : ILoginUserRequest;
 
-    public record Response(int archive_id, int updated_count);
+    public record Response(int archiveId);
 
     /// <summary>
     /// 明細の統合処理を実行する
@@ -57,14 +57,14 @@ public class MergeDetailsService(
             });
 
             // ② 指定された明細（子）に作成したアーカイブIDをセットして紐付ける
-            var updatedCount = await detailRepository.UpdateArchiveIdBySeqsAsync(archiveId, req.seqs);
+            await detailRepository.UpdateArchiveIdBySeqsAsync(archiveId, req.seqs);
 
             // ③ アーカイブ側の明細件数カウントを最新状態に更新
             await archiveRepository.UpdateDetailCountAsync(archiveId);
 
             transaction.Commit();
 
-            return new Response(archiveId, updatedCount);
+            return new Response(archiveId);
         }
         catch
         {

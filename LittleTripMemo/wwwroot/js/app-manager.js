@@ -18,12 +18,13 @@ const AppManager = {
             SystemInfo: null,
             FontSize: 'standard',
             LastLoginDate: null,
+            Plan: null,
         },
         Admin: {
-            notifications:[],
-            reportSummary: [],
-            feedbackList:[],
-            userMailList: [],
+            Notifications:[],
+            ReportSummary: [],
+            FeedbackList:[],
+            UserMailList: [],
         }
     },
     // iPhoneのキーボード対策（入力中を考慮）
@@ -153,33 +154,31 @@ const AppManager = {
     // Service Workerの登録と更新監視（Init処理の最後）
     _initServiceWorker() {
         if (!('serviceWorker' in navigator)) return;
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').then(reg => {
-                console.log('[SW] 登録完了スコープ:', reg.scope);
-                // 更新が見つかった場合のイベント
-                reg.addEventListener('updatefound', () => {
-                    const newWorker = reg.installing;
-                    newWorker.addEventListener('statechange', async () => {
-                        // 新しいSWがインストール完了し、かつ既存のSWが存在する場合（＝アップデート時）
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            console.log('[SW] 新しいバージョンが利用可能です');
-                            // ユーザーに更新を促すダイアログを表示
-                            const isOk = await $Dialog.ShowConfirm({
-                                title: "UPDATE",
-                                message: "アプリの新しいバージョンが利用可能です。\n最新版に更新しますか？",
-                                label: "UPDATE",
-                                help: ""
-                            });
-                            if (isOk) {
-                                // 画面を強制リロードして最新のキャッシュ(Network First)を適用
-                                window.location.reload(true);
-                            }
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            console.log('[SW] 登録完了スコープ:', reg.scope);
+            // 更新が見つかった場合のイベント
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', async () => {
+                    // 新しいSWがインストール完了し、かつ既存のSWが存在する場合（＝アップデート時）
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        console.log('[SW] 新しいバージョンが利用可能です');
+                        // ユーザーに更新を促すダイアログを表示
+                        const isOk = await $Dialog.ShowConfirm({
+                            title: "UPDATE",
+                            message: "アプリの新しいバージョンが利用可能です。\n最新版に更新しますか？",
+                            label: "UPDATE",
+                            help: ""
+                        });
+                        if (isOk) {
+                            // 画面を強制リロードして最新のキャッシュ(Network First)を適用
+                            window.location.reload(true);
                         }
-                    });
+                    }
                 });
-            }).catch(err => {
-                console.error('[SW] 登録失敗:', err);
             });
+        }).catch(err => {
+            console.error('[SW] 登録失敗:', err);
         });
     },
     // アプリ起動時フロー

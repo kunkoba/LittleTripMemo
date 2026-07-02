@@ -11,8 +11,6 @@ const _DetailContentCore = {
                 {
                     this.displayRoot = $Dom.GetElementById("detail-display");
                     this.displayIndexBadge = $Dom.QuerySelector(".js-index-badge", this.displayRoot);
-                    // this.displayDate = $Dom.GetElementById("detail-display-memo_date");
-                    // this.displayTime = $Dom.GetElementById("detail-display-memo_time");
                     this.displayDateContainer = $Dom.GetElementById("detail-display-date-container");
                     this.displayFaceEmoji = $Dom.GetElementById("detail-display-face_emoji");
                     this.displayFaceEmojiBg = $Dom.GetElementById("detail-display-face_emoji_bg");
@@ -21,10 +19,8 @@ const _DetailContentCore = {
                     this.displayBody = $Dom.GetElementById("detail-display-body");
                     this.displayPrice = $Dom.GetElementById("detail-display-memo_price");
                     this.displayPriceUnit = $Dom.GetElementById("detail-display-price-unit");
-                    // this.displayUrlText = $Dom.GetElementById("detail-display-link_url");
                     // 追加：表示制御用ラッパー
                     this.displayPriceWrapper = $Dom.GetElementById("detail-display-price-wrapper");
-                    // this.displayPriceLabel = $Dom.GetElementById("detail-display-price-label");
                     this.displayUrlWrapper = $Dom.GetElementById("detail-display-url-wrapper");
                 }
                 // --- 編集用（Editモード） ---

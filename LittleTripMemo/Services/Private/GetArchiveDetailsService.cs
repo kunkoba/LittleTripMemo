@@ -37,16 +37,16 @@ public class GetArchiveDetailsService(
 
         // 2. 存在チェック（冒頭で親データの存在を確認）
         var archive = await archiveRepository.GetByKeyAsync(req.archive_id);
-        BusinessException.ThrowIf(archive == null, "指定されたまとめが見つかりません。");
+        BusinessException.ThrowIf(archive == null, $"指定されたまとめが見つかりません。(id: {req.archive_id})");
 
         // 3. 明細の取得と存在チェック
         var details = await detailRepository.GetByArchiveIdAsync(req.archive_id);
         // リストが空の場合は異常（本来は明細0で自動解体されるため）
-        BusinessException.ThrowIf(!details.Any(), "まとめの中に明細が見つかりません。");
+        BusinessException.ThrowIf(details == null, $"まとめの中に明細が見つかりません。(id: {req.archive_id})");
 
         // 4. 所有者情報の取得
         var ownerUser = await appUserRepository.GetByUserIdAsync(archive!.user_id);
-        BusinessException.ThrowIf(ownerUser == null, "まとめの所有者情報が見つかりません。");
+        BusinessException.ThrowIf(ownerUser == null, $"まとめの所有者情報が見つかりません。(id: {req.archive_id})");
 
         // 5. フラグセットと返却準備
         SetAppFlags(archive);

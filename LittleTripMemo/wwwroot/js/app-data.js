@@ -1,5 +1,5 @@
-// const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
-const BaseUrl = "https://localhost:7292";
+// const BaseUrl = "https://localhost:7292";
+const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
 // const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
 const API_ENDPOINTS = {
     // Account
@@ -141,10 +141,14 @@ window.$Data = {
             const data = structuredClone(result.data);  // 値渡し
             // メイン処理
             $App.AppData.Context.IsLoggedIn = result.is_logged_in ?? false;
-            $App.AppData.Owner.plan = result.plan;
+            $App.AppData.Owner.Plan = result.plan;
+            if (result.new_token) {
+                console.log("token1:", $App.AppData.Owner.Token);
+                $App.AppData.Owner.Token = result.new_token;    // 新しいトークンがあれば上書き更新する
+                console.log("token2:", $App.AppData.Owner.Token);
+            }
             // 取得データを内部に保持
             this._setData(data);
-            
             // ベース情報をStoreに保持
             $Data.Store.Restore();
             return true;
@@ -188,10 +192,10 @@ window.$Data = {
             if (data.myFeedback) $App.AppData.Owner.myFeedback = data.myFeedback;
             if (data.myReport) $App.AppData.Owner.myReport = data.myReport;
             // 管理者用：各取得APIのレスポンスを Admin に格納
-            if (data.notifications) $App.AppData.Admin.notifications = data.notifications;
-            if (data.reportSummary) $App.AppData.Admin.reportSummary = data.reportSummary;
-            if (data.feedbackList) $App.AppData.Admin.feedbackList = data.feedbackList;
-            if (data.userMailList) $App.AppData.Admin.userMailList = data.userMailList;
+            if (data.notifications) $App.AppData.Admin.Notifications = data.notifications;
+            if (data.reportSummary) $App.AppData.Admin.ReportSummary = data.reportSummary;
+            if (data.feedbackList) $App.AppData.Admin.FeedbackList = data.feedbackList;
+            if (data.userMailList) $App.AppData.Admin.UserMailList = data.userMailList;
             console.log(">>$App.AppData:", $App.AppData);
         },
         // 定形APIの展開（自動生成モジュールのマージ）

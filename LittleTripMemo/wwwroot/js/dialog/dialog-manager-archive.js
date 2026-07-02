@@ -457,7 +457,7 @@ export default {
     // まとめ親詳細参照（アーカイブ）
     ShowArchiveInfo() {
         const archive = $Data.Store.GetArchive();
-        const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.plan === "Admin";
+        const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.Plan === "Admin";
         const el = $Dom.GenerateTemplate('tpl-view-archive');
         // ── スタイル定義（ボタンの状態別クラス） ──────────────────
         const STYLE_BASE = "flex-1 h-11 font-bold text-[0.8rem] rounded-lg tracking-wider outline-none";

@@ -45,32 +45,6 @@ export default {
         b.restore.onclick = () => { this._core.close(); $Marker.RestoreMarkers(); };
         this._core.open({ title: "ACTIONS", content: el });
     },
-    // 絵文字選択（定数リスト＋履歴保存、入力欄反映・OK確定）
-    ShowEmojiPicker(onSelect) {
-        const el = $Dom.GenerateTemplate("tpl-emoji-picker");
-        const container = $Dom.QuerySelector('#emoji-combined-grid', el);
-        // Emoji Martのピッカーを初期化
-        const picker = new EmojiMart.Picker({
-            onEmojiSelect: (emoji) => {
-                // 絵文字を選択した瞬間に反映してダイアログを閉じる
-                onSelect(emoji.native);
-                this._core.close();
-            },
-            locale: 'ja',            // 日本語化
-            previewPosition: 'none', // 下部のプレビューエリアを隠す
-            skinTonePosition: 'none', // スキントーン選択を隠す
-        });
-        picker.style.setProperty('--emoji-size', '2rem');
-        // コンテナにピッカーを注入
-        container.appendChild(picker);
-        // ダイアログを表示
-        this._core.open({
-            title: "SELECT ICON",
-            content: el,
-            help: "",
-            buttons: []
-        });
-    },
     // 座標・住所指定で移動する
     PointSearchGoogle(onOk) {
         const el = $Dom.GenerateTemplate('tpl-point-search-google');

@@ -1,4 +1,5 @@
 ﻿using LittleTripMemo.Common;
+using LittleTripMemo.JWT;
 using LittleTripMemo.Services.Core;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,9 +13,10 @@ namespace LittleTripMemo.Controllers;
 [CustomAuthorize] // 認証必須
 public class CoreController(
     UserContext userContext,
+    JwtService jwtService,
     GetCoreConfigService getCoreConfigService,
     UpdateCoreConfigService updateCoreConfigService
-) : _BaseController(userContext)
+) : _BaseController(userContext, jwtService)
 {
     /// <summary>
     /// 現在のシステム設定一覧を取得（管理者のみ）

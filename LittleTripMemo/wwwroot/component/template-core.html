@@ -1,7 +1,7 @@
 <!-- トースト用 -->
 <template id="tpl-toast">
     <div class="flex justify-center w-full">
-        <div class="flex items-center justify-center px-4 py-2 shadow-brand max-w-[500px] w-[90vw]
+        <div class="flex items-center justify-center px-4 py-2 shadow-brand w-full _max-w-[500px] _w-[90vw]
             opacity-0 translate-y-2 transition-all duration-300 pointer-events-auto z-[9999]">
             <span class="message text-[0.8rem] font-bold text-center w-full block"></span>
         </div>
@@ -47,7 +47,7 @@
 </template>
 
 <!-- 【ダイアログ子】絵文字ピッカー -->
-<template id="tpl-emoji-picker">
+<template id="tpl-emoji-picker_2">
     <div class="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 touch-none">
         <div class="p-3 border-0 bg-white rounded-[1rem] shadow-2xl flex flex-col overflow-hidden animate-fade-in">
             <div class="h-16 px-5 flex justify-between items-center shrink-0 border-b border-slate-100 bg-slate-50/50">
@@ -58,6 +58,23 @@
                 <button class="js-close w-9 h-9 bg-white rounded-full shadow-brand text-slate-400 flex items-center justify-center font-bold active:scale-95 transition-transform border border-slate-100">✖</button>
             </div>
             <div id="emoji-mart-container" class="w-full bg-white"></div>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】絵文字ピッカー -->
+<template id="tpl-emoji-picker">
+    <div class="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 touch-none">
+        <!-- ↓ 幅と高さを強制（w-full max-w-[500px] h-[85vh] を付与） -->
+        <div class="w-full max-w-[500px] h-[85vh] p-3 border-0 bg-white rounded-[1rem] shadow-2xl flex flex-col overflow-hidden animate-fade-in">
+            <div class="h-16 px-5 flex justify-between items-center shrink-0 border-b border-slate-100 bg-slate-50/50">
+                <div class="flex flex-col">
+                    <span class="text-[0.8rem] text-slate-500 uppercase tracking-[0.2em]">Select Icon</span>
+                    <span class="text-[1.2rem] text-brand-5 italic uppercase ">Marker Library</span>
+                </div>
+                <button class="js-close w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center font-bold active:scale-95 transition-transform border border-slate-100">✖</button>
+            </div>
+            <!-- ↓ flex-1 を追加して親の縦幅を完全に埋め尽くす -->
+            <div id="emoji-mart-container" class="flex-1 w-full bg-white overflow-hidden"></div>
         </div>
     </div>
 </template>
@@ -140,10 +157,10 @@
             <!-- 【変更】個別spanを廃止し、コンテナを設置 -->
             <div class="js-date-container"></div>
         </div>
-        <div class="text-[1rem] border-l-4 border-brand-3 pl-3 pr-8 py-2 my-2 font-bold text-slate-900 line-clamp-1 relative z-10">
-            <span class="title"></span>
+        <div class="text-[1rem] border-l-4 border-brand-3 pl-3 pr-8 py-2 my-2 font-bold text-slate-900 relative z-10">
+            <span class="title line-clamp-1"></span>
         </div>
-        <div class="text-[0.8rem] text-slate-400 line-clamp-4 overflow-y-auto px-2">
+        <div class="text-[0.8rem] text-slate-400 line-clamp-4 overflow-y-auto px-2 leading-[1.8]">
             <span class="body"></span>
         </div>
         <button id="btn-popup-action" class="mt-2 w-full h-10 bg-brand-2 text-brand-5 font-bold text-[0.8rem] border-y-2 border-brand-3  items-center justify-center gap-1 uppercase shadow-brand active:scale-95 transition-transform tracking-widest">
@@ -316,7 +333,7 @@
 
 <!-- 【部品】共通リンクボタン -->
 <template id="tpl-link-button">
-    <button type="button" class="shrink-0 w-12 h-12 shadow-brand rounded-full flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50"></button>
+    <button type="button" class="shrink-0 w-12 h-12 shadow-brand rounded-[1rem] flex items-center justify-center bg-white active:scale-95 transition-transform overflow-hidden border border-slate-50"></button>
 </template>
 
 <!-- 【部品】ユーザアイコン：ボタンタイプ（影あり・反応あり） -->

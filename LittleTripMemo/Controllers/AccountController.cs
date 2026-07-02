@@ -1,4 +1,5 @@
 ﻿using LittleTripMemo.Common;
+using LittleTripMemo.JWT;
 using LittleTripMemo.Services.Account;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,12 +12,13 @@ namespace LittleTripMemo.Controllers;
 [Route("api/[controller]")]
 public class AccountController(
     UserContext userContext,
+    JwtService jwtService, 
     RegistrationUserService registrationUserService,
     UpdateUserProfileService updateUserProfileService,
     EnsureLoginUserService ensureLoginUserService,
     GetUserProfileService getUserProfileService,
     WithdrawalUserService withdrawalUserService
-) : _BaseController(userContext)
+) : _BaseController(userContext, jwtService)
 {
     /// <summary>
     /// Firebase認証の結果を受け取り、アプリ側へのログインまたは新規登録を行う

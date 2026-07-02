@@ -70,7 +70,7 @@
         <div id="ui-top-bar" class="absolute top-0 left-0 right-2 z-[1000] pointer-events-none">
             <!-- ■　通知バー -->
             <div class="h-6 shadow-brand_ bg-black/20 flex items-center justify-center">
-                <div id="notice-bar-text" class="text-[0.8rem] font-bold text-white"></div>
+                <div id="notice-bar-text" class="text-[0.9rem] font-bold text-white"></div>
             </div>
             <!-- ■　アイコンバー -->
             <div class="mx-2 bg-transparent flex justify-center mt-2">
@@ -170,7 +170,7 @@
                         </div>
                         <!-- 背景用の巨大顔文字：上部に固定（スクロールしても動かない） -->
                         <div class="sticky top-[100px] w-full h-0 pointer-events-none z-0 flex justify-center">
-                            <div id="detail-display-face_emoji_bg" class="text-[160px] opacity-[0.2] select-none -translate-y-4"></div>
+                            <div id="detail-display-face_emoji_bg" class="text-[160px] opacity-[0.1] select-none -translate-y-4"></div>
                         </div>
                         <!-- メインコンテンツ：ここを縦並び・左揃えに設定 -->
                         <div class="relative z-10 flex flex-col items-start flex-1">
@@ -184,8 +184,8 @@
                                 </div>
                             </div>
                             <!-- 4. タイトル（左揃え・1rem・左アクセント） -->
-                            <div class="border-l-4 border-brand-3 pl-3 py-0.5 mt-4">
-                                <h1 id="detail-display-title" class="text-[1.2rem] font-bold text-slate-900  break-words"></h1>
+                            <div class="border-l-4 border-brand-3 pl-3 py-4 mt-4">
+                                <h1 id="detail-display-title" class="text-[1.5rem] font-bold text-slate-900  break-words"></h1>
                             </div>
                             <!-- 2. 金額（左揃え・1rem） -->
                             <div id="detail-display-price-wrapper" class="hidden pl-3 mt-2 flex items-baseline italic">
@@ -277,10 +277,10 @@
                         <div>
                             <div class="flex justify-between items-end mb-1">
                                 <label class="font-bold text-slate-400 text-[0.5rem] uppercase tracking-wider">MEMORY DETAIL</label>
-                                <div class="text-[0.5rem] text-slate-400 font-bold"><span id="detail-count-body">0</span>/300</div>
+                                <div class="text-[0.5rem] text-slate-400 font-bold"><span id="detail-count-body">0</span>/1000</div>
                             </div>
-                            <textarea name="body" id="detail-edit-body" maxlength="300" 
-                                class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+                            <textarea name="body" id="detail-edit-body" maxlength="1000" 
+                                class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[400px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
                         </div>
                         <!-- PRICE -->
                         <div>
@@ -470,7 +470,7 @@
         </div>
 
         <!-- ■　Toast を積み上げるコンテナ -->
-        <div id="toast-container" class="absolute bottom-[170px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
+        <div id="toast-container" class="absolute bottom-[70px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
 
         <!-- ヘルプメッセージ -->
         <div id="ui-help-dialog" onclick="if(event.target === this) this.classList.add('hidden')"

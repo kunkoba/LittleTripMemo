@@ -22,13 +22,13 @@ public class GetSystemInfoService(
     /// システム情報のデータ構造
     /// </summary>
     public record SystemInfoData(
-    Guid login_user_id,
-    TAppInfo app_info,
-    IEnumerable<DtoFeedbackDetail> feedbacks,
-    IEnumerable<TSysNotification> notifications,
-    DtoUserProfile? ownerProfile,
-    IEnumerable<TSysUserNotification>? userNotifications,
-    IEnumerable<DtoMyReportDetail>? myReports
+        Guid login_user_id,
+        TAppInfo app_info,
+        IEnumerable<DtoFeedbackDetail> feedbacks,
+        IEnumerable<TSysNotification> notifications,
+        DtoUserProfile? ownerProfile,
+        IEnumerable<TSysUserNotification>? userNotifications,
+        IEnumerable<DtoMyReportDetail>? myReports
     );
 
 public record Response(SystemInfoData systemInfo);

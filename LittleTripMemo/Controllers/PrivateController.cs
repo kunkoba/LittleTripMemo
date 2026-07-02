@@ -1,4 +1,5 @@
 ﻿using LittleTripMemo.Common;
+using LittleTripMemo.JWT;
 using LittleTripMemo.Services.Private;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ namespace LittleTripMemo.Controllers;
 [CustomAuthorize]
 public class PrivateController(
     UserContext userContext,
+    JwtService jwtService,
     GetUnMergeDetailsService getUnMergeDetailsService,
     GetArchiveDetailsService getArchiveDetailsService,
     GetArchiveListService getArchiveListService,
@@ -22,7 +24,7 @@ public class PrivateController(
     BulkSyncDetailsService bulkSyncDetailsService,
     PublishArchiveService publishArchiveService,
     RecreatePublicArchiveService recreatePublicArchiveService // ★救済機能を追加
-) : _BaseController(userContext)
+) : _BaseController(userContext, jwtService)
 {
     [HttpPost("GetUnMergeDetails")]
     public async Task<IActionResult> GetUnMergeDetails([FromBody] GetUnMergeDetailsService.GetUnMergeDetailsReq req)
