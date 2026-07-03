@@ -80,7 +80,7 @@ public class RegistrationUserService
             table_id = table_id,
             plan_type = PlanType.Free.ToString(),
             nick_name = $"旅人_{identityUser.Id.ToString()[..8]}", // 例: User_b34d9452
-            icon = "❔"
+            icon = "👤"
         };
         await _appUserRepo.InsertAsync(appUser);
 

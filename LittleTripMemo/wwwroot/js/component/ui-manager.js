@@ -49,7 +49,7 @@ const UI_Manager = {
                 // 信頼できないURLの場合はGoogle検索を経由する旨をユーザーに通知
                 const message = isSafe 
                     ? `次のリンクを開きます。よろしいですか？\n\n${url}`
-                    : `安全性が確認されていないURLのため、Google検索結果を経由して開きます。\n\n${url}`;
+                    : `安全性が確認されていないURLのため、\nGoogle検索結果を経由して開きます。\n\n${url}`;
                 // 3. ユーザーの最終確認
                 const isOk = await $Dialog.ShowConfirm({ title, message });
                 if (!isOk) return;

@@ -499,8 +499,7 @@ export default {
             $Dom.QuerySelector('#view-mem-price-unit', el).textContent =
                 arc.currency_unit || $App.AppData.Owner.Currency_unit || 'JPY';
             // 距離
-            $Dom.QuerySelector('#mem-stat-distance', el).textContent =
-                $Util.GetTotalDistance(details).toFixed(1) + " km";
+            $Dom.QuerySelector('#mem-stat-distance', el).textContent = $Util.GetTotalDistance(details).toFixed(1);
             // 件数表示とクリックイベント
             const btnTimeline = $Dom.QuerySelector('#btn-view-mem-timeline', el);
             const countText = $Dom.QuerySelector('#mem-stat-count', el);
@@ -574,7 +573,6 @@ export default {
         const renderLimitedToggle = (arc, onChanged) => {
             const limitArea = $Dom.QuerySelector('#archive-limit-btn-area', el);
             const btnLimit = $Dom.QuerySelector('#btn-toggle-limited', el);
-            console.log("arc:", arc)
             if (!(arc.is_owner && arc.is_public && !arc.closed_flg)) {
                 $Dom.ToggleShow(limitArea, false);
                 return;
@@ -680,7 +678,7 @@ export default {
         });
     },
     // URL公開画面
-    ShowShareArchive(archive, profile, shareUrl) {
+    ShowShareArchive_2(archive, profile, shareUrl) {
         const el = $Dom.GenerateTemplate('tpl-share-archive');
         // 1. タイトルの反映
         $Dom.QuerySelector('#share-archive-title', el).textContent = archive.title || "No Title";
@@ -701,6 +699,65 @@ export default {
             size: 'sm',
             help: "",
             buttons: [] // CLOSEボタンは右上の✖で代用し、下部はコピーボタンのみにする
+        });
+    },
+    // URL公開画面
+    ShowShareArchive(archive, profile, shareUrl) {
+        const el = $Dom.GenerateTemplate('tpl-share-archive');
+        // 1. タイトルの反映
+        $Dom.QuerySelector('#share-archive-title', el).textContent = archive.title || "No Title";
+        // 2. QRコードの生成 (無料APIを利用)
+        const qrImg = $Dom.QuerySelector('#share-qr-image', el);
+        qrImg.src = shareUrl;
+        // 3. コピー処理 (QRボタンをクリックでコピー)
+        $Dom.QuerySelector('#btn-share-copy', el).onclick = () => {
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                $Notice.Info("URLをクリップボードにコピーしました！");
+            }).catch(err => {
+                $Notice.Error("コピーに失敗しました");
+            });
+        };
+        // 4. SNSシェアボタンの処理
+        $Dom.QuerySelector('#btn-share-line', el).onclick = async () => {
+            const isOk = await $Dialog.ShowConfirm({
+                title: "LINE 連携",
+                message: "LINE を起動してもよろしいですか？",
+                label: "LINE を起動する",
+                help: ""
+            });
+            if (isOk) {
+                window.open($Util.GetShareUrl('line', shareUrl), '_blank');
+            }
+        };
+        $Dom.QuerySelector('#btn-share-x', el).onclick = async () => {
+            const isOk = await $Dialog.ShowConfirm({
+                title: "X 連携",
+                message: "X（旧Twitter）を起動してもよろしいですか？",
+                label: "X を起動する",
+                help: ""
+            });
+            if (isOk) {
+                window.open($Util.GetShareUrl('x', shareUrl, archive.title), '_blank');
+            }
+        };
+        $Dom.QuerySelector('#btn-share-fb', el).onclick = async () => {
+            const isOk = await $Dialog.ShowConfirm({
+                title: "facebook 連携",
+                message: "facebook を起動してもよろしいですか？",
+                label: "facebook を起動する",
+                help: ""
+            });
+            if (isOk) {
+                window.open($Util.GetShareUrl('facebook', shareUrl), '_blank');
+            }
+        };
+        // 
+        this._core.open({
+            title: "SHARE ARCHIVE",
+            content: el,
+            size: 'sm',
+            help: "",
+            buttons: [] // CLOSEボタンは右上の✖で代用
         });
     },
     // 状態変更専用ダイアログ

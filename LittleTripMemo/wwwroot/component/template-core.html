@@ -40,9 +40,14 @@
 </template>
 
 <!-- 【ダイアログ子】保存前確認 -->
-<template id="tpl-confirm-base">
+<template id="tpl-confirm-base_2">
     <div class="p-6 text-center flex-1 flex items-center justify-center overflow-hidden">
         <div class="font-bold text-[1rem] js-message whitespace-pre-line"></div>
+    </div>
+</template>
+<template id="tpl-confirm-base">
+    <div class="p-6 text-center flex-1 flex flex-col items-center justify-center overflow-hidden w-full">
+        <div class="font-bold text-[1rem] js-message whitespace-pre-line break-all w-full"></div>
     </div>
 </template>
 
@@ -150,7 +155,7 @@
 <!-- 【マップ】ポップアップ -->
 <template id="tpl-marker-popup">
     <div class="relative w-full bg-white rounded-[1rem] shadow-brand p-3 overflow-hidden flex flex-col">
-        <div class="absolute top-2 right-2 w-8 h-8 rounded-full bg-brand-4 text-white font-bold text-[1.2rem] flex items-center justify-center shadow-brand z-20">
+        <div class="absolute top-2 right-2 w-8 h-8 rounded-full bg-brand-4 text-white font-bold text-[1.2rem] flex items-center justify-center z-20">
             <span class="index"></span>
         </div>
         <div class="text-[0.8rem] mb-2 font-bold text-slate-400 italic">

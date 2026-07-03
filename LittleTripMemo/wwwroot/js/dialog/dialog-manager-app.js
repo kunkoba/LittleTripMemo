@@ -1,8 +1,8 @@
 export default {
     // 【🗺️ データメニュー】
     ShowDataMenu() {
+        if (!$App.AppData.Context.IsLoggedIn) return this.ShowLoginDialog();
         const isLoggedIn = $App.AppData.Context.IsLoggedIn;
-        if (!isLoggedIn) return this.ShowLoginDialog();
         const el = $Dom.GenerateTemplate('tpl-menu-data');
         const b = {
             archiveList: $Dom.QuerySelector('#btn-app-archive-list', el),

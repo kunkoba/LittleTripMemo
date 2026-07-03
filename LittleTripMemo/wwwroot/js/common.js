@@ -327,4 +327,19 @@ window.$Util = {
         // メートルをkmに変換して返却
         return totalMeters / 1000;
     },
+    // SNSシェア用URLの生成
+    GetShareUrl(type, url, title = "") {
+        const encodedUrl = encodeURIComponent(url);
+        const encodedTitle = encodeURIComponent(title);
+        switch(type) {
+            case 'line':
+                return `https://social-plugins.line.me/lineit/share?url=${encodedUrl}`;
+            case 'x':
+                return `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+            case 'facebook':
+                return `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+            default:
+                return "";
+        }
+    },
 };

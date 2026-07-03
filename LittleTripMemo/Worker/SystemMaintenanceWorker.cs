@@ -88,6 +88,8 @@ public class SystemMaintenanceWorker : BackgroundService
     private DateTime _nextReportStatsUpdateTime = DateTime.Now.AddMinutes(6);
     private DateTime _nextAppInfoUpdateTime = DateTime.Now.AddMinutes(7);
 
+    private DateTime? _lastMaintenanceDate = null; // 本日の実行済み判定用
+
     /// <summary>
     /// バッチ処理のメインループ。1分ごとに各タスクをチェックして必要に応じて実行する
     /// </summary>
@@ -101,14 +103,22 @@ public class SystemMaintenanceWorker : BackgroundService
         {
             using (LogContext.PushProperty("CorrelationId", Guid.NewGuid().ToString()[..8]))
             {
-                await TaskSyncSystemStatusAsync();  // システムステータスの同期（メンテナンスモードや最小アプリバージョンなど）
-                await TaskUpdateReactionCountsAsync();  // リアクション数の再集計
-                await TaskUpdateTableStatisticsAsync();     // テーブル統計情報の更新（件数や最大IDなど）
-                await TaskGarbageCleanupAsync();    // 論理削除された古いデータの物理削除
-                await TaskAggregateClickQueueAsync();   // クリック・閲覧数集計キューの処理
-                await TaskUpdateUserSummaryStatsAsync();    // ユーザー統計情報の更新（t_app_user_summary の集計）
-                await TaskUpdateReportStatsAsync(); // 通報実績統計の更新（アーカイブ受領数およびユーザー送信数の集計）
-                await TaskUpdateAppInfoStatsAsync();
+                // 定期タスクの実行
+                {
+                    await TaskSyncSystemStatusAsync();  // システムステータスの同期（メンテナンスモードや最小アプリバージョンなど）
+                    await TaskUpdateReactionCountsAsync();  // リアクション数の再集計
+                    await TaskUpdateTableStatisticsAsync();     // テーブル統計情報の更新（件数や最大IDなど）
+                    await TaskGarbageCleanupAsync();    // 論理削除された古いデータの物理削除
+                    await TaskAggregateClickQueueAsync();   // クリック・閲覧数集計キューの処理
+                    await TaskUpdateUserSummaryStatsAsync();    // ユーザー統計情報の更新（t_app_user_summary の集計）
+                    await TaskUpdateReportStatsAsync(); // 通報実績統計の更新（アーカイブ受領数およびユーザー送信数の集計）
+                    await TaskUpdateAppInfoStatsAsync();    // アプリ全体統計の更新（ユーザー数・アーカイブ数・明細数など）
+                }
+
+                // 日次タスクの実行
+                {
+                    await TaskDailyMaintenanceAsync();  // DBメンテ
+                }
             }
 
             // 1分間隔でチェック
@@ -139,7 +149,7 @@ public class SystemMaintenanceWorker : BackgroundService
         }
     }
 
-    #region "タスク"
+    #region "定期タスク"
 
     /// <summary>
     /// システムステータス（メンテナンスモードや最小アプリバージョンなど）を DB から取得して同期するタスク
@@ -388,6 +398,35 @@ public class SystemMaintenanceWorker : BackgroundService
                 await repository.SyncAppInfoAsync();
             });
             _nextAppInfoUpdateTime = DateTime.Now.AddMinutes(settings.AppInfoUpdateIntervalMinutes);
+        }
+    }
+
+    #endregion
+
+    #region "日次タスク"
+
+    /// <summary>
+    /// 設定された時刻に、日次のデータベース物理メンテナンスを実行する
+    /// </summary>
+    private async Task TaskDailyMaintenanceAsync()
+    {
+        var settings = optionsMonitor.CurrentValue;
+        var now = DateTime.Now;
+
+        // 1. 設定時刻（HH:mm）に到達しているか、かつ本日未実行かを確認
+        if (now.ToString("HH:mm") == settings.DailyMaintenanceTime && _lastMaintenanceDate != now.Date)
+        {
+            await RunWithScopeAsync("日次DB物理メンテナンス", async (scope) =>
+            {
+                var repository = scope.ServiceProvider.GetRequiredService<TableStatisticsTaskRepository>();
+
+                // 2. 物理掃除とインデックス再構築を実行
+                // ※この処理はトランザクション外で実行される必要があります
+                await repository.ExecuteDbMaintenanceAsync();
+
+                // 3. 実行完了を記録（同一時刻内の重複実行を防止）
+                _lastMaintenanceDate = now.Date;
+            });
         }
     }
 

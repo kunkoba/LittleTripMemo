@@ -25,25 +25,26 @@ export default {
     },
     // 【⚙️ システムメニュー】
     ShowSystemMenu() {
+        if (!$App.AppData.Context.IsLoggedIn) return this.ShowLoginDialog();
         const el = $Dom.GenerateTemplate('tpl-menu-sys');
         const isLoggedIn = $App.AppData.Context.IsLoggedIn;
         const isAdmin = isLoggedIn && $App.AppData.Owner.Plan === "Admin";
         const b = {
             notice:  $Dom.QuerySelector('#btn-sys-notice', el),
             version: $Dom.QuerySelector('#btn-sys-version', el),
-            auth:    $Dom.QuerySelector('#btn-sys-auth', el),
+            login:    $Dom.QuerySelector('#btn-sys-login', el),
             admin:   $Dom.QuerySelector('#btn-sys-admin', el),
         };
         // 表示制御
         $Dom.ToggleShow(b.admin, isAdmin);
-        const authLabel = $Dom.QuerySelector('span:last-child', b.auth);
-        authLabel.textContent = isLoggedIn ? "LOGOUT" : "LOGIN";
+        const loginLabel = $Dom.QuerySelector('span:last-child', b.login);
+        loginLabel.textContent = isLoggedIn ? "ログアウトする" : "ログイン／サインインする";
         // 新着バッジ更新
         $UI.Generator.ApplyNewBadge(b.notice, $App.AppData.Context.UnreadNoticeCount, 'label');
         // 各種イベント
         b.notice.onclick = () => this.ShowNoticeList();
         b.version.onclick = () => this.ShowAppInfo();
-        b.auth.onclick = async () => {
+        b.login.onclick = async () => {
             if (isLoggedIn) {
                 if (await this.ShowConfirm({ title: "LOGOUT", message: "ログアウトしますか？" })) {
                     this._core.closeAll();
@@ -61,8 +62,8 @@ export default {
     },
     // 【👤 ユーザーメニュー】
     ShowUserMenu() {
-        const el = $Dom.GenerateTemplate('tpl-menu-user');
         if (!$App.AppData.Context.IsLoggedIn) return this.ShowLoginDialog();
+        const el = $Dom.GenerateTemplate('tpl-menu-user');
         const b = {
             profile: $Dom.QuerySelector('#btn-sys-user-profile', el),
             mail:    $Dom.QuerySelector('#btn-user-mail', el),
@@ -345,66 +346,6 @@ export default {
         });
     },
     // プロフィール参照
-    async ShowUserProfile_2(profile, isOwner) {
-        if (isOwner) profile = $App.AppData.Owner.SystemInfo.ownerProfile;
-        if (!profile) return $Notice.Warn("ユーザー情報がありません");
-        const el = $Dom.GenerateTemplate('tpl-view-profile');
-        const renderView = () => {
-            const pIcon = profile.icon || "👤";
-            const pName = profile.nick_name || "No Name";
-            const pDesc  = profile.description || "";
-            const pL1   = profile.link_1 || "";
-            const pL2   = profile.link_2 || "";
-            const pL3   = profile.link_3 || "";
-            $Dom.QuerySelector('#view-profile-icon', el).textContent = pIcon;
-            $Dom.QuerySelector('#view-profile-nickname', el).textContent = pName;
-            $Dom.QuerySelector('#view-profile-description', el).textContent = pDesc;
-            const viewLinks = $Dom.QuerySelector('#view-profile-links', el);
-            // 【重要】追加前に既存のボタンをすべて削除してリセットする
-            viewLinks.innerHTML = '';
-            // 項目名と値のペアで定義し、入力があるもののみループ
-            [
-                { val: pL1, key: "link_1" },
-                { val: pL2, key: "link_2" },
-                { val: pL3, key: "link_3" }
-            ].forEach(item => {
-                if (!item.val || item.val.trim() === "") return;
-                // サーバー送信用パラメータ (AddClickReq 形式)
-                const params = {
-                    target_type: 1, // ClickTargetType.User
-                    target_user_id: profile.user_id,
-                    item_name: item.key
-                };
-                // ジェネレータでボタンを生成（第3引数は ShowUserProfile の引数 isOwner を使用）
-                $UI.Generator.LinkButton(viewLinks, item.val, params, isOwner);
-            });
-        };
-        renderView();
-		const headerButtons = [];
-        const isAdmin = $App.AppData.Owner.Plan === "Admin"; // 管理者判定
-        if (isOwner || isAdmin) {
-            // 統計アイコン
-            headerButtons.push({
-                label: "📊",
-                // handler: () => this.ShowClickStats(profile)
-                handler: () => this.ShowUserClickStats(profile)
-            });
-        }
-        if (isOwner) {
-            headerButtons.push({
-                label: "✏️",
-                handler: () => this.ShowEditProfile(profile, renderView)
-            });
-        }
-        //
-		this._core.open({
-			title: "USER PROFILE",
-			content: el,
-            help: "",
-			headerButtons: headerButtons
-		});
-    },
-    // プロフィール参照
     async ShowUserProfile(profile, isOwner) {
         if (isOwner) profile = $App.AppData.Owner.SystemInfo.ownerProfile;
         if (!profile) return $Notice.Warn("ユーザー情報がありません");
@@ -477,7 +418,7 @@ export default {
 		});
     },
     // プロフィール編集（上にスタックされる）
-    ShowEditProfile(profile, onUpdate) {
+    ShowEditProfile_2(profile, onUpdate) {
         const el = $Dom.GenerateTemplate('tpl-edit-profile');
         const editIconPreview = $Dom.QuerySelector('#edit-profile-icon-preview', el);
         const editIconInput = $Dom.QuerySelector('#edit-profile-icon', el);
@@ -525,6 +466,84 @@ export default {
                         handler: $Warn.CatchAsync(async () => {
                             const updatedFields = {
                                 nick_name: editNickname.value.trim(),
+                                icon: editIconInput.value,
+                                description: editDesc.value.trim(),
+                                link_1: editLink1.value.trim(),
+                                link_2: editLink2.value.trim(),
+                                link_3: editLink3.value.trim(),
+                            };
+                            const isSuccess = await $Data.Access.UpdateProfile(updatedFields);
+                            if (!isSuccess) return;
+                            Object.assign(profile, updatedFields);
+                            $Notice.Info("プロフィールを更新しました");
+                            this._core.close();
+                            if (onUpdate) onUpdate();
+                            // 下段バーのアイコンを更新
+                            $BotBar.UpdateUserIcon();
+                        })
+                    }
+                ]
+            ]
+        });
+    },
+    // プロフィール編集（上にスタックされる）
+    ShowEditProfile(profile, onUpdate) {
+        const el = $Dom.GenerateTemplate('tpl-edit-profile');
+        const editIconPreview = $Dom.QuerySelector('#edit-profile-icon-preview', el);
+        const editIconInput = $Dom.QuerySelector('#edit-profile-icon', el);
+        const editNickname = $Dom.QuerySelector('#edit-profile-nickname', el);
+        const editNicknameCount = $Dom.QuerySelector('#edit-profile-nickname-count', el);
+        // 新規項目：カテゴリ
+        const editCategory = $Dom.QuerySelector('#edit-profile-category', el);
+        const editCategoryCount = $Dom.QuerySelector('#edit-profile-category-count', el);
+        const editDesc = $Dom.QuerySelector('#edit-profile-description', el);
+        const editDescCount = $Dom.QuerySelector('#edit-profile-description-count', el);
+        const editLink1 = $Dom.QuerySelector('#edit-profile-link1', el);
+        const editLink2 = $Dom.QuerySelector('#edit-profile-link2', el);
+        const editLink3 = $Dom.QuerySelector('#edit-profile-link3', el);
+        editIconPreview.textContent = profile.icon || "👤";
+        editIconInput.value = profile.icon || "👤";
+        editNickname.value = profile.nick_name || "";
+        editNicknameCount.textContent = (profile.nick_name || "").length;
+        // カテゴリの初期値設定
+        editCategory.value = profile.user_category || "";
+        editCategoryCount.textContent = (profile.user_category || "").length;
+        editDesc.value = profile.description || "";
+        editDescCount.textContent = (profile.description || "").length;
+        editLink1.value = profile.link_1 || "";
+        editLink2.value = profile.link_2 || "";
+        editLink3.value = profile.link_3 || "";
+        editDesc.addEventListener('input', () => editDescCount.textContent = editDesc.value.length);
+        editNickname.addEventListener('input', () => editNicknameCount.textContent = editNickname.value.length);
+        // カテゴリの文字数カウントイベント
+        editCategory.addEventListener('input', () => editCategoryCount.textContent = editCategory.value.length);
+        $Dom.QuerySelector('#btn-profile-icon-trigger', el).onclick = () => {
+            $Util.ShowEmojiPicker((emoji) => {
+                editIconPreview.textContent = emoji;
+                editIconInput.value = emoji;
+            });
+        };
+        this._core.open({
+            title: "EDIT PROFILE",
+            content: el,
+            help: "",
+            isFooterFixed: false,   // 編集用
+            buttons: [
+                [
+                    {
+                        label: "CANCEL",
+                        className: "bg-slate-400 text-white shadow-md",
+                        handler: () => {
+                            this._core.close();
+                        },
+                    },
+                    {
+                        label: "SAVE",
+                        className: "bg-brand-4 text-white shadow-md",
+                        handler: $Warn.CatchAsync(async () => {
+                            const updatedFields = {
+                                nick_name: editNickname.value.trim(),
+                                user_category: editCategory.value.trim(), // パラメータ追加
                                 icon: editIconInput.value,
                                 description: editDesc.value.trim(),
                                 link_1: editLink1.value.trim(),
