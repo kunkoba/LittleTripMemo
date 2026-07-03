@@ -26,11 +26,11 @@ const UI_Manager = {
     },
     // パーツ生成を担うジェネレータ
     Generator: {
-        // URLリンクボタンの生成（安全確認とクリック数の送信）
-        LinkButton(targetEl, url, params = null, isOwner = false) {
+        // URLリンクボタンの生成
+        LinkButton(parentEl, url, params = null, isOwner = false) {
             if (!url) return null;
-			if (!targetEl) return;
-			// targetEl.innerHTML = "";	// 消しちゃダメ
+			if (!parentEl) return;
+			// parentEl.innerHTML = "";	// 消しちゃダメ
             // テンプレートからボタンDOMを生成
             const btn = $Dom.GenerateTemplate("tpl-link-button", "ui-template-root");
             // アイコンの注入（サイズは28px固定）
@@ -62,13 +62,13 @@ const UI_Manager = {
                 const finalUrl = isSafe ? url : `https://www.google.com/search?q=${encodeURIComponent(url)}`;
                 window.open(finalUrl, '_blank', 'noopener,noreferrer');
             };
-			targetEl.appendChild(btn);
+			parentEl.appendChild(btn);
         },
 		// ユーザ情報バッヂの生成
-		UserBadge(targetEl, profile, options = {}) {
+		UserBadge(parentEl, profile, options = {}) {
 			if (!profile) return null;
-			if (!targetEl) return;
-			targetEl.innerHTML = "";	// 消しちゃダメ
+			if (!parentEl) return;
+			parentEl.innerHTML = "";	// 消しちゃダメ
 			const type = options.type || 'button'; // 'button' or 'badge'
 			const isOwner = !!options.isOwner;
 			// テンプレートの生成
@@ -92,16 +92,16 @@ const UI_Manager = {
 				};
 			}
 			// return el;
-			targetEl.appendChild(el);
+			parentEl.appendChild(el);
 		},
 		// 新規バッヂ生成
-		ApplyNewBadge(targetEl, count, type = 'dot') {
-			if (!targetEl) return;
-			// targetEl.innerHTML = "";	// 消しちゃダメ
-			let badge = targetEl.querySelector('.js-unread-badge');
+		ApplyNewBadge(parentEl, count, type = 'dot') {
+			if (!parentEl) return;
+			// parentEl.innerHTML = "";	// 消しちゃダメ
+			let badge = parentEl.querySelector('.js-unread-badge');
 			const isShow = count > 0;
 			if (isShow && !badge) {
-				targetEl.classList.add('relative');
+				parentEl.classList.add('relative');
 				badge = document.createElement('span');
 				badge.className = 'js-unread-badge absolute bg-red-500 text-white font-bold flex items-center justify-center pointer-events-none  whitespace-nowrap ';
 				if (type === 'dot') {
@@ -110,14 +110,14 @@ const UI_Manager = {
 					badge.className += 'text-[9px] px-2 py-0.5 rounded-full top-1/2 -translate-y-1/2 right-4';
 					badge.textContent = 'NEW';
 				}
-				targetEl.appendChild(badge);
+				parentEl.appendChild(badge);
 			}
 			if (badge) $Dom.ToggleShow(badge, isShow);
 		},
-		// 日付ラベルを生成し、指定した要素に追加する
-		MemoDateFormatter(targetEl, detail, size = 'sm') {
-			if (!targetEl || !detail) return;
-			targetEl.innerHTML = "";
+		// 日付ラベルを生成
+		MemoDateFormatter(parentEl, detail, size = 'sm') {
+			if (!parentEl || !detail) return;
+			parentEl.innerHTML = "";
 			const el = $Dom.GenerateTemplate("tpl-date-label", "ui-template-root");
 			// 1. レイアウト切り替え（detailサイズ時のみ差分クラスをadd）
 			if (size === 'lg') {
@@ -148,7 +148,7 @@ const UI_Manager = {
 				$Dom.ToggleShow(badge, true);
 				$Dom.QuerySelector(".js-day-text", badge).textContent = `${detail.display_day} DAY`;
 			}
-			targetEl.appendChild(el);
+			parentEl.appendChild(el);
 		},
     },
 	// 初期化

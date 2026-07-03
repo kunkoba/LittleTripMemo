@@ -33,13 +33,13 @@ const isStaticRequest = (urlStr) => {
 };
 // 1. インストール処理
 self.addEventListener('install', (event) => {
-    console.log("★SW >> install");
+    // console.log("★SW >> install");
     // 待機状態をスキップし、即座に新しいSWをインストールする（確実なバージョンアップのため）
     self.skipWaiting();
 });
 // 2. アクティベート処理
 self.addEventListener('activate', (event) => {
-    console.log("★SW >> activate");
+    // console.log("★SW >> activate");
     // すべてのクライアント（開いているタブ）の制御を即座に奪う
     event.waitUntil(self.clients.claim());
     // バージョンが異なる古いキャッシュを全て物理削除する
@@ -59,7 +59,7 @@ self.addEventListener('activate', (event) => {
 });
 // 3. リクエストの横取り（Fetchイベント）
 self.addEventListener('fetch', (event) => {
-    console.log("★SW >> fetch");
+    // console.log("★SW >> fetch");
     const req = event.request;
     const url = new URL(req.url);
     // GETメソッド以外（POST等）や、API通信はSWで干渉せずそのまま流す

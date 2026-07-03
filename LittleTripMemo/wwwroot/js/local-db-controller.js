@@ -35,7 +35,7 @@ const _LocalDbCore = {
             };
             request.onsuccess = (event) => {
                 this.db = event.target.result;
-                console.log("IndexedDB Core: 準備完了");
+                console.log("- IndexedDB: 準備完了");
                 resolve(this.db);
             };
             request.onerror = (event) => {

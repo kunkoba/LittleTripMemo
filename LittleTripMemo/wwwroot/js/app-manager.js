@@ -139,7 +139,7 @@ const AppManager = {
             }, saveReactionSec);
             // ログインチェック
             $Polling.Add($Polling.TASKS.SYNC_ACTIVITY, async () => {
-                console.log("$Polling.TASKS.SYNC_ACTIVITY");
+                // console.log("$Polling.TASKS.SYNC_ACTIVITY");
                 // ユーザ存在チェック＆最終ログイン日時設定
                 let isSuccess = await this.SyncActivityLog();
                 if (!isSuccess) {
@@ -183,7 +183,7 @@ const AppManager = {
     },
     // アプリ起動時フロー
     async Init() {
-        console.log("★App.Init");
+        console.log("★★★ App.Init ★★★");
         // --- 起動処理 ---
         {
             this._initViewport();
@@ -198,6 +198,8 @@ const AppManager = {
                 // システム情報取得
                 $Data.Access.GetSystemInfo();
             }
+            // 一番最初にSVGスプライトをHTMLに注入する
+            if (typeof $Icon !== 'undefined') $Icon.Init();
         }
         // リクエストパラメータ取得
         {
@@ -238,7 +240,7 @@ const AppManager = {
     },
     // 画面モード変更
     async RefreshScreen() {
-        console.log("◆RefreshScreen");
+        console.log("- RefreshScreen");
         // データをクリア
         $Data.Clear();
         // アーカイブID

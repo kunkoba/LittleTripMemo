@@ -198,7 +198,7 @@ window.$Data = {
             if (data.reportSummary) $App.AppData.Admin.ReportSummary = data.reportSummary;
             if (data.feedbackList) $App.AppData.Admin.FeedbackList = data.feedbackList;
             if (data.userMailList) $App.AppData.Admin.UserMailList = data.userMailList;
-            console.log(">>$App.AppData:", $App.AppData);
+            console.log("- $App.AppData:", $App.AppData);
         },
         // 定形APIの展開（自動生成モジュールのマージ）
         ...ApiModule,

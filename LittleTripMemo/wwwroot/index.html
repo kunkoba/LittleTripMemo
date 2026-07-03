@@ -526,10 +526,14 @@
     // 地図
     import Map from "./js/component/map-controller.js";
     window.$Map = Map;
-    // 地図
+    // 地図マーカー
     import Marker from "./js/component/marker-controller.js";
     window.$Marker = Marker;
+    // 新規追加：アイコンレジストリ
+    import IconRegistry from "./js/component/icon-registry.js";
+    window.$Icon = IconRegistry;
 </script>
+
 <!-- アプリ基幹部品 -->
 <script type="module">
     // 通知管理
