@@ -82,6 +82,8 @@ public static class ServiceExtensions
         services.AddScoped<UpdateDetailPubService>();
         services.AddScoped<BulkSyncReactionService>();
         services.AddScoped<AddCountQueueService>();
+        services.AddScoped <OpenLimitedArchiveService>();
+        services.AddScoped<CloseLimitedArchiveService>();
 
         // Sys (General)
         services.AddScoped<GetSystemInfoService>();

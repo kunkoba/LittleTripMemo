@@ -574,7 +574,8 @@ export default {
         const renderLimitedToggle = (arc, onChanged) => {
             const limitArea = $Dom.QuerySelector('#archive-limit-btn-area', el);
             const btnLimit = $Dom.QuerySelector('#btn-toggle-limited', el);
-            if (!(arc.is_owner && arc.is_public)) {
+            console.log("arc:", arc)
+            if (!(arc.is_owner && arc.is_public && !arc.closed_flg)) {
                 $Dom.ToggleShow(limitArea, false);
                 return;
             }
@@ -583,7 +584,7 @@ export default {
             const icon = $Dom.QuerySelector('.js-check-icon', btnLimit);
             const label = $Dom.QuerySelector('.js-label-text', btnLimit);
             icon.textContent = isLimited ? "☑" : "☐";
-            label.textContent = isLimited ? "限定公開中（URLのみ）" : "限定公開に変更する";
+            label.textContent = isLimited ? "限定公開中（URLでのアクセスのみ可能）" : "限定公開に変更する（地図検索でヒットしない）";
             btnLimit.className = "w-full h-12 font-bold rounded-lg border-2 active:scale-[0.98] transition-all flex items-center justify-center gap-2";
             btnLimit.classList.add(...(isLimited
                 ? ["bg-brand-1", "border-brand-3", "text-brand-5"]
@@ -591,10 +592,12 @@ export default {
             btnLimit.onclick = async () => {
                 const nextStatus = !isLimited;
                 // API経由で limited_open_flg のみを更新
-                const isSuccess = await $Data.Access.UpdateArchivePub({
-                    archive_id: arc.archive_id,
-                    limited_open_flg: nextStatus
-                });
+                let isSuccess;
+                if (nextStatus) {
+                    isSuccess = await $Data.Access.OpenLimitedArchive({ archive_id: arc.archive_id });
+                } else {
+                    isSuccess = await $Data.Access.CloseLimitedArchive({ archive_id: arc.archive_id });
+                }
                 if (isSuccess) {
                     $Data.Store.UpdateArchive({ limited_open_flg: nextStatus });
                     $Notice.Info(nextStatus ? "限定公開に設定しました" : "全体公開に設定しました");

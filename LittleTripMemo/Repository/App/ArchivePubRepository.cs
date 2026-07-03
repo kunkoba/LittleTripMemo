@@ -231,4 +231,21 @@ public class ArchivePubRepository : _BaseRepository
         return await QueryAsync<TMemoArchivePub>(sql, new { user_id = _user.login_user_id });
     }
 
+    /// <summary>
+    /// 更新：限定公開フラグの変更
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <param name="isLimited"></param>
+    /// <returns></returns>
+    public async Task<int> UpdateLimitedOpenByKeyAsync(int archiveId, bool isLimited)
+    {
+        const string sql = @"
+        UPDATE t_memo_archive_pub
+        SET limited_open_flg = @isLimited,
+            update_tim = CURRENT_TIMESTAMP
+        WHERE archive_id = @archiveId
+          AND user_id    = @user_id";
+        return await ExecuteAsync(sql, new { archiveId, isLimited, user_id = _user.login_user_id });
+    }
+
 }

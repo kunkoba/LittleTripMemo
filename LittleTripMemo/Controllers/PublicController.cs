@@ -24,7 +24,9 @@ public class PublicController(
     UpdateArchivePubService updateArchivePubService,
     UpdateDetailPubService updateDetailPubService,
     BulkSyncReactionService bulkSyncReactionService,
-    AddCountQueueService addClickQueueService
+    AddCountQueueService addClickQueueService,
+    OpenLimitedArchiveService openLimitedArchiveService,
+    CloseLimitedArchiveService closeLimitedArchiveService
 ) : _BaseController(userContext, jwtService)
 {
     #region "未ログイン・ゲスト可"
@@ -101,6 +103,24 @@ public class PublicController(
     [HttpPost("BulkSyncReactions")]
     public async Task<IActionResult> BulkSyncReactions([FromBody] BulkSyncReactionService.BulkSyncReactionReq req)
         => OkWithBase(await bulkSyncReactionService.ExecuteAsync(req));
+
+    /// <summary>
+    /// アーカイブを更新（非公開 → 限定公開）
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("OpenLimitedArchive")]
+    public async Task<IActionResult> OpenLimitedArchive([FromBody] OpenLimitedArchiveService.OpenLimitedArchiveReq req)
+    => OkWithBase(await openLimitedArchiveService.ExecuteAsync(req));
+
+    /// <summary>
+    /// アーカイブを更新（限定公開 → 非公開）
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("CloseLimitedArchive")]
+    public async Task<IActionResult> CloseLimitedArchive([FromBody] CloseLimitedArchiveService.CloseLimitedArchiveReq req)
+        => OkWithBase(await closeLimitedArchiveService.ExecuteAsync(req));
 
     #endregion
 

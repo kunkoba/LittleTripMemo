@@ -37,8 +37,14 @@ const _BottomCore = {
 				const sortSetting = $TopBar.GetSortSetting();
 				const params = { ...range, ...sortSetting, limit: 20 };
 				$Data.Clear();
-				if (await $Data.Access.SearchByLocationPub(params)) {
-					$Marker.RefreshPointMarker();
+				const isSuccess = await $Data.Access.SearchByLocationPub(params);
+				if (isSuccess) {
+	            	const details = $Data.Store.GetDetails();
+					if (details.length > 0) {
+						$Marker.RefreshPointMarker();
+					} else {
+						$Notice.Info("データが見つかりませんでした。");
+					}
 				}
 			});
 

@@ -210,66 +210,6 @@ window.$Util = {
         }
     },
     // 絵文字ピッカー
-    ShowEmojiPicker_2(onSelect) {
-        const el = $Dom.GenerateTemplate("tpl-emoji-picker", "ui-dialog-root");
-        const container = $Dom.GetElementById('emoji-mart-container');
-        // Emoji Mart v5 の標準的な幅 352px を明示的に指定
-        const pickerWidth = 352;
-        const picker = new EmojiMart.Picker({
-            onEmojiSelect: (emoji) => {
-                onSelect(emoji.native);
-                el.remove();
-            },
-            locale: 'ja',
-            set: 'native',
-            width: pickerWidth, // ピッカー自体の幅を固定
-            perLine: 8,
-            maxHeight: 400,
-            navPosition: 'bottom',
-            previewPosition: 'none',
-            skinTonePosition: 'none',
-            cssVars: {
-                '--em-rgb-accent': 'var(--brand-lvl5)',
-                '--em-border': 'none'
-            }
-        });
-        container.appendChild(picker);
-        // 閉じる処理
-        $Dom.QuerySelector('.js-close', el).onclick = () => el.remove();
-        el.onclick = (e) => { if (e.target === el) el.remove(); };
-    },
-    // 絵文字ピッカー
-    ShowEmojiPicker_3(onSelect) {
-        const el = $Dom.GenerateTemplate("tpl-emoji-picker", "ui-dialog-root");
-        const container = $Dom.GetElementById('emoji-mart-container');
-        // Emoji Mart v5 の標準的な幅 352px を明示的に指定
-        const pickerWidth = 352;
-        const picker = new EmojiMart.Picker({
-            onEmojiSelect: (emoji) => {
-                onSelect(emoji.native);
-                el.remove();
-            },
-            locale: 'ja',
-            set: 'native',
-            width: pickerWidth, // ピッカー自体の幅を固定
-            perLine: 6,         // ★ 1行の表示数を減らす（標準8 -> 6）
-            emojiSize: 36,      // ★ 絵文字自体のサイズを大きく（標準24 -> 36）
-            emojiButtonSize: 48,// ★ タップするボタン領域を大きく（標準36 -> 48）
-            maxHeight: 600,
-            navPosition: 'bottom',
-            previewPosition: 'none',
-            skinTonePosition: 'none',
-            cssVars: {
-                '--em-rgb-accent': 'var(--brand-lvl5)',
-                '--em-border': 'none'
-            }
-        });
-        container.appendChild(picker);
-        // 閉じる処理
-        $Dom.QuerySelector('.js-close', el).onclick = () => el.remove();
-        el.onclick = (e) => { if (e.target === el) el.remove(); };
-    },
-    // 絵文字ピッカー
     ShowEmojiPicker(onSelect) {
         const el = $Dom.GenerateTemplate("tpl-emoji-picker", "ui-dialog-root");
         const container = $Dom.GetElementById('emoji-mart-container');
@@ -278,14 +218,14 @@ window.$Util = {
                 onSelect(emoji.native);
                 el.remove();
             },
-            locale: 'ja',
+            locale: 'en',
             set: 'native',
             navPosition: 'bottom',
             previewPosition: 'none',
             skinTonePosition: 'none',
-            perLine: 7,           // 1行あたりの個数を減らす
-            emojiSize: 36,        // 絵文字自体のサイズを大きく
-            emojiButtonSize: 48   // ボタンのタップ判定を大きく
+            perLine: 6,           // 1行あたりの個数を減らす
+            emojiSize: 48,        // 絵文字自体のサイズを大きく
+            emojiButtonSize: 56   // ボタンのタップ判定を大きく
         });
         // 高さは親に合わせつつ、横幅の強制100%は解除する
         picker.style.height = '100%';
