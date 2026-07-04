@@ -9,11 +9,9 @@ const _TopCore = {
                 this.root = $Dom.GetElementById(this._elementId);
                 this.btnArchiveTitle = $Dom.GetElementById('ui-archive-title');
                 this.uiSortGroup = $Dom.GetElementById('ui-sort-group');
-                // this.sortKbn = $Dom.GetElementById('sort-kbn');
                 this.sortField = $Dom.GetElementById('sort-field');
                 this.sortReaction = $Dom.GetElementById('sort-reaction');
                 this.sortWord = $Dom.GetElementById('sort-word');
-                // this.btnSysMenu = $Dom.GetElementById('btn-sys-menu');
             }
             // イベント登録
             {
@@ -21,10 +19,6 @@ const _TopCore = {
                     // まとめ親編集
                     $Dialog.ShowArchiveInfo();
                 });
-                // this.btnSysMenu.addEventListener('click', (e) => {
-                //     // システムメニュー
-                //     $Dialog.ShowSystemMenu();
-                // });
                 this.sortField.addEventListener("click", (e) => {
                     const btn = e.target.closest("button");
                     if (!btn) return;
@@ -42,16 +36,6 @@ const _TopCore = {
                 });
                 // リアクション種別（アイコン）のクリックイベント
                 if (this.sortReaction) {
-                    // this.sortReaction.addEventListener("click", (e) => {
-                    //     const btn = e.target.closest("button");
-                    //     if (!btn) return;
-                    //     this.sortReaction.querySelectorAll("button").forEach((b) => {
-                    //         b.classList.remove("bg-brand-3");
-                    //         b.classList.add("bg-brand-0");
-                    //     });
-                    //     btn.classList.remove("bg-brand-0");
-                    //     btn.classList.add("bg-brand-3");
-                    // });
                     // 1. 定数に基づいてボタンを生成（1番目を初期選択にする）
                     const reactionTypes = Object.values($Const.REACTION_TYPE);
                     this.sortReaction.innerHTML = reactionTypes.map((type, idx) => `

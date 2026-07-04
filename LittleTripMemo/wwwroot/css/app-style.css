@@ -68,7 +68,7 @@ button:active {
 
 /* 日付用スタイル */
 .kb-date-tim-sm {
-    /* 文字サイズ: text-[0.5rem] */
+    /* 文字サイズ: text-[0.8rem] */
     font-size: 0.8rem;
     /* 太字: font-bold */
     font-weight: 700;
@@ -78,7 +78,7 @@ button:active {
     font-style: italic;
 }
 .kb-date-tim-md {
-    /* 文字サイズ: text-[0.5rem] */
+    /* 文字サイズ: text-[0.8rem] */
     font-size: 1.0rem;
     /* 太字: font-bold */
     font-weight: 700;
@@ -88,7 +88,7 @@ button:active {
     font-style: italic;
 }
 .kb-date-tim-lg {
-    /* 文字サイズ: text-[0.5rem] */
+    /* 文字サイズ: text-[0.8rem] */
     font-size: 1.2rem;
     /* 太字: font-bold */
     font-weight: 700;

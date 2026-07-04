@@ -640,7 +640,7 @@ export default {
             if (!l.url) return;
             const s = profile.click_stats?.[l.key] || { t: 0, u: 0, g: 0 };
             const row = document.createElement("div");
-            row.className = "p-2 bg-slate-50 rounded-lg text-[0.75rem]";
+            row.className = "p-2 bg-slate-50 rounded-lg text-[0.8rem]";
             row.innerHTML = `
                 <div class="truncate text-blue-500 italic mb-1">🔗 ${l.url}</div>
                 <div class="flex gap-4">

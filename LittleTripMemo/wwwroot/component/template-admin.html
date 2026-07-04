@@ -39,7 +39,7 @@
         <div class="flex-1 min-w-0 p-3 pl-4">
             <div class="flex justify-between items-start mb-1">
                 <div class="js-date kb-date-tim-sm"></div>
-                <span class="js-badge-status text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-brand border"></span>
+                <span class="js-badge-status text-[0.8rem] font-bold px-2 py-0.5 uppercase tracking-wider shadow-brand border"></span>
             </div>
             <div class="text-[0.8rem] font-bold text-slate-900 truncate pr-2 mb-1 js-title"></div>
             <div class="text-[0.8rem] text-slate-400 line-clamp-1 js-body "></div>
@@ -55,11 +55,11 @@
             <select id="edit-notice-kind" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white"></select>
         </div>
         <div>
-            <div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Title</label><span class="text-[0.5rem] text-slate-400 font-bold"><span id="edit-notice-title-count">0</span>/30</span></div>
+            <div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Title</label><span class="text-[0.8rem] text-slate-400 font-bold"><span id="edit-notice-title-count">0</span>/30</span></div>
             <input id="edit-notice-title" type="text" maxlength="30" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
         </div>
         <div>
-            <div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Body</label><span class="text-[0.5rem] text-slate-400 font-bold"><span id="edit-notice-body-count">0</span>/300</span></div>
+            <div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Body</label><span class="text-[0.8rem] text-slate-400 font-bold"><span id="edit-notice-body-count">0</span>/300</span></div>
             <textarea id="edit-notice-body" maxlength="300" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
         <div>
@@ -67,14 +67,14 @@
             <input id="edit-notice-url" type="url" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-500" placeholder="https://...">
         </div>
         <div>
-            <label class="block text-[0.5rem] font-bold mb-1 uppercase text-slate-400">Disp From</label>
+            <label class="block text-[0.8rem] font-bold mb-1 uppercase text-slate-400">Disp From</label>
             <div class="flex items-center gap-2">
                 <input id="edit-notice-from" type="date" class="flex-1 border-2 border-brand-3 px-2 py-1 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
                 <button id="btn-clear-notice-from" type="button" class="w-8 h-8 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95">✕</button>
             </div>
         </div>
         <div>
-            <label class="block text-[0.5rem] font-bold mb-1 uppercase text-slate-400">Disp To</label>
+            <label class="block text-[0.8rem] font-bold mb-1 uppercase text-slate-400">Disp To</label>
             <div class="flex items-center gap-2">
                 <input id="edit-notice-to" type="date" class="flex-1 border-2 border-brand-3 px-2 py-1 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
                 <button id="btn-clear-notice-to" type="button" class="w-8 h-8 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95">✕</button>
@@ -130,7 +130,7 @@
         </div>
         <!-- 生存状態バッジ（Close状態の場合のみ表示） -->
         <div class="flex gap-1 mt-1">
-            <span class="hidden bg-slate-400 text-white text-[9px] px-2 py-0.5 rounded-full js-badge-closed ">CLOSED</span>
+            <span class="hidden bg-slate-400 text-white text-[0.8rem] px-2 py-0.5 rounded-full js-badge-closed ">CLOSED</span>
         </div>
     </div>
 </template>
@@ -142,13 +142,13 @@
             <!-- まとめタイトル (全体をボタン化) -->
             <button id="btn-admin-report-open-archive" class="w-full text-left active:scale-[0.98] transition-transform mb-4 bg-white p-3 rounded-[1rem] border border-slate-200  flex items-center justify-between">
                 <div class="flex-1 min-w-0 pr-2">
-                    <div class="text-[0.5rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Target Archive</div>
+                    <div class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Target Archive</div>
                     <div class="text-[0.8rem] font-bold text-brand-5 js-archive-title break-words line-clamp-2"></div>
                 </div>
                 <div class="text-[1.5rem] ml-2 drop-">🗺️</div>
             </button>
             <!-- ユーザ情報アイコン -->
-            <div class="text-[0.5rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Target User</div>
+            <div class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Target User</div>
             <div id="view-report-target-user-wrapper">
             </div>
             <!-- 追加：管理者用アクションボタン -->
@@ -171,7 +171,7 @@
             <div class="flex justify-between items-center mb-1">
                 <div class="js-report-tim kb-date-tim-sm"></div>
             </div>
-            <div class="text-[0.5rem] text-slate-900 break-words js-report-body line-clamp-1"></div>
+            <div class="text-[0.8rem] text-slate-900 break-words js-report-body line-clamp-1"></div>
         </div>
     </div>
 </template>
@@ -198,12 +198,12 @@
     <div class="w-full text-slate-900 space-y-6 pt-2 px-2">
         <!-- ▼ 修正：ジェネレータ用の空のラッパーに変更 -->
         <div class="px-1">
-            <label class="block font-bold text-slate-400 text-[0.5rem] mb-2 uppercase tracking-widest">To Recipient</label>
+            <label class="block font-bold text-slate-400 text-[0.8rem] mb-2 uppercase tracking-widest">To Recipient</label>
             <div id="admin-send-target-user-wrapper"></div>
         </div>
         <!-- 2. メッセージアイコン入力 (明細画面の MARKER レイアウト) -->
         <div class="px-1 w-[50%]">
-            <label class="block font-bold text-slate-400 text-[0.5rem] mb-1 uppercase tracking-wider">Message Icon</label>
+            <label class="block font-bold text-slate-400 text-[0.8rem] mb-1 uppercase tracking-wider">Message Icon</label>
             <div class="flex items-center justify-between pb-1">
                 <button id="btn-admin-send-emoji-trigger" type="button" 
                     class="h-[36px] w-full text-left text-[1.8rem] outline-none active:scale-95">
@@ -216,7 +216,7 @@
         <div>
             <div class="flex justify-between items-end mb-1">
                 <label class="block text-[0.8rem] font-bold uppercase text-slate-400">Message Body</label>
-                <span class="text-[0.5rem] font-bold text-slate-400"><span id="admin-send-body-count">0</span>/300</span>
+                <span class="text-[0.8rem] font-bold text-slate-400"><span id="admin-send-body-count">0</span>/300</span>
             </div>
             <textarea id="admin-send-body" maxlength="300" placeholder="ユーザーへのメッセージを入力してください" 
                 class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none "></textarea>
@@ -249,13 +249,13 @@
         
         <!-- ▼ 修正：ジェネレータ用の空のラッパーに変更 -->
         <div class="px-1">
-            <label class="block font-bold text-slate-400 text-[0.5rem] mb-2 uppercase tracking-widest">To Recipient</label>
+            <label class="block font-bold text-slate-400 text-[0.8rem] mb-2 uppercase tracking-widest">To Recipient</label>
             <div id="admin-send-target-user-wrapper"></div>
         </div>
 
         <!-- 2. メッセージアイコン入力 (明細画面の MARKER レイアウト) -->
         <div class="px-1 w-[50%]">
-            <label class="block font-bold text-slate-400 text-[0.5rem] mb-1 uppercase tracking-wider">Message Icon</label>
+            <label class="block font-bold text-slate-400 text-[0.8rem] mb-1 uppercase tracking-wider">Message Icon</label>
             <div class="flex items-center justify-between pb-1">
                 <button id="btn-admin-send-emoji-trigger" type="button" 
                     class="h-[36px] w-full text-left text-[1.8rem] outline-none active:scale-95">
@@ -268,7 +268,7 @@
         <div>
             <div class="flex justify-between items-end mb-1">
                 <label class="block text-[0.8rem] font-bold uppercase text-slate-400">Message Body</label>
-                <span class="text-[0.5rem] font-bold text-slate-400"><span id="admin-send-body-count">0</span>/300</span>
+                <span class="text-[0.8rem] font-bold text-slate-400"><span id="admin-send-body-count">0</span>/300</span>
             </div>
             <textarea id="admin-send-body" maxlength="300" placeholder="ユーザーへのメッセージを入力してください" 
                 class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none "></textarea>
@@ -297,7 +297,7 @@
     <div class="flex flex-col h-full w-full min-h-[200px]">
         <!-- 上部固定のスコアフィルタバー -->
         <div class="sticky top-0 z-10 bg-brand-0 pb-3 flex flex-col gap-2">
-            <div class="text-[0.5rem] font-bold text-slate-400 uppercase tracking-widest pl-1">Filter by Score</div>
+            <div class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest pl-1">Filter by Score</div>
             <div id="feedback-score-filter" class="flex justify-between bg-white">
                 <button data-score="0" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-bold rounded-lg transition-all">ALL</button>
                 <button data-score="1" class="js-score-btn flex-1 py-1.5 text-[0.8rem] font-bold rounded-lg transition-all">1</button>
@@ -318,8 +318,8 @@
         <div class="flex justify-between items-center mb-1">
             <span class="js-date kb-date-tim-sm"></span>
             <div class="flex gap-1">
-                <span class="hidden bg-slate-800 text-white text-[9px] px-2 py-0.5 rounded-full js-badge-deleted">DELETED</span>
-                <span class="hidden bg-slate-300 text-white text-[9px] px-2 py-0.5 rounded-full js-badge-closed ">CLOSED</span>
+                <span class="hidden bg-slate-800 text-white text-[0.8rem] px-2 py-0.5 rounded-full js-badge-deleted">DELETED</span>
+                <span class="hidden bg-slate-300 text-white text-[0.8rem] px-2 py-0.5 rounded-full js-badge-closed ">CLOSED</span>
             </div>
         </div>
         <!-- 宛先表示をアイコン＋ニックネームに変更 -->
@@ -337,7 +337,7 @@
         <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-200">
             <div id="js-analytics-user-badge"></div>
             <div class="flex flex-col items-end">
-                <span class="text-[0.6rem] font-bold text-slate-400 uppercase">Reports</span>
+                <span class="text-[0.8rem] font-bold text-slate-400 uppercase">Reports</span>
                 <span class="js-report-count text-[1.2rem] font-bold text-red-500">0</span>
             </div>
         </div>
@@ -345,18 +345,18 @@
         <div class="grid grid-cols-2 gap-3">
             <!-- Private Card -->
             <div class="bg-white border-2 border-slate-100 rounded-xl p-3 ">
-                <div class="text-[0.6rem] font-bold text-slate-400 uppercase mb-2 border-b border-slate-50">Private Stats</div>
+                <div class="text-[0.8rem] font-bold text-slate-400 uppercase mb-2 border-b border-slate-50">Private Stats</div>
                 <div class="js-private-stats space-y-1"></div>
             </div>
             <!-- Public Card -->
             <div class="bg-white border-2 border-brand-2 rounded-xl p-3 shadow-brand">
-                <div class="text-[0.6rem] font-bold text-brand-5 uppercase mb-2 border-b border-brand-5">Public Stats</div>
+                <div class="text-[0.8rem] font-bold text-brand-5 uppercase mb-2 border-b border-brand-5">Public Stats</div>
                 <div class="js-public-stats space-y-1"></div>
             </div>
         </div>
         <!-- クリック解析 -->
         <div class="bg-white border border-slate-200 rounded-xl p-3">
-            <div class="text-[0.6rem] font-bold text-slate-400 uppercase mb-3">Link Click Stats</div>
+            <div class="text-[0.8rem] font-bold text-slate-400 uppercase mb-3">Link Click Stats</div>
             <div class="js-click-list space-y-2"></div>
         </div>
     </div>
@@ -371,7 +371,7 @@
             <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
                 <div class="js-user-badge-container scale-90 origin-left -my-1"></div>
                 <div class="flex items-center gap-1.5 bg-red-50 px-2 py-0.5 rounded border border-red-100">
-                    <span class="text-[0.5rem] font-bold text-red-400 uppercase">Reported</span>
+                    <span class="text-[0.8rem] font-bold text-red-400 uppercase">Reported</span>
                     <span class="js-report-count text-[0.9rem] font-bold text-red-500  mt-0.5">0</span>
                 </div>
             </div>
@@ -379,19 +379,19 @@
             <div class="grid grid-cols-2 gap-4 divide-x divide-slate-100">
                 <!-- Private -->
                 <div class="pr-2">
-                    <div class="text-[0.55rem] font-bold text-slate-400 uppercase mb-2">🔒 Private</div>
+                    <div class="text-[0.8rem] font-bold text-slate-400 uppercase mb-2">🔒 Private</div>
                     <div class="js-stats-pvt"></div>
                 </div>
                 <!-- Public -->
                 <div class="pl-2">
-                    <div class="text-[0.55rem] font-bold text-brand-5 uppercase mb-2">◎ Public</div>
+                    <div class="text-[0.8rem] font-bold text-brand-5 uppercase mb-2">◎ Public</div>
                     <div class="js-stats-pub"></div>
                 </div>
             </div>
         </div>
         <!-- プロフィールリンク実績 -->
         <div class="mt-2">
-            <div class="text-[0.6rem] font-bold text-slate-400 uppercase pl-1 mb-1">Profile Links</div>
+            <div class="text-[0.8rem] font-bold text-slate-400 uppercase pl-1 mb-1">Profile Links</div>
             <div class="js-click-container space-y-2"></div>
         </div>
         <!-- ④ 強制アクション -->
@@ -410,11 +410,11 @@
 <template id="tpl-user-activity-summary">
     <div class="space-y-2">
         <div class="flex justify-between items-center">
-            <span class="text-slate-400 text-[0.7rem]">Archives</span>
+            <span class="text-slate-400 text-[0.8rem]">Archives</span>
             <b class="js-archive-count font-bold text-slate-900 text-[1rem]">0</b>
         </div>
         <div class="flex justify-between items-center">
-            <span class="text-slate-400 text-[0.7rem]">Memos</span>
+            <span class="text-slate-400 text-[0.8rem]">Memos</span>
             <b class="js-memo-count font-bold text-slate-900 text-[1rem]">0</b>
         </div>
     </div>
@@ -424,16 +424,16 @@
 <template id="tpl-admin-core-config">
     <div class="w-full text-slate-900 space-y-5 pt-2 px-2">
         <div class="bg-red-50 border-l-4 border-red-500 p-3">
-            <p class="text-[0.7rem] text-red-700 font-bold">※システム基幹設定です。慎重に操作してください。</p>
+            <p class="text-[0.8rem] text-red-700 font-bold">※システム基幹設定です。慎重に操作してください。</p>
         </div>
         <!-- アプリバージョン管理 -->
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-[0.6rem] font-bold text-slate-400 uppercase mb-1">Latest Version</label>
+                <label class="block text-[0.8rem] font-bold text-slate-400 uppercase mb-1">Latest Version</label>
                 <input id="cfg-ver-latest" type="text" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-lg focus:border-brand-5 outline-none font-bold">
             </div>
             <div>
-                <label class="block text-[0.6rem] font-bold text-slate-400 uppercase mb-1">Min Version</label>
+                <label class="block text-[0.8rem] font-bold text-slate-400 uppercase mb-1">Min Version</label>
                 <input id="cfg-ver-min" type="text" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-lg focus:border-brand-5 outline-none font-bold">
             </div>
         </div>
@@ -442,7 +442,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <span class="block text-[0.8rem] font-bold text-slate-900">Maintenance Mode</span>
-                    <span id="desc-MaintenanceMode" class="text-[0.6rem] text-slate-400 italic"></span>
+                    <span id="desc-MaintenanceMode" class="text-[0.8rem] text-slate-400 italic"></span>
                 </div>
                 <button id="btn-cfg-maint" class="w-14 h-8 rounded-full bg-slate-300 relative transition-colors shrink-0">
                     <div class="js-dot absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-all"></div>
@@ -450,7 +450,7 @@
                 <input type="hidden" id="val-cfg-maint" value="false">
             </div>
             <div>
-                <label class="block text-[0.6rem] font-bold text-slate-400 uppercase mb-1">Maintenance Message</label>
+                <label class="block text-[0.8rem] font-bold text-slate-400 uppercase mb-1">Maintenance Message</label>
                 <textarea id="cfg-maint-msg" class="w-full border-2 border-brand-3 px-3 py-2 text-[0.8rem] h-24 rounded-lg focus:border-brand-5 outline-none resize-none "></textarea>
             </div>
         </div>
@@ -462,7 +462,7 @@
     <button class="js-item-card w-full text-left p-4 border-b border-slate-100 active:bg-slate-50 flex flex-col gap-1 transition-colors">
         <div class="flex justify-between items-center mb-1">
             <span class="js-date kb-date-tim-sm"></span>
-            <span class="js-action text-[0.7rem] font-bold text-brand-5 px-2 py-0.5 bg-brand-1 rounded uppercase"></span>
+            <span class="js-action text-[0.8rem] font-bold text-brand-5 px-2 py-0.5 bg-brand-1 rounded uppercase"></span>
         </div>
         <div class="text-[0.9rem] font-bold text-slate-900 line-clamp-2 js-body"></div>
         <div class="text-right"><span class="text-slate-400 text-[1.2rem]">›</span></div>
@@ -474,27 +474,27 @@
     <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden bg-white gap-5 pt-2">
         <!-- 日時 -->
         <div class="border-b border-slate-50 pb-2">
-            <label class="block text-[0.6rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Timestamp</label>
+            <label class="block text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Timestamp</label>
             <div class="js-tim text-[1.1rem] font-bold text-slate-900 italic"></div>
         </div>
         <!-- 操作種別 -->
         <div class="border-b border-slate-50 pb-2">
-            <label class="block text-[0.6rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Action Kind</label>
+            <label class="block text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Action Kind</label>
             <div class="js-action text-[1.2rem] font-bold text-brand-5"></div>
         </div>
         <!-- 本文 (body) -->
         <div class="border-b border-slate-50 pb-2">
-            <label class="block text-[0.6rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Message / Reason</label>
+            <label class="block text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Message / Reason</label>
             <div class="js-body text-[1.1rem] font-bold text-slate-900  whitespace-pre-wrap"></div>
         </div>
         <!-- ターゲットユーザID -->
         <div class="border-b border-slate-50 pb-2">
-            <label class="block text-[0.6rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Target User ID</label>
+            <label class="block text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Target User ID</label>
             <div class="js-user-id text-[1rem] font-mono text-slate-400 break-all"></div>
         </div>
         <!-- 操作詳細 (JSON) -->
         <div class="flex-1 flex flex-col min-h-0">
-            <label class="block text-[0.6rem] font-bold text-slate-400 uppercase mb-1 pl-1">Operation Payload (JSON)</label>
+            <label class="block text-[0.8rem] font-bold text-slate-400 uppercase mb-1 pl-1">Operation Payload (JSON)</label>
             <div class="flex-1 bg-slate-900 rounded-xl p-4 overflow-y-auto">
                 <pre class="js-payload text-[0.9rem] text-emerald-400 font-mono whitespace-pre-wrap break-all "></pre>
             </div>

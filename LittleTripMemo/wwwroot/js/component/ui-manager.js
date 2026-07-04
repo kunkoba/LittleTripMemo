@@ -107,7 +107,7 @@ const UI_Manager = {
 				if (type === 'dot') {
 					badge.className += 'w-3 h-3 rounded-full top-1 right-1 border-2 border-brand-1';
 				} else {
-					badge.className += 'text-[9px] px-2 py-0.5 rounded-full top-1/2 -translate-y-1/2 right-4';
+					badge.className += 'text-[0.8rem] px-2 py-0.5 rounded-full top-1/2 -translate-y-1/2 right-4';
 					badge.textContent = 'NEW';
 				}
 				parentEl.appendChild(badge);

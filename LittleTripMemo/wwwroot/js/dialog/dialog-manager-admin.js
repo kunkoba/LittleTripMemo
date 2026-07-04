@@ -181,36 +181,36 @@ export default {
         const isSuccess = await $Data.Access.GetReportSummary();
         if (!isSuccess) return;
         const reportSummary = $App.AppData.Admin.ReportSummary || [];
-        const root = $Dom.GenerateTemplate("tpl-list-parent");
         if (reportSummary.length === 0) {
-            root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">通報データはありません</div>`;
-        } else {
-            // 通報件数の多い順にソート
-            const sorted = [...reportSummary].sort((a, b) => b.report_count - a.report_count);
-            sorted.forEach(item => {
-                const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-summary");
-                // ① まとめタイトルの反映
-                $Dom.QuerySelector(".js-archive-title", child).textContent = item.archive_title || "Unknown Title";
-                // ② 通報件数の反映
-                $Dom.QuerySelector(".js-badge-count", child).textContent = `${item.report_count}`;
-                // ③ 最終更新日の反映（キー名は実際のAPIに合わせてください）
-                const updateTim = item.update_tim || item.archive_update_tim;
-                if (updateTim) {
-                    $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(updateTim);
-                } else {
-                    $Dom.ToggleShow($Dom.QuerySelector(".js-update-tim", child), false);
-                }
-                // ④ ユーザーバッジの生成と反映（キー名は実際のAPIに合わせてください）
-                const userWrapper = $Dom.QuerySelector(".js-user-wrapper", child);
-                $UI.Generator.UserBadge(userWrapper, {
-                    user_id: item.target_user_id,
-                    nick_name: item.target_user_name || item.target_nick_name || item.target_user_id.slice(0, 8),
-                    icon: item.target_user_icon || item.target_icon || "👤"
-                }, { type: 'badge' }); // ラベル（バッジ）タイプで出力
-                child.onclick = () => this.ShowAdminReportDetail(item);
-                root.appendChild(child);
-            });
+            $Notice.Warn("通報データはありません");
+            return;
         }
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        // 通報件数の多い順にソート
+        const sorted = [...reportSummary].sort((a, b) => b.report_count - a.report_count);
+        sorted.forEach(item => {
+            const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-summary");
+            // ① まとめタイトルの反映
+            $Dom.QuerySelector(".js-archive-title", child).textContent = item.archive_title || "Unknown Title";
+            // ② 通報件数の反映
+            $Dom.QuerySelector(".js-badge-count", child).textContent = `${item.report_count}`;
+            // ③ 最終更新日の反映（キー名は実際のAPIに合わせてください）
+            const updateTim = item.update_tim || item.archive_update_tim;
+            if (updateTim) {
+                $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(updateTim);
+            } else {
+                $Dom.ToggleShow($Dom.QuerySelector(".js-update-tim", child), false);
+            }
+            // ④ ユーザーバッジの生成と反映（キー名は実際のAPIに合わせてください）
+            const userWrapper = $Dom.QuerySelector(".js-user-wrapper", child);
+            $UI.Generator.UserBadge(userWrapper, {
+                user_id: item.target_user_id,
+                nick_name: item.target_user_name || item.target_nick_name || item.target_user_id.slice(0, 8),
+                icon: item.target_user_icon || item.target_icon || "👤"
+            }, { type: 'badge' }); // ラベル（バッジ）タイプで出力
+            child.onclick = () => this.ShowAdminReportDetail(item);
+            root.appendChild(child);
+        });
         this._core.open({
             title: "通報情報管理画面",
             content: root,
@@ -519,28 +519,28 @@ export default {
         const isSuccess = await $Data.Access.GetSentUserMailList();
         if (!isSuccess) return;
         const mails = $App.AppData.Admin.UserMailList  || []; // API側で notifications に格納される想定
-        const root = $Dom.GenerateTemplate("tpl-list-parent");
         if (mails.length === 0) {
-            root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">送信済みメッセージはありません</div>`;
-        } else {
-            mails.forEach(item => {
-                const child = $Dom.GenerateTemplate("tpl-admin-list-child-user-mail");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim);
-                // --- 宛先ユーザー表示（Generator: badgeモードを使用） ---
-                const userWrapper = $Dom.QuerySelector(".js-user-wrapper", child);
-                $UI.Generator.UserBadge(userWrapper, {
-                    icon: item.icon,
-                    nick_name: item.nick_name || item.user_id.slice(0, 8),
-                    user_id: item.user_id
-                }, { type: 'badge' });
-                // 
-                const kindObj = Object.values($Const.USER_NOTICE_KIND).find(k => k.id === item.kind) || $Const.USER_NOTICE_KIND.INFO;
-                $Dom.QuerySelector(".js-emoji", child).textContent = kindObj.emoji; // リスト時
-                $Dom.QuerySelector(".js-body", child).textContent = item.body;
-                child.onclick = () => this.ShowAdminUserMailDetail(item);
-                root.appendChild(child);
-            });
+            $Notice.Warn("送信メールはありません");
+            return;
         }
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        mails.forEach(item => {
+            const child = $Dom.GenerateTemplate("tpl-admin-list-child-user-mail");
+            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.send_tim);
+            // --- 宛先ユーザー表示（Generator: badgeモードを使用） ---
+            const userWrapper = $Dom.QuerySelector(".js-user-wrapper", child);
+            $UI.Generator.UserBadge(userWrapper, {
+                icon: item.icon,
+                nick_name: item.nick_name || item.user_id.slice(0, 8),
+                user_id: item.user_id
+            }, { type: 'badge' });
+            // 
+            const kindObj = Object.values($Const.USER_NOTICE_KIND).find(k => k.id === item.kind) || $Const.USER_NOTICE_KIND.INFO;
+            $Dom.QuerySelector(".js-emoji", child).textContent = kindObj.emoji; // リスト時
+            $Dom.QuerySelector(".js-body", child).textContent = item.body;
+            child.onclick = () => this.ShowAdminUserMailDetail(item);
+            root.appendChild(child);
+        });
         this._core.open({
             title: "ユーザの履歴",
             content: root,
@@ -644,19 +644,19 @@ export default {
         if (!isSuccess) return;
         // historyList から取得
         const historyList = $Data.resData.historyList || [];
-        const root = $Dom.GenerateTemplate("tpl-list-parent");
         if (historyList.length === 0) {
-            root.innerHTML = `<div class="text-center py-10 text-slate-400 font-bold">履歴データはありません</div>`;
-        } else {
-            historyList.forEach(item => {
-                const child = $Dom.GenerateTemplate("tpl-admin-list-child-history");
-                $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim);
-                $Dom.QuerySelector(".js-action", child).textContent = item.action_kind;
-                $Dom.QuerySelector(".js-body", child).textContent = item.body || "（説明なし）";
-                child.onclick = () => this.ShowAdminUserHistoryDetail(item);
-                root.appendChild(child);
-            });
+            $Notice.Warn("通報データはありません");
+            return;
         }
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        historyList.forEach(item => {
+            const child = $Dom.GenerateTemplate("tpl-admin-list-child-history");
+            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.create_tim);
+            $Dom.QuerySelector(".js-action", child).textContent = item.action_kind;
+            $Dom.QuerySelector(".js-body", child).textContent = item.body || "（説明なし）";
+            child.onclick = () => this.ShowAdminUserHistoryDetail(item);
+            root.appendChild(child);
+        });
         this._core.open({ title: "ユーザの履歴", content: root, theme: "admin", size: "lg" });
     },
     // 【管理者機能】操作履歴の詳細表示
