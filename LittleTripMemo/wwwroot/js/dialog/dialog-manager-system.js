@@ -14,11 +14,10 @@ export default {
             // 表示されているすべてのダイアログを破棄
             this._core.closeAll();
             // Init()で全初期化するのではなく、現在の画面モードを維持して再描画する
-            // await $App.RefreshScreen();
             await $App.Init();
         });
         this._core.open({
-            title: "LOGIN",
+            title: "ログイン",
             content: el,
             help: "aaaa",
         });
@@ -58,7 +57,7 @@ export default {
         b.admin.onclick = async () => {
             this.ShowAdminMenu();
         };
-        this._core.open({ title: "SYSTEM", content: el });
+        this._core.open({ title: "システム画面", content: el });
     },
     // 【👤 ユーザーメニュー】
     ShowUserMenu() {
@@ -77,7 +76,7 @@ export default {
         b.mail.onclick    = () => this.ShowUserMailList();
         b.config.onclick  = () => this.ShowUserSettingsMenu();
         b.reports.onclick = () => this.ShowMyReportList();
-        this._core.open({ title: "USER MENU", content: el });
+        this._core.open({ title: "ユーザメニュー", content: el });
     },
     // （ユーザ設定）ユーザー設定メニュー（第2階層）
     ShowUserSettingsMenu() {
@@ -89,7 +88,7 @@ export default {
         $Dom.QuerySelector('#btn-set-font', el).onclick = () => this.ShowFontSizeConfig();
         //
         this._core.open({
-            title: "USER SETTINGS",
+            title: "ユーザ設定",
             content: el,
             help: "ユーザシステム\nメニュー",
         });
@@ -120,7 +119,7 @@ export default {
         const bind = (id, theme) => $Dom.QuerySelector(id, el).onclick = () => $UI.ChangeTheme(theme);
         bind('#th-btn-blue', 'blue'); bind('#th-btn-green', 'green'); bind('#th-btn-red', 'red'); bind('#th-btn-yellow', 'yellow');
         this._core.open({
-            title: "THEME CONFIG",
+            title: "テーマカラー",
             content: el,
             help: "",
             onClose: () => {
@@ -177,7 +176,7 @@ export default {
             };
         });
         this._core.open({
-            title: "MAP STYLE CONFIG",
+            title: "地図スタイル",
             content: el,
             help: "",
             onClose: () => {
@@ -215,7 +214,7 @@ export default {
         const oldUnit = $App.AppData.Owner.Currency_unit || 'JPY';
         inputCurrency.value = oldUnit;
         this._core.open({
-            title: "CURRENCY CONFIG",
+            title: "金額の単位",
             content: el,
             help: "",
             onClose: () => {
@@ -265,7 +264,7 @@ export default {
             $Dom.ToggleShow(unit, tempSec !== 0);
         };
         this._core.open({
-            title: "GPS TRACKING",
+            title: "GPS追従の間隔",
             content: el,
             help: "GPSの更新間隔を設定します。\n0sにすると停止します。\n更新間隔が短いほど、バッテリーの消費が早くなります。",
             onClose: () => {
@@ -320,7 +319,7 @@ export default {
         };
         renderList(selectedSize);
         this._core.open({
-            title: "FONT SIZE CONFIG",
+            title: "フォントサイズ",
             content: el,
             help: "アプリ全体の文字サイズを調整します。\nデバイスごとの適切なサイズ差は維持されます。",
             onClose: () => {
@@ -411,80 +410,11 @@ export default {
         }
         //
 		this._core.open({
-			title: "USER PROFILE",
+			title: "ユーザプロフィール",
 			content: el,
             help: "",
 			headerButtons: headerButtons
 		});
-    },
-    // プロフィール編集（上にスタックされる）
-    ShowEditProfile_2(profile, onUpdate) {
-        const el = $Dom.GenerateTemplate('tpl-edit-profile');
-        const editIconPreview = $Dom.QuerySelector('#edit-profile-icon-preview', el);
-        const editIconInput = $Dom.QuerySelector('#edit-profile-icon', el);
-        const editNickname = $Dom.QuerySelector('#edit-profile-nickname', el);
-        const editNicknameCount = $Dom.QuerySelector('#edit-profile-nickname-count', el);
-        const editDesc = $Dom.QuerySelector('#edit-profile-description', el);
-        const editDescCount = $Dom.QuerySelector('#edit-profile-description-count', el);
-        const editLink1 = $Dom.QuerySelector('#edit-profile-link1', el);
-        const editLink2 = $Dom.QuerySelector('#edit-profile-link2', el);
-        const editLink3 = $Dom.QuerySelector('#edit-profile-link3', el);
-        editIconPreview.textContent = profile.icon || "👤";
-        editIconInput.value = profile.icon || "👤";
-        editNickname.value = profile.nick_name || "";
-        editNicknameCount.textContent = (profile.nick_name || "").length;
-        editDesc.value = profile.description || "";
-        editDescCount.textContent = (profile.description || "").length;
-        editLink1.value = profile.link_1 || "";
-        editLink2.value = profile.link_2 || "";
-        editLink3.value = profile.link_3 || "";
-        editDesc.addEventListener('input', () => editDescCount.textContent = editDesc.value.length);
-        editNickname.addEventListener('input', () => editNicknameCount.textContent = editNickname.value.length);
-        $Dom.QuerySelector('#btn-profile-icon-trigger', el).onclick = () => {
-            $Util.ShowEmojiPicker((emoji) => {
-                editIconPreview.textContent = emoji;
-                editIconInput.value = emoji;
-            });
-        };
-        this._core.open({
-            title: "EDIT PROFILE",
-            content: el,
-            help: "",
-            isFooterFixed: false,   // 編集用
-            buttons: [
-                [
-                    {
-                        label: "CANCEL",
-                        className: "bg-slate-400 text-white shadow-brand",
-                        handler: () => {
-                            this._core.close();
-                        },
-                    },
-                    {
-                        label: "SAVE",
-                        className: "bg-brand-4 text-white shadow-brand",
-                        handler: $Warn.CatchAsync(async () => {
-                            const updatedFields = {
-                                nick_name: editNickname.value.trim(),
-                                icon: editIconInput.value,
-                                description: editDesc.value.trim(),
-                                link_1: editLink1.value.trim(),
-                                link_2: editLink2.value.trim(),
-                                link_3: editLink3.value.trim(),
-                            };
-                            const isSuccess = await $Data.Access.UpdateProfile(updatedFields);
-                            if (!isSuccess) return;
-                            Object.assign(profile, updatedFields);
-                            $Notice.Info("プロフィールを更新しました");
-                            this._core.close();
-                            if (onUpdate) onUpdate();
-                            // 下段バーのアイコンを更新
-                            $BotBar.UpdateUserIcon();
-                        })
-                    }
-                ]
-            ]
-        });
     },
     // プロフィール編集（上にスタックされる）
     ShowEditProfile(profile, onUpdate) {
@@ -524,7 +454,7 @@ export default {
             });
         };
         this._core.open({
-            title: "EDIT PROFILE",
+            title: "プロフィールの編集",
             content: el,
             help: "",
             isFooterFixed: false,   // 編集用
@@ -593,7 +523,7 @@ export default {
             root.appendChild(child);
         });
         this._core.open({
-            title: "MY REPORTS",
+            title: "通報したまとめ",
             content: root,
             help: "",
         });
@@ -642,7 +572,7 @@ export default {
             };
         }
         this._core.open({
-            title: "REPORT DETAIL",
+            title: "通報情報の詳細",
             content: el,
         });
     },
@@ -679,7 +609,7 @@ export default {
             container.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">設定されているリンクがありません</div>`;
         }
         this._core.open({
-            title: "CLICK STATS",
+            title: "クリック数",
             content: el,
             help: "各リンクがクリックされた回数を集計しています。\nUniqueはクリックした人数、Guestは未ログインユーザーのクリック数です。",
             buttons: []
@@ -721,7 +651,7 @@ export default {
             `;
             clickList.appendChild(row);
         });
-        this._core.open({ title: "USER ANALYTICS", content: el, theme: "admin" });
+        this._core.open({ title: "ユーザ解析", content: el, theme: "admin" });
     },
     // 【管理者機能】ユーザ解析情報2
     ShowUserClickStats(profile) {
@@ -807,7 +737,7 @@ export default {
         }
         //
         this._core.open({
-            title: "USER CLICK STATS",
+            title: "ユーザ解析",
             content: el,
             theme: profile.is_owner ? "user" : "admin", // 閲覧者が本人の場合は通常、管理者の場合はAdminテーマ
             headerButtons: headerButtons

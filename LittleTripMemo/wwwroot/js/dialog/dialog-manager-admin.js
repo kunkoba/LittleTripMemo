@@ -8,7 +8,7 @@ export default {
         $Dom.QuerySelector('#btn-admin-user-mail', el).onclick = () => this.ShowAdminUserMailList();
         $Dom.QuerySelector('#btn-admin-core-cfg', el).onclick = () => this.ShowAdminCoreConfig();
         this._core.open({
-            title: "ADMIN TOOLS",
+            title: "管理者ツール",
             content: el,
             theme: "admin",
             help: "",
@@ -62,7 +62,7 @@ export default {
         await renderList();
         //
         this._core.open({
-            title: "NOTICE Mgmt",
+            title: "システム通知管理画面",
             content: root,
             theme: "admin",
             help: "システム全体への通知を管理します。\n下のボタンから新規作成、一覧の項目タップで編集が可能です。",
@@ -129,7 +129,7 @@ export default {
         $Dom.QuerySelector('#btn-clear-notice-to', el).onclick = () => inptTo.value = "";
         //
         this._core.open({
-            title: isNew ? "NEW NOTICE" : "EDIT NOTICE",
+            title: isNew ? "システム通知 登録" : "システム通知 編集",
             content: el,
             theme: "admin",
             help: "",
@@ -212,14 +212,13 @@ export default {
             });
         }
         this._core.open({
-            title: "REPORT Mgmt",
+            title: "通報情報管理画面",
             content: root,
             theme: "admin",
             help: "",
             buttons: []
         });
     },
-    // 【管理者機能】通報詳細（is_deleted関連の処理を削除して整理）
     // 【管理者機能】通報詳細
     async ShowAdminReportDetail(summaryItem) {
         const isSuccess = await $Data.Access.GetReportDetails({
@@ -296,7 +295,7 @@ export default {
                 listContainer.appendChild(child);
             });
         }
-        this._core.open({ title: "REPORT DETAILS", content: el, theme: "admin", help: "", buttons: [] });
+        this._core.open({ title: "通報情報詳細", content: el, theme: "admin", help: "", buttons: [] });
     },
     // 【管理者機能】通報1件の全文詳細を表示
     async ShowAdminReportItemDetail(rep) {
@@ -320,7 +319,7 @@ export default {
         }, { type: 'button', isOwner: false });
         //
         this._core.open({
-            title: "REPORT CONTENT",
+            title: "通報情報詳細",
             content: el,
             theme: "admin",
             help: "",
@@ -421,11 +420,11 @@ export default {
         // 初回描画の実行
         renderList();
         this._core.open({
-            title: "FEEDBACK Mgmt",
+            title: "みんなの評価",
             content: frame,
             size: 'lg',
             theme: "admin",
-            help: "★の数やワードでフィードバックの絞り込みができます。",
+            help: "",
         });
     },
     // 【管理者機能】フィードバック詳細
@@ -483,7 +482,7 @@ export default {
         countBody.textContent = inputBody.value.length;
         inputBody.addEventListener('input', () => countBody.textContent = inputBody.value.length);
         this._core.open({
-            title: "SEND MAIL",
+            title: "送信メール",
             content: el,
             theme: "admin",
             help: "",
@@ -543,7 +542,7 @@ export default {
             });
         }
         this._core.open({
-            title: "USER MESSAGE LOG",
+            title: "ユーザの履歴",
             content: root,
             theme: "admin",
             help: "",
@@ -571,7 +570,7 @@ export default {
         // 本文（全文表示）
         $Dom.QuerySelector('#view-notice-body', el).textContent = item.body;
         this._core.open({
-            title: "MESSAGE DETAILS (ADMIN)",
+            title: "メッセージ詳細 (ADMIN)",
             content: el,
             theme: "admin",
             help: "",
@@ -613,7 +612,7 @@ export default {
         updateToggleUI(getVal("MaintenanceMode") === "true");
         btnMaint.onclick = () => updateToggleUI(valMaint.value === "false");
         this._core.open({
-            title: "SYSTEM CONFIG",
+            title: "システム設定",
             content: el, theme: "admin", size: "md",
             buttons: [[
                 { label: "CANCEL", className: "bg-slate-400 text-white", handler: () => this._core.close() },
@@ -658,7 +657,7 @@ export default {
                 root.appendChild(child);
             });
         }
-        this._core.open({ title: "USER HISTORY", content: root, theme: "admin", size: "lg" });
+        this._core.open({ title: "ユーザの履歴", content: root, theme: "admin", size: "lg" });
     },
     // 【管理者機能】操作履歴の詳細表示
     ShowAdminUserHistoryDetail(item) {
@@ -679,7 +678,7 @@ export default {
             payloadEl.textContent = "No detailed payload.";
         }
         this._core.open({
-            title: "HISTORY DETAIL",
+            title: "履歴の詳細",
             content: el,
             theme: "admin",
             size: "lg" // 縦に並ぶのでサイズを大きく確保

@@ -26,7 +26,7 @@ export default {
         b.search.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH; $App.RefreshScreen(); };
         b.pointSearch.onclick = () => this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18));
         b.create.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; $App.RefreshScreen(); };
-        this._core.open({ title: "DATA MENU", content: el });
+        this._core.open({ title: "アプリメニュー", content: el });
     },
     // 【アクションメニュー】
     ShowActionMenu() {
@@ -47,7 +47,7 @@ export default {
             $Marker.RefreshCurrentLocation();
             $Marker.FocusToLocationMarker(1000);
         };
-        this._core.open({ title: "ACTIONS", content: el });
+        this._core.open({ title: "アクションメニュー", content: el });
     },
     // 座標・住所指定で移動する
     PointSearchGoogle(onOk) {
@@ -160,7 +160,7 @@ export default {
             }
         });
         this._core.open({
-            title: "ATMOSPHERE SETTING",
+            title: "環境エフェクト",
             content: el,
             onClose: () => {
                 if (typeof Atmosphere !== 'undefined') {

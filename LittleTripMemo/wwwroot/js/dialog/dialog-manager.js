@@ -230,7 +230,7 @@ const DialogController = {
         // 補足情報の流し込み
         msgEl.textContent = message || "通信環境を確認するか、しばらく時間をおいてから再度お試しください。";
         const frame = this._core.open({
-            title: "SYSTEM ERROR",
+            title: "アプリでエラーが発生しました",
             isModal: true, // 背景クリックやXボタンで閉じさせない
             content: el,
             buttons: [[

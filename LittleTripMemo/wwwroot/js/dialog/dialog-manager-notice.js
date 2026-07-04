@@ -32,7 +32,7 @@ export default {
         $Dom.QuerySelector('#btn-info-review', el).onclick = () => this.ShowReviewList();
         $Dom.QuerySelector('#btn-info-license', el).onclick = () => $Notice.Info($Const.APP_INFO.LICENSE || "ライセンス情報がありません。");
         this._core.open({
-            title: "APP INFO",
+            title: "アプリの詳細情報",
             content: el,
             help: "アプリの基本情報と、公開されているまとめやメモの全体統計を表示します。",
             buttons:[]
@@ -61,7 +61,7 @@ export default {
             });
         }
         this._core.open({
-            title: "FEEDBACKS",
+            title: "アプリの評価",
             content: el,
             help: "",
             buttons:[
@@ -126,7 +126,7 @@ export default {
         });
         this._core.open({
             // データが既にあれば編集（EDIT）、なければ新規（WRITE）
-            title: myFeedback ? "EDIT FEEDBACK" : "WRITE FEEDBACK",
+            title: myFeedback ? "評価の編集" : "評価を書き込む",
             content: el,
             help: "",
             buttons: [[
@@ -183,7 +183,7 @@ export default {
             $Dom.ToggleShow(urlWrapper, false);
         }
 		this._core.open({
-			title: "NOTICE DETAILS",
+			title: "システム通知",
 			content: el,
             help: "",
 		});
@@ -238,7 +238,7 @@ export default {
             root.appendChild(child);
         });
         this._core.open({
-            title: "NOTIFICATIONS",
+            title: "システム通知",
             content: root,
             help: "",
         });
@@ -311,8 +311,8 @@ export default {
             }]);
         }
         this._core.open({
+            title: myReport ? "通報内容を変更する" : "通報する",
             theme: "black", // これを指定することで全体が黒ベース・角丸なしになる
-            title: myReport ? "EDIT REPORT" : "REPORT SUBMIT",
             content: el,
             help: "",
             buttons: dialogButtons // そのまま配列を渡す
@@ -368,7 +368,7 @@ export default {
             root.appendChild(child);
         });
         this._core.open({
-            title: "MESSAGES",
+            title: "受信メール",
             content: root,
             help: "",
         });
@@ -386,7 +386,7 @@ export default {
         const bodyEl = $Dom.QuerySelector('#view-notice-body', el);
         bodyEl.textContent = body.trim() !== "" ? body : item.body;
         this._core.open({
-            title: "MESSAGE DETAILS",
+            title: "受信メール詳細",
             content: el,
             help: "",
             buttons: []

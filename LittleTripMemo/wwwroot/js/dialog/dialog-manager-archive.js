@@ -89,7 +89,7 @@ export default {
             child.onclick = () => { this._core.closeAll(); $Marker.SelectMarker(index); };
             listContainer.appendChild(child);
         });
-        this._core.open({ title: "TRIP LOG", content: el });
+        this._core.open({ title: "タイムライン", content: el });
     },
     // 検索結果用リスト
     ShowDetailsSearchResult() {
@@ -141,7 +141,7 @@ export default {
             child.onclick = () => { this._core.closeAll(); $Marker.SelectMarker(index); };
             el.appendChild(child);
         });
-        this._core.open({ title: "SEARCH RESULTS", content: el });
+        this._core.open({ title: "検索の結果", content: el });
     },
     async ShowArchiveList() {
         const isSuccess = await $Data.Access.GetArchiveList();
@@ -226,7 +226,7 @@ export default {
         };
         render("");
         this._core.open({
-            title: "ARCHIVE LIST", 
+            title: "まとめの一覧", 
             size: "lg",
             content: root, 
             help: "上部の入力欄から検索できます。" 
@@ -285,7 +285,7 @@ export default {
             });
             // 選択用ダイアログを開く
             this._core.open({
-                title: "SELECT ARCHIVE",
+                title: "まとめを選択",
                 content: root,
                 help: "",
                 buttons: []
@@ -385,7 +385,7 @@ export default {
         });
         updateSelectionUI();
         frame = this._core.open({
-            title: "SELECTION MODE",
+            title: "まとめ選択",
             content: content,
             help: "",
             buttons: [[
@@ -669,7 +669,7 @@ export default {
         const headerButtons = buildHeaderButtons(profile, qrUrl);
         const dialogButtons = []; // 一般ユーザーはダイアログ下部フッター(buttons)は無し
         this._core.open({
-            title: "Archive info",
+            title: "まとめの詳細情報",
             content: el,
             size: 'lg',
             help: "",
@@ -729,7 +729,7 @@ export default {
         };
         // 
         this._core.open({
-            title: "SHARE ARCHIVE",
+            title: "まとめを共有する",
             content: el,
             size: 'sm',
             help: "",
@@ -850,7 +850,7 @@ export default {
         descEl.textContent = desc;
         // すでにダイアログがスタックされる仕様なので、そのまま上に開く
         this._core.open({
-            title: "CHANGE STATUS",
+            title: "公開状態を変更する",
             content: el,
             help: "",
             buttons: buttons
@@ -876,7 +876,7 @@ export default {
         editBody.addEventListener('input',  () => cBody.textContent  = editBody.value.length);
         //
         this._core.open({
-            title: "EDIT ARCHIVE",
+            title: "詳細情報の編集",
             content: el,
             help: "",
             isFooterFixed: false,   // 編集用
@@ -985,7 +985,7 @@ export default {
         }
         //
         this._core.open({
-            title: "ARCHIVE STATS",
+            title: "まとめの状態",
             content: el,
             help: "まとめや各明細の統計（閲覧数・リンククリック数・リアクション数）を表示しています。",
             size: 'lg'
