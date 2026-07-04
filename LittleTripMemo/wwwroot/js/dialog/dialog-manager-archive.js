@@ -678,30 +678,6 @@ export default {
         });
     },
     // URL公開画面
-    ShowShareArchive_2(archive, profile, shareUrl) {
-        const el = $Dom.GenerateTemplate('tpl-share-archive');
-        // 1. タイトルの反映
-        $Dom.QuerySelector('#share-archive-title', el).textContent = archive.title || "No Title";
-        // 3. QRコードの生成 (無料APIを利用)
-        const qrImg = $Dom.QuerySelector('#share-qr-image', el);
-        qrImg.src = shareUrl;
-        // 4. コピー処理 (ボタンをクリックでコピー)
-        $Dom.QuerySelector('#btn-share-copy', el).onclick = () => {
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                $Notice.Info("URLをクリップボードにコピーしました！");
-            }).catch(err => {
-                $Notice.Error("コピーに失敗しました");
-            });
-        };
-        this._core.open({
-            title: "SHARE ARCHIVE",
-            content: el,
-            size: 'sm',
-            help: "",
-            buttons: [] // CLOSEボタンは右上の✖で代用し、下部はコピーボタンのみにする
-        });
-    },
-    // URL公開画面
     ShowShareArchive(archive, profile, shareUrl) {
         const el = $Dom.GenerateTemplate('tpl-share-archive');
         // 1. タイトルの反映

@@ -81,6 +81,8 @@ window.$Dom = {
     GenerateTemplate(templateHtml, rootHtml = 'ui-template-root', isAppend = true){
         const tpl = this.GetElementById(templateHtml);
         const root = this.GetElementById(rootHtml);
+        console.log("GenerateTemplate1:", tpl.content.childNodes.length);
+        console.log("GenerateTemplate2:", tpl.content.firstElementChild);
         const el = tpl.content.firstElementChild.cloneNode(true);
         if (!isAppend) root.innerHTML = "";
         root.appendChild(el);

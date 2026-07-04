@@ -1,5 +1,5 @@
 export default {
-    // 【🗺️ データメニュー】
+    // 【データメニュー】
     ShowDataMenu() {
         if (!$App.AppData.Context.IsLoggedIn) return this.ShowLoginDialog();
         const isLoggedIn = $App.AppData.Context.IsLoggedIn;
@@ -28,21 +28,25 @@ export default {
         b.create.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; $App.RefreshScreen(); };
         this._core.open({ title: "DATA MENU", content: el });
     },
-    // 【� アクションメニュー】
+    // 【アクションメニュー】
     ShowActionMenu() {
         const el = $Dom.GenerateTemplate('tpl-menu-action');
         const isLoggedIn = $App.AppData.Context.IsLoggedIn;
         const b = {
             reload:   $Dom.QuerySelector('#btn-app-reload', el),
             refresh:  $Dom.QuerySelector('#btn-app-refresh', el),
-            current:  $Dom.QuerySelector('#btn-app-current', el),
             restore:  $Dom.QuerySelector('#btn-app-restore', el),
+            current:  $Dom.QuerySelector('#btn-app-current', el),
         };
         const mode = $App.AppData.Context.ScreenMode;
         b.reload.onclick = () => { this._core.close(); $Util.ReloadApp(); };
         b.refresh.onclick = () => { this._core.close(); $App.RefreshScreen(); };
-        b.current.onclick = () => { this._core.close(); $Marker.RefreshCurrentLocation(); $Marker.FocusToLocationMarker(1000); };
         b.restore.onclick = () => { this._core.close(); $Marker.RestoreMarkers(); };
+        b.current.onclick = () => {
+            this._core.close();
+            $Marker.RefreshCurrentLocation();
+            $Marker.FocusToLocationMarker(1000);
+        };
         this._core.open({ title: "ACTIONS", content: el });
     },
     // 座標・住所指定で移動する

@@ -40,32 +40,12 @@
 </template>
 
 <!-- 【ダイアログ子】保存前確認 -->
-<template id="tpl-confirm-base_2">
-    <div class="p-6 text-center flex-1 flex items-center justify-center overflow-hidden">
-        <div class="font-bold text-[1rem] js-message whitespace-pre-line"></div>
-    </div>
-</template>
 <template id="tpl-confirm-base">
     <div class="p-6 text-center flex-1 flex flex-col items-center justify-center overflow-hidden w-full">
         <div class="font-bold text-[1rem] js-message whitespace-pre-line break-all w-full"></div>
     </div>
 </template>
 
-<!-- 【ダイアログ子】絵文字ピッカー -->
-<template id="tpl-emoji-picker_2">
-    <div class="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 touch-none">
-        <div class="p-3 border-0 bg-white rounded-[1rem] shadow-2xl flex flex-col overflow-hidden animate-fade-in">
-            <div class="h-16 px-5 flex justify-between items-center shrink-0 border-b border-slate-100 bg-slate-50/50">
-                <div class="flex flex-col">
-                    <span class="text-[0.5rem] font-bold text-brand-5 uppercase tracking-[0.2em]">Select Icon</span>
-                    <span class="text-[0.8rem] font-bold text-slate-900 italic uppercase ">Marker Library</span>
-                </div>
-                <button class="js-close w-9 h-9 bg-white rounded-full shadow-brand text-slate-400 flex items-center justify-center font-bold active:scale-95 transition-transform border border-slate-100">✖</button>
-            </div>
-            <div id="emoji-mart-container" class="w-full bg-white"></div>
-        </div>
-    </div>
-</template>
 <!-- 【ダイアログ子】絵文字ピッカー -->
 <template id="tpl-emoji-picker">
     <div class="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 touch-none">
@@ -182,70 +162,6 @@
 </template>
 
 <!-- 【ダイアログ子】Atmosphere設定ダイアログ（完全高さ同調版） -->
-<template id="tpl-setting-weather_2">
-	<div class="w-full text-slate-900 space-y-4 px-1 py-1">
-		<div class="flex gap-4 items-start">
-			<!-- 左側：天候選択ボタン -->
-			<div class="w-[110px] shrink-0 flex flex-col gap-2">
-				<label class="block font-bold text-slate-400 text-[0.5rem] mb-1 uppercase tracking-widest">Weather</label>
-				<div id="atm-weather-group" class="flex flex-col gap-2">
-					<button data-val="0" class="atm-w-btn h-9 border-2 border-red-100 bg-white text-red-500 font-bold text-[0.8rem] rounded-xl active:scale-95 transition-all">Clear</button>
-					<button data-val="1" class="atm-w-btn h-9 border-2 border-brand-2 bg-white text-brand-5 font-bold text-[0.8rem] rounded-xl active:scale-95 transition-all">Leaf</button>
-					<button data-val="2" class="atm-w-btn h-9 border-2 border-brand-2 bg-white text-brand-5 font-bold text-[0.8rem] rounded-xl active:scale-95 transition-all">Rain</button>
-					<button data-val="3" class="atm-w-btn h-9 border-2 border-brand-2 bg-white text-brand-5 font-bold text-[0.8rem] rounded-xl active:scale-95 transition-all">Storm</button>
-					<button data-val="4" class="atm-w-btn h-9 border-2 border-brand-2 bg-white text-brand-5 font-bold text-[0.8rem] rounded-xl active:scale-95 transition-all">Snow</button>
-					<button data-val="5" class="atm-w-btn h-9 border-2 border-brand-2 bg-white text-brand-5 font-bold text-[0.8rem] rounded-xl active:scale-95 transition-all">Cherry</button>
-				</div>
-			</div>
-			<!-- 右側：スライダー設定（垂直並びのカード形式） -->
-			<div class="flex-1 flex flex-col gap-3">
-				<label class="block font-bold text-slate-400 text-[0.5rem] mb-1 uppercase tracking-widest text-right pr-2">Settings</label>
-				<!-- WIND 設定カード -->
-				<div class="bg-white border border-slate-100 rounded-xl p-3 ">
-					<div class="flex justify-between items-center mb-1">
-						<span class="text-[0.5rem] font-bold text-brand-5 uppercase">Wind</span>
-						<span id="atm-wind-val" class="text-brand-5 font-bold text-[0.8rem]">0</span>
-					</div>
-					<input id="atm-wind" type="range" min="0" max="9" value="0" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5 mb-2">
-					<div class="flex justify-center gap-4">
-						<button id="btn-wind-minus" class="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 font-bold active:bg-slate-100 ">-</button>
-						<button id="btn-wind-plus"  class="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 font-bold active:bg-slate-100 ">+</button>
-					</div>
-				</div>
-				<!-- DENSITY 設定カード -->
-				<div class="bg-white border border-slate-100 rounded-xl p-3 ">
-					<div class="flex justify-between items-center mb-1">
-						<span class="text-[0.5rem] font-bold text-brand-5 uppercase">Density</span>
-						<span id="atm-density-val" class="text-brand-5 font-bold text-[0.8rem]">0</span>
-					</div>
-					<input id="atm-density" type="range" min="0" max="9" value="0" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5 mb-2">
-					<div class="flex justify-center gap-4">
-						<button id="btn-density-minus" class="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 font-bold active:bg-slate-100 ">-</button>
-						<button id="btn-density-plus"  class="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 font-bold active:bg-slate-100 ">+</button>
-					</div>
-				</div>
-				<!-- DARK 設定カード -->
-				<div class="bg-white border border-slate-100 rounded-xl p-3 ">
-					<div class="flex justify-between items-center mb-1">
-						<span class="text-[0.5rem] font-bold text-brand-5 uppercase">Dark</span>
-						<span id="atm-darkness-val" class="text-brand-5 font-bold text-[0.8rem]">0</span>
-					</div>
-					<input id="atm-darkness" type="range" min="0" max="9" value="0" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5 mb-2">
-					<div class="flex justify-center gap-4">
-						<button id="btn-dark-minus" class="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 font-bold active:bg-slate-100 ">-</button>
-						<button id="btn-dark-plus"  class="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 font-bold active:bg-slate-100 ">+</button>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- 下部：コード表示バー -->
-		<div class="bg-brand-1 rounded-xl py-3 flex items-center justify-center gap-4">
-			<span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-[0.3em]">Code:</span>
-			<span id="atm-code-preview" class="text-[2rem] font-bold text-brand-5 tracking-widest ">0000</span>
-		</div>
-	</div>
-</template>
-<!-- 【修正】Atmosphere設定：数値左・スライダー中・大型ボタン右 -->
 <template id="tpl-setting-weather">
     <div class="w-full text-slate-900 space-y-6 px-1 py-1">
         <!-- 1. 天候選択ボタン（上部） -->

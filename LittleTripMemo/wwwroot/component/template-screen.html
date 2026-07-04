@@ -94,56 +94,6 @@
 </template>
 
 <!-- 【ダイアログ子】アプリ情報 / プロフィール / アーカイブ -->
-<template id="tpl-app-info_2">
-    <div class="w-full flex flex-col h-full bg-slate-50/50 pb-6">
-        <div class="flex flex-col items-center justify-center pt-10 pb-8">
-            <div class="w-24 h-24 bg-gradient-to-br from-brand-4 to-brand-5 rounded-[1.5rem] shadow-brand flex items-center justify-center text-white text-[2.5rem] font-bold mb-5"><span class="drop-  mt-1">LM</span></div>
-            <h3 class="text-[1.1rem] font-bold uppercase tracking-widest text-slate-900 js-app-name text-center  px-4"></h3>
-            <p class="text-[0.8rem] text-slate-400 font-bold tracking-widest mt-2 js-app-version"></p>
-        </div>
-        <div class="px-4 w-full">
-            <div class="bg-white rounded-[1rem] border border-slate-200  overflow-hidden flex flex-col">
-                <div class="flex justify-between items-center p-4 border-b border-slate-100">
-                    <div class="flex items-center gap-3">
-                        <span class="text-[1.5rem] drop-shadow-brand ">🛠️</span>
-                        <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Developer</span>
-                    </div>
-                    <span class="text-[1rem] font-bold text-slate-900 js-app-developer">
-                    </span>
-                </div>
-                <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
-                    <div class="flex items-center gap-3">
-                        <span class="text-[1.5rem] drop-shadow-brand ">⭐</span>
-                        <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Feedback</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-[1rem] font-bold text-yellow-500  js-app-score">★ 0.0</span>
-                        <span class="text-slate-400 text-[1.5rem] font-normal  -mt-0.5">›</span>
-                    </div>
-                </button>
-                <button id="link-info-official" type="button"
-                    class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
-                    <div class="flex items-center gap-3">
-                        <span class="text-[1.5rem] drop-shadow-brand ">🌍</span>
-                        <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Official Site</span>
-                    </div>
-                    <div class="flex items-center gap-1 bg-blue-50 text-blue-500 px-3 py-1 rounded-full border border-blue-100">
-                        <span class="text-[0.8rem] uppercase">Open</span>
-                        <span class="text-[0.8rem] ">↗</span>
-                    </div>
-                </a>
-                <button id="btn-info-license" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors">
-                    <div class="flex items-center gap-3">
-                        <span class="text-[1.5rem] drop-shadow-brand ">📜</span>
-                        <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">License</span>
-                    </div>
-                    <span class="text-slate-400 text-[1.5rem] font-normal  -mt-0.5">›</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</template>
-<!-- 【ダイアログ子】アプリ情報 / プロフィール / アーカイブ -->
 <template id="tpl-app-info">
     <div class="w-full flex flex-col h-full bg-slate-50 overflow-y-auto pb-4">
         <!-- トップヘッダー -->
@@ -232,50 +182,6 @@
     </div>
 </template>
 
-<template id="tpl-view-profile_2">
-	<div class="relative min-h-full flex flex-col bg-white px-1">
-        <!-- アイコン・ニックネーム -->
-		<div class="flex items-center gap-4 mb-3">
-			<div id="view-profile-icon" class="text-[4rem] drop-shadow-brand shrink-0"></div>
-			<div class="flex flex-col flex-1 min-w-0"><h1 id="view-profile-nickname" class="text-[1.2rem] font-bold text-slate-900 break-words "></h1></div>
-		</div>
-        <!-- 本文・リンク -->
-        <div class="bg-brand-1 overflow-y-auto ">
-            <div id="view-profile-description"
-                class="flex-1 min-h-[200px] p-2 text-[1rem] text-slate-900 leading-[2] whitespace-pre-wrap break-words">
-            </div>
-            <div id="view-profile-links" class="gap-3 flex m-2"></div>
-        </div>
-	</div>
-</template>
-<template id="tpl-view-profile_3">
-	<div class="relative min-h-full flex flex-col bg-white px-1">
-        <!-- 上部：ステータス情報 -->
-        <div class="flex justify-between items-center px-1 pb-2">
-            <div class="flex items-center gap-2">
-                <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest">No.<span id="view-profile-member-no" class="text-slate-700 text-[0.8rem]"></span></span>
-            </div>
-            <div class="flex items-center gap-1.5">
-                <span id="view-profile-category" class="bg-brand-1 text-brand-5 border border-brand-2 px-2 py-0.5 rounded text-[0.6rem] font-black uppercase tracking-wider"></span>
-                <span class="bg-amber-100 text-amber-600 border border-amber-200 px-2 py-0.5 rounded text-[0.6rem] font-black uppercase tracking-wider">Rank <span id="view-profile-rank"></span></span>
-            </div>
-        </div>
-        <!-- アイコン・ニックネーム -->
-		<div class="flex items-center gap-4 mb-3 px-1">
-			<div id="view-profile-icon" class="text-[4rem] drop-shadow-brand shrink-0"></div>
-			<div class="flex flex-col flex-1 min-w-0">
-                <h1 id="view-profile-nickname" class="text-[1.2rem] font-black text-slate-800 break-words leading-tight"></h1>
-            </div>
-		</div>
-        <!-- 本文・リンク -->
-        <div class="bg-brand-1 overflow-y-auto rounded-lg">
-            <div id="view-profile-description"
-                class="flex-1 min-h-[200px] p-3 text-[0.95rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-words">
-            </div>
-            <div id="view-profile-links" class="gap-3 flex m-3 mt-0"></div>
-        </div>
-	</div>
-</template>
 <template id="tpl-view-profile">
 	<div class="relative min-h-full flex flex-col bg-white px-1">
         <!-- 上部：ステータス情報 (No.のみ残す) -->
@@ -308,29 +214,6 @@
 	</div>
 </template>
 
-<template id="tpl-edit-profile_2">
-	<div class="w-full text-slate-900 space-y-3 px-1 pb-4">
-		<div class="flex items-end gap-3 py-1">
-			<div class="shrink-0 flex flex-col items-center">
-				<button id="btn-profile-icon-trigger" class="w-14 h-14 bg-white rounded-full shadow-brand flex items-center justify-center text-[2rem] active:scale-95 transition-transform outline-none"><span id="edit-profile-icon-preview">😀</span><input type="hidden" id="edit-profile-icon"></button>
-			</div>
-            <div class="flex-1">
-				<div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Nickname</label><span class="text-[0.5rem] font-bold text-slate-400"><span id="edit-profile-nickname-count">0</span>/20</span></div>
-				<input id="edit-profile-nickname" type="text" maxlength="20" class="w-full border-2 border-brand-3 px-4 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
-			</div>
-		</div>
-		<div>
-			<div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-400">Description</label><span class="text-[0.5rem] font-bold text-slate-400"><span id="edit-profile-description-count">0</span>/300</span></div>
-			<textarea id="edit-profile-description" maxlength="300" class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
-		</div>
-		<div class="space-y-2">
-			<label class="block text-[0.8rem] font-bold uppercase text-slate-400">Social Links</label>
-			<input id="edit-profile-link1" type="url" placeholder="URL 1 (https://...)" class="w-full border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
-			<input id="edit-profile-link2" type="url" placeholder="URL 2" class="w-full border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
-			<input id="edit-profile-link3" type="url" placeholder="URL 3" class="w-full border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
-		</div>
-	</div>
-</template>
 <template id="tpl-edit-profile">
 	<div class="w-full text-black-5 space-y-3 px-1 pb-4">
         <!-- ニックネーム（上段で横幅いっぱい） -->
@@ -443,16 +326,6 @@
     </div>
 </template>
 
-<template id="tpl-share-archive_2">
-    <div class="w-full text-slate-900 flex flex-col items-center">
-        <div class="w-full px-4 mt-2"><div id="share-archive-title" class="text-[1.2rem] font-bold text-slate-900 text-center break-words "></div></div>
-        <div class="w-full flex justify-center my-6">
-            <button id="btn-share-copy" class="shadow-brand w-48 h-48 p-3 bg-brand-0 text-white font-bold rounded-[1rem] shadow-brand active:scale-95 transition-transform flex items-center justify-center">
-                <img id="share-qr-image" src="" alt="QR Code" class="w-48 h-[200px] object-contain">
-            </button>
-        </div>
-    </div>
-</template>
 <template id="tpl-share-archive">
     <div class="w-full text-black-5 flex flex-col items-center pb-4">
         <!-- タイトル -->

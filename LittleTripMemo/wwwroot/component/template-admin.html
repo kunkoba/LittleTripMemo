@@ -363,45 +363,6 @@
 </template>
 
 <!-- 【修正】ユーザ解析：外枠テンプレート -->
-<template id="tpl-user-click-stats_2">
-    <div class="w-full flex flex-col gap-4 text-[0.8rem]">
-        <!-- ① ユーザ基本情報 & 通報リスク -->
-        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-[1rem] border border-slate-200">
-            <div class="js-user-badge-container"></div>
-            <div class="flex flex-col items-end px-2">
-                <span class="text-[0.6rem] font-bold text-slate-400 uppercase">Reported</span>
-                <span class="js-report-count text-[1.2rem] font-bold text-red-500 ">0</span>
-            </div>
-        </div>
-        <!-- ② 解析情報（非公開 vs 公開）: 横並び grid-cols-2 を flex-col に変更 -->
-        <div class="flex flex-col gap-3">
-            <!-- Private Activity -->
-            <div class="bg-white border-2 border-slate-100 rounded-[1rem] p-4 ">
-                <div class="text-[0.6rem] font-bold text-slate-400 uppercase mb-3 border-b border-slate-50 pb-1">Private Activity</div>
-                <div class="js-stats-pvt"></div>
-            </div>
-            <!-- Public Activity -->
-            <div class="bg-white border-2 border-brand-2 rounded-[1rem] p-4 ">
-                <div class="text-[0.6rem] font-bold text-brand-5 uppercase mb-3 border-b border-brand-5 pb-1">Public Activity</div>
-                <div class="js-stats-pub"></div>
-            </div>
-        </div>
-        <!-- ③ クリック集計情報（リスト） -->
-        <div class="flex flex-col gap-2">
-            <div class="text-[0.6rem] font-bold text-slate-400 uppercase pl-1">Profile Link Performance</div>
-            <div class="js-click-container space-y-2"></div>
-        </div>
-        <!-- ④ 強制アクション -->
-        <div id="admin-ban-control" class="hidden mt-2 pb-4 flex flex-col">
-            <button id="btn-admin-ban" class="w-full h-12 bg-red-50 text-red-600 font-bold rounded-[1rem] border-2 border-red-200 active:scale-95 transition-all flex items-center justify-center gap-2">
-                🚫 SHADOW BAN USER
-            </button>
-            <button id="btn-admin-unban" class="w-full h-12 bg-slate-100 text-slate-400 font-bold rounded-[1rem] border-2 border-slate-200 active:scale-95 transition-all flex items-center justify-center gap-2">
-                ✅ LIFT BAN STATUS
-            </button>
-        </div>
-    </div>
-</template>
 <template id="tpl-user-click-stats">
     <div class="w-full flex flex-col gap-2 text-[0.8rem]">
         <!-- ユーザー情報、通報数、Private/Public実績を1枚のカードに統合 -->

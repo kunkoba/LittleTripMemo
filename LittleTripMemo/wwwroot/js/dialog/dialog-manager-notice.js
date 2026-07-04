@@ -1,32 +1,5 @@
 export default {
     // （システム）アプリ情報
-    ShowAppInfo_2() {
-        const el = $Dom.GenerateTemplate("tpl-app-info");
-        // $Const.APP_INFO から情報を埋め込む
-        $Dom.QuerySelector('.js-app-name', el).textContent = $Const.APP_INFO.NAME;
-        $Dom.QuerySelector('.js-app-version', el).textContent = `Version ${$Const.APP_INFO.VERSION}`;
-        $Dom.QuerySelector('.js-app-developer', el).textContent = $Const.APP_INFO.DEVELOPER;
-        const linkOfficial = $Dom.QuerySelector('#link-info-official', el);
-        if ($Const.APP_INFO.OFFICIAL_SITE) {
-            // linkOfficial.href = $Const.APP_INFO.OFFICIAL_SITE;
-            linkOfficial.onclick = () => $Util.OpenSafeUrl($Const.APP_INFO.OFFICIAL_SITE);
-        } else {
-            $Dom.ToggleShow(linkOfficial, false);
-        }
-        // systemInfo からスコア平均を取得して反映
-        const sysInfo = $App.AppData.Owner.SystemInfo || {};
-        const scoreAvg = sysInfo.score_avg || 0;
-        $Dom.QuerySelector('.js-app-score', el).textContent = `★ ${scoreAvg.toFixed(1)}`;
-        $Dom.QuerySelector('#btn-info-review', el).onclick = () => this.ShowReviewList();
-        $Dom.QuerySelector('#btn-info-license', el).onclick = () => $Notice.Info($Const.APP_INFO.LICENSE || "ライセンス情報がありません。");
-        this._core.open({
-            title: "APP INFO",
-            content: el,
-            help: "",
-            buttons:[]
-        });
-    },
-    // （システム）アプリ情報
     ShowAppInfo() {
         const el = $Dom.GenerateTemplate("tpl-app-info");
         // --- 1. アプリ定数からの基本情報 ---

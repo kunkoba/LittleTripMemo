@@ -1,6 +1,6 @@
 // アプリ基盤
 const AppManager = {
-    AppSettingKey: "little_trip_settings",
+AppSettingKey: "little_trip_settings",
     AppData: {
         Context: {
             ScreenMode: $Const.SCREEN_MODE.CREATE,
