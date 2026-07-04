@@ -25,21 +25,24 @@ public static class UserHistoryRegister
     /// 呼び出し側の利便性のため、操作した管理者の情報は UserContext から自動的に抽出して memo_json にマージします。
     /// </summary>
     /// <param name="history">user_id, action_kind, body, memo_json をセットしたモデル</param>
-    public static async Task RegistAsync(TSysUserHistory history)
+    public static async Task RegistAsync(TSysUserHistory history, SysUserHistoryRepository? repo = null)
     {
-        if (_accessor?.HttpContext == null) return;
+        var context = _accessor?.HttpContext;
 
-        // 現在のリクエストスコープから必要なコンポーネントを調達
-        var services = _accessor.HttpContext.RequestServices;
-        var repo = services.GetRequiredService<SysUserHistoryRepository>();
-        var userContext = services.GetRequiredService<UserContext>();
+        // リポジトリが未指定なら HttpContext から取得を試みる
+        repo ??= context?.RequestServices.GetRequiredService<SysUserHistoryRepository>();
+
+        // どちらからもリポジトリが取れない（バッチ等で引数未指定）場合は終了
+        if (repo == null) return;
+
+        // UserContext（管理者情報）の取得を試みる
+        var userContext = context?.RequestServices.GetService<UserContext>();
 
         // 管理者による操作の場合、操作者情報を memo_json に自動付与する
-        if (userContext.login_user_id != Guid.Empty)
+        if (userContext != null && userContext.login_user_id != Guid.Empty)
         {
             history.memo_json ??= new Dictionary<string, object>();
 
-            // すでに admin_id が入っていない場合のみセット（二重書き込み防止）
             if (!history.memo_json.ContainsKey("admin_id"))
             {
                 history.memo_json["admin_id"] = userContext.login_user_id;
@@ -47,7 +50,7 @@ public static class UserHistoryRegister
             }
         }
 
-        // 保存実行（リポジトリの InsertAsync を呼び出し）
+        // 保存実行
         await repo.InsertAsync(history);
     }
 

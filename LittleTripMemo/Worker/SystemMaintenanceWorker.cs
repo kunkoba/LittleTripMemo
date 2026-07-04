@@ -413,19 +413,18 @@ public class SystemMaintenanceWorker : BackgroundService
         var settings = optionsMonitor.CurrentValue;
         var now = DateTime.Now;
 
-        // 1. 設定時刻（HH:mm）に到達しているか、かつ本日未実行かを確認
         if (now.ToString("HH:mm") == settings.DailyMaintenanceTime && _lastMaintenanceDate != now.Date)
         {
-            await RunWithScopeAsync("日次DB物理メンテナンス", async (scope) =>
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<TableStatisticsTaskRepository>();
-
-                // 2. 物理掃除とインデックス再構築を実行
-                // ※この処理はトランザクション外で実行される必要があります
-                await repository.ExecuteDbMaintenanceAsync();
-
-                // 3. 実行完了を記録（同一時刻内の重複実行を防止）
-                _lastMaintenanceDate = now.Date;
+            _lastMaintenanceDate = now.Date;
+            // 結果を無視する（破棄する）
+            // 実行を別スレッドに放り投げる。ループは即座に「1分待ち」へ進む
+            _ = Task.Run(async () => {
+                await RunWithScopeAsync("日次DB物理メンテナンス", async (scope) => {
+                    var repository = scope.ServiceProvider.GetRequiredService<TableStatisticsTaskRepository>();
+                    await repository.ExecuteDbMaintenanceAsync();
+                });
+            }).ContinueWith(t => {
+                if (t.IsFaulted) logger.LogError("【日次メンテナンス致命的失敗】{ex}", t.Exception);
             });
         }
     }
