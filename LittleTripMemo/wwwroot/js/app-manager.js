@@ -198,8 +198,6 @@ AppSettingKey: "little_trip_settings",
                 // システム情報取得
                 $Data.Access.GetSystemInfo();
             }
-            // 一番最初にSVGスプライトをHTMLに注入する
-            if (typeof $Icon !== 'undefined') $Icon.Init();
         }
         // リクエストパラメータ取得
         {
