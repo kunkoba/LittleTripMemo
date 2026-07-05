@@ -70,7 +70,7 @@ const _MarkerCore = {
             // 32pxの絵文字を中央配置（ひし形の対角線に合わせてコンテナを52pxに調整）
             const iconHtml = `
                 <div class="flex items-center justify-center" style="width: 52px; height: 52px;">
-                    <div class="_bg-white/50 w-9 h-9 border-2 border-brand-1 shadow-brand flex items-center justify-center" 
+                    <div class="_bg-white/50 w-9 h-9 border-2 border-brand-1 shadow-md flex items-center justify-center" 
                         style="transform: rotate(45deg);">
                         <span class="text-[2rem]" style="transform: rotate(-45deg); display: block; line-height: 1;">
                             ${row.face_emoji || '😀'}

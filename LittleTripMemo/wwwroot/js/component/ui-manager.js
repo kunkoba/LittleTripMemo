@@ -229,7 +229,7 @@ const UI_Manager = {
         if (!btn) return;
         if (isOn) {
             // ONのスタイル（発光する緑）
-            btn.classList.remove('bg-slate-700', 'text-slate-600', 'border-slate-600', 'shadow-brand');
+            btn.classList.remove('bg-slate-700', 'text-slate-600', 'border-slate-600', 'shadow-md');
             btn.classList.add(
                 'bg-emerald-500', 
                 'text-white', 
@@ -244,7 +244,7 @@ const UI_Manager = {
                 'border-emerald-400', 
                 'shadow-[0_0_20px_rgba(16,185,129,0.8)]'
             );
-            btn.classList.add('bg-slate-700', 'text-slate-600', 'border-slate-600', 'shadow-brand');
+            btn.classList.add('bg-slate-700', 'text-slate-600', 'border-slate-600', 'shadow-md');
         }
     },
 };

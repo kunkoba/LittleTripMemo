@@ -101,7 +101,7 @@
             <!-- 背景装飾 -->
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-1 rounded-full opacity-50"></div>
             <div class="absolute -bottom-10 -left-10 w-24 h-24 bg-brand-2 rounded-full opacity-50"></div>
-            <div class="w-20 h-20 bg-gradient-to-br from-brand-4 to-brand-5 rounded-2xl shadow-brand flex items-center justify-center text-white text-[2rem] font-black mb-4 z-10">
+            <div class="w-20 h-20 bg-gradient-to-br from-brand-4 to-brand-5 rounded-2xl shadow-md flex items-center justify-center text-white text-[2rem] font-black mb-4 z-10">
                 <span class="drop- leading-none mt-1">LM</span>
             </div>
             <h3 class="text-[1.1rem] font-black uppercase tracking-widest text-slate-800 js-app-name text-center leading-tight px-4 z-10"></h3>
@@ -171,7 +171,7 @@
 <template id="tpl-app-info">
     <div class="w-full flex flex-col gap-4">
         <!-- アプリ情報 -->
-        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3 shadow-sm">
+        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3">
             <div class="flex justify-between items-baseline border-b border-slate-100 pb-2">
                 <span class="text-[0.8rem] text-slate-600">アプリ名</span>
                 <span class="text-[1rem] font-bold text-slate-900 js-app-name"></span>
@@ -186,7 +186,7 @@
             </div>
         </div>
         <!-- リンク・アクション -->
-        <div class="bg-white rounded-[1rem] border border-slate-200 flex flex-col shadow-sm overflow-hidden">
+        <div class="bg-white rounded-[1rem] border border-slate-200 flex flex-col overflow-hidden">
             <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-100 active:bg-slate-50 transition-colors">
                 <span class="text-[0.8rem] text-slate-600">アプリの評価</span>
                 <div class="flex items-center gap-2">
@@ -205,7 +205,7 @@
             </button>
         </div>
         <!-- 全体統計 -->
-        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3 shadow-sm">
+        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3">
             <div class="flex justify-between items-baseline border-b border-slate-100 pb-2 mb-1">
                 <span class="text-[0.8rem] text-slate-600">最終集計日時</span>
                 <span class="text-[1rem] font-bold text-slate-900 js-last-update"></span>
@@ -316,7 +316,7 @@
             <div id="view-mem-user-wrapper" class="w-fit"></div>
             <!-- 元に戻したボタン -->
             <button id="btn-view-mem-timeline" 
-                class="h-10 shadow-brand rounded-[1rem] flex items-center justify-center gap-2 active:scale-95 transition-transform px-4 outline-none bg-white">
+                class="h-10 shadow-md rounded-[1rem] flex items-center justify-center gap-2 active:scale-95 transition-transform px-4 outline-none bg-white">
                 <span id="mem-stat-count" class="text-[1.1rem] font-bold text-slate-900">0</span>
                 <span class="text-[0.8rem] font-bold text-slate-600 uppercase tracking-wider">memos</span>
             </button>
@@ -467,7 +467,7 @@
         </div>
         <!-- QRコード ＆ コピー案内 -->
         <div class="w-full flex flex-col items-center my-6">
-            <button id="btn-share-copy" class="shadow-brand w-48 h-48 p-3 bg-white rounded-[1rem] active:scale-95 transition-transform flex items-center justify-center border border-slate-100 outline-none">
+            <button id="btn-share-copy" class="shadow-md w-48 h-48 p-3 bg-white rounded-[1rem] active:scale-95 transition-transform flex items-center justify-center border border-slate-100 outline-none">
                 <img id="share-qr-image" src="" alt="QR Code" class="w-full h-full object-contain">
             </button>
             <span class="text-[0.8rem] font-bold text-slate-600 mt-3 tracking-wider">※ QRコードをタップするとURLをコピーできます</span>
@@ -495,7 +495,7 @@
 	<div class="relative min-h-full flex flex-col bg-white px-1">
 		<!-- 1. ヘッダー（日付とアイコンを横並びに） -->
         <div class="absolute top-0 right-2 ">
-            <span id="view-notice-icon" class="text-[2rem] drop-shadow-brand"></span>
+            <span id="view-notice-icon" class="text-[2rem] drop-shadow-md"></span>
         </div>
 		<div class="flex items-center gap-4 my-4">
             <div class="flex items-center gap-3 text-black font-bold text-[1rem]">
@@ -520,7 +520,7 @@
 <template id="tpl-view-notice">
     <div class="w-full flex flex-col gap-4">
         <!-- 基本情報カード -->
-        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-2 shadow-sm">
+        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-2">
             <!-- アイコン（通知種別） -->
             <div class="flex justify-between items-baseline border-b border-slate-100 pb-2 mb-1">
                 <span class="text-[0.8rem] text-slate-600">通知種別</span>
@@ -540,7 +540,7 @@
             </div>
         </div>
         <!-- 本文・リンクカード -->
-        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3 shadow-sm flex-1">
+        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3 flex-1">
             <span class="text-[0.8rem] text-slate-600 border-b border-slate-100 pb-2">内容</span>
             <div id="view-notice-body" class="text-[1rem] text-slate-900 leading-[1.8] whitespace-pre-wrap break-words min-h-[150px]"></div>
             <!-- リンク表示エリア -->
@@ -585,7 +585,7 @@
     </div>
 </template>
 <template id="tpl-my-report-detail">
-    <div class="w-full flex flex-col gap-4 p-2 text-slate-900">
+    <div class="w-full flex flex-col gap-4 text-slate-900">
         <!-- 基本情報 -->
         <div class="flex flex-col gap-3 border-b border-slate-200 pb-4">
             <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
@@ -600,7 +600,7 @@
             <!-- 対象まとめ -->
             <div class="flex flex-col gap-1">
                 <span class="text-[0.8rem] text-slate-600">対象まとめ</span>
-                <button id="btn-report-jump-archive" class="h-10 w-full flex items-center justify-between p-3 bg-white rounded-full active:bg-slate-50 transition-colors text-left shadow-brand">
+                <button id="btn-report-jump-archive" class="h-10 w-full flex items-center justify-between p-3 bg-white rounded-full active:bg-slate-50 transition-colors text-left shadow-md">
                     <div class="flex-1 min-w-0 pr-2">
                         <div id="view-report-archive-title" class="text-[1rem] font-bold text-slate-900 truncate"></div>
                     </div>
@@ -793,7 +793,7 @@
 <template id="tpl-archive-click-stats">
     <div class="w-full flex flex-col gap-4 text-slate-900">
         <!-- アーカイブ情報カード -->
-        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-2 shadow-sm">
+        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-2">
             <div class="flex items-center gap-2 mb-2 border-b border-slate-100 pb-2">
                 <span class="text-[1rem]">📁</span>
                 <span class="text-[0.8rem] font-bold text-slate-900">まとめ情報</span>
@@ -834,7 +834,7 @@
             </div>
         </div>
         <!-- 明細情報カード -->
-        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-2 shadow-sm">
+        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-2">
             <div class="flex items-center gap-2 mb-2 border-b border-slate-100 pb-2">
                 <span class="text-[1rem]">📋</span>
                 <span class="text-[0.8rem] font-bold text-slate-900">明細情報</span>

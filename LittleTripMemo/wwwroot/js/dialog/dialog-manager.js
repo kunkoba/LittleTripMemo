@@ -14,7 +14,7 @@ const _DialogCore = {
     // 共通クラス定数
     HEADER_BTN_CLASS:   "kb-icon-emoji-md _bg-white h-8 w-8 rounded-full flex items-center justify-center active:scale-95 transition-transform",
     FOOTER_BTN_BASE:    "font-bold text-[0.8rem] h-12 uppercase active:scale-95 transition-transform",
-    FOOTER_BTN_DEFAULT: "bg-brand-5 text-white shadow-brand",
+    FOOTER_BTN_DEFAULT: "bg-brand-5 text-white shadow-md",
     // 初期化
     init() {
         this.dialogRoot = $Dom.GetElementById(this.elementId);
@@ -218,7 +218,7 @@ const DialogController = {
                 size: 'sm',
                 onClose: () => { if (!isResolved) resolve(false); },
                 buttons: [[
-                    { label: "CANCEL", className: "bg-slate-400 text-white shadow-brand", handler: () => { isResolved = true; resolve(false); this._core.close(); } },
+                    { label: "CANCEL", className: "bg-slate-400 text-white shadow-md", handler: () => { isResolved = true; resolve(false); this._core.close(); } },
                     { label: label, handler: () => { isResolved = true; resolve(true); this._core.close(); } }
                 ]]
             });
@@ -286,7 +286,7 @@ const DialogController = {
                 content: div,
                 onClose: () => { if (!isResolved) resolve(null); },
                 buttons: [[
-                    { label: "CANCEL", className: "bg-slate-400 text-white shadow-brand", handler: () => { isResolved = true; resolve(null); this._core.close(); } },
+                    { label: "CANCEL", className: "bg-slate-400 text-white shadow-md", handler: () => { isResolved = true; resolve(null); this._core.close(); } },
                     { label: label, handler: () => { isResolved = true; resolve(input.value); this._core.close(); } }
                 ]]
             });

@@ -302,7 +302,7 @@ const _DetailFrameCore = {
             btn.classList.toggle('text-brand-5', isActive);
             btn.classList.toggle('border-brand-3', isActive);
             btn.classList.toggle('bg-brand-1', isActive);
-            btn.classList.toggle('shadow-brand', isActive);
+            btn.classList.toggle('shadow-md', isActive);
         });
     },
     // リアクションボタンクリック

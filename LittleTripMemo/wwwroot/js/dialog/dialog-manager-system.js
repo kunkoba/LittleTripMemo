@@ -106,10 +106,10 @@ export default {
         const html = `
             <div class="p-6 w-full space-y-6 bg-brand-0">
                 <div class="flex justify-between items-center border-b border-brand-2 pb-6">
-                    <button id="th-btn-blue" class="w-12 h-12 bg-[#0ea5e9] border-2 border-white shadow-brand active:scale-95 transition-transform"></button>
-                    <button id="th-btn-green" class="w-12 h-12 bg-[#22c55e] border-2 border-white shadow-brand active:scale-95 transition-transform"></button>
-                    <button id="th-btn-red" class="w-12 h-12 bg-[#ef4444] border-2 border-white shadow-brand active:scale-95 transition-transform"></button>
-                    <button id="th-btn-yellow" class="w-12 h-12 bg-[#eab308] border-2 border-white shadow-brand active:scale-95 transition-transform"></button>
+                    <button id="th-btn-blue" class="w-12 h-12 bg-[#0ea5e9] border-2 border-white shadow-md active:scale-95 transition-transform"></button>
+                    <button id="th-btn-green" class="w-12 h-12 bg-[#22c55e] border-2 border-white shadow-md active:scale-95 transition-transform"></button>
+                    <button id="th-btn-red" class="w-12 h-12 bg-[#ef4444] border-2 border-white shadow-md active:scale-95 transition-transform"></button>
+                    <button id="th-btn-yellow" class="w-12 h-12 bg-[#eab308] border-2 border-white shadow-md active:scale-95 transition-transform"></button>
                 </div>
                 <div class="space-y-1 px-6">${previewItems}</div>
             </div>`;
@@ -130,7 +130,7 @@ export default {
             buttons: [[
                 {
                     label: "CANCEL",
-                    className: "bg-slate-400 text-white shadow-brand",
+                    className: "bg-slate-400 text-white shadow-md",
                     handler: () => {
                         this._core.close();
                     },
@@ -187,7 +187,7 @@ export default {
             buttons: [[
                 {
                     label: "CANCEL",
-                    className: "bg-slate-400 text-white shadow-brand",
+                    className: "bg-slate-400 text-white shadow-md",
                     handler: () => {
                         this._core.close();
                     },
@@ -225,7 +225,7 @@ export default {
             buttons: [[
                 {
                     label: "CANCEL",
-                    className: "bg-slate-400 text-white shadow-brand",
+                    className: "bg-slate-400 text-white shadow-md",
                     handler: () => {
                         this._core.close();
                     },
@@ -273,7 +273,7 @@ export default {
             buttons: [[
                 {
                     label: "CANCEL",
-                    className: "bg-slate-400 text-white shadow-brand",
+                    className: "bg-slate-400 text-white shadow-md",
                     handler: () => this._core.close()
                 },
                 {
@@ -329,7 +329,7 @@ export default {
             buttons: [[
                 {
                     label: "CANCEL",
-                    className: "bg-slate-400 text-white shadow-brand",
+                    className: "bg-slate-400 text-white shadow-md",
                     handler: () => this._core.close(),
                 },
                 {
