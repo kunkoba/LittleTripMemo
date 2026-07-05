@@ -72,7 +72,7 @@ button:active {
     font-size: 0.8rem;
     /* 太字: font-bold */
     font-weight: 700;
-    /* 文字色: text-slate-400 */
+    /* 文字色: text-slate-600 */
     color: rgb(148 163 184);
     /* イタリック: italic */
     font-style: italic;
@@ -82,7 +82,7 @@ button:active {
     font-size: 1.0rem;
     /* 太字: font-bold */
     font-weight: 700;
-    /* 文字色: text-slate-400 */
+    /* 文字色: text-slate-600 */
     color: rgb(148 163 184);
     /* イタリック: italic */
     font-style: italic;
@@ -92,7 +92,7 @@ button:active {
     font-size: 1.2rem;
     /* 太字: font-bold */
     font-weight: 700;
-    /* 文字色: text-slate-400 */
+    /* 文字色: text-slate-600 */
     color: rgb(148 163 184);
     /* イタリック: italic */
     font-style: italic;

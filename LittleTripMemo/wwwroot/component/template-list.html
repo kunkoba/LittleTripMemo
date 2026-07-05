@@ -1,6 +1,6 @@
 <!-- 【リスト親】フレーム -->
 <template id="tpl-list-parent">
-    <div class="w-full text-slate-400 mb-4"></div>
+    <div class="w-full text-slate-600 mb-4"></div>
 </template>
 
 <!-- 【リスト親】グループヘッダー -->
@@ -16,7 +16,7 @@
 
 <!-- 【リスト親】タイムラインコンテナ -->
 <template id="tpl-timeline-container">
-    <div class="relative w-full text-slate-400 mb-2 px-1">
+    <div class="relative w-full text-slate-600 mb-2 px-1">
         <div class="absolute left-[22px] top-0 bottom-0 w-px bg-slate-200 z-0"></div>
         <div class="js-list-container relative z-10 space-y-4"></div>
     </div>
@@ -41,11 +41,11 @@
         </div>
         <div class="flex-1 bg-white rounded-[1rem] p-3 border border-slate-200 shadow-brand relative overflow-hidden flex flex-col items-start gap-2">
             <div class="js-index-badge absolute top-2 right-2 w-7 h-7 rounded-full bg-brand-4 text-white font-bold text-[0.8rem] flex items-center justify-center  z-20"></div>
-            <button class="js-btn-detach hidden absolute top-2 right-10 w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-400 flex items-center justify-center  z-20 hover:bg-slate-100 active:scale-95 transition-all text-[0.8rem]">🗑</button>
+            <button class="js-btn-detach hidden absolute top-2 right-10 w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-600 flex items-center justify-center  z-20 hover:bg-slate-100 active:scale-95 transition-all text-[0.8rem]">🗑</button>
             <div class="border-l-4 border-brand-3 pl-2 py-2 w-full mt-2">
                 <div class="js-title text-[1rem] font-bold text-slate-900 break-words"></div>
             </div>
-            <div class="js-price-wrapper pl-3 flex items-baseline italic w-full hidden"><span class="js-price text-[1rem] font-bold italic "></span><span class="js-price-unit text-[0.8rem] font-bold text-slate-400 ml-1.5 uppercase"></span></div>
+            <div class="js-price-wrapper pl-3 flex items-baseline italic w-full hidden"><span class="js-price text-[1rem] font-bold italic "></span><span class="js-price-unit text-[0.8rem] font-bold text-slate-600 ml-1.5 uppercase"></span></div>
             <div class="js-body text-[0.8rem] text-slate-900 whitespace-pre-wrap break-words w-full"></div>
         </div>
     </div>
@@ -70,42 +70,42 @@
         <!-- 3. 地点タイトル -->
         <div class="js-title text-[1rem] font-bold text-slate-900 truncate mb-1"></div>
         <!-- 4. 本文 (2行まで許容) -->
-        <div class="js-body text-[0.8rem] text-slate-400 line-clamp-2  mb-3"></div>
+        <div class="js-body text-[0.8rem] text-slate-600 line-clamp-2  mb-3"></div>
         <!-- 5. 金額表示（既存ロジック用） -->
         <div class="js-price-wrapper hidden flex items-baseline gap-1 mb-3 bg-slate-50 w-fit px-2 py-0.5 rounded-md border border-slate-100">
             <span class="js-memo-price text-[0.8rem] font-bold italic"></span>
-            <span class="js-memo-currency text-[0.8rem] font-bold text-slate-400"></span>
+            <span class="js-memo-currency text-[0.8rem] font-bold text-slate-600"></span>
         </div>
         <!-- 6. フッター：リアクション統計 ＆ 更新日 -->
         <div class="flex justify-between items-end mt-auto pt-2 border-t border-slate-50">
             <div class="flex gap-2.5">
                 <div class="flex items-center gap-1">
                     <span class="js-icon-funny icon-emoji-sm"></span>
-                    <span class="js-count-funny text-[1rem] font-bold text-slate-400">
+                    <span class="js-count-funny text-[1rem] font-bold text-slate-600">
                         0
                     </span>
                 </div>
                 <div class="flex items-center gap-1">
                     <span class="js-icon-love icon-emoji-sm"></span>
-                    <span class="js-count-love text-[1rem] font-bold text-slate-400">
+                    <span class="js-count-love text-[1rem] font-bold text-slate-600">
                         0
                     </span>
                 </div>
                 <div class="flex items-center gap-1">
                     <span class="js-icon-surprise icon-emoji-sm"></span>
-                    <span class="js-count-surprise text-[1rem] font-bold text-slate-400">
+                    <span class="js-count-surprise text-[1rem] font-bold text-slate-600">
                         0
                     </span>
                 </div>
                 <div class="flex items-center gap-1">
                     <span class="js-icon-sad icon-emoji-sm"></span>
-                    <span class="js-count-sad text-[1rem] font-bold text-slate-400">
+                    <span class="js-count-sad text-[1rem] font-bold text-slate-600">
                         0
                     </span>
                 </div>
             </div>
             <div class="text-right">
-                <div class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-tighter  mb-1">Last Update</div>
+                <div class="text-[0.8rem] font-bold text-slate-600 uppercase tracking-tighter  mb-1">Last Update</div>
                 <div class="js-update-tim kb-date-tim-sm"></div>
             </div>
         </div>
@@ -126,7 +126,7 @@
                 </div>
             </div>
             <div class="js-title text-[0.8rem] font-bold text-slate-900 truncate mb-1"></div>
-            <div class="js-memo text-[0.8rem] text-slate-400 line-clamp-1"></div>
+            <div class="js-memo text-[0.8rem] text-slate-600 line-clamp-1"></div>
         </div>
     </div>
 </template>
@@ -146,8 +146,8 @@
             <span class="text-white text-[0.8rem] font-bold js-check-mark hidden">✓</span>
         </div>
         <div class="flex-1 min-w-0">
-            <div class="flex items-baseline gap-2"><span class="shrink-0 text-[0.8rem] font-bold text-slate-400 js-time"></span><span class="flex-1 text-[0.8rem] font-bold text-slate-900 truncate js-title"></span></div>
-            <div class="text-[0.8rem] text-slate-400 line-clamp-1 mt-0.5 js-body"></div>
+            <div class="flex items-baseline gap-2"><span class="shrink-0 text-[0.8rem] font-bold text-slate-600 js-time"></span><span class="flex-1 text-[0.8rem] font-bold text-slate-900 truncate js-title"></span></div>
+            <div class="text-[0.8rem] text-slate-600 line-clamp-1 mt-0.5 js-body"></div>
         </div>
         <div class="shrink-0 ml-1 js-emoji icon-emoji-lg"></div>
     </div>
@@ -175,7 +175,7 @@
 
 <!-- 【リスト子】レビューアイテム -->
 <template id="tpl-list-child-review">
-    <div class="p-4 flex flex-col">
+    <div class="p-4 flex flex-col border-b">
         <div class="flex justify-between items-center mb-1.5">
             <div class="js-date kb-date-tim-sm"></div>
             <div class="js-stars text-[1rem] text-yellow-500 tracking-widest  drop-"></div>
@@ -204,7 +204,7 @@
             </div>
             <div class="text-[1rem] font-bold text-slate-900 truncate js-title"></div>
             <!-- ② break-words を追加し、pb-4 を削除 -->
-            <div class="text-[0.8rem] text-slate-400 line-clamp-2 js-body break-words"></div>
+            <div class="text-[0.8rem] text-slate-600 line-clamp-2 js-body break-words"></div>
         </div>
     </div>
 </template>
@@ -247,15 +247,15 @@
         <div class="flex justify-around text-[0.8rem]">
             <div class="flex flex-col items-center">
                 <span class="js-total font-bold text-brand-5 text-[1rem]">0</span>
-                <span class="text-[0.8rem] text-slate-400 uppercase ">Total</span>
+                <span class="text-[0.8rem] text-slate-600 uppercase ">Total</span>
             </div>
             <div class="flex flex-col items-center">
                 <span class="js-unique font-bold text-slate-900 text-[1rem]">0</span>
-                <span class="text-[0.8rem] text-slate-400 uppercase ">Unique</span>
+                <span class="text-[0.8rem] text-slate-600 uppercase ">Unique</span>
             </div>
             <div class="flex flex-col items-center">
-                <span class="js-guest font-bold text-slate-400 text-[1rem]">0</span>
-                <span class="text-[0.8rem] text-slate-400 uppercase ">Guest</span>
+                <span class="js-guest font-bold text-slate-600 text-[1rem]">0</span>
+                <span class="text-[0.8rem] text-slate-600 uppercase ">Guest</span>
             </div>
         </div>
     </div>
@@ -264,16 +264,16 @@
     <div class="bg-slate-50 rounded-[1rem] p-4 flex flex-col gap-2 border border-slate-100">
         <div class="js-url text-blue-500 font-bold italic break-all text-[1rem] mb-1"></div>
         <div class="flex justify-between items-baseline">
-            <span class="text-[0.8rem] text-slate-400">合計クリック数</span>
+            <span class="text-[0.8rem] text-slate-600">合計クリック数</span>
             <span class="js-total text-[1rem] font-bold text-brand-5">0</span>
         </div>
         <div class="flex justify-between items-baseline">
-            <span class="text-[0.8rem] text-slate-400">訪問者数（ユニーク）</span>
+            <span class="text-[0.8rem] text-slate-600">訪問者数（ユニーク）</span>
             <span class="js-unique text-[1rem] font-bold text-slate-700">0</span>
         </div>
         <div class="flex justify-between items-baseline">
-            <span class="text-[0.8rem] text-slate-400">未ログインユーザー</span>
-            <span class="js-guest text-[1rem] font-bold text-slate-400">0</span>
+            <span class="text-[0.8rem] text-slate-600">未ログインユーザー</span>
+            <span class="js-guest text-[1rem] font-bold text-slate-600">0</span>
         </div>
     </div>
 </template>

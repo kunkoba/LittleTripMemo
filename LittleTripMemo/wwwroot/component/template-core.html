@@ -28,7 +28,7 @@
                 <div id="dialog-title" class="flex-1 flex items-center font-bold italic uppercase tracking-wider truncate pr-2"></div>
                 <div id="dialog-header-actions" class="flex items-center gap-6 shrink-0 mr-2">
                     <!-- 閉じるボタン：既存維持（共通部品のため） -->
-                    <button id="dialog-btn-close-x" class="w-9 h-9 bg-white rounded-[1rem] shadow-brand text-slate-400 flex items-center justify-center active:scale-95 text-[1rem] transition-transform">✖</button>
+                    <button id="dialog-btn-close-x" class="w-9 h-9 bg-white rounded-[1rem] shadow-brand text-slate-600 flex items-center justify-center active:scale-95 text-[1rem] transition-transform">✖</button>
                 </div>
             </div>
             <!-- コンテンツエリア：基本の背景色が必要な場合はここもJSで指定 -->
@@ -53,10 +53,10 @@
         <div class="w-full max-w-[400px] h-[70vh] p-3 border-0 bg-white rounded-[1rem] shadow-2xl flex flex-col overflow-hidden animate-fade-in">
             <div class="h-16 px-5 flex justify-between items-center shrink-0 border-b border-slate-100 bg-slate-50/50">
                 <div class="flex flex-col">
-                    <!-- <span class="text-[0.8rem] text-slate-500 uppercase tracking-[0.2em]">Select Icon</span> -->
+                    <!-- <span class="text-[0.8rem] text-slate-600 uppercase tracking-[0.2em]">Select Icon</span> -->
                     <span class="text-[1.2rem] text-brand-5 italic uppercase ">Marker Library</span>
                 </div>
-                <button class="js-close w-9 h-9 bg-white rounded-full shadow-md text-slate-400 flex items-center justify-center font-bold active:scale-95 transition-transform border border-slate-100">✖</button>
+                <button class="js-close w-9 h-9 bg-white rounded-full shadow-md text-slate-600 flex items-center justify-center font-bold active:scale-95 transition-transform border border-slate-100">✖</button>
             </div>
             <!-- ↓ flex-1 を追加して親の縦幅を完全に埋め尽くす -->
             <div id="emoji-mart-container" class="flex-1 w-full bg-white overflow-hidden"></div>
@@ -72,7 +72,7 @@
         </div>
         <div class="text-[0.8rem] space-y-2">
             <p>下記の入力欄に、探したい場所の情報を入力してください。</p>
-            <ul class="list-disc list-inside pl-1 text-slate-400 space-y-1">
+            <ul class="list-disc list-inside pl-1 text-slate-600 space-y-1">
                 <li>住所（例：台東区上野）</li>
                 <li>施設名（例：東京スカイツリー）</li>
                 <li>座標（例：35.7, 139.8）</li>
@@ -82,7 +82,7 @@
         <div class="w-full">
             <input id="inputPointValue" type="text" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] text-slate-900 focus:outline-none focus:border-brand-5 bg-white" placeholder="場所、住所、または座標を入力">
         </div>
-        <p class="text-[0.8rem] text-slate-400 text-right">※Googleマップ等のURL貼り付けにも対応</p>
+        <p class="text-[0.8rem] text-slate-600 text-right">※Googleマップ等のURL貼り付けにも対応</p>
     </div>
 </template>
 
@@ -105,8 +105,8 @@
         </div>
         <div>
             <div class="flex justify-between items-end mb-1">
-                <label class="block text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Report Details</label>
-                <span class="text-[0.8rem] font-bold text-slate-400"><span id="report-text-count">0</span>/300</span>
+                <label class="block text-[0.8rem] font-bold text-slate-600 uppercase tracking-widest">Report Details</label>
+                <span class="text-[0.8rem] font-bold text-slate-600"><span id="report-text-count">0</span>/300</span>
             </div>
             <textarea id="input-report-body" maxlength="300" placeholder="問題のある箇所や理由を具体的に記入してください" class="w-full border-2 border-brand-3 p-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
@@ -117,14 +117,14 @@
 <template id="tpl-review-post">
     <div class="w-full text-slate-900 px-2 space-y-6 pt-4">
         <div class="text-center">
-            <label class="block text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Tap to Rate</label>
+            <label class="block text-[0.8rem] font-bold text-slate-600 uppercase tracking-widest">Tap to Rate</label>
             <div id="review-star-input" class="flex justify-center gap-1 text-[40px] "></div>
             <input type="hidden" id="input-review-rating" value="5">
         </div>
         <div>
             <div class="flex justify-between items-end mb-2">
-                <label class="block text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Review</label>
-                <span class="text-[0.8rem] font-bold text-slate-400"><span id="review-text-count">0</span>/300</span>
+                <label class="block text-[0.8rem] font-bold text-slate-600 uppercase tracking-widest">Review</label>
+                <span class="text-[0.8rem] font-bold text-slate-600"><span id="review-text-count">0</span>/300</span>
             </div>
             <textarea id="input-review-body" maxlength="300" placeholder="アプリの感想をお聞かせください" 
                 class="w-full border-2 border-brand-3 p-3 text-[1rem] min-h-[200px] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
@@ -138,7 +138,7 @@
         <div class="absolute top-2 right-2 w-8 h-8 rounded-full bg-brand-4 text-white font-bold text-[1.2rem] flex items-center justify-center z-20">
             <span class="index"></span>
         </div>
-        <div class="text-[0.8rem] mb-2 font-bold text-slate-400 italic">
+        <div class="text-[0.8rem] mb-2 font-bold text-slate-600 italic">
             <!-- 【変更】個別spanを廃止し、コンテナを設置 -->
             <div class="js-date-container"></div>
         </div>
@@ -179,36 +179,36 @@
         <div class="flex flex-col gap-2">
             <!-- WIND -->
             <div class="bg-white p-2">
-                <label class="block font-bold text-slate-400 text-[0.8rem] uppercase tracking-widest mb-1 pl-1">Wind Speed</label>
+                <label class="block font-bold text-slate-600 text-[0.8rem] uppercase tracking-widest mb-1 pl-1">Wind Speed</label>
                 <div class="flex items-center gap-4">
                     <span id="atm-wind-val" class="w-8 text-[1.5rem] font-bold text-brand-5 text-center italic">0</span>
                     <input id="atm-wind" type="range" min="0" max="9" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5">
                     <div class="flex gap-2 shrink-0">
-                        <button id="btn-wind-minus" class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 text-[1.5rem] font-bold active:scale-90 ">-</button>
+                        <button id="btn-wind-minus" class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 text-[1.5rem] font-bold active:scale-90 ">-</button>
                         <button id="btn-wind-plus"  class="w-12 h-12 rounded-xl bg-brand-5 border border-brand-4 flex items-center justify-center text-white text-[1.5rem] font-bold active:scale-90 shadow-brand">+</button>
                     </div>
                 </div>
             </div>
             <!-- DENSITY -->
             <div class="bg-white p-2">
-                <label class="block font-bold text-slate-400 text-[0.8rem] uppercase tracking-widest mb-1 pl-1">Density</label>
+                <label class="block font-bold text-slate-600 text-[0.8rem] uppercase tracking-widest mb-1 pl-1">Density</label>
                 <div class="flex items-center gap-4">
                     <span id="atm-density-val" class="w-8 text-[1.5rem] font-bold text-brand-5 text-center italic">0</span>
                     <input id="atm-density" type="range" min="0" max="9" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5">
                     <div class="flex gap-2 shrink-0">
-                        <button id="btn-density-minus" class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 text-[1.5rem] font-bold active:scale-90 ">-</button>
+                        <button id="btn-density-minus" class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 text-[1.5rem] font-bold active:scale-90 ">-</button>
                         <button id="btn-density-plus"  class="w-12 h-12 rounded-xl bg-brand-5 border border-brand-4 flex items-center justify-center text-white text-[1.5rem] font-bold active:scale-90 shadow-brand">+</button>
                     </div>
                 </div>
             </div>
             <!-- DARK -->
             <div class="bg-white p-2">
-                <label class="block font-bold text-slate-400 text-[0.8rem] uppercase tracking-widest mb-1 pl-1">Darkness</label>
+                <label class="block font-bold text-slate-600 text-[0.8rem] uppercase tracking-widest mb-1 pl-1">Darkness</label>
                 <div class="flex items-center gap-4">
                     <span id="atm-darkness-val" class="w-8 text-[1.5rem] font-bold text-brand-5 text-center italic">0</span>
                     <input id="atm-darkness" type="range" min="0" max="9" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5">
                     <div class="flex gap-2 shrink-0">
-                        <button id="btn-dark-minus" class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 text-[1.5rem] font-bold active:scale-90 ">-</button>
+                        <button id="btn-dark-minus" class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 text-[1.5rem] font-bold active:scale-90 ">-</button>
                         <button id="btn-dark-plus"  class="w-12 h-12 rounded-xl bg-brand-5 border border-brand-4 flex items-center justify-center text-white text-[1.5rem] font-bold active:scale-90 shadow-brand">+</button>
                     </div>
                 </div>
@@ -216,7 +216,7 @@
         </div>
         <!-- 3. 下部：コード（非表示でも良いが、デバッグ用に最小化して残す） -->
         <div class="flex justify-center border-t border-slate-50 pt-4">
-            <span id="atm-code-preview" class="text-[1.2rem] font-bold text-slate-400 tracking-[0.5em]">0000</span>
+            <span id="atm-code-preview" class="text-[1.2rem] font-bold text-slate-600 tracking-[0.5em]">0000</span>
         </div>
     </div>
 </template>
@@ -244,8 +244,8 @@
     <div class="px-1">
         <div class="relative flex items-center">
             <input type="text" class="js-input w-full border-2 border-brand-3 pl-10 pr-10 py-2 rounded-full text-[0.8rem] focus:outline-none focus:border-brand-5 bg-white " placeholder="タイトルや本文を検索...">
-            <span class="absolute left-4 text-slate-400">🔍</span>
-            <button class="js-clear absolute right-3 w-7 h-7 flex items-center justify-center bg-slate-200 text-slate-400 rounded-full text-[0.8rem] font-bold hidden active:scale-90 transition-transform">
+            <span class="absolute left-4 text-slate-600">🔍</span>
+            <button class="js-clear absolute right-3 w-7 h-7 flex items-center justify-center bg-slate-200 text-slate-600 rounded-full text-[0.8rem] font-bold hidden active:scale-90 transition-transform">
                 ✖
             </button>
         </div>
@@ -269,7 +269,7 @@
 <template id="tpl-user-badge">
 	<div class="rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border border-slate-200 flex items-center gap-2 bg-white">
 		<span class="js-icon icon-emoji-lg"></span>
-		<span class="js-name text-[0.8rem] text-slate-400 tracking-tight line-clamp-1 font-bold"></span>
+		<span class="js-name text-[0.8rem] text-slate-600 tracking-tight line-clamp-1 font-bold"></span>
 	</div>
 </template>
 
@@ -282,9 +282,9 @@
         </div>
         <!-- メインテキスト（マスク日付 or 実日付） -->
         <div class="flex items-baseline">
-            <div class="js-main-text text-slate-400 mr-1"></div>
+            <div class="js-main-text text-slate-600 mr-1"></div>
             <!-- 時刻（オプション） -->
-            <div class="js-time-text text-slate-400 ml-2"></div>
+            <div class="js-time-text text-slate-600 ml-2"></div>
         </div>
     </div>
 </template>

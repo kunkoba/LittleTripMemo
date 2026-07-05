@@ -4,7 +4,7 @@ export default {
         const el = $Dom.GenerateTemplate("tpl-app-info");
         // --- 1. アプリ定数からの基本情報 ---
         $Dom.QuerySelector('.js-app-name', el).textContent = $Const.APP_INFO.NAME;
-        $Dom.QuerySelector('.js-app-version', el).textContent = `Version ${$Const.APP_INFO.VERSION}`;
+        $Dom.QuerySelector('.js-app-version', el).textContent = $Const.APP_INFO.VERSION;
         $Dom.QuerySelector('.js-app-developer', el).textContent = $Const.APP_INFO.DEVELOPER;
         const linkOfficial = $Dom.QuerySelector('#link-info-official', el);
         if ($Const.APP_INFO.OFFICIAL_SITE) {
@@ -21,10 +21,10 @@ export default {
         $Dom.QuerySelector('.js-stat-memos', el).textContent = (appInfo.total_detail_pub_count || 0).toLocaleString();
         // 最終集計日時
         if (appInfo.last_aggregate_tim) {
-            $Dom.QuerySelector('.js-last-update', el).textContent = "Update: " + $Util.FormatDate(appInfo.last_aggregate_tim);
+            $Dom.QuerySelector('.js-last-update', el).textContent = $Util.FormatDate(appInfo.last_aggregate_tim);
         }
         // --- 3. スコア・フィードバック数の反映 ---
-        const scoreAvg = appInfo.avg_score ?? sysInfo.score_avg ?? 0;
+        const scoreAvg = appInfo.avg_score ?? sysInfo.avg_score ?? 0;
         const feedbackCount = appInfo.total_feedback_count || 0;
         $Dom.QuerySelector('.js-app-score', el).textContent = `★ ${scoreAvg.toFixed(1)}`;
         $Dom.QuerySelector('.js-app-feedback-count', el).textContent = feedbackCount;
@@ -45,11 +45,11 @@ export default {
         // systemInfo からフィードバック情報を取得
         const sysInfo = $App.AppData.Owner.SystemInfo || {};
         const feedbackList = sysInfo.feedbacks ||[];
-        const scoreAvg = sysInfo.app_info.score_avg || 0;
+        const scoreAvg = sysInfo.app_info.avg_score || 0;
         $Dom.QuerySelector(".js-avg-score", el).textContent = scoreAvg.toFixed(1);
         $Dom.QuerySelector(".js-avg-stars", el).textContent = "★".repeat(Math.round(scoreAvg)) + "☆".repeat(5 - Math.round(scoreAvg));
         if (feedbackList.length === 0) {
-            container.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">フィードバックはありません</div>`;
+            container.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-600 py-6">フィードバックはありません</div>`;
         } else {
             feedbackList.forEach(rev => {
                 const child = $Dom.GenerateTemplate("tpl-list-child-review");
@@ -102,8 +102,8 @@ export default {
             if (i <= currentRating) {
                 star.className = "text-yellow-500";
             } else {
-                // star.className = "outline-none transition-colors active:scale-90 text-slate-400";
-                star.className = "text-slate-400";
+                // star.className = "outline-none transition-colors active:scale-90 text-slate-600";
+                star.className = "text-slate-600";
             }
             star.onclick = () => {
                 currentRating = i;
@@ -111,9 +111,9 @@ export default {
                 stars.forEach((s, idx) => {
                     if (idx < currentRating) {
                         s.classList.add("text-yellow-500");
-                        s.classList.remove("text-slate-400");
+                        s.classList.remove("text-slate-600");
                     } else {
-                        s.classList.add("text-slate-400");
+                        s.classList.add("text-slate-600");
                         s.classList.remove("text-yellow-500");
                     }
                 });
@@ -196,7 +196,7 @@ export default {
             return;
         }
         const root = $Dom.GenerateTemplate("tpl-list-parent");
-        // root.className = "w-full text-slate-400 mb-2 px-1";
+        // root.className = "w-full text-slate-600 mb-2 px-1";
         const setNoticeStyle = (el, isNew) => {
             const badge = $Dom.QuerySelector(".js-badge-new", el);
             $Dom.ToggleShow(badge, isNew);
@@ -326,7 +326,7 @@ export default {
             return;
         }
         const root = $Dom.GenerateTemplate("tpl-list-parent");
-        root.className = "w-full text-slate-400 mb-2 px-1";
+        root.className = "w-full text-slate-600 mb-2 px-1";
         // システム通知と同様のスタイル制御（未読：太枠＋影 / 既読：薄枠）
         const setMailStyle = (el, isNew) => {
             const badge = $Dom.QuerySelector(".js-badge-new", el);

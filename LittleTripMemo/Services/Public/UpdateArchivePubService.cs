@@ -37,7 +37,8 @@ public class UpdateArchivePubService : _BaseService
             archive_id = req.archive_id,
             title = req.title,
             memo = req.memo,
-            link_url = req.link_url
+            link_url = req.link_url,
+            currency_unit = req.currency_unit
         });
         return new Response(req.archive_id);
     }

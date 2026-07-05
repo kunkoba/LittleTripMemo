@@ -167,7 +167,7 @@ export default {
                 return target.toLowerCase().includes(query);
             });
             if (filtered.length === 0) {
-                listContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-10">合致するまとめがありません</div>`;
+                listContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-600 py-10">合致するまとめがありません</div>`;
                 return;
             }
             const pvt = filtered.filter(item => !item.is_public);
@@ -239,7 +239,7 @@ export default {
             const isSuccess = await $Data.Access.GetArchiveList();
             if (!isSuccess) return;
             const root = $Dom.GenerateTemplate("tpl-list-parent");
-            // root.className = "w-full text-slate-400 mb-2 px-1";
+            // root.className = "w-full text-slate-600 mb-2 px-1";
             const archives = $Data.Store.GetArchiveList() ||[];
             // プライベートデータのみに絞る
             const privateList = archives.filter(item => !item.is_public);
@@ -463,7 +463,7 @@ export default {
         const STYLE_BASE = "flex-1 h-11 font-bold text-[0.8rem] rounded-lg tracking-wider outline-none";
         const STYLE_ACTIVE = " bg-white text-slate-900 shadow-brand border border-slate-200 active:scale-95 transition-all";
         const STYLE_CURRENT = " bg-brand-5 text-white shadow-inner border border-brand-5 cursor-default pointer-events-none";
-        const STYLE_DISABLED = " bg-slate-100 text-slate-400 border border-slate-100 cursor-not-allowed pointer-events-none";
+        const STYLE_DISABLED = " bg-slate-100 text-slate-600 border border-slate-100 cursor-not-allowed pointer-events-none";
         // ── 1. タイトルと本文 ──────────────────────────────────
         const renderTitleAndBody = (arc) => {
             $Dom.QuerySelector('#view-mem-title', el).textContent = arc.title || "";
@@ -586,7 +586,7 @@ export default {
             btnLimit.className = "w-full h-12 font-bold rounded-lg border-2 active:scale-[0.98] transition-all flex items-center justify-center gap-2";
             btnLimit.classList.add(...(isLimited
                 ? ["bg-brand-1", "border-brand-3", "text-brand-5"]
-                : ["bg-slate-50", "border-slate-200", "text-slate-400"]));
+                : ["bg-slate-50", "border-slate-200", "text-slate-600"]));
             btnLimit.onclick = async () => {
                 const nextStatus = !isLimited;
                 // API経由で limited_open_flg のみを更新
@@ -945,7 +945,7 @@ export default {
         const detailsContainer = $Dom.QuerySelector('.js-details-container', el);
         const details = $Data.Store.GetDetails() || [];
         if (details.length === 0) {
-            detailsContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-4">明細データがありません</div>`;
+            detailsContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-600 py-4">明細データがありません</div>`;
         } else {
             details.forEach(dtl => {
                 const child = $Dom.GenerateTemplate('tpl-archive-click-stats-item');
@@ -961,7 +961,7 @@ export default {
                     const count = dtl[countProp] || 0;
                     const div = document.createElement("div");
                     div.className = "flex items-center gap-1 text-[0.8rem]";
-                    div.innerHTML = `<span class="icon-emoji-sm">${type.emoji}</span><span class="font-bold text-slate-400">${count}</span>`;
+                    div.innerHTML = `<span class="icon-emoji-sm">${type.emoji}</span><span class="font-bold text-slate-600">${count}</span>`;
                     reactContainer.appendChild(div);
                 });
                 // --- 2.2 クリック統計の反映 ---
@@ -969,7 +969,7 @@ export default {
                 const statsBox = $Dom.QuerySelector('.js-dtl-stats-box', child);
                 if (dtl.link_url && dtl.link_url.trim() !== "") {
                     urlEl.textContent = dtl.link_url;
-                    urlEl.classList.replace("text-slate-400", "text-blue-500");
+                    urlEl.classList.replace("text-slate-600", "text-blue-500");
                     const dStats = (dtl.click_stats && dtl.click_stats.link_url) ? dtl.click_stats.link_url : { t: 0, u: 0, g: 0 };
                     $Dom.QuerySelector('.js-dtl-total', child).textContent = dStats.t || 0;
                     $Dom.QuerySelector('.js-dtl-unique', child).textContent = dStats.u || 0;
@@ -977,7 +977,7 @@ export default {
                     $Dom.ToggleShow(statsBox, true);
                 } else {
                     urlEl.textContent = "リンクなし";
-                    urlEl.classList.add("text-slate-400", "italic");
+                    urlEl.classList.add("text-slate-600", "italic");
                     $Dom.ToggleShow(statsBox, false);
                 }
                 detailsContainer.appendChild(child);

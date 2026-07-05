@@ -100,7 +100,7 @@ export default {
         // プレビュー用バーを0-5までループ生成
         let previewItems = '';
         for (let i = 0; i <= 5; i++) {
-            const textColor = i > 2 ? 'text-white' : 'text-slate-400';
+            const textColor = i > 2 ? 'text-white' : 'text-slate-600';
             previewItems += `<div class="w-full h-10 bg-brand-${i} border border-brand-2 flex items-center px-4 text-[0.8rem] font-bold ${textColor}">LEVEL ${i} PREVIEW</div>`;
         }
         const html = `
@@ -535,7 +535,7 @@ export default {
         const titleEl = $Dom.QuerySelector("#view-report-archive-title", el);
         if (report.is_deleted) {
             titleEl.textContent = "既に削除されています";
-            titleEl.classList.add("text-slate-400"); // 無効な感じの色
+            titleEl.classList.add("text-slate-600"); // 無効な感じの色
         } else if (report.is_closed) {
             titleEl.textContent = "現在「CLOSE」中です";
             titleEl.classList.add("text-red-400");   // 警告・停止中の色
@@ -606,7 +606,7 @@ export default {
         });
         // リンクが1つも無い場合の表示
         if (container.children.length === 0) {
-            container.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">設定されているリンクがありません</div>`;
+            container.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-600 py-6">設定されているリンクがありません</div>`;
         }
         this._core.open({
             title: "クリック数",
@@ -644,9 +644,9 @@ export default {
             row.innerHTML = `
                 <div class="truncate text-blue-500 italic mb-1">🔗 ${l.url}</div>
                 <div class="flex gap-4">
-                    <span>🖱️ <b class="text-brand-5">${s.t}</b> <small class="text-slate-400">TTL</small></span>
-                    <span>👤 <b class="text-slate-900">${s.u}</b> <small class="text-slate-400">UNIQ</small></span>
-                    <span>👻 <b class="text-slate-400">${s.g}</b> <small class="text-slate-400">GST</small></span>
+                    <span>🖱️ <b class="text-brand-5">${s.t}</b> <small class="text-slate-600">TTL</small></span>
+                    <span>👤 <b class="text-slate-900">${s.u}</b> <small class="text-slate-600">UNIQ</small></span>
+                    <span>👻 <b class="text-slate-600">${s.g}</b> <small class="text-slate-600">GST</small></span>
                 </div>
             `;
             clickList.appendChild(row);
@@ -664,7 +664,7 @@ export default {
             const target = $Dom.QuerySelector(selector, el);
             target.innerHTML = ""; // クリア
             if (!data) {
-                target.innerHTML = `<span class="text-slate-400 italic">No Data</span>`;
+                target.innerHTML = `<span class="text-slate-600 italic">No Data</span>`;
                 return;
             }
             const child = $Dom.GenerateTemplate("tpl-user-activity-summary");

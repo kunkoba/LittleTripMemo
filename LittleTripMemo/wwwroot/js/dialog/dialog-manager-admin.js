@@ -20,11 +20,11 @@ export default {
         if (!isSuccess) return;
         const notices = $App.AppData.Admin.Notifications ||[];
         const root = $Dom.GenerateTemplate("tpl-list-parent");
-        // root.className = "w-full text-slate-400 mb-2 px-1";
+        // root.className = "w-full text-slate-600 mb-2 px-1";
         const renderList = async () => {
             root.innerHTML = "";
             if (notices.length === 0) {
-                root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-6">通知データがありません</div>`;
+                root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-600 py-6">通知データがありません</div>`;
                 return;
             }
             const now = new Date();
@@ -44,7 +44,7 @@ export default {
                     badge.className += " border-brand-3 bg-brand-5 text-white";
                 } else if (now < fromDate) {
                     badge.textContent = "公開前";
-                    badge.className += " border-slate-300 bg-slate-100 text-slate-400";
+                    badge.className += " border-slate-300 bg-slate-100 text-slate-600";
                 } else {
                     badge.textContent = "公開終了";
                     badge.className += " border-slate-300 bg-slate-500 text-white";
@@ -284,7 +284,7 @@ export default {
         // 下部の通報理由リスト描画
         const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
         if (reports.length === 0) {
-            listContainer.innerHTML = `<div class="text-[0.8rem] text-slate-400 p-2">詳細データがありません</div>`;
+            listContainer.innerHTML = `<div class="text-[0.8rem] text-slate-600 p-2">詳細データがありません</div>`;
         } else {
             reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
@@ -363,9 +363,9 @@ export default {
                 const score = parseInt(btn.dataset.score);
                 if (score === currentScore) {
                     btn.classList.add("bg-brand-5", "text-white", "shadow-brand");
-                    btn.classList.remove("text-slate-400");
+                    btn.classList.remove("text-slate-600");
                 } else {
-                    btn.classList.add("text-slate-400");
+                    btn.classList.add("text-slate-600");
                     btn.classList.remove("bg-brand-5", "text-white", "shadow-brand");
                 }
             });
@@ -384,7 +384,7 @@ export default {
             // リスト再描画
             listContainer.innerHTML = "";
             if (filtered.length === 0) {
-                listContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-400 py-10">合致するデータはありません。</div>`;
+                listContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-600 py-10">合致するデータはありません。</div>`;
                 return;
             }
             filtered.forEach(item => {
