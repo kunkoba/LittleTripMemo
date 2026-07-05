@@ -148,7 +148,7 @@ const _DialogCore = {
         frame._onClose = onClose;
         if (!isModal) { 
             const btnCloseX = document.createElement("button");
-            btnCloseX.className = `${this.HEADER_BTN_CLASS} text-[0.8rem]`;
+            btnCloseX.className = `${this.HEADER_BTN_CLASS}`;
             btnCloseX.textContent = "✖";
             btnCloseX.onclick = () => this.close();
             headerActions.appendChild(btnCloseX);
