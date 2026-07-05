@@ -517,8 +517,13 @@ export default {
             if (item.is_deleted) {
                 $Dom.ToggleShow($Dom.QuerySelector(".js-badge-deleted", child), true);
             } else {
-                if (item.is_closed)  $Dom.ToggleShow($Dom.QuerySelector(".js-badge-closed", child), true);
+                if (item.is_closed) {
+                    $Dom.ToggleShow($Dom.QuerySelector(".js-badge-closed", child), true);
+                } else {
+                    $Dom.ToggleShow($Dom.QuerySelector(".js-badge-alive", child), true);
+                }
             }
+            console.log("item:", item);
             child.onclick = () => this.ShowMyReportDetail(item);
             root.appendChild(child);
         });

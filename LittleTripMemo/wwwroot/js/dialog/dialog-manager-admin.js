@@ -194,19 +194,25 @@ export default {
             $Dom.QuerySelector(".js-archive-title", child).textContent = item.archive_title || "Unknown Title";
             // ② 通報件数の反映
             $Dom.QuerySelector(".js-badge-count", child).textContent = `${item.report_count}`;
-            // ③ 最終更新日の反映（キー名は実際のAPIに合わせてください）
-            const updateTim = item.update_tim || item.archive_update_tim;
-            if (updateTim) {
-                $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(updateTim);
+            // ③ 最終更新日の反映
+            $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
+            // ステータスバッジの表示
+            if (item.is_deleted) {
+                $Dom.ToggleShow($Dom.QuerySelector(".js-badge-deleted", child), true);
             } else {
-                $Dom.ToggleShow($Dom.QuerySelector(".js-update-tim", child), false);
+                if (item.is_closed) {
+                    $Dom.ToggleShow($Dom.QuerySelector(".js-badge-closed", child), true);
+                } else {
+                    $Dom.ToggleShow($Dom.QuerySelector(".js-badge-alive", child), true);
+                }
             }
+            console.log("item:", item);
             // ④ ユーザーバッジの生成と反映（キー名は実際のAPIに合わせてください）
             const userWrapper = $Dom.QuerySelector(".js-user-wrapper", child);
             $UI.Generator.UserBadge(userWrapper, {
                 user_id: item.target_user_id,
-                nick_name: item.target_user_name || item.target_nick_name || item.target_user_id.slice(0, 8),
-                icon: item.target_user_icon || item.target_icon || "👤"
+                nick_name: item.target_nick_name,
+                icon: item.target_icon,
             }, { type: 'badge' }); // ラベル（バッジ）タイプで出力
             child.onclick = () => this.ShowAdminReportDetail(item);
             root.appendChild(child);
