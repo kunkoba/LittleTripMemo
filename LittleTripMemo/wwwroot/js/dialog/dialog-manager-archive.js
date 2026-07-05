@@ -285,7 +285,7 @@ export default {
             });
             // 選択用ダイアログを開く
             this._core.open({
-                title: "まとめを選択",
+                title: "追加先のまとめを選択",
                 content: root,
                 help: "",
                 buttons: []
@@ -385,7 +385,7 @@ export default {
         });
         updateSelectionUI();
         frame = this._core.open({
-            title: "まとめ選択",
+            title: "地点メモを選択",
             content: content,
             help: "",
             buttons: [[
@@ -669,7 +669,7 @@ export default {
         const headerButtons = buildHeaderButtons(profile, qrUrl);
         const dialogButtons = []; // 一般ユーザーはダイアログ下部フッター(buttons)は無し
         this._core.open({
-            title: "まとめの詳細情報",
+            title: "まとめの詳細",
             content: el,
             size: 'lg',
             help: "",

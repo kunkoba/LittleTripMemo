@@ -57,7 +57,7 @@ export default {
         b.admin.onclick = async () => {
             this.ShowAdminMenu();
         };
-        this._core.open({ title: "システム画面", content: el });
+        this._core.open({ title: "システムメニュー", content: el });
     },
     // 【👤 ユーザーメニュー】
     ShowUserMenu() {
@@ -410,7 +410,7 @@ export default {
         }
         //
 		this._core.open({
-			title: "ユーザプロフィール",
+			title: "ユーザ情報",
 			content: el,
             help: "",
 			headerButtons: headerButtons

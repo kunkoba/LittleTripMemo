@@ -66,7 +66,7 @@ export default {
             help: "",
             buttons:[
                 {
-                    label: "Write",
+                    label: "評価する",
                     className: "",
                     handler: async () => {
                         this.ShowReviewPost();
@@ -126,7 +126,7 @@ export default {
         });
         this._core.open({
             // データが既にあれば編集（EDIT）、なければ新規（WRITE）
-            title: myFeedback ? "評価の編集" : "評価を書き込む",
+            title: myFeedback ? "評価内容の編集" : "評価を書き込む",
             content: el,
             help: "",
             buttons: [[
@@ -183,7 +183,7 @@ export default {
             $Dom.ToggleShow(urlWrapper, false);
         }
 		this._core.open({
-			title: "システム通知",
+			title: "システム通知詳細",
 			content: el,
             help: "",
 		});
@@ -238,7 +238,7 @@ export default {
             root.appendChild(child);
         });
         this._core.open({
-            title: "システム通知",
+            title: "システム通知一覧",
             content: root,
             help: "",
         });

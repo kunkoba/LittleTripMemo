@@ -62,7 +62,7 @@ export default {
         await renderList();
         //
         this._core.open({
-            title: "システム通知管理画面",
+            title: "システム通知一覧",
             content: root,
             theme: "admin",
             help: "システム全体への通知を管理します。\n下のボタンから新規作成、一覧の項目タップで編集が可能です。",
@@ -218,7 +218,7 @@ export default {
             root.appendChild(child);
         });
         this._core.open({
-            title: "通報情報管理画面",
+            title: "通報情報の集計結果",
             content: root,
             theme: "admin",
             help: "",
@@ -434,7 +434,7 @@ export default {
         // 初回描画の実行
         renderList();
         this._core.open({
-            title: "みんなの評価",
+            title: "みんなの評価一覧",
             content: frame,
             size: 'lg',
             theme: "admin",
@@ -496,7 +496,7 @@ export default {
         countBody.textContent = inputBody.value.length;
         inputBody.addEventListener('input', () => countBody.textContent = inputBody.value.length);
         this._core.open({
-            title: "送信メール",
+            title: "メール送信",
             content: el,
             theme: "admin",
             help: "",
@@ -556,7 +556,7 @@ export default {
             root.appendChild(child);
         });
         this._core.open({
-            title: "ユーザの履歴",
+            title: "メール送信履歴一覧",
             content: root,
             theme: "admin",
             help: "",
@@ -671,7 +671,12 @@ export default {
             child.onclick = () => this.ShowAdminUserHistoryDetail(item);
             root.appendChild(child);
         });
-        this._core.open({ title: "ユーザの履歴", content: root, theme: "admin", size: "lg" });
+        this._core.open({ 
+            title: "ユーザの行動履歴", 
+            content: root, 
+            theme: "admin", 
+            size: "lg" 
+        });
     },
     // 【管理者機能】操作履歴の詳細表示
     ShowAdminUserHistoryDetail(item) {
