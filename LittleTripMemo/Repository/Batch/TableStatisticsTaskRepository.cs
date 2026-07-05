@@ -37,6 +37,16 @@ public class TableStatisticsTaskRepository : _BaseRepository
     }
 
     /// <summary>
+    /// 指定されたテーブルがデータベース内に物理的に存在するか確認する
+    /// </summary>
+    public async Task<bool> TableExistsAsync(int tableId)
+    {
+        string tableName = $"t_memo_detail_{tableId}";
+        const string sql = "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = @tableName)";
+        return await ExecuteScalarAsync<bool>(sql, new { tableName });
+    }
+
+    /// <summary>
     /// 管理テーブルに存在しないテーブルIDがあれば初期レコードを挿入する（安全策）
     /// </summary>
     public async Task EnsureManagerRecordExistsAsync(int tableId)

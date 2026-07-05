@@ -207,7 +207,15 @@ public class SystemMaintenanceWorker : BackgroundService
                 var repository = scope.ServiceProvider.GetRequiredService<TableStatisticsTaskRepository>();
                 for (int i = 1; i <= settings.MaxTableNum; i++)
                 {
-                    await repository.SyncStatisticsAsync(i);
+                    // ★存在確認ガード
+                    if (await repository.TableExistsAsync(i))
+                    {
+                        await repository.SyncStatisticsAsync(i);
+                    }
+                    else
+                    {
+                        logger.LogWarning("集計スキップ: t_memo_detail_{i} が存在しません。", i);
+                    }
                 }
             });
             _nextTableStatsUpdateTime = DateTime.Now.AddMinutes(settings.TableStatsUpdateIntervalMinutes);
@@ -341,7 +349,15 @@ public class SystemMaintenanceWorker : BackgroundService
                 // ① 秘密側（分散テーブルごと）の集計を実行
                 for (int i = 1; i <= settings.MaxTableNum; i++)
                 {
-                    await repository.SyncUserPrivateStatsAsync(i);
+                    // ★存在確認ガード
+                    if (await repository.TableExistsAsync(i))
+                    {
+                        await repository.SyncUserPrivateStatsAsync(i);
+                    }
+                    else
+                    {
+                        logger.LogWarning("ユーザー統計スキップ: t_memo_detail_{i} が存在しません。", i);
+                    }
                 }
 
                 // ② 公開側の集計を実行（全ユーザー一括）

@@ -358,7 +358,7 @@
 </template>
 
 <!-- 【ダイアログ子】通知詳細 -->
-<template id="tpl-view-notice">
+<template id="tpl-view-notice_2">
 	<div class="relative min-h-full flex flex-col bg-white px-1">
 		<!-- 1. ヘッダー（日付とアイコンを横並びに） -->
         <div class="absolute top-0 right-2 ">
@@ -384,6 +384,41 @@
         </div>
 	</div>
 </template>
+<!-- 【ダイアログ子】通知詳細 -->
+<template id="tpl-view-notice">
+    <div class="w-full flex flex-col gap-4">
+        <!-- 基本情報カード -->
+        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-2 shadow-sm">
+            <!-- アイコン（通知種別） -->
+            <div class="flex justify-between items-baseline border-b border-slate-100 pb-2 mb-1">
+                <span class="text-[0.8rem] text-slate-400">通知種別</span>
+                <span id="view-notice-icon" class="text-[1rem] leading-none drop-shadow-sm"></span>
+            </div>
+            <!-- 日時 -->
+            <div class="flex justify-between items-baseline">
+                <span class="text-[0.8rem] text-slate-400">受信日時</span>
+                <span id="view-notice-date" class="text-[1rem] font-bold text-slate-900"></span>
+            </div>
+            <!-- ユーザー情報（差出人など：JS側で動的に表示/非表示） -->
+            <div id="view-notice-user-wrapper" class="hidden mt-2 pt-2 border-t border-slate-100"></div>
+            <!-- タイトル領域（件名：JS側で動的に表示/非表示） -->
+            <div id="view-notice-title-area" class="flex flex-col mt-2 pt-2 border-t border-slate-100 gap-1">
+                <span class="text-[0.8rem] text-slate-400">件名</span>
+                <div id="view-notice-title" class="text-[1rem] font-bold text-slate-900 break-words"></div>
+            </div>
+        </div>
+        <!-- 本文・リンクカード -->
+        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3 shadow-sm flex-1">
+            <span class="text-[0.8rem] text-slate-400 border-b border-slate-100 pb-2">内容</span>
+            <div id="view-notice-body" class="text-[1rem] text-slate-900 leading-[1.8] whitespace-pre-wrap break-words min-h-[150px]"></div>
+            <!-- リンク表示エリア -->
+            <div id="view-notice-url-wrapper" class="hidden mt-auto pt-4 border-t border-slate-100 flex-col gap-2">
+                <span class="text-[0.8rem] text-slate-400">関連リンク</span>
+                <!-- JSでボタンがappendされる -->
+            </div>
+        </div>
+    </div>
+</template>
 
 <template id="tpl-multi-select-content">
     <div class="flex flex-col h-full w-full overflow-hidden">
@@ -394,7 +429,7 @@
 </template>
 
 <!-- 【ダイアログ子】自分の通報詳細 -->
-<template id="tpl-my-report-detail">
+<template id="tpl-my-report-detail_2">
     <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden">
         <div class="flex justify-between items-center pb-2 px-1">
             <span class="js-report-tim kb-date-tim-md"></span>
@@ -414,6 +449,38 @@
         <!-- 通報内容 -->
         <div class="h-[200px] bg-brand-1 rounded-lg p-2 overflow-y-auto">
             <div id="view-report-body" class="text-[1rem] text-slate-900 leading-[2] whitespace-pre-wrap break-words"></div>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】自分の通報詳細 -->
+<template id="tpl-my-report-detail">
+    <div class="w-full flex flex-col gap-4 p-2 text-slate-900">
+        <!-- 基本情報 -->
+        <div class="flex flex-col gap-3 border-b border-slate-200 pb-4">
+            <div class="flex justify-between items-baseline">
+                <span class="text-[0.8rem] text-slate-400">通報日時</span>
+                <span class="js-report-tim text-[1rem] font-bold text-slate-900"></span>
+            </div>
+            <!-- 対象ユーザー -->
+            <div class="flex flex-col gap-1">
+                <span class="text-[0.8rem] text-slate-400">対象ユーザー</span>
+                <div id="view-report-target-user-wrapper" class="w-full"></div>
+            </div>
+            <!-- 対象まとめ -->
+            <div class="flex flex-col gap-1">
+                <span class="text-[0.8rem] text-slate-400">対象まとめ</span>
+                <button id="btn-report-jump-archive" class="w-full flex items-center justify-between p-3 bg-white border border-slate-200 rounded-[1rem] active:bg-slate-50 transition-colors text-left shadow-sm">
+                    <div class="flex-1 min-w-0 pr-2">
+                        <div id="view-report-archive-title" class="text-[1rem] font-bold text-slate-900 truncate"></div>
+                    </div>
+                    <span class="text-[1rem] ml-2">🗺️</span>
+                </button>
+            </div>
+        </div>
+        <!-- 通報内容 -->
+        <div class="flex flex-col gap-2">
+            <span class="text-[0.8rem] text-slate-400">通報内容</span>
+            <div id="view-report-body" class="text-[1rem] text-slate-900 leading-[1.8] whitespace-pre-wrap break-words p-3 bg-slate-50 border border-slate-200 rounded-lg min-h-[150px]"></div>
         </div>
     </div>
 </template>

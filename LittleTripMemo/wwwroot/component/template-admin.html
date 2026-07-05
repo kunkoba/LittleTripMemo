@@ -94,23 +94,6 @@
     </button>
 </template>
 
-<!-- 【ダイアログ子】管理者フィードバック詳細 -->
-<template id="tpl-admin-feedback-detail">
-    <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden bg-white">
-        <div class="flex justify-between items-center mb-4">
-            <span class="text-[1rem] font-bold text-slate-400 tracking-wider js-date italic"></span>
-            <span class="js-score text-[1.2rem] text-yellow-500 tracking-widest  drop-"></span>
-        </div>
-        <!-- ▼ 修正：ジェネレータ用の空のラッパーに変更 -->
-        <div class="mb-4">
-            <div id="view-feedback-user-wrapper"></div>
-        </div>
-        <div class="bg-brand-1 rounded-lg p-2">
-            <div class="text-[1rem] text-slate-900  whitespace-pre-wrap break-words js-body mt-2 h-[200px] overflow-y-auto pr-2"></div>
-        </div>
-    </div>
-</template>
-
 <!-- 【リスト子】管理者通報集計一覧用 -->
 <template id="tpl-admin-list-child-report-summary">
     <div class="relative bg-white border border-brand-1 shadow-brand p-3 flex flex-col gap-2 cursor-pointer active:bg-slate-50 mb-3 rounded-[1rem]">
@@ -136,7 +119,7 @@
 </template>
 
 <!-- 【ダイアログ子】管理者通報詳細 -->
-<template id="tpl-admin-report-detail">
+<template id="tpl-admin-report-detail_2">
     <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden">
         <div class="shrink-0 p-4 border-b border-brand-2 bg-slate-50 relative mb-3">
             <!-- まとめタイトル (全体をボタン化) -->
@@ -160,6 +143,49 @@
         <div class="flex-1 overflow-y-auto p-2 bg-brand-0">
             <div id="admin-report-detail-list" class="space-y-2 pb-4 px-1"></div>
         </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】管理者通報詳細 -->
+<template id="tpl-admin-report-detail">
+    <div class="w-full flex flex-col gap-4 p-2 text-slate-900">
+        <!-- 対象情報 -->
+        <div class="flex flex-col gap-3 border-b border-slate-200 pb-4">
+            <!-- 対象まとめ -->
+            <div class="flex flex-col gap-1">
+                <span class="text-[0.8rem] text-slate-400">対象まとめ</span>
+                <button id="btn-admin-report-open-archive" class="w-full flex items-center justify-between p-3 bg-white border border-slate-200 rounded-[1rem] active:bg-slate-50 transition-colors text-left shadow-sm">
+                    <div class="flex-1 min-w-0 pr-2">
+                        <div class="text-[1rem] font-bold text-slate-900 js-archive-title break-words line-clamp-2"></div>
+                    </div>
+                    <span class="text-[1rem] ml-2">🗺️</span>
+                </button>
+            </div>
+            <!-- 対象ユーザー -->
+            <div class="flex flex-col gap-1">
+                <span class="text-[0.8rem] text-slate-400">対象ユーザー</span>
+                <div id="view-report-target-user-wrapper" class="w-full"></div>
+            </div>
+            <!-- 管理者用アクションボタン -->
+            <div class="flex gap-3 mt-2">
+                <button id="btn-admin-report-close" class="flex-1 h-11 bg-slate-500 text-white text-[0.8rem] font-bold rounded-lg active:scale-95 transition-all">非公開化 (Close)</button>
+                <button id="btn-admin-report-private" class="flex-1 h-11 bg-slate-800 text-white text-[0.8rem] font-bold rounded-lg active:scale-95 transition-all">削除 (Delete)</button>
+            </div>
+        </div>
+        <!-- 通報理由リスト -->
+        <div class="flex flex-col gap-2">
+            <span class="text-[0.8rem] text-slate-400">寄せられた通報内容</span>
+            <div id="admin-report-detail-list" class="flex flex-col gap-2"></div>
+        </div>
+    </div>
+</template>
+<!-- 【リスト子】管理者通報詳細アイテム -->
+<template id="tpl-admin-list-child-report-item">
+    <div class="bg-white p-3 border border-slate-200 rounded-lg shadow-sm border-l-4 border-l-red-400 cursor-pointer active:bg-slate-50 transition-colors">
+        <div class="flex justify-between items-baseline mb-1">
+            <span class="text-[0.8rem] text-slate-400">通報日時</span>
+            <span class="js-report-tim text-[1rem] font-bold text-slate-900"></span>
+        </div>
+        <div class="text-[1rem] text-slate-900 break-words js-report-body line-clamp-2 mt-1"></div>
     </div>
 </template>
 
@@ -224,8 +250,9 @@
     </div>
 </template>
 
+
 <!-- 【ダイアログ子】管理者フィードバック詳細 -->
-<template id="tpl-admin-feedback-detail">
+<template id="tpl-admin-feedback-detail_2">
     <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden bg-white">
         <div class="flex justify-between items-center mb-4">
             <span class="text-[1rem] font-bold text-slate-400 tracking-wider js-date italic"></span>
@@ -237,6 +264,33 @@
         </div>
         <div class="bg-brand-1 rounded-lg p-2">
             <div class="text-[1rem] text-slate-900  whitespace-pre-wrap break-words js-body mt-2 h-[200px] overflow-y-auto pr-2"></div>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】管理者フィードバック詳細 -->
+<template id="tpl-admin-feedback-detail">
+    <div class="w-full flex flex-col gap-4 p-2 text-slate-900">
+        <!-- 投稿日時 -->
+        <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
+            <span class="text-[0.8rem] text-slate-400">投稿日時</span>
+            <span class="js-date text-[1rem] font-bold text-slate-900"></span>
+        </div>
+        <!-- 評価スコア -->
+        <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
+            <span class="text-[0.8rem] text-slate-400">評価スコア</span>
+            <span class="js-score text-[1rem] text-yellow-500 tracking-widest drop-shadow-sm"></span>
+        </div>
+        <!-- 投稿ユーザー -->
+        <div class="flex flex-col gap-1 border-b border-slate-200 pb-3">
+            <span class="text-[0.8rem] text-slate-400">投稿ユーザー</span>
+            <div id="view-feedback-user-wrapper" class="w-full"></div>
+        </div>
+        <!-- フィードバック内容 -->
+        <div class="flex flex-col gap-2">
+            <span class="text-[0.8rem] text-slate-400">フィードバック内容</span>
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 min-h-[150px]">
+                <div class="js-body text-[1rem] text-slate-900 leading-[1.8] whitespace-pre-wrap break-words"></div>
+            </div>
         </div>
     </div>
 </template>
@@ -273,7 +327,7 @@
 </template>
 
 <!-- 【ダイアログ子】管理者：通報内容の全文詳細 -->
-<template id="tpl-admin-report-item-detail">
+<template id="tpl-admin-report-item-detail_2">
     <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden bg-white">
         <div class="flex justify-between items-center pb-2">
             <span class="js-report-tim kb-date-tim-md"></span>
@@ -284,6 +338,25 @@
         </div>
         <div class="flex-1 bg-brand-1 rounded-lg p-2 h-[200px] overflow-y-auto">
             <div class="text-[1rem] text-slate-900 leading-[2] whitespace-pre-wrap break-words js-report-body mt-2"></div>
+        </div>
+    </div>
+</template>
+<!-- 【ダイアログ子】管理者：通報内容の全文詳細 -->
+<template id="tpl-admin-report-item-detail">
+    <div class="w-full flex flex-col gap-4 p-2 text-slate-900">
+        <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
+            <span class="text-[0.8rem] text-slate-400">通報日時</span>
+            <span class="js-report-tim text-[1rem] font-bold text-slate-900"></span>
+        </div>
+        <div class="flex flex-col gap-1 border-b border-slate-200 pb-3">
+            <span class="text-[0.8rem] text-slate-400">通報者</span>
+            <div id="view-report-user-wrapper" class="w-full"></div>
+        </div>
+        <div class="flex flex-col gap-2">
+            <span class="text-[0.8rem] text-slate-400">通報内容</span>
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 min-h-[150px]">
+                <div class="text-[1rem] text-slate-900 leading-[1.8] whitespace-pre-wrap break-words js-report-body"></div>
+            </div>
         </div>
     </div>
 </template>
