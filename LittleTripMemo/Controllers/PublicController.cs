@@ -4,6 +4,7 @@ using LittleTripMemo.Services;
 using LittleTripMemo.Services.Public;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace LittleTripMemo.Controllers;
 
@@ -47,6 +48,7 @@ public class PublicController(
     /// リンクやボタンのクリック統計をキューに追加する
     /// </summary>
     [AllowAnonymous]
+    [EnableRateLimiting("PublicApiPolicy")] 
     [HttpPost("AddClick")]
     public async Task<IActionResult> AddClick([FromBody] AddCountQueueService.AddCountReq req)
         => OkWithBase(await addClickQueueService.ExecuteAsync(req));

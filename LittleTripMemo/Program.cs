@@ -11,6 +11,7 @@ using LittleTripMemo.Repository;
 using LittleTripMemo.Services.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -94,6 +95,23 @@ builder.Services.AddCors(options => options.AddDefaultPolicy(p => p.AllowAnyOrig
 // 9. 定期バッチ実行
 builder.Services.AddHostedService<LittleTripMemo.Worker.SystemMaintenanceWorker>();
 
+// 10. レート制限（大量アクセス制限）
+builder.Services.AddRateLimiter(options => {
+    options.OnRejected = async (context, token) => {
+        // ログだけ残して、レスポンスは「200 OK」で正常を装う
+        Log.Warning("【レート制限（サイレント）】IP: {IP}", context.HttpContext.Connection.RemoteIpAddress);
+        context.HttpContext.Response.StatusCode = StatusCodes.Status200OK;
+        await context.HttpContext.Response.WriteAsJsonAsync(new { is_logged_in = false, plan = "Free", data = new { is_success = true } }, token);
+    };
+    options.AddFixedWindowLimiter("PublicApiPolicy", opt => {
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.PermitLimit = 1; // 1分間に1回
+        opt.QueueLimit = 0;
+    });
+});
+
+
+
 var app = builder.Build();
 
 // UserHistoryLogger に HttpContextAccessor を紐付け（静的サービスからの DI 解決を可能にする）
@@ -107,6 +125,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseRateLimiter();
 
 app.UseRouting();
 app.UseCors();
