@@ -961,7 +961,7 @@ export default {
                     const count = dtl[countProp] || 0;
                     const div = document.createElement("div");
                     div.className = "flex items-center gap-1 text-[0.8rem]";
-                    div.innerHTML = `<span>${type.emoji}</span><span class="font-bold text-slate-400">${count}</span>`;
+                    div.innerHTML = `<span class="icon-emoji-sm">${type.emoji}</span><span class="font-bold text-slate-400">${count}</span>`;
                     reactContainer.appendChild(div);
                 });
                 // --- 2.2 クリック統計の反映 ---

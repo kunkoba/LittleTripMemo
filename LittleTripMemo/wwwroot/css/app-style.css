@@ -97,3 +97,32 @@ button:active {
     /* イタリック: italic */
     font-style: italic;
 }
+
+/* 絵文字アイコン用クラス */
+.icon-emoji-sm {
+    font-size: 1.0rem;
+    width:     1.0rem;
+    height:    1.0rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.icon-emoji-md {
+    font-size: 1.4rem;
+    width:     1.4rem;
+    height:    1.4rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.icon-emoji-lg {
+    font-size: 1.8rem;
+    width:     1.8rem;
+    height:    1.8rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -74,7 +74,7 @@
                         <!-- 初期状態を黒背景にし、内部にアイコンとテキストの要素を分割 -->
                         <button id="ui-archive-title" class="hidden py-1 px-3 flex items-center gap-2 bg-slate-800/50 rounded-full 
                             text-white text-[0.8rem] font-bold shadow-brand max-w-full transition-colors pointer-events-auto">
-                            <span class="js-icon text-[1rem] shrink-0 drop-shadow-brand">🔒</span>
+                            <span class="js-icon shrink-0 icon-emoji-sm">🔒</span>
                             <span class="js-text truncate  pt-0.5">タイトル</span>
                         </button>
                     </div>
@@ -388,21 +388,22 @@
                 <!-- アイコンバー -->
                 <div class="mx-6 bg-transparent mb-3 flex flex-col items-center gap-4">
                     <!-- 【下段】固定エリア：①メニューグループ（カプセル：装飾なしアイコンを4つ配置） -->
-                    <div id="bot-group-menu" class="w-full max-w-[500px] flex items-center justify-between bg-brand-1 rounded-full px-6 py-1 shadow-brand border border-brand-2 pointer-events-auto">
+                    <div id="bot-group-menu" class="h-12 w-full max-w-[500px] flex items-center justify-between bg-brand-1 rounded-full px-6 py-1 shadow-brand border border-brand-2 pointer-events-auto">
                         <!-- システムメニュー -->
-                        <button id="btn-sys-menu" class="relative w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-brand">
+                        <button id="btn-sys-menu" class="relative icon-emoji-lg">
                             ⚙️
                         </button>
                         <!-- ユーザメニュー -->
-                        <button id="btn-user-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-brand">
+                        <!-- <button id="btn-user-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-brand"> -->
+                        <button id="btn-user-menu" class="relative icon-emoji-lg">
                             👤
                         </button>
                         <!-- データメニュー― -->
-                        <button id="btn-data-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] drop-shadow-brand">
+                        <button id="btn-data-menu" class="icon-emoji-lg">
                             🗺️
                         </button>
                         <!-- アクションメニュー -->
-                        <button id="btn-app-menu" class="w-10 h-10 flex items-center justify-center text-[1.5rem] text-brand-5 drop-shadow-brand">
+                        <button id="btn-app-menu" class="icon-emoji-lg">
                             👆
                         </button>
                     </div>
@@ -427,11 +428,11 @@
                             </button>
                         </div>
                         <!-- ③ メインアクション（単体ボタン） -->
-                        <div id="bot-group-action" class="flex flex-col items-center">
-                            <button id="btn-create" class="rounded-full shadow-brand w-14 h-14 bg-brand-1 text-[24px] hidden pointer-events-auto active:scale-95 transition-transform">
+                        <div id="bot-group-action" class="h-16 flex flex-col items-center">
+                            <button id="btn-create" class="icon-emoji-lg rounded-full hidden bg-brand-1 w-14 h-14 pointer-events-auto active:scale-95 transition-transform">
                                 ➕
                             </button>
-                            <button id="btn-search" class="rounded-full shadow-brand w-14 h-14 bg-brand-1 text-[24px] hidden pointer-events-auto active:scale-95 transition-transform">
+                            <button id="btn-search" class="icon-emoji-lg rounded-full hidden bg-brand-1 w-14 h-14 pointer-events-auto active:scale-95 transition-transform">
                                 🔎
                             </button>
                         </div>

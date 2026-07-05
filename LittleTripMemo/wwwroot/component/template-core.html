@@ -26,7 +26,7 @@
             <div id="dialog-title-bar" class="h-14 flex items-center justify-between shadow-brand shrink-0 px-4 relative z-[1000]">
                 <!-- タイトル文字：文字色のクラスを削除 -->
                 <div id="dialog-title" class="flex-1 flex items-center font-bold italic uppercase tracking-wider truncate pr-2"></div>
-                <div id="dialog-header-actions" class="flex items-center gap-3 shrink-0">
+                <div id="dialog-header-actions" class="flex items-center gap-6 shrink-0 mr-2">
                     <!-- 閉じるボタン：既存維持（共通部品のため） -->
                     <button id="dialog-btn-close-x" class="w-9 h-9 bg-white rounded-[1rem] shadow-brand text-slate-400 flex items-center justify-center active:scale-95 text-[1rem] transition-transform">✖</button>
                 </div>
@@ -241,7 +241,7 @@
 
 <!-- 【部品】検索バー -->
 <template id="tpl-dialog-search-bar">
-    <div class="px-1 pb-4">
+    <div class="px-1">
         <div class="relative flex items-center">
             <input type="text" class="js-input w-full border-2 border-brand-3 pl-10 pr-10 py-2 rounded-full text-[0.8rem] focus:outline-none focus:border-brand-5 bg-white " placeholder="タイトルや本文を検索...">
             <span class="absolute left-4 text-slate-400">🔍</span>
@@ -260,7 +260,7 @@
 <!-- 【部品】ユーザアイコン：ボタンタイプ（影あり・反応あり） -->
 <template id="tpl-user-button">
 	<button type="button" class="rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border-4 border-white shadow-brand flex items-center gap-2 active:opacity-60 transition-opacity bg-white">
-		<span class="js-icon text-[1.4rem] drop-shadow-brand"></span>
+		<span class="js-icon icon-emoji-lg"></span>
 		<span class="js-name text-[0.8rem] text-slate-900 tracking-tight line-clamp-1 font-bold"></span>
 	</button>
 </template>
@@ -268,7 +268,7 @@
 <!-- 【部品】ユーザアイコン：バッジタイプ（影なし・反応なし） -->
 <template id="tpl-user-badge">
 	<div class="rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border border-slate-200 flex items-center gap-2 bg-white">
-		<span class="js-icon text-[1.4rem]"></span>
+		<span class="js-icon icon-emoji-lg"></span>
 		<span class="js-name text-[0.8rem] text-slate-400 tracking-tight line-clamp-1 font-bold"></span>
 	</div>
 </template>

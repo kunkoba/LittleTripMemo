@@ -31,8 +31,8 @@ window.$Const = {
     REACTION_TYPE: {
         FUNNY:    { id: 1, emoji: '🤣', prop: 'has_funny',    btnId: 'detail-btn-funny' },
         LOVE:     { id: 2, emoji: '😍', prop: 'has_love',     btnId: 'detail-btn-love' },
-        SURPRISE: { id: 3, emoji: '😮', prop: 'has_surprise', btnId: 'detail-btn-surprise' },
-        SAD:      { id: 4, emoji: '😰', prop: 'has_sad',      btnId: 'detail-btn-sad' },
+        SURPRISE: { id: 3, emoji: '😲', prop: 'has_surprise', btnId: 'detail-btn-surprise' },
+        SAD:      { id: 4, emoji: '😢', prop: 'has_sad',      btnId: 'detail-btn-sad' },
     },
     // 全体通知種別
     NOTICE_KIND: {

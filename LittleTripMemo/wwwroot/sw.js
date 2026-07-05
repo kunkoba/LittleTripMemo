@@ -1,5 +1,5 @@
 // キャッシュのバージョン（アップデート時はこの数値を変更する）
-const CACHE_VERSION = 'v0.0.5';
+const CACHE_VERSION = 'v0.0.6';
 // キャッシュ名の定義
 const CACHE_KEYS = {
     STATIC: `static-cache-${CACHE_VERSION}`,   // 変更がないもの用（Cache First）

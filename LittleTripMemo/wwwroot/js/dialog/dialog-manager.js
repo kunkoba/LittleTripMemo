@@ -12,8 +12,8 @@ const _DialogCore = {
     backdrop: null,
     stack:[],
     // 共通クラス定数
-    // HEADER_BTN_CLASS: "w-9 h-9 bg-white rounded-full shadow-brand flex items-center justify-center active:scale-95 border border-brand-2 transition-transform",
-    HEADER_BTN_CLASS: "w-9 h-9 bg-white rounded-full flex items-center justify-center active:scale-95 transition-transform",
+    // HEADER_BTN_CLASS: "w-9 h-9 bg-white rounded-full flex items-center justify-center active:scale-95 transition-transform",
+    HEADER_BTN_CLASS: "icon-emoji-md bg-white rounded-full flex items-center justify-center active:scale-95 transition-transform",
     FOOTER_BTN_BASE:  "font-bold text-[0.8rem] h-12 rounded-[1rem] uppercase active:scale-95 transition-transform",
     FOOTER_BTN_DEFAULT: "bg-brand-5 text-white shadow-brand",
     // 初期化
