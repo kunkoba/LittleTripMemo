@@ -17,6 +17,7 @@ const _DetailFrameCore = {
                 this.btnCancel2 = $Dom.GetElementById("detail-btn-cancel2");
                 this.btnSave = $Dom.GetElementById("detail-btn-save");
                 this.footer = $Dom.GetElementById("detail-footer-id");
+                this.groupEdit = $Dom.GetElementById("detail-group-edit");
                 // 下部ボタン
                 this.groupMove = $Dom.GetElementById("detail-group-move");
                 this.btnMoveFirst = $Dom.GetElementById("detail-btn-first");
@@ -24,10 +25,6 @@ const _DetailFrameCore = {
                 this.btnMoveNext = $Dom.GetElementById("detail-btn-next");
                 this.btnMoveLast = $Dom.GetElementById("detail-btn-last");
                 this.groupReaction = $Dom.GetElementById("detail-group-reaction");
-                // this.btnReactionFunny = $Dom.GetElementById("detail-btn-funny");
-                // this.btnReactionHelpful = $Dom.GetElementById("detail-btn-love");
-                // this.btnReactionSurprise = $Dom.GetElementById("detail-btn-surprise");
-                // this.btnReactionSad = $Dom.GetElementById("detail-btn-sad");
                 // リアクションボタンを定数から一括取得・登録
                 this.reactionButtons = {};
                 Object.values($Const.REACTION_TYPE).forEach(type => {
@@ -178,11 +175,6 @@ const _DetailFrameCore = {
                 this.btnMoveNext.addEventListener("click",  () => this._moveAndRender(() => $Marker.FocusNext()));
                 this.btnMoveLast.addEventListener("click",  () => this._moveAndRender(() => $Marker.FocusLast()));
                 this.mapBarrier.addEventListener("click", () => this.handleCloseOrCancel());
-                // // リアクションボタン
-                // this.btnReactionFunny.addEventListener("click", () => this._onReactionClick("is_funny", 1));
-                // this.btnReactionHelpful.addEventListener("click", () => this._onReactionClick("is_love", 2));
-                // this.btnReactionSurprise.addEventListener("click", () => this._onReactionClick("is_surprise", 3));
-                // this.btnReactionSad.addEventListener("click", () => this._onReactionClick("is_sad", 4));
             }
         }
     },
@@ -209,6 +201,7 @@ const _DetailFrameCore = {
         switch ($App.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
                 // 新規登録
+                $Dom.ToggleShow(this.groupEdit, true);
                 $Dom.ToggleShow(this.btnCancel, true);
                 $Dom.ToggleShow(this.btnSave, true);
                 break;
@@ -364,6 +357,7 @@ const DetailFrameController = {
         if (isNew) {
             // 1. 新規入力時
             $DetailContent.RenderDetail(null, true); // 編集モードで描画
+            $Dom.ToggleShow(_DetailFrameCore.groupEdit, true); // ★追加
             $Dom.ToggleShow(_DetailFrameCore.btnCurrent, true);
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, false);
             $Dom.ToggleShow(_DetailFrameCore.btnReport, false);
@@ -372,10 +366,11 @@ const DetailFrameController = {
             $Dom.ToggleShow(_DetailFrameCore.btnCancel, true);
             $Dom.ToggleShow(_DetailFrameCore.groupMove, false);
             $Dom.ToggleShow(_DetailFrameCore.groupReaction, false);
-            $Dom.ToggleShow(_DetailFrameCore.footer, false);
+            $Dom.ToggleShow(_DetailFrameCore.footer, true);    // ★フッター自体は表示
         } else {
             // 2. 既存データ参照時
             $Dom.ToggleShow(_DetailFrameCore.footer, true);
+            $Dom.ToggleShow(_DetailFrameCore.groupEdit, false); // ★参照時は隠す
             $Dom.ToggleShow(_DetailFrameCore.btnCurrent, false);
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, isOwner);
             $Dom.ToggleShow(_DetailFrameCore.btnReport, !isOwner && isPublic);

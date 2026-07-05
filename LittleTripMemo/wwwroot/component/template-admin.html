@@ -363,7 +363,7 @@
 </template>
 
 <!-- 【修正】ユーザ解析：外枠テンプレート -->
-<template id="tpl-user-click-stats">
+<template id="tpl-user-click-stats_2">
     <div class="w-full flex flex-col gap-2 text-[0.8rem]">
         <!-- ユーザー情報、通報数、Private/Public実績を1枚のカードに統合 -->
         <div class="bg-white rounded-lg border border-slate-200  p-3">
@@ -405,9 +405,44 @@
         </div>
     </div>
 </template>
+<template id="tpl-user-click-stats">
+    <div class="w-full flex flex-col gap-5 p-4 text-slate-900 bg-white">
+        <!-- セクション：基本情報 -->
+        <div class="flex flex-col gap-1">
+            <label class="text-[0.8rem] font-bold text-slate-400">対象ユーザー</label>
+            <div class="js-user-badge-container py-1"></div>
+        </div>
+        <!-- セクション：通報ステータス -->
+        <div class="flex flex-col gap-1 border-t border-slate-100 pt-3">
+            <label class="text-[0.8rem] font-bold text-slate-400">アカウント通報数</label>
+            <div class="text-[1rem] font-bold text-red-500 px-1"><span class="js-report-count">0</span> 件</div>
+        </div>
+        <!-- セクション：統計データ -->
+        <div class="flex flex-col gap-4 border-t border-slate-100 pt-3">
+            <div>
+                <label class="text-[0.8rem] font-bold text-slate-400">🔒 非公開データ</label>
+                <div class="js-stats-pvt mt-1"></div>
+            </div>
+            <div>
+                <label class="text-[0.8rem] font-bold text-slate-400">◎ 公開データ</label>
+                <div class="js-stats-pub mt-1"></div>
+            </div>
+        </div>
+        <!-- セクション：リンク解析 -->
+        <div class="flex flex-col gap-1 border-t border-slate-100 pt-3">
+            <label class="text-[0.8rem] font-bold text-slate-400">プロフィールリンク解析</label>
+            <div class="js-click-container flex flex-col gap-3 mt-1"></div>
+        </div>
+        <!-- 管理者用アクション -->
+        <div id="admin-ban-control" class="hidden flex flex-col gap-2 mt-4 pt-4 border-t-2 border-red-100">
+            <button id="btn-admin-ban" class="w-full py-4 bg-red-50 text-red-600 font-bold rounded-[1rem] border border-red-200 text-[1rem]">🚫 シャドウバンを実行</button>
+            <button id="btn-admin-unban" class="w-full py-4 bg-slate-100 text-slate-400 font-bold rounded-[1rem] border border-slate-200 text-[1rem]">✅ 制限を解除</button>
+        </div>
+    </div>
+</template>
 
 <!-- 【修正】ユーザ解析：数値項目テンプレート -->
-<template id="tpl-user-activity-summary">
+<template id="tpl-user-activity-summary_2">
     <div class="space-y-2">
         <div class="flex justify-between items-center">
             <span class="text-slate-400 text-[0.8rem]">Archives</span>
@@ -416,6 +451,18 @@
         <div class="flex justify-between items-center">
             <span class="text-slate-400 text-[0.8rem]">Memos</span>
             <b class="js-memo-count font-bold text-slate-900 text-[1rem]">0</b>
+        </div>
+    </div>
+</template>
+<template id="tpl-user-activity-summary">
+    <div class="flex flex-col gap-2 py-1 px-1">
+        <div class="flex justify-between items-baseline">
+            <span class="text-[0.8rem] text-slate-500">まとめ作成数</span>
+            <span class="text-[1rem] font-bold"><span class="js-archive-count">0</span> 件</span>
+        </div>
+        <div class="flex justify-between items-baseline">
+            <span class="text-[0.8rem] text-slate-500">メモ登録数</span>
+            <span class="text-[1rem] font-bold"><span class="js-memo-count">0</span> 件</span>
         </div>
     </div>
 </template>

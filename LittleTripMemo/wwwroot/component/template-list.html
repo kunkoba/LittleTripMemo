@@ -221,7 +221,7 @@
 </template>
 
 <!-- 【リスト子】ユーザ解析用（クリック集計） -->
-<template id="tpl-user-click-stats-item">
+<template id="tpl-user-click-stats-item_2">
     <div class="bg-white p-3 rounded-[1rem] border border-slate-200 ">
         <div class="js-url text-blue-500 italic truncate mb-2 pb-1 border-b border-slate-50"></div>
         <div class="flex justify-around text-[0.8rem]">
@@ -237,6 +237,23 @@
                 <span class="js-guest font-bold text-slate-400 text-[1rem]">0</span>
                 <span class="text-[0.8rem] text-slate-400 uppercase ">Guest</span>
             </div>
+        </div>
+    </div>
+</template>
+<template id="tpl-user-click-stats-item">
+    <div class="bg-slate-50 rounded-[1rem] p-4 flex flex-col gap-2 border border-slate-100">
+        <div class="js-url text-blue-500 font-bold italic break-all text-[1rem] mb-1"></div>
+        <div class="flex justify-between items-baseline">
+            <span class="text-[0.8rem] text-slate-400">合計クリック数</span>
+            <span class="js-total text-[1rem] font-bold text-brand-5">0</span>
+        </div>
+        <div class="flex justify-between items-baseline">
+            <span class="text-[0.8rem] text-slate-400">訪問者数（ユニーク）</span>
+            <span class="js-unique text-[1rem] font-bold text-slate-700">0</span>
+        </div>
+        <div class="flex justify-between items-baseline">
+            <span class="text-[0.8rem] text-slate-400">未ログインユーザー</span>
+            <span class="js-guest text-[1rem] font-bold text-slate-400">0</span>
         </div>
     </div>
 </template>
