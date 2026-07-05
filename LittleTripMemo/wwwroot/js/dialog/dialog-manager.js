@@ -12,8 +12,8 @@ const _DialogCore = {
     backdrop: null,
     stack:[],
     // 共通クラス定数
-    HEADER_BTN_CLASS: "icon-emoji-md bg-white h-8 w-8 rounded-full flex items-center justify-center active:scale-95 transition-transform",
-    FOOTER_BTN_BASE:  "font-bold text-[0.8rem] h-12 rounded-[1rem] uppercase active:scale-95 transition-transform",
+    HEADER_BTN_CLASS:   "kb-icon-emoji-md _bg-white h-8 w-8 rounded-full flex items-center justify-center active:scale-95 transition-transform",
+    FOOTER_BTN_BASE:    "font-bold text-[0.8rem] h-12 uppercase active:scale-95 transition-transform",
     FOOTER_BTN_DEFAULT: "bg-brand-5 text-white shadow-brand",
     // 初期化
     init() {
@@ -57,21 +57,23 @@ const _DialogCore = {
         // --- 1. テーマ別スタイルの明示的ADD ---
         const themeConfigs = {
             admin: {
-                frame:  ['bg-white', 'border-2', 'border-red-600', 'rounded-none'],
-                header: ['bg-slate-800'],
-                title:  ['text-white'],
-                // footer: ['bg-slate-50', 'border-t-2', 'border-red-600']
-                footer: ['bg-slate-50']
+                // frame:  ['bg-white', 'border-2', 'border-red-600'],
+                // header: ['bg-slate-800'],
+                // title:  ['text-white'],
+                // footer: ['bg-slate-50'],
+                frame:  ['bg-white', 'border-2', 'border-red-600'],
+                header: ['bg-slate-100'],
+                title:  ['text-slate-900'],
+                footer: ['bg-slate-100'],
             },
             report: {
-                frame:  ['bg-white', 'border-2', 'border-black', 'rounded-none'],
+                frame:  ['bg-white', 'border-2', 'border-black'],
                 header: ['bg-black'],
                 title:  ['text-red-500'],
                 footer: ['bg-white', 'border-t', 'border-slate-300']
             },
             user: { // デフォルト
-                // frame:  ['bg-brand-0', 'border-2', 'border-brand-5', 'rounded-[1rem]'],
-                frame:  ['bg-brand-0', 'rounded-[1rem]'],
+                frame:  ['bg-brand-0'],
                 header: ['bg-brand-0'],
                 title:  ['text-brand-5'],
                 footer: ['bg-brand-1', 'border-t', 'border-brand-2']
@@ -97,7 +99,7 @@ const _DialogCore = {
         if (help) {
             const btnHelp = document.createElement("button");
             btnHelp.className = `${this.HEADER_BTN_CLASS} text-brand-5 font-bold`;
-            btnHelp.textContent = "?";
+            btnHelp.textContent = "？";
             btnHelp.onclick = () => {
                 document.getElementById('ui-help-dialog-body').textContent = help;
                 document.getElementById('ui-help-dialog').classList.remove('hidden');

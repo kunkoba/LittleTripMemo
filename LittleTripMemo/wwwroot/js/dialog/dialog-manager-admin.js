@@ -295,7 +295,14 @@ export default {
                 listContainer.appendChild(child);
             });
         }
-        this._core.open({ title: "通報情報詳細", content: el, theme: "admin", help: "", buttons: [] });
+        this._core.open({ 
+            title: "通報集計詳細", 
+            content: el, 
+            size: 'lg',
+            theme: "admin", 
+            help: "", 
+            buttons: [] 
+        });
     },
     // 【管理者機能】通報1件の全文詳細を表示
     async ShowAdminReportItemDetail(rep) {
@@ -322,6 +329,7 @@ export default {
             title: "通報情報詳細",
             content: el,
             theme: "admin",
+            size: 'lg',
             help: "",
             buttons: []
         });

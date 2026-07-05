@@ -297,7 +297,8 @@
 		</div>
 		<div>
 			<div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-600">Description</label><span class="text-[0.8rem] font-bold text-slate-600"><span id="edit-profile-description-count">0</span>/300</span></div>
-			<textarea id="edit-profile-description" maxlength="300" class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+			<textarea id="edit-profile-description" maxlength="300" 
+                class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[300px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
 		</div>
 		<div class="space-y-2">
 			<label class="block text-[0.8rem] font-bold uppercase text-slate-600">Social Links</label>
@@ -308,7 +309,7 @@
 	</div>
 </template>
 
-<template id="tpl-view-archive">
+<template id="tpl-view-archive_2">
     <div class="relative h-full flex flex-col bg-white p-1 gap-4">
         <!-- 1. ユーザバッヂ ＆ 明細件数ボタン (横並び) -->
         <div class="shrink-0 flex justify-between items-center w-full px-1">
@@ -325,7 +326,7 @@
             <h1 id="view-mem-title" class="text-[1.2rem] font-bold text-slate-900 break-words  border-l-4 border-brand-3 pl-3 py-4"></h1>
         </div>
         <!-- 3. 本文 (残りいっぱい) -->
-        <div class="min-h-[200px] bg-brand-1 rounded-xl p-3 flex flex-col gap-3 overflow-y-auto">
+        <div class="flex-1 bg-brand-1 rounded-xl p-3 flex flex-col gap-3 overflow-y-auto">
             <div id="view-mem-body" class="text-[1rem] text-slate-900 leading-[2] whitespace-pre-wrap break-words"></div>
             <div id="view-mem-url-wrapper" class="flex flex-wrap gap-2 mt-auto pt-2"></div>
         </div>
@@ -357,8 +358,79 @@
         <div id="archive-limit-btn-area" class="shrink-0 pb-2">
             <button id="btn-toggle-limited" class="w-full h-12 font-bold rounded-lg border-2 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                 <span class="js-check-icon text-[1.2rem]">☐</span>
-                <span class="js-label-text text-[0.8rem]">限定公開に変更する</span>
+                <span class="js-label-text text-[0.8rem]"></span>
             </button>
+        </div>
+    </div>
+</template>
+<template id="tpl-view-archive">
+    <div class="w-full flex flex-col gap-6 p-4 text-slate-900 bg-white">
+        <!-- セクション：作成者 -->
+        <div class="flex flex-col gap-2">
+            <label class="text-[0.8rem] font-bold text-slate-600 uppercase">作成者</label>
+            <div id="view-mem-user-wrapper" class="w-fit"></div>
+        </div>
+        <!-- セクション：統計情報 -->
+        <div class="flex flex-col gap-3 border-t border-slate-100 pt-4">
+            <!-- <label class="text-[0.8rem] font-bold text-slate-600">統計情報</label> -->
+            <div class="flex flex-col gap-2 _px-1">
+                <div class="flex justify-between items-baseline">
+                    <span class="text-[0.8rem] text-slate-600">地点メモ数</span>
+                    <button id="btn-view-mem-timeline" class="text-[1rem] font-bold underline text-brand-5">
+                        <span id="mem-stat-count">0</span> 件 (タイムライン表示)
+                    </button>
+                </div>
+                <div class="flex justify-between items-baseline">
+                    <span class="text-[0.8rem] text-slate-600">総移動距離</span>
+                    <!-- <span class="text-[1rem] font-bold"> -->
+                        <!-- <span id="mem-stat-distance">0</span> km -->
+                    <!-- </span> -->
+                    <span class="text-[1rem] font-bold italic">
+                        <span id="mem-stat-distance">0</span>
+                        <span class="text-[0.8rem] font-normal text-slate-600">km</span>
+                    </span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                    <span class="text-[0.8rem] text-slate-600">合計金額</span>
+                    <span class="text-[1rem] font-bold italic">
+                        <span id="mem-stat-price">0</span>
+                        <span id="view-mem-price-unit" class="text-[0.8rem] font-normal text-slate-600"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- セクション：タイトル -->
+        <div class="flex flex-col gap-1 border-t border-slate-100 pt-4">
+            <label class="text-[0.8rem] font-bold text-slate-600">まとめタイトル</label>
+            <h1 id="view-mem-title" class="text-[1rem] font-bold break-words px-1"></h1>
+        </div>
+        <!-- セクション：説明文 -->
+        <div class="flex flex-col gap-1 border-t border-slate-100 pt-4">
+            <label class="text-[0.8rem] font-bold text-slate-600">説明・メモ</label>
+            <div id="view-mem-body" class="text-[1rem] leading-[1.8] whitespace-pre-wrap break-words px-1"></div>
+        </div>
+        <!-- セクション：リンク -->
+        <div class="flex flex-col gap-2 _border-t _border-slate-100 pt-4">
+            <!-- <label class="text-[0.8rem] font-bold text-slate-600">関連リンク</label> -->
+            <div id="view-mem-url-wrapper" class="flex flex-wrap gap-2"></div>
+        </div>
+        <!-- セクション：公開設定（オーナー用） -->
+        <div id="archive-status-bar-container" class="flex flex-col gap-4 border-t-2 border-brand-1 pt-6 mt-2">
+            <div>
+                <label class="text-[0.8rem] font-bold text-brand-5 mb-2 block">公開ステータスの変更</label>
+                <div id="archive-status-bar" class="flex gap-2">
+                    <button id="btn-status-memo" class="flex-1 h-12 font-bold text-[0.8rem] rounded-lg">memo</button>
+                    <button id="btn-status-private" class="flex-1 h-12 font-bold text-[0.8rem] rounded-lg">private</button>
+                    <button id="btn-status-close" class="flex-1 h-12 font-bold text-[0.8rem] rounded-lg">public</button>
+                    <button id="btn-status-open" class="flex-1 h-12 font-bold text-[0.8rem] rounded-lg">open</button>
+                </div>
+            </div>
+            <div id="archive-limit-btn-area">
+                <button id="btn-toggle-limited" class="w-full py-4 font-bold rounded-lg border-2 text-[0.8rem] flex items-center justify-center gap-2">
+                    <span class="js-check-icon">☐</span>
+                    <span class="js-label-text">限定公開設定</span>
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -370,8 +442,11 @@
             <input id="edit-mem-title" type="text" maxlength="30" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
         </div>
         <div>
-            <div class="flex justify-between items-end mb-1"><label class="text-slate-600 block text-[0.8rem] font-bold uppercase">Description / Memo</label><span class="text-[0.8rem] text-slate-600 font-bold"><span id="edit-mem-body-count">0</span>/300</span></div>
-            <textarea id="edit-mem-body" maxlength="300" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[200px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
+            <div class="flex justify-between items-end mb-1"><label class="text-slate-600 block text-[0.8rem] font-bold uppercase">Description / Memo</label><span class="text-[0.8rem] text-slate-600 font-bold">
+                <span id="edit-mem-body-count">0</span>/300</span>
+            </div>
+            <textarea id="edit-mem-body" maxlength="300" 
+                class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[300px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
         <div>
             <label class="text-slate-600 block text-[0.8rem] font-bold mb-1 uppercase">Link URL</label>
@@ -449,12 +524,12 @@
             <!-- アイコン（通知種別） -->
             <div class="flex justify-between items-baseline border-b border-slate-100 pb-2 mb-1">
                 <span class="text-[0.8rem] text-slate-600">通知種別</span>
-                <span id="view-notice-icon" class="text-[1rem] leading-none drop-shadow-sm"></span>
+                <span id="view-notice-icon" class="kb-icon-emoji-md"></span>
             </div>
             <!-- 日時 -->
             <div class="flex justify-between items-baseline">
                 <span class="text-[0.8rem] text-slate-600">受信日時</span>
-                <span id="view-notice-date" class="text-[1rem] font-bold text-slate-900"></span>
+                <span id="view-notice-date" class="kb-date-tim-md"></span>
             </div>
             <!-- ユーザー情報（差出人など：JS側で動的に表示/非表示） -->
             <div id="view-notice-user-wrapper" class="hidden mt-2 pt-2 border-t border-slate-100"></div>
@@ -513,9 +588,9 @@
     <div class="w-full flex flex-col gap-4 p-2 text-slate-900">
         <!-- 基本情報 -->
         <div class="flex flex-col gap-3 border-b border-slate-200 pb-4">
-            <div class="flex justify-between items-baseline">
+            <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
                 <span class="text-[0.8rem] text-slate-600">通報日時</span>
-                <span class="js-report-tim text-[1rem] font-bold text-slate-900"></span>
+                <span class="js-report-tim kb-date-tim-md"></span>
             </div>
             <!-- 対象ユーザー -->
             <div class="flex flex-col gap-1">
@@ -525,11 +600,11 @@
             <!-- 対象まとめ -->
             <div class="flex flex-col gap-1">
                 <span class="text-[0.8rem] text-slate-600">対象まとめ</span>
-                <button id="btn-report-jump-archive" class="w-full flex items-center justify-between p-3 bg-white border border-slate-200 rounded-[1rem] active:bg-slate-50 transition-colors text-left shadow-sm">
+                <button id="btn-report-jump-archive" class="h-10 w-full flex items-center justify-between p-3 bg-white rounded-full active:bg-slate-50 transition-colors text-left shadow-brand">
                     <div class="flex-1 min-w-0 pr-2">
                         <div id="view-report-archive-title" class="text-[1rem] font-bold text-slate-900 truncate"></div>
                     </div>
-                    <span class="text-[1rem] ml-2">🗺️</span>
+                    <span class="text-[1rem] ml-2">👉</span>
                 </button>
             </div>
         </div>
@@ -545,25 +620,25 @@
 <template id="tpl-menu-sys">
     <div class="w-full flex flex-col bg-brand-0">
         <button id="btn-sys-notice" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">📢</span>
+            <span class="col-span-1 kb-icon-emoji-lg">📢</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">システム通知一覧</span>
         </button>
         <button id="btn-sys-version" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">ℹ️</span>
+            <span class="col-span-1 kb-icon-emoji-lg">ℹ️</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">アプリの詳細情報</span>
         </button>
         <button id="btn-sys-admin" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-red-100 active:bg-red-200 transition-colors text-red-600 bg-red-50">
-            <span class="col-span-1 icon-emoji-lg">👑</span>
+            <span class="col-span-1 kb-icon-emoji-lg">👑</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">管理者ツール</span>
         </button>
         <button id="btn-sys-login" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">🚪</span>
+            <span class="col-span-1 kb-icon-emoji-lg">🚪</span>
             <span class="col-span-1">
             </span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase"></span>
@@ -575,22 +650,22 @@
 <template id="tpl-menu-user">
     <div class="w-full flex flex-col bg-brand-0">
         <button id="btn-sys-user-profile" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">👤</span>
+            <span class="col-span-1 kb-icon-emoji-lg">👤</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">プロフィール情報</span>
         </button>
         <button id="btn-user-mail" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">📩</span>
+            <span class="col-span-1 kb-icon-emoji-lg">📩</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">受信メールの一覧</span>
         </button>
         <button id="btn-sys-my-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">🚫</span>
+            <span class="col-span-1 kb-icon-emoji-lg">🚫</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">通報したまとめ一覧</span>
         </button>
         <button id="btn-sys-user-config" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">⚙️</span>
+            <span class="col-span-1 kb-icon-emoji-lg">⚙️</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">利用端末の設定</span>
         </button>
@@ -601,37 +676,37 @@
 <template id="tpl-menu-data">
     <div class="w-full flex flex-col bg-brand-0">
         <button id="btn-app-archive-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">📚</span>
+            <span class="col-span-1 kb-icon-emoji-lg">📚</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">まとめを一覧表示</span>
         </button>
         <button id="btn-app-info" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">📖</span>
+            <span class="col-span-1 kb-icon-emoji-lg">📖</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">まとめの詳細表示</span>
         </button>
         <button id="btn-app-point-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">☰</span>
+            <span class="col-span-1 kb-icon-emoji-lg">☰</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">地点メモの一覧</span>
         </button>
         <button id="btn-app-batch" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">📦</span>
+            <span class="col-span-1 kb-icon-emoji-lg">📦</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">地点メモをまとめる</span>
         </button>
         <button id="btn-app-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">🔎</span>
+            <span class="col-span-1 kb-icon-emoji-lg">🔎</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">公開データを検索</span>
         </button>
         <button id="btn-app-point-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">👇</span>
+            <span class="col-span-1 kb-icon-emoji-lg">👇</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">ワード検索で地点移動</span>
         </button>
         <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">➕</span>
+            <span class="col-span-1 kb-icon-emoji-lg">➕</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">地点メモを作成する</span>
         </button>
@@ -643,22 +718,22 @@
     <div class="w-full flex flex-col bg-brand-0">
         <button id="btn-app-reload" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <!-- <span class="col-span-1 flex justify-center text-[1.5rem]">🌐</span> -->
-            <span class="col-span-1 icon-emoji-lg">🌐</span>
+            <span class="col-span-1 kb-icon-emoji-lg">🌐</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">アプリを再起動</span>
         </button>
         <button id="btn-app-refresh" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">🔄</span>
+            <span class="col-span-1 kb-icon-emoji-lg">🔄</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">画面を再読み込み</span>
         </button>
         <button id="btn-app-restore" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">♻️</span>
+            <span class="col-span-1 kb-icon-emoji-lg">♻️</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">マーカーを元に戻す</span>
         </button>
         <button id="btn-app-current" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 icon-emoji-lg">📍</span>
+            <span class="col-span-1 kb-icon-emoji-lg">📍</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">現在地へ移動</span>
         </button>
@@ -716,7 +791,7 @@
 
 <!-- 【ダイアログ子】アーカイブ・明細クリック集計表示用親枠 -->
 <template id="tpl-archive-click-stats">
-    <div class="w-full flex flex-col gap-4 p-4 text-slate-900">
+    <div class="w-full flex flex-col gap-4 text-slate-900">
         <!-- アーカイブ情報カード -->
         <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-2 shadow-sm">
             <div class="flex items-center gap-2 mb-2 border-b border-slate-100 pb-2">

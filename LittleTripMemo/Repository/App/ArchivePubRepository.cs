@@ -223,10 +223,12 @@ public class ArchivePubRepository : _BaseRepository
     public async Task<IEnumerable<TMemoArchivePub>> GetAllAsync()
     {
         const string sql = @"
-        SELECT * FROM t_memo_archive_pub
-        WHERE user_id = @user_id
-          AND del_flg = false
-        ORDER BY update_tim DESC";
+            SELECT * FROM t_memo_archive_pub
+            WHERE user_id = @user_id
+              AND del_flg = false
+            ORDER BY update_tim DESC
+            LIMIT 100
+        ";
 
         return await QueryAsync<TMemoArchivePub>(sql, new { user_id = _user.login_user_id });
     }

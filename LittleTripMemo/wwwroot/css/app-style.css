@@ -72,8 +72,8 @@ button:active {
     font-size: 0.8rem;
     /* 太字: font-bold */
     font-weight: 700;
-    /* 文字色: text-slate-600 */
-    color: rgb(148 163 184);
+    /* 文字色: text-slate-900 */
+    color: rgb(15 23 42);
     /* イタリック: italic */
     font-style: italic;
 }
@@ -82,8 +82,8 @@ button:active {
     font-size: 1.0rem;
     /* 太字: font-bold */
     font-weight: 700;
-    /* 文字色: text-slate-600 */
-    color: rgb(148 163 184);
+    /* 文字色: text-slate-900 */
+    color: rgb(15 23 42);
     /* イタリック: italic */
     font-style: italic;
 }
@@ -99,7 +99,7 @@ button:active {
 }
 
 /* 絵文字アイコン用クラス */
-.icon-emoji-sm {
+.kb-icon-emoji-sm {
     font-size: 1.0rem;
     width:     1.0rem;
     height:    1.0rem;
@@ -108,7 +108,7 @@ button:active {
     align-items: center;
     justify-content: center;
 }
-.icon-emoji-md {
+.kb-icon-emoji-md {
     font-size: 1.4rem;
     width:     1.4rem;
     height:    1.4rem;
@@ -117,7 +117,7 @@ button:active {
     align-items: center;
     justify-content: center;
 }
-.icon-emoji-lg {
+.kb-icon-emoji-lg {
     font-size: 1.8rem;
     width:     1.8rem;
     height:    1.8rem;

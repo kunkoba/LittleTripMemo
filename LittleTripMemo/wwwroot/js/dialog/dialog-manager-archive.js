@@ -581,8 +581,8 @@ export default {
             const isLimited = !!arc.limited_open_flg; // 正しいフラグを参照
             const icon = $Dom.QuerySelector('.js-check-icon', btnLimit);
             const label = $Dom.QuerySelector('.js-label-text', btnLimit);
-            icon.textContent = isLimited ? "☑" : "☐";
-            label.textContent = isLimited ? "限定公開中（URLでのアクセスのみ可能）" : "限定公開に変更する（地図検索でヒットしない）";
+            icon.textContent = isLimited ? "" : "";
+            label.textContent = isLimited ? "限定公開中" : "全体公開中";
             btnLimit.className = "w-full h-12 font-bold rounded-lg border-2 active:scale-[0.98] transition-all flex items-center justify-center gap-2";
             btnLimit.classList.add(...(isLimited
                 ? ["bg-brand-1", "border-brand-3", "text-brand-5"]
@@ -961,7 +961,7 @@ export default {
                     const count = dtl[countProp] || 0;
                     const div = document.createElement("div");
                     div.className = "flex items-center gap-1 text-[0.8rem]";
-                    div.innerHTML = `<span class="icon-emoji-sm">${type.emoji}</span><span class="font-bold text-slate-600">${count}</span>`;
+                    div.innerHTML = `<span class="kb-icon-emoji-sm">${type.emoji}</span><span class="font-bold text-slate-600">${count}</span>`;
                     reactContainer.appendChild(div);
                 });
                 // --- 2.2 クリック統計の反映 ---

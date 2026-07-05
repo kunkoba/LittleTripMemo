@@ -128,11 +128,13 @@ public class DetailRepository : _BaseRepository
     public async Task<IEnumerable<TMemoDetail>> GetUnMergedAsync()
     {
         string sql = $@"
-        SELECT * FROM t_memo_detail_{_user.table_id} 
-        WHERE archive_id = 0
-          AND user_id    = @user_id 
-          AND del_flg    = false 
-        ORDER BY memo_date ASC, memo_time ASC, seq ASC";
+            SELECT * FROM t_memo_detail_{_user.table_id} 
+            WHERE archive_id = 0
+              AND user_id    = @user_id 
+              AND del_flg    = false 
+            ORDER BY memo_date ASC, memo_time ASC, seq ASC
+            LIMIT 100
+        ";
 
         return await QueryAsync<TMemoDetail>(sql, new { user_id = _user.login_user_id });
     }
