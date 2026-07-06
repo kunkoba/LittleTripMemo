@@ -302,9 +302,12 @@
                                 <label class="font-bold text-slate-600 text-[0.8rem] uppercase tracking-wider">URL</label>
                                 <div class="text-[0.8rem] text-slate-600 font-bold"><span id="detail-count-url">0</span>/200</div>
                             </div>
-                            <div class="flex items-center border-brand-2 pb-1">
+                            <!-- 修正：flexコンテナ化とボタン追加 -->
+                            <div class="flex items-center gap-2 border-brand-2 pb-1">
                                 <input name="link_url" id="detail-edit-link_url" type="url" maxlength="200" 
-                                    class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none" placeholder="https://...">
+                                    class="flex-1 border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white" placeholder="https://...">
+                                <button id="btn-detail-edit-url-clear" type="button" 
+                                    class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95 transition-all">✖</button>
                             </div>
                         </div>
                         <!-- 隠しフィールド -->

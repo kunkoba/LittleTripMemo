@@ -204,7 +204,6 @@ export default {
                     $Dom.ToggleShow($Dom.QuerySelector(".js-badge-alive", child), true);
                 }
             }
-            console.log("item:", item);
             // ④ ユーザーバッジの生成と反映（キー名は実際のAPIに合わせてください）
             const userWrapper = $Dom.QuerySelector(".js-user-wrapper", child);
             $UI.Generator.UserBadge(userWrapper, {
@@ -678,7 +677,7 @@ export default {
         });
     },
     // 【管理者機能】操作履歴の詳細表示
-    ShowAdminUserHistoryDetail(item) {
+    ShowAdminUserHistoryDetail_2(item) {
         const el = $Dom.GenerateTemplate("tpl-admin-user-history-detail");
         $Dom.QuerySelector(".js-tim", el).textContent = $Util.FormatDate(item.create_tim);
         $Dom.QuerySelector(".js-action", el).textContent = item.action_kind;
@@ -701,5 +700,82 @@ export default {
             theme: "admin",
             size: "lg" // 縦に並ぶのでサイズを大きく確保
         });
-    }
+    },
+    // 【管理者機能】操作履歴の詳細表示
+    ShowAdminUserHistoryDetail(item) {
+        const el = $Dom.GenerateTemplate("tpl-admin-user-history-detail");
+        $Dom.QuerySelector(".js-tim", el).textContent = $Util.FormatDate(item.create_tim);
+        $Dom.QuerySelector(".js-action", el).textContent = item.action_kind;
+        $Dom.QuerySelector(".js-body", el).textContent = item.body || "（説明なし）";
+        const payloadContainer = $Dom.QuerySelector(".js-payload-container", el);
+        if (item.memo_json) {
+            let jsonObj;
+            try {
+                jsonObj = typeof item.memo_json === 'string' ? JSON.parse(item.memo_json) : item.memo_json;
+            } catch (e) {
+                // パース失敗時はそのままテキストで出力
+                payloadContainer.textContent = item.memo_json;
+                jsonObj = null;
+            }
+            if (jsonObj) {
+                const table = document.createElement("table");
+                table.className = "w-full text-left text-[0.9rem] border-collapse";
+                const tbody = document.createElement("tbody");
+                table.appendChild(tbody);
+                let rowIdCounter = 0;
+                // 再帰的にテーブル行を構築するローカル関数
+                const buildRows = (data, parentId, level) => {
+                    for (const key in data) {
+                        const val = data[key];
+                        const isObj = val !== null && typeof val === 'object';
+                        const tr = document.createElement("tr");
+                        tr.className = `border-b border-slate-100 ${parentId ? 'hidden' : ''}`;
+                        if (parentId) tr.dataset.parentId = parentId;
+                        const tdKey = document.createElement("td");
+                        tdKey.className = "py-2 align-top text-slate-600 font-bold w-1/3";
+                        tdKey.style.paddingLeft = `${level * 1 + 0.5}rem`;
+                        const tdVal = document.createElement("td");
+                        tdVal.className = "py-2 pr-2 font-mono break-all text-slate-900";
+                        if (isObj) {
+                            const childCount = Object.keys(val).length;
+                            const currentId = `json-node-${rowIdCounter++}`;
+                            tdKey.innerHTML = `<span class="cursor-pointer text-brand-5 select-none hover:opacity-70 transition-opacity">▶ ${key}</span>`;
+                            tdVal.textContent = Array.isArray(val) ? `[ ${childCount} items ]` : `{ ${childCount} items }`;
+                            tdVal.classList.add("text-slate-400", "italic");
+                            // 開閉イベント
+                            tdKey.querySelector('span').onclick = (e) => {
+                                const isOpen = e.target.textContent.startsWith('▼');
+                                e.target.textContent = isOpen ? `▶ ${key}` : `▼ ${key}`;
+                                // 自分の直下の子要素のみ表示切替
+                                const children = tbody.querySelectorAll(`tr[data-parent-id="${currentId}"]`);
+                                children.forEach(c => c.classList.toggle("hidden", isOpen));
+                            };
+                            tr.appendChild(tdKey);
+                            tr.appendChild(tdVal);
+                            tbody.appendChild(tr);
+                            // 子要素の生成
+                            buildRows(val, currentId, level + 1);
+                        } else {
+                            tdKey.textContent = key;
+                            tdVal.textContent = val === "" ? '""' : String(val);
+                            tr.appendChild(tdKey);
+                            tr.appendChild(tdVal);
+                            tbody.appendChild(tr);
+                        }
+                    }
+                };
+                buildRows(jsonObj, "", 0);
+                payloadContainer.appendChild(table);
+            }
+        } else {
+            payloadContainer.textContent = "詳細データはありません";
+            payloadContainer.classList.add("text-slate-500", "text-[0.8rem]", "p-2");
+        }
+        this._core.open({
+            title: "履歴の詳細",
+            content: el,
+            theme: "admin",
+            size: "lg"
+        });
+    },
 };

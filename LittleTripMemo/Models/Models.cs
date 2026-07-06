@@ -17,8 +17,11 @@ public class TAppUser
     public string? icon { get; set; }
     public string? nick_name { get; set; }
     public string? description { get; set; }
+    [SafeUrl(2000)]
     public string? link_1 { get; set; }
+    [SafeUrl(2000)]
     public string? link_2 { get; set; }
+    [SafeUrl(2000)]
     public string? link_3 { get; set; }
     public bool ban_flg { get; set; } = false;
     public DateTime last_login_tim { get; set; }
@@ -44,6 +47,7 @@ public class TMemoArchive : IAppRecord
     public string? category { get; set; } = "気まぐれ旅";
     public string title { get; set; } = "仮のタイトル";
     public string memo { get; set; } = "仮の本文";
+    [SafeUrl(2000)]
     public string link_url { get; set; } = string.Empty;
     public string currency_unit { get; set; } = "JPY";
     public bool closed_flg { get; set; } = false;
@@ -62,6 +66,7 @@ public class TMemoArchivePub : IAppRecord
     public string? category { get; set; } = "気まぐれ旅";
     public string title { get; set; } = string.Empty;
     public string memo { get; set; } = string.Empty;
+    [SafeUrl(2000)]
     public string link_url { get; set; } = string.Empty;
     public string currency_unit { get; set; } = "JPY";
     public bool closed_flg { get; set; } = false;
@@ -89,6 +94,7 @@ public class TMemoDetail : IAppRecord
     public string memo_time { get; set; } = string.Empty;
     public string face_emoji { get; set; } = string.Empty;
     public string weather_code { get; set; } = string.Empty;
+    [SafeUrl(2000)]
     public string? link_url { get; set; } = string.Empty;
     public int memo_price { get; set; } = 0;
     public bool del_flg { get; set; } = false;
@@ -112,6 +118,7 @@ public class TMemoDetailPub : IAppRecord
     public string memo_time { get; set; } = string.Empty;
     public string face_emoji { get; set; } = string.Empty;
     public string weather_code { get; set; } = string.Empty;
+    [SafeUrl(2000)]
     public string? link_url { get; set; } = string.Empty;
     public int memo_price { get; set; } = 0;
     public bool del_flg { get; set; } = false;
@@ -161,6 +168,7 @@ public class TSysNotification
     public long seq { get; set; }
     public string title { get; set; } = string.Empty;
     public string body { get; set; } = string.Empty;
+    [SafeUrl(2000)]
     public string link_url { get; set; } = string.Empty; // ★追加
     public short kind { get; set; }
     public DateTime disp_from { get; set; }
@@ -187,6 +195,7 @@ public class TSysUserNotification
     public Guid user_id { get; set; }     // 対象ユーザー
     public short kind { get; set; } // varchar から short に変更
     public string body { get; set; } = string.Empty;
+    [SafeUrl(2000)]
     public string link_url { get; set; } = string.Empty;
     public DateTime send_tim { get; set; }
 }
@@ -227,6 +236,7 @@ public class DtoArchive
     public string? category { get; set; } = "気まぐれ旅";
     public string title { get; set; } = string.Empty;
     public string memo { get; set; } = string.Empty;
+    [SafeUrl(2000)]
     public string link_url { get; set; } = string.Empty;
     public string currency_unit { get; set; } = "JPY";
     public bool closed_flg { get; set; } = false;
@@ -290,6 +300,7 @@ public class DtoUserNotification
         public Guid user_id { get; set; }
         public string emoji { get; set; } = string.Empty;
         public string body { get; set; } = string.Empty;
+        [SafeUrl(2000)]
         public string link_url { get; set; } = string.Empty;
         public DateTime send_tim { get; set; }
 

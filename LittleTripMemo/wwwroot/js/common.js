@@ -134,6 +134,54 @@ window.$Util = {
             return false;
         }
     },
+    // urlアイコン
+    GetUrlIconHtml_2(url, size = 32) {
+		const u = url.toLowerCase();
+		let slug = "";
+		if (u.includes('youtube.com') || u.includes('youtu.be')) slug = "youtube";
+		else if (u.includes('instagram.com')) slug = "instagram";
+		else if (u.includes('twitter.com') || u.includes('x.com')) slug = "x";
+		else if (u.includes('facebook.com')) slug = "facebook";
+		else if (u.includes('github.com')) slug = "github";
+		else if (u.includes('tiktok.com')) slug = "tiktok";
+		if (slug) {
+			// Simple Icons CDN を使用して公式ロゴを取得
+			return `<img src="https://cdn.simpleicons.org/${slug}" width="${size}" height="${size}" style="width:${size}px; height:${size}px;" alt="${slug}">`;
+		}
+		// 判定不可の場合はGoogleのFaviconサービスをフォールバックとして使用
+		return `<img src="https://www.google.com/s2/favicons?sz=64&domain=${url}" width="${size}" height="${size}" style="width:${size}px; height:${size}px;" alt="icon">`;
+	},
+    // 【新規】URLが安全（http/https）か検証する
+    getSafeUrl(urlStr) {
+        if (!urlStr) return null;
+        try {
+            const url = new URL(urlStr);
+            if (!['http:', 'https:'].includes(url.protocol)) return null;
+            return url.href;
+        } catch { return null; }
+    },
+    // 【新規】安全な画像部品（DOM）を生成して返す
+    createUrlIconDom(url, size = 32) {
+        const safeUrl = this.getSafeUrl(url);
+        if (!safeUrl) return null;
+        const img = document.createElement('img');
+        img.width = size; img.height = size;
+        img.style.width = `${size}px`; img.style.height = `${size}px`;
+        img.alt = "icon";
+        const u = safeUrl.toLowerCase();
+        let slug = "";
+        if (u.includes('youtube.com') || u.includes('youtu.be')) slug = "youtube";
+        else if (u.includes('instagram.com')) slug = "instagram";
+        else if (u.includes('x.com') || u.includes('twitter.com')) slug = "x";
+        else if (u.includes('facebook.com')) slug = "facebook";
+        else if (u.includes('github.com')) slug = "github";
+        else if (u.includes('tiktok.com')) slug = "tiktok";
+        // プロパティ代入により、ブラウザが自動的にXSSを防止する
+        img.src = slug 
+            ? `https://cdn.simpleicons.org/${slug}` 
+            : `https://www.google.com/s2/favicons?sz=64&domain=${new URL(safeUrl).hostname}`;
+        return img;
+    },
     // GPSから現在地を取得する（純粋な座標取得のみ）
     async GetCurrentPosition() {
         return new Promise((resolve, reject) => {
@@ -236,23 +284,6 @@ window.$Util = {
         $Dom.QuerySelector('.js-close', el).onclick = () => el.remove();
         el.onclick = (e) => { if (e.target === el) el.remove(); };
     },
-    // urlアイコン
-    GetUrlIconHtml(url, size = 32) {
-		const u = url.toLowerCase();
-		let slug = "";
-		if (u.includes('youtube.com') || u.includes('youtu.be')) slug = "youtube";
-		else if (u.includes('instagram.com')) slug = "instagram";
-		else if (u.includes('twitter.com') || u.includes('x.com')) slug = "x";
-		else if (u.includes('facebook.com')) slug = "facebook";
-		else if (u.includes('github.com')) slug = "github";
-		else if (u.includes('tiktok.com')) slug = "tiktok";
-		if (slug) {
-			// Simple Icons CDN を使用して公式ロゴを取得
-			return `<img src="https://cdn.simpleicons.org/${slug}" width="${size}" height="${size}" style="width:${size}px; height:${size}px;" alt="${slug}">`;
-		}
-		// 判定不可の場合はGoogleのFaviconサービスをフォールバックとして使用
-		return `<img src="https://www.google.com/s2/favicons?sz=64&domain=${url}" width="${size}" height="${size}" style="width:${size}px; height:${size}px;" alt="icon">`;
-	},
     // IDを難読化（URL用）
     EncodeId(id) {
         if (!id) return "";

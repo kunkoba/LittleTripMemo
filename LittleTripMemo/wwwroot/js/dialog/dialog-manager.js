@@ -86,7 +86,6 @@ const _DialogCore = {
         } else if (size === 'md') {
             frameBg.classList.add("min-h-[50vh]");
         } else {
-            console.log("confirm-sm");
             frameBg.classList.add("min-h-[300px]");
         }
         titleEl.textContent = title;

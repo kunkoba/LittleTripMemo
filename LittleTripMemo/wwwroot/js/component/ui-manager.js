@@ -27,10 +27,10 @@ const UI_Manager = {
     // パーツ生成を担うジェネレータ
     Generator: {
         // URLリンクボタンの生成
-        LinkButton(parentEl, url, params = null, isOwner = false) {
+        LinkButton_2(parentEl, url, params = null, isOwner = false) {
+			// parentEl.innerHTML = "";	// 消しちゃダメ
             if (!url) return null;
 			if (!parentEl) return;
-			// parentEl.innerHTML = "";	// 消しちゃダメ
             // テンプレートからボタンDOMを生成
             const btn = $Dom.GenerateTemplate("tpl-link-button", "ui-template-root");
             // アイコンの注入（サイズは28px固定）
@@ -63,6 +63,43 @@ const UI_Manager = {
                 window.open(finalUrl, '_blank', 'noopener,noreferrer');
             };
 			parentEl.appendChild(btn);
+        },
+		LinkButton(parentEl, url, params = null, isOwner = false) {
+            if (!url) return;
+            if (!parentEl) return;
+            const btn = $Dom.GenerateTemplate("tpl-link-button", "ui-template-root");
+            const iconDom = $Util.createUrlIconDom(url, 36);
+            if (iconDom) {
+                btn.innerHTML = ""; 
+                btn.appendChild(iconDom);
+            } else {
+                return; // 不正なURLならボタン自体作らない
+            }
+            btn.onclick = async (e) => {
+                e.stopPropagation();
+                if (!$App.AppData.Context.IsOnline) {
+                    $Notice.Warn("オフライン中は、外部リンクを開けません。");
+                    return;
+                }
+                const safeUrl = $Util.getSafeUrl(url);
+                if (!safeUrl) {
+                    $Notice.Error("無効なURLです。");
+                    return;
+                }
+                const isSafe = $Util.IsSafeUrl(safeUrl);
+                const title = isSafe ? "外部サイトを開く" : "セキュリティ警告";
+                const message = isSafe 
+                    ? `次のリンクを開きます。よろしいですか？\n\n${safeUrl}`
+                    : `安全性が確認されていないURLのため、\nGoogle検索結果を経由して開きます。\n\n${safeUrl}`;
+                const isOk = await $Dialog.ShowConfirm({ title, message });
+                if (!isOk) return;
+                if (params && !isOwner) {
+                    $Data.Access.AddClick(params);
+                }
+                const finalUrl = isSafe ? safeUrl : `https://www.google.com/search?q=${encodeURIComponent(safeUrl)}`;
+                window.open(finalUrl, '_blank', 'noopener,noreferrer');
+            };
+            parentEl.appendChild(btn);
         },
 		// ユーザ情報バッヂの生成
 		UserBadge(parentEl, profile, options = {}) {

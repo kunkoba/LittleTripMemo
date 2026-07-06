@@ -228,15 +228,24 @@
 		</div>
 		<div class="space-y-2">
 			<label class="block text-[0.8rem] font-bold uppercase text-slate-600">Social Links</label>
-			<input id="edit-profile-link1" type="url" placeholder="URL 1 (https://...)" class="w-full border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
-			<input id="edit-profile-link2" type="url" placeholder="URL 2" class="w-full border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
-			<input id="edit-profile-link3" type="url" placeholder="URL 3" class="w-full border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+            <div class="flex items-center gap-2">
+                <input id="edit-profile-link1" type="url" placeholder="URL 1 (https://...)" class="flex-1 border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+                <button id="btn-edit-profile-link1-clear" type="button" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95 transition-all">✖</button>
+            </div>
+            <div class="flex items-center gap-2">
+                <input id="edit-profile-link2" type="url" placeholder="URL 2 (https://...)" class="flex-1 border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+                <button id="btn-edit-profile-link2-clear" type="button" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95 transition-all">✖</button>
+            </div>
+            <div class="flex items-center gap-2">
+                <input id="edit-profile-link3" type="url" placeholder="URL 3 (https://...)" class="flex-1 border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+                <button id="btn-edit-profile-link3-clear" type="button" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95 transition-all">✖</button>
+            </div>
 		</div>
 	</div>
 </template>
 
 <template id="tpl-view-archive">
-    <div class="w-full flex flex-col gap-6 p-4 text-slate-900 bg-white">
+    <div class="w-full flex flex-col gap-6 text-slate-900 bg-white">
         <!-- セクション：作成者 -->
         <div class="flex flex-col gap-2">
             <label class="text-[0.8rem] font-bold text-slate-600 uppercase">作成者</label>
@@ -322,7 +331,10 @@
         </div>
         <div>
             <label class="text-slate-600 block text-[0.8rem] font-bold mb-1 uppercase">Link URL</label>
-            <input id="edit-mem-url" type="url" placeholder="https://..." class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+            <div class="flex items-center gap-2">
+                <input id="edit-mem-url" type="url" placeholder="https://..." class="flex-1 border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+                <button id="btn-edit-mem-url-clear" type="button" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95 transition-all">✖</button>
+            </div>
         </div>
         <div>
             <label class="text-slate-600 block text-[0.8rem] font-bold mb-1 uppercase">Currency</label>

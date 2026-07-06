@@ -1,8 +1,9 @@
-﻿// CustomAuthorizeAttribute.cs（認可チェックのみにする）
-using LittleTripMemo.Common;
+﻿using LittleTripMemo.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+
+// CustomAuthorizeAttribute.cs（認可チェックのみにする）
 
 public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
 {

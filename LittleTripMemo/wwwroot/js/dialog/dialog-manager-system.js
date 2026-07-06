@@ -447,6 +447,11 @@ export default {
         editNickname.addEventListener('input', () => editNicknameCount.textContent = editNickname.value.length);
         // カテゴリの文字数カウントイベント
         editCategory.addEventListener('input', () => editCategoryCount.textContent = editCategory.value.length);
+        // 追記：3つのリンクすべてにクリアイベントを紐付け
+        [1, 2, 3].forEach(num => {
+            const input = $Dom.QuerySelector(`#edit-profile-link${num}`, el);
+            $Dom.QuerySelector(`#btn-edit-profile-link${num}-clear`, el).onclick = () => input.value = "";
+        });
         $Dom.QuerySelector('#btn-profile-icon-trigger', el).onclick = () => {
             $Util.ShowEmojiPicker((emoji) => {
                 editIconPreview.textContent = emoji;
@@ -523,7 +528,6 @@ export default {
                     $Dom.ToggleShow($Dom.QuerySelector(".js-badge-alive", child), true);
                 }
             }
-            console.log("item:", item);
             child.onclick = () => this.ShowMyReportDetail(item);
             root.appendChild(child);
         });

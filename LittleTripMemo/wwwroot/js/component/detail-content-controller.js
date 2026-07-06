@@ -19,6 +19,7 @@ const _DetailContentCore = {
                     this.displayBody = $Dom.GetElementById("detail-display-body");
                     this.displayPrice = $Dom.GetElementById("detail-display-memo_price");
                     this.displayPriceUnit = $Dom.GetElementById("detail-display-price-unit");
+                    this.btnUrlClear = $Dom.GetElementById("btn-detail-edit-url-clear");
                     // 追加：表示制御用ラッパー
                     this.displayPriceWrapper = $Dom.GetElementById("detail-display-price-wrapper");
                     this.displayUrlWrapper = $Dom.GetElementById("detail-display-url-wrapper");
@@ -85,6 +86,10 @@ const _DetailContentCore = {
                 this.editPriceMinus.addEventListener('input', () => {
                     this.editPricePlus.value = "";
                     this.editPrice.value = this.editPriceMinus.value * -1;
+                });
+                this.btnUrlClear.addEventListener('click', () => {
+                    this.editUrl.value = "";
+                    this.countUrl.textContent = "0"; // 文字数カウントもリセット
                 });
                 // 文字数カウント連動（入力イベント）
                 const elements =
@@ -364,13 +369,20 @@ const DetailContentController = {
             return false;
         }
         // 5. URL形式チェック（入力されている場合のみ）
+        // if (detail.link_url && detail.link_url.trim().length > 0) {
+        //     try {
+        //         // 文字列がhttpから始まっているか等の簡易チェック
+        //         if (!detail.link_url.startsWith('http')) {
+        //             throw new Error();
+        //         }
+        //     } catch (e) {
+        //         $Notice.Warn("有効なURLを入力してください。");
+        //         return false;
+        //     }
+        // }
         if (detail.link_url && detail.link_url.trim().length > 0) {
-            try {
-                // 文字列がhttpから始まっているか等の簡易チェック
-                if (!detail.link_url.startsWith('http')) {
-                    throw new Error();
-                }
-            } catch (e) {
+            // 【修正点】新設した検証関数を通す
+            if (!$Util.getSafeUrl(detail.link_url)) {
                 $Notice.Warn("有効なURLを入力してください。");
                 return false;
             }
