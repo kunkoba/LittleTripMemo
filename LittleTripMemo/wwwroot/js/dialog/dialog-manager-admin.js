@@ -194,8 +194,6 @@ export default {
             $Dom.QuerySelector(".js-archive-title", child).textContent = item.archive_title || "Unknown Title";
             // ② 通報件数の反映
             $Dom.QuerySelector(".js-badge-count", child).textContent = `${item.report_count}`;
-            // ③ 最終更新日の反映
-            $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
             // ステータスバッジの表示
             if (item.is_deleted) {
                 $Dom.ToggleShow($Dom.QuerySelector(".js-badge-deleted", child), true);
@@ -301,6 +299,7 @@ export default {
                 listContainer.appendChild(child);
             });
         }
+        // 画面を開く
         this._core.open({ 
             title: "通報集計詳細", 
             content: el, 

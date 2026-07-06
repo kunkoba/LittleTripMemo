@@ -60,23 +60,25 @@ public class SysReportRepository : _BaseRepository
                 COUNT(1) AS report_count,
                 a.limited_open_flg AS is_limited,
                 u.icon AS target_icon,
-                u.nick_name AS target_nick_name
+                u.nick_name AS target_nick_name,
+                a.closed_flg AS is_closed,
+                a.del_flg AS is_deleted
             FROM t_sys_reports r
             INNER JOIN t_memo_archive_pub a 
                 ON r.archive_id = a.archive_id
             INNER JOIN t_app_user u
                 ON r.target_user_id = u.user_id
-            WHERE a.del_flg = false      -- 削除されていない
-              AND a.closed_flg = false   -- 非公開(クローズ)状態ではない
             GROUP BY 
                 r.target_user_id, 
                 r.archive_id, 
                 a.title,
                 a.limited_open_flg,
                 u.icon,
-                u.nick_name
+                u.nick_name,
+                a.closed_flg,
+                a.del_flg
             ORDER BY report_count DESC
-            LIMIT 100
+            LIMIT 200
             """;
 
         return await QueryAsync<DtoReportSummary>(sql);

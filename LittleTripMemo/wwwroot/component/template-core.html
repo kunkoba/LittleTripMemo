@@ -21,9 +21,9 @@
 <template id="tpl-dialog-frame">
     <div class="absolute inset-0 z-[2000] pointer-events-none flex items-center justify-center bg-black/20">
         <!-- 外枠：枠線や背景色のクラスを削除 -->
-        <div id="dialog-frame-bg" class="pointer-events-auto w-[90%] max-w-[500px] max-h-[70vh] shadow-2xl flex flex-col overflow-hidden relative">
+        <div id="dialog-frame-bg" class="pointer-events-auto w-[90%] max-w-[500px] max-h-[70vh] flex flex-col overflow-hidden relative">
             <!-- タイトルバー：背景色のクラスを削除 -->
-            <div id="dialog-title-bar" class="h-14 flex items-center justify-between shadow-md shrink-0 px-4 relative z-[1000]">
+            <div id="dialog-title-bar" class="h-14 flex items-center justify-between border-b-2 shrink-0 px-4 relative z-[1000]">
                 <!-- タイトル文字：文字色のクラスを削除 -->
                 <div id="dialog-title" class="flex-1 flex items-center font-bold italic uppercase tracking-wider truncate pr-2"></div>
                 <div id="dialog-header-actions" class="flex items-center gap-6 shrink-0 mr-2">
@@ -47,19 +47,36 @@
 </template>
 
 <!-- 【ダイアログ子】絵文字ピッカー -->
-<template id="tpl-emoji-picker">
+<template id="tpl-emoji-picker_2">
     <div class="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 touch-none">
         <!-- ↓ 幅と高さを強制（w-full max-w-[500px] h-[85vh] を付与） -->
         <div class="w-full max-w-[400px] h-[70vh] p-3 border-0 bg-white rounded-[1rem] shadow-2xl flex flex-col overflow-hidden animate-fade-in">
             <div class="h-16 px-5 flex justify-between items-center shrink-0 border-b border-slate-100 bg-slate-50/50">
                 <div class="flex flex-col">
                     <!-- <span class="text-[0.8rem] text-slate-600 uppercase tracking-[0.2em]">Select Icon</span> -->
-                    <span class="text-[1.2rem] text-brand-5 italic uppercase ">Marker Library</span>
+                    <span class="text-[1rem] text-brand-5 font-bold">絵文字マート</span>
                 </div>
                 <button class="js-close w-9 h-9 bg-white rounded-full shadow-md text-slate-600 flex items-center justify-center font-bold active:scale-95 transition-transform border border-slate-100">✖</button>
             </div>
             <!-- ↓ flex-1 を追加して親の縦幅を完全に埋め尽くす -->
             <div id="emoji-mart-container" class="flex-1 w-full bg-white overflow-hidden"></div>
+        </div>
+    </div>
+</template>
+<template id="tpl-emoji-picker">
+    <div class="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 touch-none">
+        <!-- 外枠：サイズと角丸を標準に合わせる -->
+        <div class="w-full max-w-[400px] h-[75vh] bg-white flex flex-col overflow-hidden animate-fade-in">
+            <!-- ヘッダー：1要素1行のルールを適用 -->
+            <div class="shrink-0 px-5 py-4 flex justify-between items-start shadow-md border-b-2">
+                <div class="flex flex-col gap-1">
+                    <span class="text-[1rem] font-bold text-brand-5">マーカーライブラリ</span>
+                </div>
+                <!-- 閉じボタン：標準サイズ -->
+                <button class="js-close kb-icon-emoji-md active:scale-95 transition-transform">✖</button>
+            </div>
+            <!-- ピッカー挿入エリア：残りの高さをすべて使う -->
+            <div id="emoji-mart-container" class="flex-1 py-4 w-full bg-white overflow-hidden"></div>
         </div>
     </div>
 </template>
@@ -179,7 +196,7 @@
         <div class="flex flex-col gap-2">
             <!-- WIND -->
             <div class="bg-white p-2">
-                <label class="block font-bold text-slate-600 text-[0.8rem] uppercase tracking-widest mb-1 pl-1">Wind Speed</label>
+                <label class="block font-bold text-slate-600 text-[0.8rem] uppercase tracking-widest mb-1 pl-1">風速</label>
                 <div class="flex items-center gap-4">
                     <span id="atm-wind-val" class="w-8 text-[1.5rem] font-bold text-brand-5 text-center italic">0</span>
                     <input id="atm-wind" type="range" min="0" max="9" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5">
@@ -191,7 +208,7 @@
             </div>
             <!-- DENSITY -->
             <div class="bg-white p-2">
-                <label class="block font-bold text-slate-600 text-[0.8rem] uppercase tracking-widest mb-1 pl-1">Density</label>
+                <label class="block font-bold text-slate-600 text-[0.8rem] uppercase tracking-widest mb-1 pl-1">粒度</label>
                 <div class="flex items-center gap-4">
                     <span id="atm-density-val" class="w-8 text-[1.5rem] font-bold text-brand-5 text-center italic">0</span>
                     <input id="atm-density" type="range" min="0" max="9" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5">
@@ -203,7 +220,7 @@
             </div>
             <!-- DARK -->
             <div class="bg-white p-2">
-                <label class="block font-bold text-slate-600 text-[0.8rem] uppercase tracking-widest mb-1 pl-1">Darkness</label>
+                <label class="block font-bold text-slate-600 text-[0.8rem] uppercase tracking-widest mb-1 pl-1">暗さ</label>
                 <div class="flex items-center gap-4">
                     <span id="atm-darkness-val" class="w-8 text-[1.5rem] font-bold text-brand-5 text-center italic">0</span>
                     <input id="atm-darkness" type="range" min="0" max="9" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5">

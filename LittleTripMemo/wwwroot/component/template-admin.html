@@ -101,11 +101,8 @@
         <div class="absolute top-3 right-3 bg-red-500 text-white text-[0.8rem] font-bold px-2.5 py-1 rounded-full ">
             <span class="js-report-count js-badge-count">0</span>
         </div>
-        <!-- 最終更新日 -->
-        <div class="js-update-tim kb-date-tim-sm">
-        </div>
         <!-- まとめタイトル -->
-        <div class="text-[1rem] font-bold text-slate-900 pr-10 line-clamp-2">
+        <div class="text-[1rem] font-bold text-slate-900 pr-10 line-clamp-1">
             <span class="js-archive-title">タイトル</span>
         </div>
         <!-- ユーザーバッジ領域（JSで生成して流し込む） -->
@@ -113,6 +110,7 @@
         </div>
         <!-- 生存状態バッジ（Close状態の場合のみ表示） -->
         <div class="flex gap-1 mt-1">
+            <span class="hidden bg-slate-800 text-white text-[0.8rem] px-2 py-0.5 rounded-full js-badge-deleted">DELETED</span>
             <span class="hidden bg-slate-400 text-white text-[0.8rem] px-2 py-0.5 rounded-full js-badge-closed ">CLOSED</span>
             <span class="hidden bg-brand-5   text-white text-[0.8rem] px-2 py-0.5 rounded-full js-badge-alive ">ALIVE</span>
         </div>
@@ -127,7 +125,7 @@
             <!-- 対象まとめ -->
             <div class="flex flex-col gap-1">
                 <span class="text-[0.8rem] text-slate-600">対象まとめ</span>
-                <button id="btn-admin-report-open-archive" class="h-10 w-full flex items-center justify-between p-3 bg-white border border-slate-200 rounded-full active:bg-slate-50 transition-colors text-left shadow-md">
+                <button id="btn-admin-report-open-archive" class="h-10 w-full flex items-center justify-between p-3 bg-white rounded-full active:bg-slate-50 transition-colors text-left shadow-md">
                     <div class="flex-1 min-w-0 pr-2">
                         <div class="text-[1rem] font-bold text-slate-900 js-archive-title break-words line-clamp-2"></div>
                     </div>

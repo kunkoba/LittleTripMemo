@@ -26,7 +26,18 @@ export default {
         b.search.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH; $App.RefreshScreen(); };
         b.pointSearch.onclick = () => this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18));
         b.create.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; $App.RefreshScreen(); };
-        this._core.open({ title: "アプリメニュー", content: el });
+        // 画面を開く
+        const help = [
+            "地点メモ関連の操作を行います",
+            "● 地点メモ・・・その日その時その場所のメモ",
+            "● まとめ・・・地点メモをまとめた旅行記",
+            "● 公開データ・・・みんなが公開している「まとめ」",
+        ].join('\n');
+        this._core.open({ 
+            title: "アプリメニュー", 
+            content: el,
+            help: help,
+        });
     },
     // 【アクションメニュー】
     ShowActionMenu() {
@@ -47,15 +58,32 @@ export default {
             $Marker.RefreshCurrentLocation();
             $Marker.FocusToLocationMarker(1000);
         };
-        this._core.open({ title: "アクションメニュー", content: el });
+        // 画面を開く
+        const help = [
+            "画面関連の操作を行います",
+            "● アプリ再起動・・・各データをネットワークから再読み込みします",
+            "● 画面再読み込み・・・現在の画面を、再度ネットワークから読み込みます",
+            "● マーカーを元に戻す・・・移動させてしまったマーカーだけを元に戻します",
+            "● 現在地へ移動・・・強制的に現在地に移動します",
+        ].join('\n');
+        this._core.open({ 
+            title: "アクションメニュー", 
+            content: el,
+            help: help, 
+        });
     },
     // 座標・住所指定で移動する
     PointSearchGoogle(onOk) {
         const el = $Dom.GenerateTemplate('tpl-point-search-google');
+        // 画面を開く
+        const help = [
+            "地名や施設名を入力して、地図をその場所へジャンプさせます",
+            "",
+        ].join('\n');
         this._core.open({
-            title: "地点・住所検索",
+            title: "ワード検索で移動",
             content: el,
-            help: "",
+            help: help,
             buttons: [
                 {
                     label: "GO！",
@@ -159,9 +187,17 @@ export default {
                 b.classList.add('bg-brand-5', 'text-white', 'border-brand-5');
             }
         });
+        // 画面を開く
+        const help = [
+            "環境エフェクトを設定できます",
+            "● 地点メモを開いたときに、画面にアニメーション効果を付与できます",
+            "● 風速、粒度、暗さをスライドバーで調整してください",
+            "● クリアボタンでリセットできます",
+        ].join('\n');
         this._core.open({
             title: "環境エフェクト",
             content: el,
+            help: help,
             onClose: () => {
                 if (typeof Atmosphere !== 'undefined') {
                     Atmosphere.hide();

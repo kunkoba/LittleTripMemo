@@ -170,10 +170,12 @@ public class ArchiveRepository : _BaseRepository
     {
         // COUNTのJOINを排除。detail_countカラムをそのまま返す
         const string sql = @"
-        SELECT * FROM t_memo_archive 
-        WHERE user_id = @user_id 
-          AND del_flg = false
-        ORDER BY update_tim DESC";
+            SELECT * FROM t_memo_archive 
+            WHERE user_id = @user_id 
+              AND del_flg = false
+            ORDER BY update_tim DESC
+            LIMIT 100
+        ";
 
         return await QueryAsync<TMemoArchive>(sql, new { user_id = _user.login_user_id });
     }
