@@ -106,7 +106,23 @@ const _DialogCore = {
             btnHelp.className = `${this.HEADER_BTN_CLASS} text-brand-5 font-bold`;
             btnHelp.textContent = "？";
             btnHelp.onclick = () => {
-                document.getElementById('ui-help-dialog-body').textContent = help;
+                const parts = help.split('\n');
+                const firstLine = parts.shift(); // 最初の1行を取り出す
+                const restText = parts.join('\n'); // 残りのテキスト
+                const helpBody = document.getElementById('ui-help-dialog-body');
+                helpBody.innerHTML = ""; // 一旦クリア
+                // 1行目のスタイル適用
+                const titleEl = document.createElement('div');
+                titleEl.className = "text-[1.2rem] font-bold text-slate-900 pb-2";
+                titleEl.textContent = firstLine;
+                helpBody.appendChild(titleEl);
+                // 2行目以降の適用
+                if (restText) {
+                    const restEl = document.createElement('div');
+                    restEl.className = "whitespace-pre-wrap";
+                    restEl.textContent = restText;
+                    helpBody.appendChild(restEl);
+                }
                 document.getElementById('ui-help-dialog').classList.remove('hidden');
             };
             headerActions.appendChild(btnHelp);

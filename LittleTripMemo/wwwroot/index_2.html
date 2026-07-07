@@ -1,146 +1,119 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>click_stats → CSV</title>
-
-<style>
-body{
-    font-family:sans-serif;
-    margin:20px;
-}
-
-textarea{
-    width:100%;
-    height:250px;
-    font-family:Consolas,monospace;
-    font-size:14px;
-    margin-bottom:10px;
-}
-
-button{
-    padding:8px 16px;
-    margin-right:10px;
-    cursor:pointer;
-}
-
-#csv{
-    height:250px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confetti Popper Effect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #0f172a;
+        }
+        canvas {
+            display: block;
+        }
+        /* クラッカーのサイズを半分に指定 */
+        .popper-cone {
+            position: absolute;
+            bottom: 50px;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #ef4444;
+            cursor: pointer;
+            z-index: 10;
+        }
+    </style>
 </head>
 <body>
-
-<h2>JSON → CSV</h2>
-
-<h3>JSON入力</h3>
-<textarea id="json"></textarea>
-
-<button id="convert">CSVへ変換</button>
-<button id="download">CSVをダウンロード</button>
-
-<h3>CSV</h3>
-<textarea id="csv" readonly></textarea>
-
-<script>
-
-/**
- * click_stats を CSV に変換
- * @param {Object} data
- * @returns {string}
- */
-function clickStatsToCsv(data){
-
-    const rows = [
-        ["対象","項目","種別","t","u","g"]
-    ];
-
-    /**
-     * click_stats追加
-     */
-    function addRows(target, clickStats){
-
-        if(!clickStats) return;
-
-        for(const [item, stat] of Object.entries(clickStats)){
-
-            const type = item.startsWith("link") ? "link" : "view";
-
-            rows.push([
-                target,
-                item,
-                type,
-                stat.t ?? 0,
-                stat.u ?? 0,
-                stat.g ?? 0
-            ]);
+    <div id="leftPopper" class="popper-cone left-[20%] rotate-[30deg]"></div>
+    <div id="rightPopper" class="popper-cone right-[20%] -rotate-[30deg]"></div>
+    <!-- 中央の起動ボタン -->
+    <button id="centerButton" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-6 py-3 bg-white text-slate-900 rounded-full font-bold z-20">
+        PUSH
+    </button>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const leftPopper = document.getElementById('leftPopper');
+        const rightPopper = document.getElementById('rightPopper');
+        const centerButton = document.getElementById('centerButton');
+        let particles = [];
+        let width, height;
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
         }
-    }
-
-    // archive
-    addRows("archive", data.archive.click_stats);
-
-    // details
-    for(const detail of data.details){
-        addRows(`detail:${detail.seq}`, detail.click_stats);
-    }
-
-    // userProfile
-    addRows("userProfile", data.userProfile.click_stats);
-
-    return rows
-        .map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(","))
-        .join("\n");
-}
-
-
-// CSV変換
-document.getElementById("convert").onclick = ()=>{
-
-    try{
-
-        const json = JSON.parse(document.getElementById("json").value);
-
-        const csv = clickStatsToCsv(json);
-
-        document.getElementById("csv").value = csv;
-
-    }catch(e){
-
-        alert("JSONの形式が正しくありません。\n\n"+e.message);
-
-    }
-
-};
-
-
-// ダウンロード
-document.getElementById("download").onclick = ()=>{
-
-    const csv = document.getElementById("csv").value;
-
-    if(!csv){
-        alert("先にCSVへ変換してください。");
-        return;
-    }
-
-    const blob = new Blob([csv],{
-        type:"text/csv;charset=utf-8;"
-    });
-
-    const a = document.createElement("a");
-
-    a.href = URL.createObjectURL(blob);
-
-    a.download = "click_stats.csv";
-
-    a.click();
-
-    URL.revokeObjectURL(a.href);
-
-};
-
-</script>
-
+        window.addEventListener('resize', resize);
+        resize();
+        class Particle {
+            constructor(x, y, angle) {
+                this.x = x;
+                this.y = y;
+                /* 拡散角の計算 */
+                const spread = (Math.random() * 0.5 - 0.25);
+                const speed = Math.random() * 10 + 5;
+                this.vx = Math.cos(angle + spread) * speed;
+                this.vy = Math.sin(angle + spread) * speed;
+                this.size = Math.random() * 6 + 1;
+                this.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+                this.gravity = 0.15;
+                this.friction = 0.99;
+                this.life = 1;
+                this.decay = Math.random() * 0.005 + 0.002;
+            }
+            update() {
+                /* 移動速度と重力の適用 */
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+            }
+            draw() {
+                /* 粒子の描画 */
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+        function createExplosion(x, y, angle) {
+            /* 粒子数設定 */
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle(x, y, angle));
+            }
+        }
+        function fire(element, angleModifier) {
+            const rect = element.getBoundingClientRect();
+            /* 回転角に応じた開口部位置の特定 */
+            const rad = angleModifier * Math.PI / 180;
+            const popperX = rect.left + rect.width / 2 + Math.sin(rad) * 20;
+            const popperY = rect.top + rect.height / 2 - Math.cos(rad) * 20;
+            createExplosion(popperX, popperY, -Math.PI / 2 + rad);
+        }
+        function animate() {
+            /* 背景の残像描写 */
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.15)';
+            ctx.fillRect(0, 0, width, height);
+            particles = particles.filter(p => p.life > 0);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        centerButton.addEventListener('click', () => {
+            /* 左右のクラッカーを同時に起動 */
+            fire(leftPopper, 30);
+            fire(rightPopper, -30);
+        });
+        animate();
+    </script>
 </body>
 </html>

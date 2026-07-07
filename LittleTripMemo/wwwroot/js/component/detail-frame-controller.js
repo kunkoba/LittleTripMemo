@@ -99,7 +99,8 @@ const _DetailFrameCore = {
                     const currentData = $Data.Store.GetDetailByKey(data.archive_id, data.seq, data.dbid);
                     if (currentData) {
                         $DetailContent.RenderDetail(currentData, true); // 編集モード
-                        $Dom.ToggleShow(this.footer, false); // フッターを隠す
+                        $Dom.ToggleShow(this.footer, true); // フッターは表示したままにする
+                        $Dom.ToggleShow(this.groupEdit, true); // 編集用ボタングループを表示
                         $Dom.ToggleShow(this.btnEdit, false); // 編集ボタン隠す
                         $Dom.ToggleShow(this.groupMove, false);
                         $Dom.ToggleShow(this.groupReaction, false);
