@@ -239,17 +239,17 @@
 <!-- 【リスト子】ユーザ解析用（クリック集計） -->
 <template id="tpl-user-click-stats-item">
     <div class="bg-slate-50 rounded-[1rem] p-4 flex flex-col gap-2 border border-slate-100">
-        <div class="js-url text-blue-500 font-bold italic break-all text-[0.8rem] mb-1"></div>
+        <div class="js-url text-blue-500 font-bold italic break-all text-[0.8rem] mb-1 line-clamp-1"></div>
         <div class="flex justify-between items-baseline">
-            <span class="text-[0.8rem] text-slate-600">合計クリック数</span>
+            <span class="text-[0.8rem] text-slate-600">総クリック数</span>
             <span class="js-total text-[1rem] font-bold text-brand-5">0</span>
         </div>
         <div class="flex justify-between items-baseline">
-            <span class="text-[0.8rem] text-slate-600">訪問者数（ユニーク）</span>
+            <span class="text-[0.8rem] text-slate-600">クリックユーザ数</span>
             <span class="js-unique text-[1rem] font-bold text-slate-700">0</span>
         </div>
         <div class="flex justify-between items-baseline">
-            <span class="text-[0.8rem] text-slate-600">未ログインユーザー</span>
+            <span class="text-[0.8rem] text-slate-600">guestクリック数</span>
             <span class="js-guest text-[1rem] font-bold text-slate-600">0</span>
         </div>
     </div>

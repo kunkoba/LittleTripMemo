@@ -91,16 +91,6 @@ const _DialogCore = {
         titleEl.textContent = title;
         // --- 3. ヘッダーアクション（ヘルプ・カスタムボタン） ---
         headerActions.innerHTML = "";
-        if (help) {
-            const btnHelp = document.createElement("button");
-            btnHelp.className = `${this.HEADER_BTN_CLASS} text-brand-5 font-bold`;
-            btnHelp.textContent = "？";
-            btnHelp.onclick = () => {
-                document.getElementById('ui-help-dialog-body').textContent = help;
-                document.getElementById('ui-help-dialog').classList.remove('hidden');
-            };
-            headerActions.appendChild(btnHelp);
-        }
         if (headerButtons && headerButtons.length > 0) {
             headerButtons.forEach(btnDef => {
                 const btn = document.createElement("button");
@@ -110,6 +100,16 @@ const _DialogCore = {
                 btn.onclick = () => { if (btnDef.handler) btnDef.handler(); };
                 headerActions.appendChild(btn);
             });
+        }
+        if (help) {
+            const btnHelp = document.createElement("button");
+            btnHelp.className = `${this.HEADER_BTN_CLASS} text-brand-5 font-bold`;
+            btnHelp.textContent = "？";
+            btnHelp.onclick = () => {
+                document.getElementById('ui-help-dialog-body').textContent = help;
+                document.getElementById('ui-help-dialog').classList.remove('hidden');
+            };
+            headerActions.appendChild(btnHelp);
         }
         // --- 4. コンテンツ流し込み ---
         if (content instanceof HTMLElement) {
@@ -145,7 +145,7 @@ const _DialogCore = {
         if (!isModal) { 
             const btnCloseX = document.createElement("button");
             btnCloseX.className = `${this.HEADER_BTN_CLASS}`;
-            btnCloseX.textContent = "✖";
+            btnCloseX.textContent = "✕";
             btnCloseX.onclick = () => this.close();
             headerActions.appendChild(btnCloseX);
         }
@@ -245,7 +245,7 @@ const DialogController = {
                 }
             ]]
         });
-        // ✖ボタンを強制非表示にして閉じられないようにする
+        // ✕ボタンを強制非表示にして閉じられないようにする
         const headerActions = frame.querySelector("#dialog-header-actions");
         if (headerActions && headerActions.lastChild) {
             headerActions.lastChild.classList.add("hidden");

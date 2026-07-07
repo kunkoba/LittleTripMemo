@@ -620,7 +620,7 @@ export default {
         this._core.open({
             title: "クリック数",
             content: el,
-            help: "各リンクがクリックされた回数を集計しています。\nUniqueはクリックした人数、Guestは未ログインユーザーのクリック数です。",
+            help: "各リンクがクリックされた回数を集計しています。\nUniqueはクリックした人数、Guestはguestクリック数のクリック数です。",
             buttons: []
         });
     },

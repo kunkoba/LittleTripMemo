@@ -141,7 +141,7 @@ public class SystemMaintenanceWorker : BackgroundService
             {
                 await action(scope);
             }
-            logger.LogInformation("【{TaskName}】を完了しました。", taskName);
+            //logger.LogInformation("【{TaskName}】を完了しました。", taskName);
         }
         catch (Exception exception)
         {

@@ -68,7 +68,7 @@ const UI_Manager = {
             if (!url) return;
             if (!parentEl) return;
             const btn = $Dom.GenerateTemplate("tpl-link-button", "ui-template-root");
-            const iconDom = $Util.createUrlIconDom(url, 36);
+            const iconDom = $Util.createUrlIconDom(url, 32);
             if (iconDom) {
                 btn.innerHTML = ""; 
                 btn.appendChild(iconDom);
