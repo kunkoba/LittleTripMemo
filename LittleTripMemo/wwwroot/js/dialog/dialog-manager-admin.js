@@ -44,10 +44,10 @@ export default {
                     badge.className += " border-brand-3 bg-brand-5 text-white";
                 } else if (now < fromDate) {
                     badge.textContent = "公開前";
-                    badge.className += " border-slate-300 bg-slate-100 text-slate-600";
+                    badge.className += " border-slate-200 bg-slate-100 text-slate-600";
                 } else {
                     badge.textContent = "公開終了";
-                    badge.className += " border-slate-300 bg-slate-500 text-white";
+                    badge.className += " border-slate-200 bg-slate-500 text-white";
                 }
                 // 編集を開き、保存成功時は一覧を閉じて開き直す
                 child.onclick = () => {
@@ -729,7 +729,7 @@ export default {
                         const val = data[key];
                         const isObj = val !== null && typeof val === 'object';
                         const tr = document.createElement("tr");
-                        tr.className = `border-b border-slate-100 ${parentId ? 'hidden' : ''}`;
+                        tr.className = `border-b border-slate-200 ${parentId ? 'hidden' : ''}`;
                         if (parentId) tr.dataset.parentId = parentId;
                         const tdKey = document.createElement("td");
                         tdKey.className = "py-2 align-top text-slate-600 font-bold w-1/3";

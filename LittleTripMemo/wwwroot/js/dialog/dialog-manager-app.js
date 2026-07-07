@@ -55,8 +55,14 @@ export default {
         b.restore.onclick = () => { this._core.close(); $Marker.RestoreMarkers(); };
         b.current.onclick = () => {
             this._core.close();
-            $Marker.RefreshCurrentLocation();
-            $Marker.FocusToLocationMarker(1000);
+            if ($App.AppData.Owner.Plan !== "Admin") {
+                $Marker.RefreshCurrentLocation();
+                $Marker.FocusToLocationMarker(1000);
+            } else {
+                // 地図の中心に現在地を移動
+                const center = $Map.GetCenter();
+                $Marker.SetLocationMarkerPos(center.lat, center.lng);
+            }
         };
         // 画面を開く
         const help = [

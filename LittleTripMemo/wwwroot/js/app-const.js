@@ -16,7 +16,7 @@ window.$Const = {
     },
     // 地図設定
     MAP_CONFIG: {
-        MIN_ZOOM: 8,
+        MIN_ZOOM: 4,
         MAX_ZOOM: 18,
         DEFAULT_ZOOM: 12
     },

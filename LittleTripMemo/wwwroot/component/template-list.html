@@ -41,7 +41,7 @@
         </div>
         <div class="flex-1 bg-white rounded-[1rem] p-3 border border-slate-200 shadow-md relative overflow-hidden flex flex-col items-start gap-2">
             <div class="js-index-badge absolute top-2 right-2 w-7 h-7 rounded-full bg-brand-4 text-white font-bold text-[0.8rem] flex items-center justify-center  z-20"></div>
-            <button class="js-btn-detach hidden absolute top-2 right-10 w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-600 flex items-center justify-center  z-20 hover:bg-slate-100 active:scale-95 transition-all text-[0.8rem]">🗑</button>
+            <button class="js-btn-detach hidden absolute top-2 right-10 w-7 h-7 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center  z-20 hover:bg-slate-100 active:scale-95 transition-all text-[0.8rem]">🗑</button>
             <div class="border-l-4 border-brand-3 pl-2 py-2 w-full mt-2">
                 <div class="js-title text-[1rem] font-bold text-slate-900 break-words"></div>
             </div>
@@ -72,7 +72,7 @@
         <!-- 4. 本文 (2行まで許容) -->
         <div class="js-body text-[0.8rem] text-slate-600 line-clamp-2  mb-3"></div>
         <!-- 5. 金額表示（既存ロジック用） -->
-        <div class="js-price-wrapper hidden flex items-baseline gap-1 mb-3 bg-slate-50 w-fit px-2 py-0.5 rounded-md border border-slate-100">
+        <div class="js-price-wrapper hidden flex items-baseline gap-1 mb-3 bg-slate-50 w-fit px-2 py-0.5 rounded-md border border-slate-200">
             <span class="js-memo-price text-[0.8rem] font-bold italic"></span>
             <span class="js-memo-currency text-[0.8rem] font-bold text-slate-600"></span>
         </div>
@@ -217,11 +217,11 @@
             <div class="js-face text-[1.5rem]  shrink-0"></div>
         </div>
         <!-- 2. リアクション集計 -->
-        <div class="js-reaction-container flex gap-3 mb-3 bg-slate-50 p-2 rounded-lg border border-slate-100">
+        <div class="js-reaction-container flex gap-3 mb-3 bg-slate-50 p-2 rounded-lg border border-slate-200">
             <!-- JSで $Const.REACTION_TYPE をループして各数値を挿入 -->
         </div>
         <!-- 3. URL、集計結果 -->
-        <div class="flex justify-between items-center mt-auto pt-2 border-t border-slate-100">
+        <div class="flex justify-between items-center mt-auto pt-2 border-t border-slate-200">
             <div class="flex-1 min-w-0 mr-4">
                 <!-- URLが存在する場合のみ js-url-wrapper を表示 -->
                 <div class="js-url-wrapper hidden text-[0.8rem] text-blue-500 italic truncate">
@@ -238,7 +238,7 @@
 
 <!-- 【リスト子】ユーザ解析用（クリック集計） -->
 <template id="tpl-user-click-stats-item">
-    <div class="bg-slate-50 rounded-[1rem] p-4 flex flex-col gap-2 border border-slate-100">
+    <div class="bg-slate-50 rounded-[1rem] p-4 flex flex-col gap-2 border border-slate-200">
         <div class="js-url text-blue-500 font-bold italic break-all text-[0.8rem] mb-1 line-clamp-1"></div>
         <div class="flex justify-between items-baseline">
             <span class="text-[0.8rem] text-slate-600">総クリック数</span>

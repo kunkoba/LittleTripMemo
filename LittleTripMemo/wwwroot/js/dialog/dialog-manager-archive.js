@@ -482,7 +482,7 @@ export default {
         const STYLE_BASE = "flex-1 h-11 font-bold text-[0.8rem] rounded-lg tracking-wider outline-none";
         const STYLE_ACTIVE = " bg-white text-slate-900 shadow-md border border-slate-200 active:scale-95 transition-all";
         const STYLE_CURRENT = " bg-brand-5 text-white shadow-inner border border-brand-5 cursor-default pointer-events-none";
-        const STYLE_DISABLED = " bg-slate-100 text-slate-600 border border-slate-100 cursor-not-allowed pointer-events-none";
+        const STYLE_DISABLED = " bg-slate-100 text-slate-600 border border-slate-200 cursor-not-allowed pointer-events-none";
         const renderTitleAndBody = (arc) => {
             $Dom.QuerySelector('#view-mem-title', el).textContent = arc.title || "";
             $Dom.QuerySelector('#view-mem-body', el).textContent = arc.memo || "";

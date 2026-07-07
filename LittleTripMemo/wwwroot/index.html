@@ -44,14 +44,14 @@
     <!-- 広告1 -->
     <div class="flex flex-col items-center">
         <div class="text-slate-600 text-[0.8rem] font-bold tracking-widest uppercase mb-2">Advertisement</div>
-        <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-600 text-[0.8rem] font-bold shadow-inner">
+        <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 text-[0.8rem] font-bold shadow-inner">
             AD BANNER 1
         </div>
     </div>
     <!-- 広告2 -->
     <div class="flex flex-col items-center">
         <div class="text-slate-600 text-[0.8rem] font-bold tracking-widest uppercase mb-2">Advertisement</div>
-        <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-600 text-[0.8rem] font-bold shadow-inner">
+        <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 text-[0.8rem] font-bold shadow-inner">
             AD BANNER 2
         </div>
     </div>
@@ -430,12 +430,12 @@
                             </button>
                         </div>
                         <!-- ③ メインアクション（単体ボタン） -->
-                        <div id="bot-group-action" class="h-16 flex flex-col items-center">
-                            <button id="btn-create" class="kb-icon-emoji-lg shadow-md rounded-full hidden bg-brand-1 w-14 h-14 pointer-events-auto active:scale-95 transition-transform">
-                                ➕
-                            </button>
-                            <button id="btn-search" class="kb-icon-emoji-lg shadow-md rounded-full hidden bg-brand-1 w-14 h-14 pointer-events-auto active:scale-95 transition-transform">
+                        <div id="bot-group-action" class="h-16 hidden items-center justify-center gap-4 pointer-events-auto">
+                            <button id="btn-search" class="mr-4 items-center justify-center shadow-md rounded-full transition-all duration-300 focus:outline-none shrink-0">
                                 🔎
+                            </button>
+                            <button id="btn-create" class="items-center justify-center shadow-md rounded-full transition-all duration-300 focus:outline-none shrink-0">
+                                ➕
                             </button>
                         </div>
                     </div>
@@ -466,7 +466,7 @@
         <!-- ヘルプメッセージ -->
         <div id="ui-help-dialog" onclick="if(event.target === this) this.classList.add('hidden')"
             class="fixed inset-0 z-[3000] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
-            <div class="w-[90%] max-w-[480px] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-slate-300">
+            <div class="w-[90%] max-w-[480px] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-slate-200">
                 <!-- ヘッダー -->
                 <div class="h-12 flex items-center justify-between px-4 bg-slate-800 text-white">
                     <span class="font-semibold text-[0.8rem] tracking-wide">

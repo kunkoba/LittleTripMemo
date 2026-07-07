@@ -624,44 +624,6 @@ export default {
             buttons: []
         });
     },
-    // 【管理者機能】ユーザ解析情報
-    ShowUserAnalytics(profile) {
-        const el = $Dom.GenerateTemplate("tpl-user-analytics");
-        // 1. 基本情報 & 通報数
-        const badge = $UI.Generator.UserBadge(u, { type: 'badge' });
-        $Dom.GetElementById("js-analytics-user-badge", el).appendChild(badge);
-        $Dom.QuerySelector(".js-report-count", el).textContent = profile.report_count || 0;
-        // 2. 統計値の流し込みヘルパー
-        const renderStats = (containerSelector, stats) => {
-            const target = $Dom.QuerySelector(containerSelector, el);
-            if (!stats) return target.innerHTML = "No Data";
-            target.innerHTML = `
-                <div class="flex justify-between"><span>Archives:</span><span class="font-bold">${stats.archive_count}</span></div>
-                <div class="flex justify-between"><span>Memos:</span><span class="font-bold">${stats.detail_count}</span></div>
-            `;
-        };
-        renderStats(".js-private-stats", profile.info_stats);
-        renderStats(".js-public-stats", profile.info_stats_pub);
-        // 3. クリック統計
-        const clickList = $Dom.QuerySelector(".js-click-list", el);
-        const links = [ {key:'link_1', url:profile.link_1}, {key:'link_2', url:profile.link_2}, {key:'link_3', url:profile.link_3} ];
-        links.forEach(l => {
-            if (!l.url) return;
-            const s = profile.click_stats?.[l.key] || { t: 0, u: 0, g: 0 };
-            const row = document.createElement("div");
-            row.className = "p-2 bg-slate-50 rounded-lg text-[0.8rem]";
-            row.innerHTML = `
-                <div class="truncate text-blue-500 italic mb-1">🔗 ${l.url}</div>
-                <div class="flex gap-4">
-                    <span>🖱️ <b class="text-brand-5">${s.t}</b> <small class="text-slate-600">TTL</small></span>
-                    <span>👤 <b class="text-slate-900">${s.u}</b> <small class="text-slate-600">UNIQ</small></span>
-                    <span>👻 <b class="text-slate-600">${s.g}</b> <small class="text-slate-600">GST</small></span>
-                </div>
-            `;
-            clickList.appendChild(row);
-        });
-        this._core.open({ title: "ユーザ解析", content: el, theme: "admin" });
-    },
     // 【管理者機能】ユーザ解析情報2
     ShowUserClickStats(profile) {
         const el = $Dom.GenerateTemplate("tpl-user-click-stats");
@@ -744,10 +706,19 @@ export default {
             btnBan.onclick = () => handleBanUpdate(true);
             btnUnban.onclick = () => handleBanUpdate(false);
         }
-        //
+        // 画面を開く
+        const help = [
+            "【ユーザの解析情報です】",
+            "",
+            "",
+            "",
+            "",
+            "",
+        ].join('\n');
         this._core.open({
-            title: "ユーザ解析",
+            title: "ユーザ情報解析",
             content: el,
+            help: help,
             theme: profile.is_owner ? "user" : "admin", // 閲覧者が本人の場合は通常、管理者の場合はAdminテーマ
             headerButtons: headerButtons
         });

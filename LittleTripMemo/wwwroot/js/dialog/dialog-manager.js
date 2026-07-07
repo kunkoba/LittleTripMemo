@@ -13,7 +13,7 @@ const _DialogCore = {
     stack:[],
     // 共通クラス定数
     HEADER_BTN_CLASS:   "kb-icon-emoji-md _bg-white h-8 w-8 rounded-full flex items-center justify-center active:scale-95 transition-transform",
-    FOOTER_BTN_BASE:    "font-bold text-[0.8rem] h-12 uppercase active:scale-95 transition-transform",
+    FOOTER_BTN_BASE:    "font-bold text-[1rem] h-12 uppercase active:scale-95 transition-transform",
     FOOTER_BTN_DEFAULT: "bg-brand-5 text-white shadow-md",
     // 初期化
     init() {
@@ -66,7 +66,7 @@ const _DialogCore = {
                 frame:  ['bg-white', 'border-2', 'border-black'],
                 header: ['bg-black'],
                 title:  ['text-red-500'],
-                footer: ['bg-white', 'border-t', 'border-slate-300']
+                footer: ['bg-white', 'border-t', 'border-slate-200']
             },
             user: { // デフォルト
                 frame:  ['bg-brand-0'],

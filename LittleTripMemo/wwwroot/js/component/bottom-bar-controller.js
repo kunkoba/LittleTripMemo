@@ -11,6 +11,7 @@ const _BottomCore = {
 			this.btnDataMenu = $Dom.GetElementById('btn-data-menu');
 			this.btnAppMenu  = $Dom.GetElementById('btn-app-menu');
 			// --- 2. 要素取得 (動的エリア・バッジ) ---
+			this.groupAction   = $Dom.GetElementById('bot-group-action'); // 追加
 			this.btnCreate     = $Dom.GetElementById('btn-create');
 			this.btnSearch     = $Dom.GetElementById('btn-search');
 			this.groupMove     = $Dom.GetElementById('bot-group-move');
@@ -27,12 +28,23 @@ const _BottomCore = {
 			this.btnAppMenu.addEventListener('click',  () => $Dialog.ShowActionMenu());
 			// --- 5. イベント登録 (メインアクション・移動ボタン：既存維持) ---
 			this.btnCreate.addEventListener('click', () => {
+				// ★追加：CREATEモードでなければモード切替を実行
+				if ($App.AppData.Context.ScreenMode !== $Const.SCREEN_MODE.CREATE) {
+					$App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+					$App.RefreshScreen();
+					return;
+				}
 				$Marker.RefreshCurrentArrow();
 				$Marker.FocusToLocationMarker();
-				setTimeout(() => $DetailFrame.Open(), 50);
+				setTimeout(() => $DetailFrame.Open(), 100);
 			});
-
 			this.btnSearch.addEventListener('click', async () => {
+				// ★追加：SEARCHモードでなければモード切替を実行
+				if ($App.AppData.Context.ScreenMode !== $Const.SCREEN_MODE.SEARCH) {
+					$App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH;
+					$App.RefreshScreen();
+					return;
+				}
 				const range = $Map.GetSearchRange(0.8);
 				const sortSetting = $TopBar.GetSortSetting();
 				const params = { ...range, ...sortSetting, limit: 20 };
@@ -47,7 +59,6 @@ const _BottomCore = {
 					}
 				}
 			});
-
 			this.btnFirst.onclick = () => $Marker.FocusFirst();
 			this.btnPrev.onclick  = () => $Marker.FocusPrev();
 			this.btnNext.onclick  = () => $Marker.FocusNext();
@@ -61,19 +72,27 @@ const _BottomCore = {
 	// 画面モード変更
 	changeScreenMode() {
 		const mode = $App.AppData.Context.ScreenMode;
-
 		// 上段の動的要素を一旦すべて隠す
 		$Dom.ToggleShow(this.groupMove, false);
-		$Dom.ToggleShow(this.btnCreate, false);
-		$Dom.ToggleShow(this.btnSearch, false);
-
+		$Dom.ToggleShow(this.groupAction, false); // 追加
+		// アニメーション用クラス定義
+		const activeClasses = ["w-14", "h-14", "text-[1.5rem]", "bg-brand-1", "active:scale-95", "z-10"];
+		const inactiveClasses = ["w-10", "h-10", "text-[1rem]", "bg-white", "opacity-70", "z-0"];
 		// 画面モードに応じて必要なものだけ表示
 		switch (mode) {
 			case $Const.SCREEN_MODE.CREATE:
-				$Dom.ToggleShow(this.btnCreate, true);
+				$Dom.ToggleShow(this.groupAction, true);
+				this.btnCreate.classList.remove(...inactiveClasses);
+				this.btnCreate.classList.add(...activeClasses);
+				this.btnSearch.classList.remove(...activeClasses);
+				this.btnSearch.classList.add(...inactiveClasses);
 				break;
 			case $Const.SCREEN_MODE.SEARCH:
-				$Dom.ToggleShow(this.btnSearch, true);
+				$Dom.ToggleShow(this.groupAction, true);
+				this.btnSearch.classList.remove(...inactiveClasses);
+				this.btnSearch.classList.add(...activeClasses);
+				this.btnCreate.classList.remove(...activeClasses);
+				this.btnCreate.classList.add(...inactiveClasses);
 				break;
 			case $Const.SCREEN_MODE.ARCHIVE:
 			case $Const.SCREEN_MODE.ARCHIVE_PUB:

@@ -342,65 +342,33 @@
     </div>
 </template>
 
-<!-- ユーザ解析情報 -->
-<template id="tpl-user-analytics">
-    <div class="w-full flex flex-col gap-4 text-[0.8rem]">
-        <!-- ヘッダー：ユーザ情報 & 通報数 -->
-        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <div id="js-analytics-user-badge"></div>
-            <div class="flex flex-col items-end">
-                <span class="text-[0.8rem] font-bold text-slate-600 uppercase">Reports</span>
-                <span class="js-report-count text-[1.2rem] font-bold text-red-500">0</span>
-            </div>
-        </div>
-        <!-- 統計：Private / Public -->
-        <div class="grid grid-cols-2 gap-3">
-            <!-- Private Card -->
-            <div class="bg-white border-2 border-slate-100 rounded-xl p-3 ">
-                <div class="text-[0.8rem] font-bold text-slate-600 uppercase mb-2 border-b border-slate-50">Private Stats</div>
-                <div class="js-private-stats space-y-1"></div>
-            </div>
-            <!-- Public Card -->
-            <div class="bg-white border-2 border-brand-2 rounded-xl p-3 shadow-md">
-                <div class="text-[0.8rem] font-bold text-brand-5 uppercase mb-2 border-b border-brand-5">Public Stats</div>
-                <div class="js-public-stats space-y-1"></div>
-            </div>
-        </div>
-        <!-- クリック解析 -->
-        <div class="bg-white border border-slate-200 rounded-xl p-3">
-            <div class="text-[0.8rem] font-bold text-slate-600 uppercase mb-3">Link Click Stats</div>
-            <div class="js-click-list space-y-2"></div>
-        </div>
-    </div>
-</template>
-
 <!-- ユーザ解析：外枠テンプレート -->
 <template id="tpl-user-click-stats">
-    <div class="w-full flex flex-col gap-5 p-4 text-slate-900 bg-white">
+    <div class="w-full flex flex-col gap-5 text-slate-900 bg-white">
         <!-- セクション：基本情報 -->
         <div class="flex flex-col gap-1">
             <label class="text-[0.8rem] font-bold text-slate-600">対象ユーザー</label>
             <div class="js-user-badge-container py-1"></div>
         </div>
         <!-- セクション：通報ステータス -->
-        <div class="flex flex-col gap-1 border-t border-slate-100 pt-3">
+        <div class="flex flex-col gap-1 border-t border-slate-200 pt-3">
             <label class="text-[0.8rem] font-bold text-slate-600">アカウント通報数</label>
             <div class="text-[1rem] font-bold text-red-500 px-1"><span class="js-report-count">0</span> 件</div>
         </div>
         <!-- セクション：統計データ -->
-        <div class="flex flex-col gap-4 border-t border-slate-100 pt-3">
+        <div class="flex flex-col gap-4 border-t border-slate-200 pt-3">
             <div>
-                <label class="text-[0.8rem] font-bold text-slate-600">🔒 非公開データ</label>
+                <label class="text-[1rem] font-bold text-slate-600">🔒 非公開データ</label>
                 <div class="js-stats-pvt mt-1"></div>
             </div>
             <div>
-                <label class="text-[0.8rem] font-bold text-slate-600">◎ 公開データ</label>
+                <label class="text-[1rem] font-bold text-slate-600">◎ 公開用データ</label>
                 <div class="js-stats-pub mt-1"></div>
             </div>
         </div>
         <!-- セクション：リンク解析 -->
-        <div class="flex flex-col gap-1 border-t border-slate-100 pt-3">
-            <label class="text-[0.8rem] font-bold text-slate-600">プロフィールリンク解析</label>
+        <div class="flex flex-col gap-1 border-t border-slate-200 pt-3">
+            <label class="text-[1rem] font-bold text-slate-600">リンク解析</label>
             <div class="js-click-container flex flex-col gap-3 mt-1"></div>
         </div>
         <!-- 管理者用アクション -->
@@ -415,11 +383,11 @@
 <template id="tpl-user-activity-summary">
     <div class="flex flex-col gap-2 py-1 px-1 pl-3">
         <div class="flex justify-between items-baseline">
-            <span class="text-[0.8rem] text-slate-600">まとめ作成数</span>
+            <span class="text-[0.8rem] text-slate-600">総まとめ数</span>
             <span class="text-[1rem] font-bold"><span class="js-archive-count">0</span> 件</span>
         </div>
         <div class="flex justify-between items-baseline">
-            <span class="text-[0.8rem] text-slate-600">メモ登録数</span>
+            <span class="text-[0.8rem] text-slate-600">総地点メモ数</span>
             <span class="text-[1rem] font-bold"><span class="js-memo-count">0</span> 件</span>
         </div>
     </div>
@@ -443,7 +411,7 @@
             </div>
         </div>
         <!-- メンテナンス設定 -->
-        <div class="space-y-3 pt-2 border-t border-slate-100">
+        <div class="space-y-3 pt-2 border-t border-slate-200">
             <div class="flex justify-between items-center">
                 <div>
                     <span class="block text-[0.8rem] font-bold text-slate-900">Maintenance Mode</span>
@@ -464,7 +432,7 @@
 
 <!-- 【追加】管理者：ユーザー操作履歴リスト用（子） -->
 <template id="tpl-admin-list-child-history_2">
-    <button class="js-item-card w-full text-left p-4 border-b border-slate-100 active:bg-slate-50 flex flex-col gap-1 transition-colors">
+    <button class="js-item-card w-full text-left p-4 border-b border-slate-200 active:bg-slate-50 flex flex-col gap-1 transition-colors">
         <div class="flex justify-between items-center mb-1">
             <span class="js-date kb-date-tim-sm"></span>
             <span class="js-action text-[0.8rem] font-bold text-brand-5 px-2 py-0.5 bg-brand-1 rounded uppercase"></span>

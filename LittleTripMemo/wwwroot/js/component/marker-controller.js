@@ -233,6 +233,14 @@ const _MarkerCore = {
     getLocationMarkerPos(){
         return this.locationMarker?.getLatLng();
     },
+    // 現在地マーカーを任意の座標にセットする
+    setLocationMarkerPos(lat, lng) {
+        if (this.locationMarker) {
+            this.locationMarker.setLatLng([lat, lng]);
+            // 明細画面に反映（開いている時だけ）
+            $DetailContent.SetPos(lat, lng);
+        }
+    },
     // 指定インデックスのマーカー座標を返す
     getCurrentMarkerPos(index) {
         const marker = this._markerList[index];
@@ -282,7 +290,10 @@ const MarkerController = {
         switch ($App.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
                 _MarkerCore.refreshCurrentLocation();
-                this.FocusToLocationMarker();
+                if ($App.AppData.Owner.Plan !== "Admin") {
+                    // 現在地へ移動
+                    this.FocusToLocationMarker();
+                }
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
             case $Const.SCREEN_MODE.ARCHIVE_PUB:
@@ -340,6 +351,9 @@ const MarkerController = {
     },
     GetLocationMarkerPos() {
         return _MarkerCore.getLocationMarkerPos();
+    },
+    SetLocationMarkerPos(lat, lng) {
+        _MarkerCore.setLocationMarkerPos(lat, lng);
     },
     GetCurrentMarkerPos() {
         return _MarkerCore.getCurrentMarkerPos(this._currentIndex);

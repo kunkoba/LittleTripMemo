@@ -250,9 +250,6 @@ AppSettingKey: "little_trip_settings",
                 if (this.AppData.Context.IsLoggedIn) {
                     // 地点データ取得
                     isSuccess = await $Data.Access.GetUnMergeDetails({});
-                    // if (!isSuccess) {
-                    //     return;
-                    // };
                 }
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
