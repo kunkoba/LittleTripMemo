@@ -21,6 +21,7 @@ const _DetailFrameCore = {
                 // ★追加：SEARCHモード用アクション
                 this.groupSearchAction = $Dom.GetElementById("detail-group-search-action");
                 this.btnJumpArchive = $Dom.GetElementById("detail-btn-jump-archive");
+                this.txtJumpArchiveTitle = $Dom.GetElementById("detail-jump-archive-title"); // タイトル表示用
                 // 下部ボタン
                 this.groupMove = $Dom.GetElementById("detail-group-move");
                 this.btnMoveFirst = $Dom.GetElementById("detail-btn-first");
@@ -406,6 +407,10 @@ const DetailFrameController = {
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, !isSearch && isOwner);
             $Dom.ToggleShow(_DetailFrameCore.btnReport, !isSearch && (!isOwner && isPublic));
             $Dom.ToggleShow(_DetailFrameCore.groupSearchAction, isSearch); // SEARCHモード時のみ表示
+            // ★追加：SEARCHモードならまとめタイトルをボタンにセット
+            if (isSearch && _DetailFrameCore.txtJumpArchiveTitle) {
+                _DetailFrameCore.txtJumpArchiveTitle.textContent = detail.a_title || "まとめへ移動";
+            }
             //
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, isOwner);
             $Dom.ToggleShow(_DetailFrameCore.btnReport, !isOwner && isPublic);

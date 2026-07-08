@@ -157,7 +157,7 @@
                 <!-- 詳細パネルの内容 (スクロールエリア) -->
                 <div id="ui-detail-content-id" class="flex-1 overflow-y-auto p-4">
                     <!-- ■ 参照用（表示モード）：縦並び・左揃え・1rem 統一版 -->
-                    <div id="detail-display" class="hidden relative _min-h-full flex flex-col bg-white">
+                    <div id="detail-display" class="hidden relative flex flex-col bg-white mb-10">
                         <!-- 右上の正円インデックスバッジ -->
                         <div class="js-index-badge absolute top-0 right-0 w-10 h-10 rounded-full bg-brand-4 text-white font-bold text-[1.2rem] flex items-center justify-center shadow-md z-20">
                         </div>
@@ -180,11 +180,11 @@
                                 <span id="detail-display-price-unit" class="text-[1rem] font-bold text-slate-600 ml-3 uppercase"></span>
                             </div>
                             <!-- 5. 【新設】ボトムエリア：絵文字（左）＋ リンク（右） -->
-                            <div class="my-2 pb-4 flex justify-between gap-6 w-full pl-2 border-y">
+                            <div class="my-2 pt-2 pb-4 flex justify-between gap-6 w-full pl-2 border-y">
                                 <!-- 巨大絵文字 -->
                                 <div id="detail-display-face_emoji" class="text-[5rem] leading-none drop-shadow-lg shrink-0"></div>
                                 <!-- URLリンクボタン（Generatorで注入） -->
-                                <div id="detail-display-url-wrapper" class="mt-2 flex flex-wrap gap-2"></div>
+                                <div id="detail-display-url-wrapper" class="m-2 flex flex-wrap gap-2"></div>
                             </div>
                             <!-- 4. 本文（左揃え・1rem以下） -->
                             <div id="detail-display-body" class="w-full rounded-lg p-2 text-[1rem] text-slate-900 whitespace-pre-wrap break-words leading-[2]"></div>
@@ -329,8 +329,10 @@
                     </div>
                     <!-- ★新設：検索結果からのアーカイブ遷移用ボタン -->
                     <div id="detail-group-search-action" class="hidden mb-4">
-                        <button id="detail-btn-jump-archive" type="button" class="w-full bg-brand-5 text-white font-bold text-[1rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform flex items-center justify-center gap-2">
-                            <span class="text-[1.2rem]">🗂️</span> VIEW ARCHIVE
+                        <button id="detail-btn-jump-archive" type="button" class="w-full bg-brand-5 text-white font-bold text-[0.9rem] h-12 rounded-[1rem] shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 px-4">
+                            <span class="text-[1.2rem] shrink-0">🗂️</span> 
+                            <!-- タイトル流し込み用span（長すぎる場合は...で省略） -->
+                            <span id="detail-jump-archive-title" class="truncate">VIEW ARCHIVE</span>
                         </button>
                     </div>
                     <!-- （いいねボタン） -->
