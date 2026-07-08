@@ -333,9 +333,9 @@
         </div>
         <div>
             <div class="flex justify-between items-end mb-1"><label class="text-slate-600 block text-[0.8rem] font-bold uppercase">Description / Memo</label><span class="text-[0.8rem] text-slate-600 font-bold">
-                <span id="edit-mem-body-count">0</span>/300</span>
+                <span id="edit-mem-body-count">0</span>/1000</span>
             </div>
-            <textarea id="edit-mem-body" maxlength="300" 
+            <textarea id="edit-mem-body" maxlength="1000" 
                 class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[300px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
         <div>
@@ -544,11 +544,6 @@
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">公開データを検索</span>
         </button>
-        <button id="btn-app-point-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-            <span class="col-span-1 kb-icon-emoji-lg">👇</span>
-            <span class="col-span-1"></span>
-            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">ワードで地点移動</span>
-        </button>
         <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 kb-icon-emoji-lg">➕</span>
             <span class="col-span-1"></span>
@@ -580,6 +575,11 @@
             <span class="col-span-1 kb-icon-emoji-lg">📍</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">現在地へ移動</span>
+        </button>
+        <button id="btn-app-point-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">👇</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">ワードで地点移動</span>
         </button>
     </div>
 </template>

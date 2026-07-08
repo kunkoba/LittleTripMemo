@@ -271,6 +271,7 @@ const _DetailContentCore = {
         // 隠しフィールド（ID・座標など）を完全に空にする
         this.editArchiveId.value = "";
         this.editSeq.value = "0";
+        this.editDbid.value = ""; // ★この一行を追記
         // 金額の隠しフィールドと入力枠を確実にリセット
         this.editPrice.value = "0";
         this.editPricePlus.value = "";

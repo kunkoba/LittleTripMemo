@@ -276,6 +276,8 @@ const _DetailFrameCore = {
             this.root.classList.add("opacity-0", "translate-y-full");
             // シンプルにリサイズだけを呼ぶ
             $Map.ResizeMap(400);
+            // パネルを閉じる処理の最後
+            $App.ResumeGpsTracking(); // ★パネルを閉じる際にGPSを再開
         }
         // アイコン表示切替
         $UI.ToggleIconBar(!isShow);
@@ -339,10 +341,17 @@ const DetailFrameController = {
 	},
     // 開く
     Open(detail) {
-        // console.log("Open: ", detail);
+        $App.PauseGpsTracking(); // ★パネルを開く際にGPSを止める
         // ▼ 画面を開く前にポップアップを閉じる
         $Marker.ClosePopup();
         const isNew = !detail;
+        // 新規作成時は強調表示もクリアする
+        if (isNew) {
+            $Marker.ClearSelection(); // ★旧選択を完全にクリア
+            $DetailContent.RenderDetail(null, true); 
+        } else {
+            $DetailContent.RenderDetail(detail, false);
+        }
         // パネルを開く際、中心に固定するターゲット座標を決定
         let targetPos = null;
         if (isNew) {

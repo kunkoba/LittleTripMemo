@@ -233,6 +233,7 @@ AppSettingKey: "little_trip_settings",
         }
         // UI関連
         await this.RefreshScreen();
+        $Marker.NavigateDefault(); // ★ここで初期移動を実行
         // Service Worker の初期化（追加）
         this._initServiceWorker();
     },
@@ -439,6 +440,18 @@ AppSettingKey: "little_trip_settings",
         this._saveSettings(); // 保存実行
         $UI.ChangeFontSize(size);
     },
+    // 【GPS】GPS追従の一時停止
+    PauseGpsTracking() {
+        $Polling.Stop($Polling.TASKS.GPS_FOLLOW);
+        console.log("GPS追従 >> 一時停止.");
+    },
+    // 【GPS】GPS追従の再開（設定が0より大きい場合のみ）
+    ResumeGpsTracking() {
+        if (this.AppData.Owner.GpsTrackingSec > 0 && this.AppData.Context.IsOnline) {
+            $Polling.Start($Polling.TASKS.GPS_FOLLOW);
+            console.log("GPS追従 >> 再開");
+        }
+    }
 };
 
 // DOM読み込み後にアプリ起動

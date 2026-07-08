@@ -10,22 +10,28 @@ export default {
             pointList:   $Dom.QuerySelector('#btn-app-point-list', el),
             batch:       $Dom.QuerySelector('#btn-app-batch', el),
             search:      $Dom.QuerySelector('#btn-app-search', el),
-            pointSearch: $Dom.QuerySelector('#btn-app-point-search', el),
             create:      $Dom.QuerySelector('#btn-app-create', el),
         };
         const mode = $App.AppData.Context.ScreenMode;
         const isArchive = (mode === $Const.SCREEN_MODE.ARCHIVE || mode === $Const.SCREEN_MODE.ARCHIVE_PUB);
         $Dom.ToggleShow(b.archiveInfo, isArchive);
         $Dom.ToggleShow(b.search, isLoggedIn && mode !== $Const.SCREEN_MODE.SEARCH);
-        $Dom.ToggleShow(b.pointSearch, mode === $Const.SCREEN_MODE.SEARCH);
         $Dom.ToggleShow(b.create, isLoggedIn && mode !== $Const.SCREEN_MODE.CREATE);
         b.archiveList.onclick = () => this.ShowArchiveList();
         b.archiveInfo.onclick = () => this.ShowArchiveInfo();
         b.pointList.onclick = () => (mode === $Const.SCREEN_MODE.SEARCH) ? this.ShowDetailsSearchResult() : this.ShowDetailsTimeLine();
         b.batch.onclick = () => this.ShowMultiSelectTimeline();
-        b.search.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH; $App.RefreshScreen(); };
-        b.pointSearch.onclick = () => this.PointSearchGoogle((p) => $Map.MoveMap(p.lat, p.lng, 18));
-        b.create.onclick = () => { this._core.close(); $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; $App.RefreshScreen(); };
+        b.search.onclick = () => { 
+            this._core.close(); 
+            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH; 
+            $App.RefreshScreen(); 
+        };
+        b.create.onclick = () => { 
+            this._core.close(); 
+            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; 
+            $App.RefreshScreen(); 
+            $Marker.NavigateDefault(); // ★明示的に移動させる
+        };
         // 画面を開く
         const help = [
             "地点メモ関連の操作を行います",
@@ -48,6 +54,7 @@ export default {
             refresh:  $Dom.QuerySelector('#btn-app-refresh', el),
             restore:  $Dom.QuerySelector('#btn-app-restore', el),
             current:  $Dom.QuerySelector('#btn-app-current', el),
+            pointSearch: $Dom.QuerySelector('#btn-app-point-search', el),
         };
         const mode = $App.AppData.Context.ScreenMode;
         b.reload.onclick = () => { this._core.close(); $Util.ReloadApp(); };
@@ -55,15 +62,16 @@ export default {
         b.restore.onclick = () => { this._core.close(); $Marker.RestoreMarkers(); };
         b.current.onclick = () => {
             this._core.close();
-            if ($App.AppData.Owner.Plan !== "Admin") {
-                $Marker.RefreshCurrentLocation();
-                $Marker.FocusToLocationMarker(1000);
-            } else {
-                // 地図の中心に現在地を移動
-                const center = $Map.GetCenter();
-                $Marker.SetLocationMarkerPos(center.lat, center.lng);
-            }
+            $Marker.RefreshCurrentLocation();
+            $Marker.FocusToLocationMarker(1000);
         };
+        b.pointSearch.onclick = () => this.PointSearchGoogle((p) => {
+            $Map.MoveMap(p.lat, p.lng, 18);
+            if ($App.AppData.Owner.Plan  === "Admin") {
+                // 現在地マーカーも移動（ダミーまとめ作成用）
+                $Marker.SetLocationMarkerPos(p.lat, p.lng);
+            }
+        });
         // 画面を開く
         const help = [
             "画面関連の操作を行います",

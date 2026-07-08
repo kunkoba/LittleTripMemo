@@ -273,40 +273,73 @@ const MarkerController = {
             },
             onDragEnd: (index, latLng) => {
                 console.log(">onDragEnd:", latLng);
-                // ドラッグ完了後
                 _MarkerCore.clearArrow();
-                details[index].latitude = latLng.lat;
-                details[index].longitude = latLng.lng;
+                // 1. メモリ上の原本データを直接更新する
+                const rawDetails = $Data.Access._rawData.details; // 原本を参照
+                if (rawDetails[index]) {
+                    rawDetails[index].latitude = latLng.lat;
+                    rawDetails[index].longitude = latLng.lng;
+                }
+                // 2. Storeの状態を同期（クローンを作り直す）
+                $Data.Store.Restore();
+                // 3. 詳細画面の隠しフィールドを現在のマーカー位置で即時更新
+                // これにより、編集モードに切り替えて保存した際に新座標が反映される
+                $DetailContent.SetPos(latLng.lat, latLng.lng);
                 if ($App.AppData.Context.ScreenMode !== $Const.SCREEN_MODE.SEARCH) {
                     _MarkerCore.generateArrowList();
                 }
                 this._currentIndex = index;
                 this.FocusToCurrentMarker();
-            }
+            },
         });
     },
     // 画面モード変更時
     ChangeScreenMode(){
+        // switch ($App.AppData.Context.ScreenMode) {
+        //     case $Const.SCREEN_MODE.CREATE:
+        //         _MarkerCore.refreshCurrentLocation();
+        //         if ($App.AppData.Owner.Plan !== "Admin") {
+        //             // 現在地へ移動
+        //             this.FocusToLocationMarker();
+        //         }
+        //         break;
+        //     case $Const.SCREEN_MODE.ARCHIVE:
+        //     case $Const.SCREEN_MODE.ARCHIVE_PUB:
+        //         const seq = $App.AppData.Context.TargetSeq;
+        //         if (seq > 0) {
+        //             $Marker.FocusBySeq(seq);
+        //             $App.AppData.Context.TargetSeq = -1;    // 不要になったらクリア
+        //         } else {
+        //             this.FocusFirst();
+        //         }
+        //         break;
+        // }
         switch ($App.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
                 _MarkerCore.refreshCurrentLocation();
-                if ($App.AppData.Owner.Plan !== "Admin") {
-                    // 現在地へ移動
-                    this.FocusToLocationMarker();
-                }
+                break;
+            // ARCHIVE関連の Focus 呼び出しをすべて削除
+        }
+	},
+    // 2. 【新設】初期位置への移動専用メソッド
+    NavigateDefault() {
+        const mode = $App.AppData.Context.ScreenMode;
+        switch (mode) {
+            case $Const.SCREEN_MODE.CREATE:
+                this.FocusToLocationMarker();
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
             case $Const.SCREEN_MODE.ARCHIVE_PUB:
                 const seq = $App.AppData.Context.TargetSeq;
                 if (seq > 0) {
-                    $Marker.FocusBySeq(seq);
-                    $App.AppData.Context.TargetSeq = -1;    // 不要になったらクリア
+                    this.FocusBySeq(seq);
+                    $App.AppData.Context.TargetSeq = -1; 
                 } else {
                     this.FocusFirst();
                 }
                 break;
         }
-	},
+    },
     // クリア指示
     Clear() {
         _MarkerCore.clearAll();
@@ -398,6 +431,16 @@ const MarkerController = {
             // 見つかったら既存の選択メソッドを実行（移動・強調・ポップアップが走る）
             this.SelectMarker(index);
         }
+    },
+    // 選択状態（赤丸）を解除
+    ClearHighlight() {
+        _MarkerCore.highlightMarker(false);
+    },
+    // 窓口（MarkerController）内に追加
+    ClearSelection() {
+        this._currentIndex = -1; // インデックスを無効化
+        _MarkerCore.highlightMarker(false); // 赤丸を消す
+        _MarkerCore.toggleMarkerPopup(false); // ポップアップを閉じる
     },
 };
 

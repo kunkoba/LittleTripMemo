@@ -58,8 +58,16 @@ const _MapCore = {
         this.setMapStyle($App.AppData.Owner.MapStyle);
     },
     // 地図機能の物理的なロック処理
-    lockMap(isLock){
+    lockMap_2(isLock){
         const features = ['dragging', 'touchZoom', 'scrollWheelZoom', 'doubleClickZoom', 'boxZoom', 'keyboard'];
+        features.forEach(f => {
+            if (this._map[f]) isLock ? this._map[f].disable() : this._map[f].enable();
+        });
+    },
+    // 地図機能の物理的なロック処理
+    lockMap(isLock){
+        // scrollWheelZoom(マウスホイール) と touchZoom(スマホのピンチズーム) をロック対象から除外
+        const features = ['dragging', 'doubleClickZoom', 'boxZoom', 'keyboard'];
         features.forEach(f => {
             if (this._map[f]) isLock ? this._map[f].disable() : this._map[f].enable();
         });
