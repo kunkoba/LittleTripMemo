@@ -181,21 +181,11 @@ const _MarkerCore = {
             const actionText = $Dom.QuerySelector(".js-action-text", el);
             // 画面モードによるアクションボタンの制御
             if ($App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH) {
-                if (actionText) actionText.textContent = detail.a_title || "VIEW ARCHIVE";
-                btnAction.onclick = async (e) => {
-                    const isOk = await $Dialog.ShowConfirm({
-                        title: "Archive",
-                        help: "",
-                        message: `このまとめを開きますか？`
-                    });
-                    if (!isOk) return;
-                    //
+                // 画面モードによるアクションボタンの制御（全モード共通で明細を開く）
+                if (actionText) actionText.textContent = "VIEW DETAIL";
+                btnAction.onclick = (e) => {
                     e.stopPropagation();
-                    $App.AppData.Context.ScreenMode = detail.is_public ? $Const.SCREEN_MODE.ARCHIVE_PUB : $Const.SCREEN_MODE.ARCHIVE;
-                    $App.AppData.Context.TargetArchiveId = detail.archive_id;
-                    $App.AppData.Context.TargetSeq = detail.seq;
-                    $App.RefreshScreen();
-                    this._map.closePopup();
+                    $DetailFrame.Open(detail);
                 };
             } else {
                 if (actionText) actionText.textContent = "VIEW detail";

@@ -18,6 +18,9 @@ const _DetailFrameCore = {
                 this.btnSave = $Dom.GetElementById("detail-btn-save");
                 this.footer = $Dom.GetElementById("detail-footer-id");
                 this.groupEdit = $Dom.GetElementById("detail-group-edit");
+                // ★追加：SEARCHモード用アクション
+                this.groupSearchAction = $Dom.GetElementById("detail-group-search-action");
+                this.btnJumpArchive = $Dom.GetElementById("detail-btn-jump-archive");
                 // 下部ボタン
                 this.groupMove = $Dom.GetElementById("detail-group-move");
                 this.btnMoveFirst = $Dom.GetElementById("detail-btn-first");
@@ -71,6 +74,22 @@ const _DetailFrameCore = {
                         const url = `https://www.google.com/maps/search/?api=1&query=${data.latitude},${data.longitude}`;
                         window.open(url, '_blank');
                     }
+                });
+                // ★追加：まとめアーカイブへ飛ぶ（フッターボタン）
+                this.btnJumpArchive.addEventListener("click", async () => {
+                    const data = $DetailContent.GetFormEditData();
+                    if (!data || !data.archive_id) return;
+                    const isOk = await $Dialog.ShowConfirm({
+                        title: "Archive",
+                        help: "",
+                        message: `このまとめを開きますか？`
+                    });
+                    if (!isOk) return;
+                    this.handleCloseOrCancel(); // 詳細パネルを閉じる
+                    $App.AppData.Context.ScreenMode = data.is_public ? $Const.SCREEN_MODE.ARCHIVE_PUB : $Const.SCREEN_MODE.ARCHIVE;
+                    $App.AppData.Context.TargetArchiveId = data.archive_id;
+                    $App.AppData.Context.TargetSeq = data.seq; // この地点にフォーカスを当てる
+                    await $App.RefreshScreen();
                 });
                 // 通報ボタンクリック時の処理
                 this.btnReport.addEventListener("click", () => {
@@ -379,9 +398,15 @@ const DetailFrameController = {
             $Dom.ToggleShow(_DetailFrameCore.footer, true);    // ★フッター自体は表示
         } else {
             // 2. 既存データ参照時
+            const isSearch = $App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH;
             $Dom.ToggleShow(_DetailFrameCore.footer, true);
             $Dom.ToggleShow(_DetailFrameCore.groupEdit, false); // ★参照時は隠す
             $Dom.ToggleShow(_DetailFrameCore.btnCurrent, false);
+            // ★変更：SEARCHモード時は編集・通報を隠し、新設したフッターボタンを表示
+            $Dom.ToggleShow(_DetailFrameCore.btnEdit, !isSearch && isOwner);
+            $Dom.ToggleShow(_DetailFrameCore.btnReport, !isSearch && (!isOwner && isPublic));
+            $Dom.ToggleShow(_DetailFrameCore.groupSearchAction, isSearch); // SEARCHモード時のみ表示
+            //
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, isOwner);
             $Dom.ToggleShow(_DetailFrameCore.btnReport, !isOwner && isPublic);
             $DetailContent.RenderDetail(detail, false);
@@ -389,7 +414,7 @@ const DetailFrameController = {
             $Dom.ToggleShow(_DetailFrameCore.btnSave, false);
             $Dom.ToggleShow(_DetailFrameCore.groupMove, true);
             // リアクションボタンの制御
-            if (isPublic) {
+            if (isPublic && !isSearch) { // ★変更：SEARCHモード時はリアクションの不整合を防ぐため隠す
                 $Dom.ToggleShow(_DetailFrameCore.groupReaction, true);
                 // リアクションカウントをボタンに描画
                 _DetailFrameCore.renderReactions(detail);
