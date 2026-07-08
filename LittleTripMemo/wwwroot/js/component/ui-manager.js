@@ -144,7 +144,7 @@ const UI_Manager = {
 				if (type === 'dot') {
 					badge.className += 'w-3 h-3 rounded-full top-1 right-1 border-2 border-brand-1';
 				} else {
-					badge.className += 'text-[0.8rem] px-2 py-0.5 rounded-full top-1/2 -translate-y-1/2 right-4';
+					badge.className += 'text-[0.9rem] px-2 py-0.5 rounded-full top-1/2 -translate-y-1/2 right-4';
 					badge.textContent = 'NEW';
 				}
 				parentEl.appendChild(badge);
@@ -168,7 +168,7 @@ const UI_Manager = {
 				$Dom.QuerySelector(".js-main-text", el).classList.add('text-[1rem]');
 				$Dom.QuerySelector(".js-time-text", el).classList.add('text-[1rem]');
 				const badge = $Dom.QuerySelector(".js-day-badge", el);
-				badge.classList.add('w-16', 'h-8', 'text-[0.8rem]'); // テンプレート側のサイズクラスを上書き
+				badge.classList.add('w-16', 'h-8', 'text-[0.9rem]'); // テンプレート側のサイズクラスを上書き
 			}
 			// 2. データの流し込み（Formatterで加工済みの値を信頼して代入）
 			const mainText = $Dom.QuerySelector(".js-main-text", el);

@@ -4,13 +4,13 @@
         <div class="border-l-4 border-brand-3 pl-3">
             <strong class="text-[1rem] tracking-wide">ログイン</strong>
         </div>
-        <div class="text-[0.8rem] space-y-2">
+        <div class="text-[0.9rem] space-y-2">
             <p>ログインするとすべての機能が使えます。</p>
         </div>
         <button id="btn-login-google" class="w-full flex items-center justify-center gap-3 border-2 border-brand-3 bg-white px-3 py-3 text-[1rem] text-slate-900 font-bold hover:bg-brand-1 active:bg-brand-2">
             Googleでログイン
         </button>
-        <p class="text-[0.8rem] text-slate-600 text-center">※ログインにはGoogleアカウントが必要です</p>
+        <p class="text-[0.9rem] text-slate-600 text-center">※ログインにはGoogleアカウントが必要です</p>
     </div>
 </template>
 
@@ -53,11 +53,11 @@
 <template id="tpl-config-gps">
     <div class="w-full text-slate-900 space-y-6 px-6 py-8 bg-brand-0">
         <div class="flex flex-col items-center gap-4">
-            <label class="block font-bold text-slate-600 text-[0.8rem] uppercase tracking-widest">間隔を変更する</label>
+            <label class="block font-bold text-slate-600 text-[0.9rem] uppercase tracking-widest">間隔を変更する</label>
             <!-- 秒数表示エリア -->
             <div class="flex items-baseline gap-1 h-24">
                 <span id="gps-val-display" class="text-[3.5rem] font-bold text-brand-5 ">0</span>
-                <span id="gps-unit-display" class="text-[0.8rem] font-bold text-slate-600 uppercase">sec</span>
+                <span id="gps-unit-display" class="text-[0.9rem] font-bold text-slate-600 uppercase">sec</span>
             </div>
             <!-- 水平スライダー -->
             <div class="w-full px-2">
@@ -65,7 +65,7 @@
                     class="w-full h-2 bg-brand-2 rounded-lg appearance-none cursor-pointer accent-brand-5 shadow-inner">
             </div>
             <!-- 目盛りラベル -->
-            <div class="w-full flex justify-between px-1 text-[0.8rem] font-bold text-slate-600 uppercase">
+            <div class="w-full flex justify-between px-1 text-[0.9rem] font-bold text-slate-600 uppercase">
                 <span>Off</span>
                 <span>60s</span>
                 <span>120s</span>
@@ -77,10 +77,10 @@
 <template id="tpl-config-currency">
     <div class="w-full text-slate-900 my-3 space-y-4 px-4">
         <div>
-            <label class="block font-bold text-slate-600 text-[0.8rem] mb-1">数値の単位</label>
+            <label class="block font-bold text-slate-600 text-[0.9rem] mb-1">数値の単位</label>
             <input id="input-currency" type="text" maxlength="5" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] text-slate-900 focus:outline-none focus:border-brand-5 bg-white uppercase" placeholder="e.g. JPY, USD, €">
         </div>
-        <p class="text-[0.8rem] text-slate-600 ">※入力した文字列が金額の単位として表示されます。</p>
+        <p class="text-[0.9rem] text-slate-600 ">※入力した文字列が金額の単位として表示されます。</p>
     </div>
 </template>
 
@@ -99,53 +99,53 @@
         <!-- アプリ情報 -->
         <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3">
             <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
-                <span class="text-[0.8rem] text-slate-600">アプリ名</span>
+                <span class="text-[0.9rem] text-slate-600">アプリ名</span>
                 <span class="text-[1rem] font-bold text-slate-900 js-app-name"></span>
             </div>
             <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
-                <span class="text-[0.8rem] text-slate-600">バージョン</span>
+                <span class="text-[0.9rem] text-slate-600">バージョン</span>
                 <span class="text-[1rem] font-bold text-slate-900 js-app-version"></span>
             </div>
             <div class="flex justify-between items-baseline">
-                <span class="text-[0.8rem] text-slate-600">開発者</span>
+                <span class="text-[0.9rem] text-slate-600">開発者</span>
                 <span class="text-[1rem] font-bold text-slate-900 js-app-developer"></span>
             </div>
         </div>
         <!-- リンク・アクション -->
         <div class="bg-white rounded-[1rem] border border-slate-200 flex flex-col overflow-hidden">
             <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-200 active:bg-slate-50 transition-colors">
-                <span class="text-[0.8rem] text-slate-600">アプリの評価</span>
+                <span class="text-[0.9rem] text-slate-600">アプリの評価</span>
                 <div class="flex items-center gap-2">
                     <span class="text-[1rem] font-bold text-yellow-500 js-app-score">★ 0.0</span>
-                    <span class="text-[0.8rem] text-slate-600">(<span class="js-app-feedback-count">0</span>)</span>
+                    <span class="text-[0.9rem] text-slate-600">(<span class="js-app-feedback-count">0</span>)</span>
                     <span class="text-[1rem] text-slate-600 ml-1">⏩</span>
                 </div>
             </button>
             <button id="link-info-official" type="button" class="w-full flex justify-between items-center p-4 border-b border-slate-200 active:bg-slate-50 transition-colors">
-                <span class="text-[0.8rem] text-slate-600">開発者のサイト</span>
+                <span class="text-[0.9rem] text-slate-600">開発者のサイト</span>
                 <span class="text-[1rem] font-bold text-blue-500">⏩</span>
             </button>
             <button id="btn-info-license" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors">
-                <span class="text-[0.8rem] text-slate-600">ライセンス</span>
+                <span class="text-[0.9rem] text-slate-600">ライセンス</span>
                 <span class="text-[1rem] text-slate-600">⏩</span>
             </button>
         </div>
         <!-- 全体統計 -->
         <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3">
             <div class="flex justify-between items-baseline border-b border-slate-200 pb-2 mb-1">
-                <span class="text-[0.8rem] text-slate-600">最終集計日時</span>
+                <span class="text-[0.9rem] text-slate-600">最終集計日時</span>
                 <span class="text-[1rem] font-bold text-slate-900 js-last-update"></span>
             </div>
             <div class="flex justify-between items-baseline">
-                <span class="text-[0.8rem] text-slate-600">ユーザ数</span>
+                <span class="text-[0.9rem] text-slate-600">ユーザ数</span>
                 <span class="text-[1rem] font-bold text-slate-900 js-stat-users">0</span>
             </div>
             <div class="flex justify-between items-baseline">
-                <span class="text-[0.8rem] text-slate-600">総まとめ数</span>
+                <span class="text-[0.9rem] text-slate-600">総まとめ数</span>
                 <span class="text-[1rem] font-bold text-slate-900 js-stat-archives">0</span>
             </div>
             <div class="flex justify-between items-baseline">
-                <span class="text-[0.8rem] text-slate-600">総地点メモ数</span>
+                <span class="text-[0.9rem] text-slate-600">総地点メモ数</span>
                 <span class="text-[1rem] font-bold text-slate-900 js-stat-memos">0</span>
             </div>
         </div>
@@ -155,7 +155,7 @@
 <template id="tpl-review-list">
     <div class="w-full flex flex-col h-full bg-slate-50 pb-2">
         <div class="shrink-0 flex flex-col items-center justify-center py-6 bg-white border-b border-slate-200  z-10">
-            <span class="text-[0.8rem] font-bold text-slate-600 uppercase tracking-[0.2em] mb-2">Average Rating</span>
+            <span class="text-[0.9rem] font-bold text-slate-600 uppercase tracking-[0.2em] mb-2">Average Rating</span>
             <span class="text-[4rem] font-bold text-slate-900  js-avg-score tracking-tighter">0.0</span>
             <span class="text-[1.2rem] text-yellow-500 tracking-widest mt-2 js-avg-stars drop-"></span>
         </div>
@@ -214,8 +214,8 @@
 			</div>
             <div class="flex-1">
                 <div class="flex justify-between items-end mb-1">
-                    <label class="block text-[0.8rem] font-bold uppercase text-slate-600">称号・二つ名</label>
-                    <span class="text-[0.8rem] font-bold text-slate-600"><span id="edit-profile-category-count">0</span>/10</span>
+                    <label class="block text-[0.9rem] font-bold uppercase text-slate-600">称号・二つ名</label>
+                    <span class="text-[0.9rem] font-bold text-slate-600"><span id="edit-profile-category-count">0</span>/10</span>
                 </div>
                 <input id="edit-profile-category" type="text" maxlength="10" placeholder="通りすがり" 
                     class="w-full border-2 border-brand-3 px-4 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
@@ -224,31 +224,31 @@
         <!-- ニックネーム（上段で横幅いっぱい） -->
 		<div>
 			<div class="flex justify-between items-end mb-1">
-                <label class="block text-[0.8rem] font-bold uppercase text-slate-600">ニックネーム</label>
-                <span class="text-[0.8rem] font-bold text-slate-600"><span id="edit-profile-nickname-count">0</span>/20</span>
+                <label class="block text-[0.9rem] font-bold uppercase text-slate-600">ニックネーム</label>
+                <span class="text-[0.9rem] font-bold text-slate-600"><span id="edit-profile-nickname-count">0</span>/20</span>
             </div>
 			<input id="edit-profile-nickname" type="text" maxlength="20" 
                 class="w-full border-2 border-brand-3 px-4 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
 		</div>
         <!-- 紹介文 -->
 		<div>
-			<div class="flex justify-between items-end mb-1"><label class="block text-[0.8rem] font-bold uppercase text-slate-600">紹介文</label><span class="text-[0.8rem] font-bold text-slate-600"><span id="edit-profile-description-count">0</span>/300</span></div>
+			<div class="flex justify-between items-end mb-1"><label class="block text-[0.9rem] font-bold uppercase text-slate-600">紹介文</label><span class="text-[0.9rem] font-bold text-slate-600"><span id="edit-profile-description-count">0</span>/300</span></div>
 			<textarea id="edit-profile-description" maxlength="300" 
                 class="w-full border-2 border-brand-3 px-4 py-3 text-[1rem] h-[300px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
 		</div>
 		<div class="space-y-2">
-			<label class="block text-[0.8rem] font-bold uppercase text-slate-600">各SNSリンク</label>
+			<label class="block text-[0.9rem] font-bold uppercase text-slate-600">各SNSリンク</label>
             <div class="flex items-center gap-2">
-                <input id="edit-profile-link1" type="url" placeholder="URL 1 (https://...)" class="flex-1 border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
-                <button id="btn-edit-profile-link1-clear" type="button" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95 transition-all">✕</button>
+                <input id="edit-profile-link1" type="url" placeholder="URL 1 (https://...)" class="flex-1 border-2 border-brand-3 px-4 py-2 text-[0.9rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+                <button id="btn-edit-profile-link1-clear" type="button" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.9rem] active:scale-95 transition-all">✕</button>
             </div>
             <div class="flex items-center gap-2">
-                <input id="edit-profile-link2" type="url" placeholder="URL 2 (https://...)" class="flex-1 border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
-                <button id="btn-edit-profile-link2-clear" type="button" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95 transition-all">✕</button>
+                <input id="edit-profile-link2" type="url" placeholder="URL 2 (https://...)" class="flex-1 border-2 border-brand-3 px-4 py-2 text-[0.9rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+                <button id="btn-edit-profile-link2-clear" type="button" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.9rem] active:scale-95 transition-all">✕</button>
             </div>
             <div class="flex items-center gap-2">
-                <input id="edit-profile-link3" type="url" placeholder="URL 3 (https://...)" class="flex-1 border-2 border-brand-3 px-4 py-2 text-[0.8rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
-                <button id="btn-edit-profile-link3-clear" type="button" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95 transition-all">✕</button>
+                <input id="edit-profile-link3" type="url" placeholder="URL 3 (https://...)" class="flex-1 border-2 border-brand-3 px-4 py-2 text-[0.9rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
+                <button id="btn-edit-profile-link3-clear" type="button" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.9rem] active:scale-95 transition-all">✕</button>
             </div>
 		</div>
 	</div>
@@ -258,22 +258,22 @@
     <div class="w-full flex flex-col gap-6 text-slate-900 bg-white pb-4">
         <!-- セクション：作成者 -->
         <div class="flex flex-col gap-2">
-            <label class="text-[0.8rem] font-bold text-slate-600 uppercase">作成者</label>
+            <label class="text-[0.9rem] font-bold text-slate-600 uppercase">作成者</label>
             <div id="view-mem-user-wrapper" class="w-fit"></div>
         </div>
         <!-- セクション：タイトル -->
         <div class="flex flex-col gap-1 border-t border-slate-200 pt-4">
-            <label class="text-[0.8rem] font-bold text-slate-600">まとめタイトル</label>
+            <label class="text-[0.9rem] font-bold text-slate-600">まとめタイトル</label>
             <h1 id="view-mem-title" class="text-[1rem] font-bold break-words px-1"></h1>
         </div>
         <!-- セクション：説明文 -->
         <div class="flex flex-col gap-1 border-t border-slate-200 pt-4">
-            <label class="text-[0.8rem] font-bold text-slate-600">説明・メモ</label>
+            <label class="text-[0.9rem] font-bold text-slate-600">説明・メモ</label>
             <div id="view-mem-body" class="text-[1rem] leading-[1.8] whitespace-pre-wrap break-words px-1"></div>
         </div>
         <!-- セクション：リンク -->
         <div class="flex flex-col gap-2 _border-t _border-slate-200 pt-4">
-            <!-- <label class="text-[0.8rem] font-bold text-slate-600">関連リンク</label> -->
+            <!-- <label class="text-[0.9rem] font-bold text-slate-600">関連リンク</label> -->
             <div id="view-mem-url-wrapper" class="flex flex-wrap gap-2"></div>
         </div>
         <!-- セクション：統計情報 -->
@@ -281,25 +281,25 @@
             <div class="flex flex-col gap-2 _px-1">
                 <!-- 地点メモ数 -->
                 <div class="flex justify-between items-baseline">
-                    <span class="text-[0.8rem] text-slate-600">地点メモ数</span>
+                    <span class="text-[0.9rem] text-slate-600">地点メモ数</span>
                     <button id="btn-view-mem-timeline" class="text-[1rem] font-bold underline text-brand-5">
                         <span id="mem-stat-count">0</span> 件 (タイムライン表示)
                     </button>
                 </div>
                 <!-- 総移動距離 -->
                 <div class="flex justify-between items-baseline">
-                    <span class="text-[0.8rem] text-slate-600">総移動距離</span>
+                    <span class="text-[0.9rem] text-slate-600">総移動距離</span>
                     <span class="text-[1rem] font-bold italic">
                         <span id="mem-stat-distance">0</span>
-                        <span class="text-[0.8rem] font-normal text-slate-600">km</span>
+                        <span class="text-[0.9rem] font-normal text-slate-600">km</span>
                     </span>
                 </div>
                 <!-- 合計金額 -->
                 <div class="flex justify-between items-baseline">
-                    <span class="text-[0.8rem] text-slate-600">合計金額</span>
+                    <span class="text-[0.9rem] text-slate-600">合計金額</span>
                     <span class="text-[1rem] font-bold italic">
                         <span id="mem-stat-price">0</span>
-                        <span id="view-mem-price-unit" class="text-[0.8rem] font-normal text-slate-600"></span>
+                        <span id="view-mem-price-unit" class="text-[0.9rem] font-normal text-slate-600"></span>
                     </span>
                 </div>
             </div>
@@ -307,16 +307,16 @@
         <!-- セクション：公開設定（オーナー用） -->
         <div id="archive-status-bar-container" class="flex flex-col gap-4 border-t border-slate-200 pt-6 mt-2">
             <div>
-                <label class="text-[0.8rem] font-bold text-brand-5 mb-2 block">公開ステータスの変更</label>
+                <label class="text-[0.9rem] font-bold text-brand-5 mb-2 block">公開ステータスの変更</label>
                 <div id="archive-status-bar" class="flex gap-2">
-                    <button id="btn-status-memo" class="flex-1 h-12 font-bold text-[0.8rem] rounded-lg">memo</button>
-                    <button id="btn-status-private" class="flex-1 h-12 font-bold text-[0.8rem] rounded-lg">private</button>
-                    <button id="btn-status-close" class="flex-1 h-12 font-bold text-[0.8rem] rounded-lg">public</button>
-                    <button id="btn-status-open" class="flex-1 h-12 font-bold text-[0.8rem] rounded-lg">open</button>
+                    <button id="btn-status-memo" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">memo</button>
+                    <button id="btn-status-private" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">private</button>
+                    <button id="btn-status-close" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">public</button>
+                    <button id="btn-status-open" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">open</button>
                 </div>
             </div>
             <div id="archive-limit-btn-area">
-                <button id="btn-toggle-limited" class="w-full py-4 font-bold rounded-lg border-2 text-[0.8rem] flex items-center justify-center gap-2">
+                <button id="btn-toggle-limited" class="w-full py-4 font-bold rounded-lg border-2 text-[0.9rem] flex items-center justify-center gap-2">
                     <span class="js-check-icon">☐</span>
                     <span class="js-label-text">限定公開設定</span>
                 </button>
@@ -328,25 +328,25 @@
 <template id="tpl-edit-archive">
     <div class="w-full text-slate-900 space-y-4 mb-4">
         <div>
-            <div class="flex justify-between items-end mb-1"><label class="text-slate-600 block text-[0.8rem] font-bold uppercase">Trip Title</label><span class="text-[0.8rem] text-slate-600 font-bold"><span id="edit-mem-title-count">0</span>/30</span></div>
+            <div class="flex justify-between items-end mb-1"><label class="text-slate-600 block text-[0.9rem] font-bold uppercase">Trip Title</label><span class="text-[0.9rem] text-slate-600 font-bold"><span id="edit-mem-title-count">0</span>/30</span></div>
             <input id="edit-mem-title" type="text" maxlength="30" class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
         </div>
         <div>
-            <div class="flex justify-between items-end mb-1"><label class="text-slate-600 block text-[0.8rem] font-bold uppercase">Description / Memo</label><span class="text-[0.8rem] text-slate-600 font-bold">
+            <div class="flex justify-between items-end mb-1"><label class="text-slate-600 block text-[0.9rem] font-bold uppercase">Description / Memo</label><span class="text-[0.9rem] text-slate-600 font-bold">
                 <span id="edit-mem-body-count">0</span>/1000</span>
             </div>
             <textarea id="edit-mem-body" maxlength="1000" 
                 class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[300px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
         </div>
         <div>
-            <label class="text-slate-600 block text-[0.8rem] font-bold mb-1 uppercase">Link URL</label>
+            <label class="text-slate-600 block text-[0.9rem] font-bold mb-1 uppercase">Link URL</label>
             <div class="flex items-center gap-2">
                 <input id="edit-mem-url" type="url" placeholder="https://..." class="flex-1 border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white text-blue-600">
-                <button id="btn-edit-mem-url-clear" type="button" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95 transition-all">✕</button>
+                <button id="btn-edit-mem-url-clear" type="button" class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.9rem] active:scale-95 transition-all">✕</button>
             </div>
         </div>
         <div>
-            <label class="text-slate-600 block text-[0.8rem] font-bold mb-1 uppercase">Currency</label>
+            <label class="text-slate-600 block text-[0.9rem] font-bold mb-1 uppercase">Currency</label>
             <input id="edit-mem-currency" type="text" maxlength="5" placeholder="円, ドル..." class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white uppercase text-slate-900">
         </div>
     </div>
@@ -363,7 +363,7 @@
             <button id="btn-share-copy" class="shadow-md w-48 h-48 p-3 bg-white rounded-[1rem] active:scale-95 transition-transform flex items-center justify-center border border-slate-200 outline-none">
                 <img id="share-qr-image" src="" alt="QR Code" class="w-full h-full object-contain">
             </button>
-            <span class="text-[0.8rem] font-bold text-slate-600 mt-3 tracking-wider">※ QRコードをタップするとURLをコピーできます</span>
+            <span class="text-[0.9rem] font-bold text-slate-600 mt-3 tracking-wider">※ QRコードをタップするとURLをコピーできます</span>
         </div>
         <!-- SNSシェアボタン -->
         <div class="flex items-center justify-center gap-6 mt-2">
@@ -390,29 +390,29 @@
         <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-2">
             <!-- アイコン（通知種別） -->
             <div class="flex justify-between items-baseline border-b border-slate-200 pb-2 mb-1">
-                <span class="text-[0.8rem] text-slate-600">通知種別</span>
+                <span class="text-[0.9rem] text-slate-600">通知種別</span>
                 <span id="view-notice-icon" class="kb-icon-emoji-md"></span>
             </div>
             <!-- 日時 -->
             <div class="flex justify-between items-baseline">
-                <span class="text-[0.8rem] text-slate-600">受信日時</span>
+                <span class="text-[0.9rem] text-slate-600">受信日時</span>
                 <span id="view-notice-date" class="kb-date-tim-md"></span>
             </div>
             <!-- ユーザー情報（差出人など：JS側で動的に表示/非表示） -->
             <div id="view-notice-user-wrapper" class="hidden mt-2 pt-2 border-t border-slate-200"></div>
             <!-- タイトル領域（件名：JS側で動的に表示/非表示） -->
             <div id="view-notice-title-area" class="flex flex-col mt-2 pt-2 border-t border-slate-200 gap-1">
-                <span class="text-[0.8rem] text-slate-600">件名</span>
+                <span class="text-[0.9rem] text-slate-600">件名</span>
                 <div id="view-notice-title" class="text-[1rem] font-bold text-slate-900 break-words"></div>
             </div>
         </div>
         <!-- 本文・リンクカード -->
         <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3 flex-1">
-            <span class="text-[0.8rem] text-slate-600 border-b border-slate-200 pb-2">内容</span>
+            <span class="text-[0.9rem] text-slate-600 border-b border-slate-200 pb-2">内容</span>
             <div id="view-notice-body" class="text-[1rem] text-slate-900 leading-[1.8] whitespace-pre-wrap break-words min-h-[150px]"></div>
             <!-- リンク表示エリア -->
             <div id="view-notice-url-wrapper" class="hidden mt-auto pt-4 border-t border-slate-200 flex-col gap-2">
-                <span class="text-[0.8rem] text-slate-600">関連リンク</span>
+                <span class="text-[0.9rem] text-slate-600">関連リンク</span>
                 <!-- JSでボタンがappendされる -->
             </div>
         </div>
@@ -433,17 +433,17 @@
         <!-- 基本情報 -->
         <div class="flex flex-col gap-3 border-b border-slate-200 pb-4">
             <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
-                <span class="text-[0.8rem] text-slate-600">通報日時</span>
+                <span class="text-[0.9rem] text-slate-600">通報日時</span>
                 <span class="js-report-tim kb-date-tim-md"></span>
             </div>
             <!-- 対象ユーザー -->
             <div class="flex flex-col gap-1">
-                <span class="text-[0.8rem] text-slate-600">対象ユーザー</span>
+                <span class="text-[0.9rem] text-slate-600">対象ユーザー</span>
                 <div id="view-report-target-user-wrapper" class="w-full"></div>
             </div>
             <!-- 対象まとめ -->
             <div class="flex flex-col gap-1">
-                <span class="text-[0.8rem] text-slate-600">対象まとめ</span>
+                <span class="text-[0.9rem] text-slate-600">対象まとめ</span>
                 <button id="btn-report-jump-archive" class="h-10 w-full flex items-center justify-between p-3 bg-white rounded-full active:bg-slate-50 transition-colors text-left shadow-md">
                     <div class="flex-1 min-w-0 pr-2">
                         <div id="view-report-archive-title" class="text-[1rem] font-bold text-slate-900 truncate"></div>
@@ -454,7 +454,7 @@
         </div>
         <!-- 通報内容 -->
         <div class="flex flex-col gap-2">
-            <span class="text-[0.8rem] text-slate-600">通報内容</span>
+            <span class="text-[0.9rem] text-slate-600">通報内容</span>
             <div id="view-report-body" class="text-[1rem] text-slate-900 leading-[1.8] whitespace-pre-wrap break-words p-3 bg-slate-50 border border-slate-200 rounded-lg min-h-[150px]"></div>
         </div>
     </div>
@@ -592,13 +592,13 @@
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2 text-slate-900 font-bold">
                     <span class="text-[1.5rem]">👤</span>
-                    <span class="text-[0.8rem]">ユーザー情報</span>
+                    <span class="text-[0.9rem]">ユーザー情報</span>
                 </div>
-                <span class="js-user-id text-[0.8rem] text-slate-600 font-bold"></span>
+                <span class="js-user-id text-[0.9rem] text-slate-600 font-bold"></span>
             </div>
             <div>
-                <label class="block text-[0.8rem] font-bold text-slate-600 mb-1">ニックネーム</label>
-                <div class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-1.5 rounded-md font-bold border border-amber-100 text-[0.8rem]">
+                <label class="block text-[0.9rem] font-bold text-slate-600 mb-1">ニックネーム</label>
+                <div class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-1.5 rounded-md font-bold border border-amber-100 text-[0.9rem]">
                     <span>📁</span> <span class="js-nickname"></span>
                 </div>
             </div>
@@ -611,23 +611,23 @@
 <!-- 【ダイアログ子】リンク1件分のアイテム -->
 <template id="tpl-click-stats-item">
     <div class="bg-white rounded-[1rem]  border border-slate-200 p-4">
-        <label class="block text-[0.8rem] font-bold text-slate-600 mb-2 js-link-title"></label>
-        <div class="bg-slate-50 border border-slate-200 rounded-md px-3 py-2 mb-3 text-[0.8rem] text-slate-600 truncate js-link-url"></div>
+        <label class="block text-[0.9rem] font-bold text-slate-600 mb-2 js-link-title"></label>
+        <div class="bg-slate-50 border border-slate-200 rounded-md px-3 py-2 mb-3 text-[0.9rem] text-slate-600 truncate js-link-url"></div>
         <div class="grid grid-cols-3 gap-2">
             <!-- Total -->
             <div class="flex flex-col items-center justify-center border border-amber-200 bg-amber-50/50 rounded-md py-2">
-                <span class="text-[0.8rem] font-bold text-slate-600 mb-0.5">Total</span>
-                <div class="font-bold text-indigo-600 text-[1rem]  mt-1"><span class="js-total">0</span><span class="text-[0.8rem] text-slate-600 ml-0.5">回</span></div>
+                <span class="text-[0.9rem] font-bold text-slate-600 mb-0.5">Total</span>
+                <div class="font-bold text-indigo-600 text-[1rem]  mt-1"><span class="js-total">0</span><span class="text-[0.9rem] text-slate-600 ml-0.5">回</span></div>
             </div>
             <!-- Unique -->
             <div class="flex flex-col items-center justify-center border border-slate-200 rounded-md py-2">
-                <span class="text-[0.8rem] font-bold text-slate-600 mb-0.5">Unique</span>
-                <div class="font-bold text-emerald-500 text-[1rem]  mt-1"><span class="js-unique">0</span><span class="text-[0.8rem] text-slate-600 ml-0.5">人</span></div>
+                <span class="text-[0.9rem] font-bold text-slate-600 mb-0.5">Unique</span>
+                <div class="font-bold text-emerald-500 text-[1rem]  mt-1"><span class="js-unique">0</span><span class="text-[0.9rem] text-slate-600 ml-0.5">人</span></div>
             </div>
             <!-- Guest -->
             <div class="flex flex-col items-center justify-center border border-slate-200 rounded-md py-2">
-                <span class="text-[0.8rem] font-bold text-slate-600 mb-0.5">Guest</span>
-                <div class="font-bold text-slate-900 text-[1rem]  mt-1"><span class="js-guest">0</span><span class="text-[0.8rem] text-slate-600 ml-0.5">回</span></div>
+                <span class="text-[0.9rem] font-bold text-slate-600 mb-0.5">Guest</span>
+                <div class="font-bold text-slate-900 text-[1rem]  mt-1"><span class="js-guest">0</span><span class="text-[0.9rem] text-slate-600 ml-0.5">回</span></div>
             </div>
         </div>
     </div>
@@ -640,39 +640,39 @@
         <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-2">
             <div class="flex items-center gap-2 mb-2 border-b border-slate-200 pb-2">
                 <span class="text-[1rem]">📁</span>
-                <span class="text-[0.8rem] font-bold text-slate-900">まとめ情報</span>
+                <span class="text-[0.9rem] font-bold text-slate-900">まとめ情報</span>
             </div>
             <div class="flex justify-between items-baseline">
-                <span class="text-[0.8rem] text-slate-600">ステータス</span>
+                <span class="text-[0.9rem] text-slate-600">ステータス</span>
                 <div class="flex gap-1">
-                    <span class="px-2 py-0.5 rounded text-[0.8rem] font-bold js-arc-status-badge"></span>
-                    <span class="px-2 py-0.5 rounded text-[0.8rem] font-bold bg-blue-100 text-blue-600 js-arc-owner-badge hidden">オーナー</span>
+                    <span class="px-2 py-0.5 rounded text-[0.9rem] font-bold js-arc-status-badge"></span>
+                    <span class="px-2 py-0.5 rounded text-[0.9rem] font-bold bg-blue-100 text-blue-600 js-arc-owner-badge hidden">オーナー</span>
                 </div>
             </div>
             <div class="flex justify-between items-baseline">
-                <span class="text-[0.8rem] text-slate-600 shrink-0">タイトル</span>
+                <span class="text-[0.9rem] text-slate-600 shrink-0">タイトル</span>
                 <span class="text-[1rem] font-bold text-slate-900 js-arc-title line-clamp-1 text-right"></span>
             </div>
             <div class="flex justify-between items-baseline">
-                <span class="text-[0.8rem] text-slate-600">閲覧数</span>
+                <span class="text-[0.9rem] text-slate-600">閲覧数</span>
                 <span class="text-[1rem] font-bold text-brand-5 js-arc-view-count">0</span>
             </div>
             <!-- リンク情報 -->
             <div class="mt-2 pt-2 border-t border-slate-200 flex flex-col gap-2">
                 <div class="flex flex-col">
-                    <span class="text-[0.8rem] text-slate-600 mb-1">リンクURL</span>
-                    <div class="text-[0.8rem] text-blue-500 truncate js-arc-url"></div>
+                    <span class="text-[0.9rem] text-slate-600 mb-1">リンクURL</span>
+                    <div class="text-[0.9rem] text-blue-500 truncate js-arc-url"></div>
                 </div>
                 <div class="flex justify-between items-baseline">
-                    <span class="text-[0.8rem] text-slate-600 pl-2 border-l-2 border-brand-2">総クリック数</span>
+                    <span class="text-[0.9rem] text-slate-600 pl-2 border-l-2 border-brand-2">総クリック数</span>
                     <span class="js-arc-total text-[1rem] font-bold text-slate-900">0</span>
                 </div>
                 <div class="flex justify-between items-baseline">
-                    <span class="text-[0.8rem] text-slate-600 pl-2 border-l-2 border-brand-2">クリックユーザ数</span>
+                    <span class="text-[0.9rem] text-slate-600 pl-2 border-l-2 border-brand-2">クリックユーザ数</span>
                     <span class="js-arc-unique text-[1rem] font-bold text-slate-900">0</span>
                 </div>
                 <div class="flex justify-between items-baseline">
-                    <span class="text-[0.8rem] text-slate-600 pl-2 border-l-2 border-brand-2">guestクリック数</span>
+                    <span class="text-[0.9rem] text-slate-600 pl-2 border-l-2 border-brand-2">guestクリック数</span>
                     <span class="js-arc-guest text-[1rem] font-bold text-slate-900">0</span>
                 </div>
             </div>
@@ -681,7 +681,7 @@
         <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-2">
             <div class="flex items-center gap-2 mb-2 border-b border-slate-200 pb-2">
                 <span class="text-[1rem]">📋</span>
-                <span class="text-[0.8rem] font-bold text-slate-900">明細情報</span>
+                <span class="text-[0.9rem] font-bold text-slate-900">明細情報</span>
             </div>
             <div class="js-details-container flex flex-col gap-3"></div>
         </div>
@@ -693,34 +693,34 @@
     <div class="p-3 bg-slate-50 border border-slate-200 rounded-[1rem] flex flex-col gap-2">
         <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
             <div class="flex items-center gap-2">
-                <span class="js-dtl-seq w-6 h-6 bg-slate-800 text-white text-[0.8rem] font-bold rounded-full flex items-center justify-center shrink-0"></span>
+                <span class="js-dtl-seq w-6 h-6 bg-slate-800 text-white text-[0.9rem] font-bold rounded-full flex items-center justify-center shrink-0"></span>
                 <span class="js-dtl-title text-[1rem] font-bold text-slate-900 truncate max-w-[180px]"></span>
             </div>
             <span class="js-dtl-icon shrink-0 text-[1rem]"></span>
         </div>
         <!-- リアクション -->
         <div class="flex flex-col gap-1">
-            <span class="text-[0.8rem] text-slate-600">リアクション数</span>
+            <span class="text-[0.9rem] text-slate-600">リアクション数</span>
             <!-- リアクションはご要望通り横並び維持 -->
             <div class="js-dtl-reactions flex flex-wrap gap-x-4 gap-y-2 py-1"></div>
         </div>
         <!-- リンク情報 -->
         <div class="mt-1 pt-2 border-t border-slate-200 flex flex-col gap-2">
             <div class="flex flex-col mb-1">
-                <span class="text-[0.8rem] text-slate-600 mb-1">リンクURL</span>
-                <span class="js-dtl-url text-[0.8rem] text-blue-500 truncate"></span>
+                <span class="text-[0.9rem] text-slate-600 mb-1">リンクURL</span>
+                <span class="js-dtl-url text-[0.9rem] text-blue-500 truncate"></span>
             </div>
             <div class="js-dtl-stats-box hidden flex flex-col gap-2">
                 <div class="flex justify-between items-baseline">
-                    <span class="text-[0.8rem] text-slate-600 pl-2 border-l-2 border-slate-200">総クリック数</span>
+                    <span class="text-[0.9rem] text-slate-600 pl-2 border-l-2 border-slate-200">総クリック数</span>
                     <span class="js-dtl-total text-[1rem] font-bold text-slate-900">0</span>
                 </div>
                 <div class="flex justify-between items-baseline">
-                    <span class="text-[0.8rem] text-slate-600 pl-2 border-l-2 border-slate-200">クリックユーザ数</span>
+                    <span class="text-[0.9rem] text-slate-600 pl-2 border-l-2 border-slate-200">クリックユーザ数</span>
                     <span class="js-dtl-unique text-[1rem] font-bold text-slate-900">0</span>
                 </div>
                 <div class="flex justify-between items-baseline">
-                    <span class="text-[0.8rem] text-slate-600 pl-2 border-l-2 border-slate-200">guestクリック数</span>
+                    <span class="text-[0.9rem] text-slate-600 pl-2 border-l-2 border-slate-200">guestクリック数</span>
                     <span class="js-dtl-guest text-[1rem] font-bold text-slate-900">0</span>
                 </div>
             </div>

@@ -68,6 +68,11 @@
     max-width: 400px !important;
     margin: 0;
 }
+/* 地図タイルの情報を「脇役」に押し下げるフィルタ */
+.leaflet-tile_2 {
+    filter: grayscale(0.8) brightness(1.08) contrast(0.8);
+}
+
 
 /* リスト項目（アクティブ状態） */
 .list-item-active {
@@ -101,4 +106,26 @@
     border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* マーカーの外枠（多重影） */
+.custom-marker-wrapper {
+    filter: drop-shadow(0 4px 3px rgba(0,0,0,0.4)) drop-shadow(0 0 8px var(--brand-lvl3));
+}
+/* ひし形の土台：線を2pxに細める */
+.marker-diamond-base {
+    /* background-color: white !important; */
+    border-width: 2px !important; /* 3pxから2pxへ変更 */
+    transform: rotate(45deg);
+    box-sizing: border-box;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.1);
+}
+/* 絵文字：1pxのドロップシャドウで縁取りを強化 */
+.marker-diamond-base .js-emoji {
+    transform: rotate(-45deg);
+    display: block;
+    font-size: 2.5rem;
+    margin-top: -2px;
+    /* 絵文字の輪郭を強調する1pxの影 */
+    filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.5));
 }

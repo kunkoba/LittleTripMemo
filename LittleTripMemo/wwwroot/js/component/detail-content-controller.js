@@ -13,7 +13,7 @@ const _DetailContentCore = {
                     this.displayIndexBadge = $Dom.QuerySelector(".js-index-badge", this.displayRoot);
                     this.displayDateContainer = $Dom.GetElementById("detail-display-date-container");
                     this.displayFaceEmoji = $Dom.GetElementById("detail-display-face_emoji");
-                    this.displayFaceEmojiBg = $Dom.GetElementById("detail-display-face_emoji_bg");
+                    // this.displayFaceEmojiBg = $Dom.GetElementById("detail-display-face_emoji_bg");
                     this.displayWeatherEmoji = $Dom.GetElementById("detail-display-weather_code");
                     this.displayTitle = $Dom.GetElementById("detail-display-title");
                     this.displayBody = $Dom.GetElementById("detail-display-body");
@@ -215,7 +215,7 @@ const _DetailContentCore = {
         }
         // 絵文字
         this.displayFaceEmoji.textContent = detail.face_emoji || '😀';
-        this.displayFaceEmojiBg.textContent = detail.face_emoji || '😀';
+        // this.displayFaceEmojiBg.textContent = detail.face_emoji || '😀';
         this.displayWeatherEmoji.textContent = detail.weather_code || '0000';
     },
     // 編集用反映

@@ -101,7 +101,7 @@ export default {
         let previewItems = '';
         for (let i = 0; i <= 5; i++) {
             const textColor = i > 2 ? 'text-white' : 'text-slate-600';
-            previewItems += `<div class="w-full h-10 bg-brand-${i} border border-brand-2 flex items-center px-4 text-[0.8rem] font-bold ${textColor}">LEVEL ${i} PREVIEW</div>`;
+            previewItems += `<div class="w-full h-10 bg-brand-${i} border border-brand-2 flex items-center px-4 text-[0.9rem] font-bold ${textColor}">LEVEL ${i} PREVIEW</div>`;
         }
         const html = `
             <div class="p-6 w-full space-y-6 bg-brand-0">
@@ -615,7 +615,7 @@ export default {
         });
         // リンクが1つも無い場合の表示
         if (container.children.length === 0) {
-            container.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-600 py-6">設定されているリンクがありません</div>`;
+            container.innerHTML = `<div class="text-center text-[0.9rem] font-bold text-slate-600 py-6">設定されているリンクがありません</div>`;
         }
         this._core.open({
             title: "クリック数",

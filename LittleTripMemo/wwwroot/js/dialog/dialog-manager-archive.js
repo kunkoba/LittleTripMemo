@@ -167,7 +167,7 @@ export default {
                 return target.toLowerCase().includes(query);
             });
             if (filtered.length === 0) {
-                listContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-600 py-10">合致するまとめがありません</div>`;
+                listContainer.innerHTML = `<div class="text-center text-[0.9rem] font-bold text-slate-600 py-10">合致するまとめがありません</div>`;
                 return;
             }
             const pvt = filtered.filter(item => !item.is_public);
@@ -479,7 +479,7 @@ export default {
         // 画像の先読み
         const imgPreload = new Image();
         imgPreload.src = qrImageUrl;
-        const STYLE_BASE = "flex-1 h-11 font-bold text-[0.8rem] rounded-lg tracking-wider outline-none";
+        const STYLE_BASE = "flex-1 h-11 font-bold text-[0.9rem] rounded-lg tracking-wider outline-none";
         const STYLE_ACTIVE = " bg-white text-slate-900 shadow-md border border-slate-200 active:scale-95 transition-all";
         const STYLE_CURRENT = " bg-brand-5 text-white shadow-inner border border-brand-5 cursor-default pointer-events-none";
         const STYLE_DISABLED = " bg-slate-100 text-slate-600 border border-slate-200 cursor-not-allowed pointer-events-none";
@@ -727,7 +727,7 @@ export default {
         const detailsContainer = $Dom.QuerySelector('.js-details-container', el);
         const details = $Data.Store.GetDetails() || [];
         if (details.length === 0) {
-            detailsContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-600 py-4">明細データがありません</div>`;
+            detailsContainer.innerHTML = `<div class="text-center text-[0.9rem] font-bold text-slate-600 py-4">明細データがありません</div>`;
         } else {
             details.forEach(dtl => {
                 const child = $Dom.GenerateTemplate('tpl-archive-click-stats-item');
@@ -742,7 +742,7 @@ export default {
                     const countProp = type.prop.replace('has_', 'count_');
                     const count = dtl[countProp] || 0;
                     const div = document.createElement("div");
-                    div.className = "flex items-center gap-1 text-[0.8rem]";
+                    div.className = "flex items-center gap-1 text-[0.9rem]";
                     div.innerHTML = `<span class="kb-icon-emoji-sm">${type.emoji}</span><span class="font-bold text-slate-600">${count}</span>`;
                     reactContainer.appendChild(div);
                 });

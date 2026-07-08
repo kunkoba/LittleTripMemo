@@ -24,7 +24,7 @@ export default {
         const renderList = async () => {
             root.innerHTML = "";
             if (notices.length === 0) {
-                root.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-600 py-6">通知データがありません</div>`;
+                root.innerHTML = `<div class="text-center text-[0.9rem] font-bold text-slate-600 py-6">通知データがありません</div>`;
                 return;
             }
             const now = new Date();
@@ -287,7 +287,7 @@ export default {
         // 下部の通報理由リスト描画
         const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
         if (reports.length === 0) {
-            listContainer.innerHTML = `<div class="text-[0.8rem] text-slate-600 p-2">詳細データがありません</div>`;
+            listContainer.innerHTML = `<div class="text-[0.9rem] text-slate-600 p-2">詳細データがありません</div>`;
         } else {
             reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
                 const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
@@ -396,7 +396,7 @@ export default {
             // リスト再描画
             listContainer.innerHTML = "";
             if (filtered.length === 0) {
-                listContainer.innerHTML = `<div class="text-center text-[0.8rem] font-bold text-slate-600 py-10">合致するデータはありません。</div>`;
+                listContainer.innerHTML = `<div class="text-center text-[0.9rem] font-bold text-slate-600 py-10">合致するデータはありません。</div>`;
                 return;
             }
             filtered.forEach(item => {
@@ -719,7 +719,7 @@ export default {
             }
             if (jsonObj) {
                 const table = document.createElement("table");
-                table.className = "w-full text-left text-[0.9rem] border-collapse";
+                table.className = "w-full text-left text-[1rem] border-collapse";
                 const tbody = document.createElement("tbody");
                 table.appendChild(tbody);
                 let rowIdCounter = 0;
@@ -769,7 +769,7 @@ export default {
             }
         } else {
             payloadContainer.textContent = "詳細データはありません";
-            payloadContainer.classList.add("text-slate-500", "text-[0.8rem]", "p-2");
+            payloadContainer.classList.add("text-slate-500", "text-[0.9rem]", "p-2");
         }
         this._core.open({
             title: "履歴の詳細",

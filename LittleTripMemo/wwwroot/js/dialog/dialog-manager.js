@@ -274,7 +274,7 @@ const DialogController = {
             div.className = "w-full p-4 space-y-3";
             if (message) {
                 const msg = document.createElement('p');
-                msg.className = "text-[0.8rem] font-bold text-slate-900";
+                msg.className = "text-[0.9rem] font-bold text-slate-900";
                 msg.textContent = message;
                 div.appendChild(msg);
             }

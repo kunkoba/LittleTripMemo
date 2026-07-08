@@ -233,9 +233,10 @@ AppSettingKey: "little_trip_settings",
         }
         // UI関連
         await this.RefreshScreen();
-        $Marker.NavigateDefault(); // ★ここで初期移動を実行
         // Service Worker の初期化（追加）
         this._initServiceWorker();
+        // 現在地へ移動
+        $Marker.FocusToLocationMarker();
     },
     // 画面モード変更
     async RefreshScreen() {

@@ -67,18 +67,13 @@ const _MarkerCore = {
     // マーカー生成（まとめて）
     generatePointMarkerList(details, callbacks) {
         details.forEach((row, index) => {
-            // 32pxの絵文字を中央配置（ひし形の対角線に合わせてコンテナを52pxに調整）
-            const iconHtml = `
-                <div class="flex items-center justify-center" style="width: 52px; height: 52px;">
-                    <div class="_bg-white/50 w-9 h-9 border-2 border-brand-1 shadow-md flex items-center justify-center" 
-                        style="transform: rotate(45deg);">
-                        <span class="text-[2rem]" style="transform: rotate(-45deg); display: block; line-height: 1;">
-                            ${row.face_emoji || '😀'}
-                        </span>
-                    </div>
-                </div>`;
+            // 1. テンプレートからDOMを生成
+            const el = $Dom.GenerateTemplate("tpl-marker-icon");
+            // 2. 絵文字を注入
+            $Dom.QuerySelector(".js-emoji", el).textContent = row.face_emoji || '😀';
+            // 3. LeafletのIconとして設定（innerHTMLで文字列として渡す）
             const customIcon = L.divIcon({
-                html: iconHtml,
+                html: el.innerHTML,
                 className: '', 
                 iconSize: [52, 52],
                 iconAnchor: [26, 26] 
@@ -87,11 +82,11 @@ const _MarkerCore = {
                 icon: customIcon,
                 draggable: true
             }).addTo(this._map);
-            // イベント登録（インデックスのみをコールバックで返す）
+            // 描画後はテンプレート用ルートから削除しておく（メモリ節約）
+            el.remove();
             marker.on('click', () => callbacks.onClick(index));
             marker.on('dragend', (e) => callbacks.onDragEnd(index, e.target.getLatLng()));
             this._markerList.push(marker);
-            // 【根本対応】データにマーカー実体への参照を保持させる
             row.marker = marker;
         });
     },
@@ -295,60 +290,55 @@ const MarkerController = {
     },
     // 画面モード変更時
     ChangeScreenMode(){
-        // switch ($App.AppData.Context.ScreenMode) {
-        //     case $Const.SCREEN_MODE.CREATE:
-        //         _MarkerCore.refreshCurrentLocation();
-        //         if ($App.AppData.Owner.Plan !== "Admin") {
-        //             // 現在地へ移動
-        //             this.FocusToLocationMarker();
-        //         }
-        //         break;
-        //     case $Const.SCREEN_MODE.ARCHIVE:
-        //     case $Const.SCREEN_MODE.ARCHIVE_PUB:
-        //         const seq = $App.AppData.Context.TargetSeq;
-        //         if (seq > 0) {
-        //             $Marker.FocusBySeq(seq);
-        //             $App.AppData.Context.TargetSeq = -1;    // 不要になったらクリア
-        //         } else {
-        //             this.FocusFirst();
-        //         }
-        //         break;
-        // }
         switch ($App.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
                 _MarkerCore.refreshCurrentLocation();
-                break;
-            // ARCHIVE関連の Focus 呼び出しをすべて削除
-        }
-	},
-    // 2. 【新設】初期位置への移動専用メソッド
-    NavigateDefault() {
-        const mode = $App.AppData.Context.ScreenMode;
-        switch (mode) {
-            case $Const.SCREEN_MODE.CREATE:
-                this.FocusToLocationMarker();
+                if ($App.AppData.Owner.Plan !== "Admin") {
+                    // 現在地へ移動
+                    this.FocusToLocationMarker();
+                }
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
             case $Const.SCREEN_MODE.ARCHIVE_PUB:
                 const seq = $App.AppData.Context.TargetSeq;
                 if (seq > 0) {
-                    this.FocusBySeq(seq);
-                    $App.AppData.Context.TargetSeq = -1; 
+                    $Marker.FocusBySeq(seq);
+                    $App.AppData.Context.TargetSeq = -1;    // 不要になったらクリア
                 } else {
                     this.FocusFirst();
                 }
                 break;
         }
-    },
+	},
     // クリア指示
     Clear() {
         _MarkerCore.clearAll();
     },
     // 現在の状態に基づくフォーカス実行
-    FocusToCurrentMarker(delay = 200) {
+    FocusToCurrentMarker_2(delay = 200) {
         const marker = _MarkerCore.getMarker(this._currentIndex);
         if (!marker) return;
         const details = $Data.Store.GetDetails();
+        $Map.FocusToTargetMarker(marker, delay);
+        _MarkerCore.toggleMarkerPopup(true, this._currentIndex, details[this._currentIndex]);
+        // ハイライト
+        _MarkerCore.highlightMarker(true, this._currentIndex);
+    },
+    // 現在の状態に基づくフォーカス実行
+    FocusToCurrentMarker(delay = 200) {
+        const details = $Data.Store.GetDetails();
+        if (!details) return;
+        // 【追記】すべてのマーカーのZインデックスを一旦リセット（通常階層へ戻す）
+        _MarkerCore._markerList.forEach((m, idx) => {
+            if (m && typeof m.setZIndexOffset === 'function') {
+                m.setZIndexOffset(0);
+            }
+        });
+        // 現在のマーカーを取得
+        const marker = _MarkerCore.getMarker(this._currentIndex);
+        if (!marker) return;
+        // 【追記】現在選択されているマーカーだけに非常に高い数値を与えて最前面へ強制移動
+        marker.setZIndexOffset(1000);
         $Map.FocusToTargetMarker(marker, delay);
         _MarkerCore.toggleMarkerPopup(true, this._currentIndex, details[this._currentIndex]);
         // ハイライト

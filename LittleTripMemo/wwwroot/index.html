@@ -43,15 +43,15 @@
 <div id="ad-space-pc" class="hidden lg:flex w-[250px] shrink-0 bg-slate-50 border-r border-brand-2 z-[2000] flex-col items-center justify-center shadow-md relative gap-8">
     <!-- 広告1 -->
     <div class="flex flex-col items-center">
-        <div class="text-slate-600 text-[0.8rem] font-bold tracking-widest uppercase mb-2">Advertisement</div>
-        <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 text-[0.8rem] font-bold shadow-inner">
+        <div class="text-slate-600 text-[0.9rem] font-bold tracking-widest uppercase mb-2">Advertisement</div>
+        <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 text-[0.9rem] font-bold shadow-inner">
             AD BANNER 1
         </div>
     </div>
     <!-- 広告2 -->
     <div class="flex flex-col items-center">
-        <div class="text-slate-600 text-[0.8rem] font-bold tracking-widest uppercase mb-2">Advertisement</div>
-        <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 text-[0.8rem] font-bold shadow-inner">
+        <div class="text-slate-600 text-[0.9rem] font-bold tracking-widest uppercase mb-2">Advertisement</div>
+        <div class="w-[200px] h-[250px] bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 text-[0.9rem] font-bold shadow-inner">
             AD BANNER 2
         </div>
     </div>
@@ -64,7 +64,7 @@
         <div id="ui-top-bar" class="absolute top-0 left-0 right-0 z-[1000] pointer-events-none">
             <!-- ■　通知バー -->
             <div class="h-8 bg-black/20 flex items-center justify-center">
-                <div id="notice-bar-text" class="text-[0.9rem] font-bold text-white"></div>
+                <div id="notice-bar-text" class="text-[1rem] font-bold text-white"></div>
             </div>
             <!-- ■　アイコンバー -->
             <div class="mx-2 bg-transparent flex justify-center mt-2">
@@ -73,7 +73,7 @@
                     <div class="p-0 flex justify-center">
                         <!-- 初期状態を黒背景にし、内部にアイコンとテキストの要素を分割 -->
                         <button id="ui-archive-title" class="hidden h-10 py-1 px-6 flex items-center gap-2 bg-slate-800/50 rounded-full 
-                            text-white text-[0.8rem] font-bold shadow-md max-w-full transition-colors pointer-events-auto">
+                            text-white text-[0.9rem] font-bold shadow-md max-w-full transition-colors pointer-events-auto">
                             <span class="js-icon shrink-0 kb-icon-emoji-sm">🔒</span>
                             <span class="js-text truncate text-[1rem]">タイトル</span>
                         </button>
@@ -82,17 +82,17 @@
                     <div id="ui-sort-group" class="hidden flex flex-col items-center ">
                         <!-- 並び順 -->
                         <div id="sort-field" class="shadow-md w-fit mb-2 h-8 flex  rounded-full overflow-hidden pointer-events-auto">
-                            <button data-value="1" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-3 transition-colors">
+                            <button data-value="1" class="ui-btn h-full px-3 text-[0.9rem] font-bold bg-brand-3 transition-colors">
                                 Created
                             </button>
-                            <button data-value="2" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">
+                            <button data-value="2" class="ui-btn h-full px-3 text-[0.9rem] font-bold bg-brand-0 transition-colors">
                                 Updated
                             </button>
-                            <button data-value="3" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">
+                            <button data-value="3" class="ui-btn h-full px-3 text-[0.9rem] font-bold bg-brand-0 transition-colors">
                                 Reaction
                             </button>
                             <!-- ▼ ここに「Word」を追加 -->
-                            <button data-value="4" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">
+                            <button data-value="4" class="ui-btn h-full px-3 text-[0.9rem] font-bold bg-brand-0 transition-colors">
                                 Word
                             </button>
                         </div>
@@ -161,10 +161,6 @@
                         <!-- 右上の正円インデックスバッジ -->
                         <div class="js-index-badge absolute top-0 right-0 w-10 h-10 rounded-full bg-brand-4 text-white font-bold text-[1.2rem] flex items-center justify-center shadow-md z-20">
                         </div>
-                        <!-- 背景用の巨大顔文字：上部に固定（スクロールしても動かない） -->
-                        <div class="sticky top-[100px] w-full h-0 pointer-events-none z-0 flex justify-center">
-                            <div id="detail-display-face_emoji_bg" class="text-[160px] opacity-[0.1] select-none -translate-y-4"></div>
-                        </div>
                         <!-- メインコンテンツ：ここを縦並び・左揃えに設定 -->
                         <div class="relative z-10 flex flex-col items-start flex-1">
                             <!-- 1. 日付・時刻を部品化 -->
@@ -172,18 +168,20 @@
                                 <div class="flex items-center gap-3 text-black font-bold text-[1rem] text-slate-600 italic">
                                     <!-- 部品注入用コンテナに変更 -->
                                     <div id="detail-display-date-container"></div>
-                                    <!-- 顔文字（1rem） -->
-                                    <span id="detail-display-face_emoji" class="text-[1.5rem] hidden"></span>
                                 </div>
                             </div>
-                            <!-- 4. タイトル（左揃え・1rem・左アクセント） -->
-                            <div class="border-l-4 border-brand-3 pl-3 py-4 mt-4">
-                                <h1 id="detail-display-title" class="text-[1.5rem] font-bold text-slate-900  break-words"></h1>
-                            </div>
-                            <!-- 2. 金額（左揃え・1rem） -->
-                            <div id="detail-display-price-wrapper" class="hidden pl-3 mt-2 flex items-baseline italic">
-                                <span id="detail-display-memo_price" class="text-[1.2rem] font-bold italic "></span>
-                                <span id="detail-display-price-unit" class="text-[1rem] font-bold text-slate-600 ml-3 uppercase"></span>
+                            <!-- タイトル・金額 ＆ 絵文字 ブロック -->
+                            <div class="flex justify-between items-center w-full mt-4">
+                                <!-- 左側：タイトルと金額の縦並び -->
+                                <div class="flex flex-col gap-1 border-l-4 border-brand-3 pl-3 flex-1 min-w-0 pr-2 py-1">
+                                    <h1 id="detail-display-title" class="text-[1.5rem] font-bold text-slate-900 break-words leading-tight"></h1>
+                                    <div id="detail-display-price-wrapper" class="hidden flex items-baseline italic">
+                                        <span id="detail-display-memo_price" class="text-[1.2rem] font-bold italic"></span>
+                                        <span id="detail-display-price-unit" class="text-[1rem] font-bold text-slate-600 ml-2 uppercase"></span>
+                                    </div>
+                                </div>
+                                <!-- 右側：絵文字（大） -->
+                                <span id="detail-display-face_emoji" class="text-[3.5rem] shrink-0 leading-none drop-shadow-md pb-2"></span>
                             </div>
                             <!-- 5. 本文（左揃え・1rem以下） -->
                             <div id="detail-display-body" class="w-full rounded-lg p-2 text-[1rem] text-slate-900 whitespace-pre-wrap break-words leading-[2]"></div>
@@ -199,13 +197,13 @@
                         <!-- DATE & TIME -->
                         <div class="grid grid-cols-2 gap-6">
                             <div>
-                                <label class="block font-bold text-slate-600 text-[0.8rem] mb-1 uppercase tracking-wider">DATE</label>
+                                <label class="block font-bold text-slate-600 text-[0.9rem] mb-1 uppercase tracking-wider">DATE</label>
                                 <div class="flex items-center border-b-2 border-brand-2 pb-1">
                                     <input name="memo_date" id="detail-edit-memo_date" type="date" class="w-full bg-transparent outline-none font-bold text-slate-900 text-[1rem]">
                                 </div>
                             </div>
                             <div>
-                                <label class="block font-bold text-slate-600 text-[0.8rem] mb-1 uppercase tracking-wider">TIME</label>
+                                <label class="block font-bold text-slate-600 text-[0.9rem] mb-1 uppercase tracking-wider">TIME</label>
                                 <div class="flex items-center border-b-2 border-brand-2 pb-1">
                                     <input name="memo_time" id="detail-edit-memo_time" type="time" class="w-full bg-transparent outline-none font-bold text-slate-900 text-[1rem]">
                                 </div>
@@ -214,7 +212,7 @@
                         <!-- 編集用 (detail-edit) の MARKER & ATMOSPHERE エリア -->
                         <div class="grid grid-cols-2 gap-6">
                             <div>
-                                <label class="block font-bold text-slate-600 text-[0.8rem] mb-1 uppercase tracking-wider">MARKER</label>
+                                <label class="block font-bold text-slate-600 text-[0.9rem] mb-1 uppercase tracking-wider">MARKER</label>
                                 <div class="flex items-center justify-between border-b-2 border-brand-2 pb-1">
                                     <!-- マーカー絵文字 -->
                                     <button id="btn-face-trigger" type="button" class="relative h-8 w-full text-right text-[3rem] outline-none active:scale-95">
@@ -225,7 +223,7 @@
                             </div>
                             <div>
                                 <!-- 環境エフェクト -->
-                                <label class="block font-bold text-slate-600 text-[0.8rem] mb-1 uppercase tracking-wider">EFECT</label>
+                                <label class="block font-bold text-slate-600 text-[0.9rem] mb-1 uppercase tracking-wider">EFECT</label>
                                 <div class="flex items-center justify-between border-b-2 border-brand-2 pb-1">
                                     <button id="btn-atmosphere-trigger" type="button" class="h-8 w-full text-right text-[1rem] outline-none active:scale-95 font-bold text-brand-5 tracking-widest">
                                         <span id="span-atmosphere-preview">0000</span>
@@ -242,10 +240,10 @@
                                 <div class="flex-1">
                                     <!-- タイトルとカウントを1行で、幅は入力欄と同じ -->
                                     <div class="flex justify-between items-center mb-1">
-                                        <label class="font-bold text-slate-600 text-[0.8rem] uppercase tracking-wider">
+                                        <label class="font-bold text-slate-600 text-[0.9rem] uppercase tracking-wider">
                                             TITLE
                                         </label>
-                                        <div class="text-[0.8rem] text-slate-600 font-bold">
+                                        <div class="text-[0.9rem] text-slate-600 font-bold">
                                             <span id="detail-count-title">0</span>/30
                                         </div>
                                     </div>
@@ -268,8 +266,8 @@
                         <!-- BODY -->
                         <div>
                             <div class="flex justify-between items-end mb-1">
-                                <label class="font-bold text-slate-600 text-[0.8rem] uppercase tracking-wider">MEMORY DETAIL</label>
-                                <div class="text-[0.8rem] text-slate-600 font-bold"><span id="detail-count-body">0</span>/1000</div>
+                                <label class="font-bold text-slate-600 text-[0.9rem] uppercase tracking-wider">MEMORY DETAIL</label>
+                                <div class="text-[0.9rem] text-slate-600 font-bold"><span id="detail-count-body">0</span>/1000</div>
                             </div>
                             <textarea name="body" id="detail-edit-body" maxlength="1000" 
                                 class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-[400px] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none"></textarea>
@@ -277,7 +275,7 @@
                         <!-- PRICE -->
                         <div>
                             <div class="flex justify-between items-end mb-1">
-                                <label class="font-bold text-slate-600 text-[0.8rem] uppercase tracking-wider">PRICE</label>
+                                <label class="font-bold text-slate-600 text-[0.9rem] uppercase tracking-wider">PRICE</label>
                             </div>
                             <div class="grid grid-cols-2 gap-6">
                                 <div>
@@ -299,15 +297,15 @@
                         <!-- URL -->
                         <div>
                             <div class="flex justify-between items-end mb-1">
-                                <label class="font-bold text-slate-600 text-[0.8rem] uppercase tracking-wider">URL</label>
-                                <div class="text-[0.8rem] text-slate-600 font-bold"><span id="detail-count-url">0</span>/200</div>
+                                <label class="font-bold text-slate-600 text-[0.9rem] uppercase tracking-wider">URL</label>
+                                <div class="text-[0.9rem] text-slate-600 font-bold"><span id="detail-count-url">0</span>/200</div>
                             </div>
                             <!-- 修正：flexコンテナ化とボタン追加 -->
                             <div class="flex items-center gap-2 border-brand-2 pb-1">
                                 <input name="link_url" id="detail-edit-link_url" type="url" maxlength="200" 
                                     class="flex-1 border-2 border-brand-3 px-3 py-2 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white" placeholder="https://...">
                                 <button id="btn-detail-edit-url-clear" type="button" 
-                                    class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.8rem] active:scale-95 transition-all">✕</button>
+                                    class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.9rem] active:scale-95 transition-all">✕</button>
                             </div>
                         </div>
                         <!-- 隠しフィールド -->
@@ -332,19 +330,19 @@
                     <div id="detail-group-reaction" class="flex justify-between gap-2 mb-4">
                         <button id="detail-btn-funny"    class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[2rem]">🤣</span>
-                            <span class="text-[0.8rem] font-bold text-brand-5 js-count mt-0.5">0</span>
+                            <span class="text-[0.9rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
                         <button id="detail-btn-love"  class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[2rem]">😍</span>
-                            <span class="text-[0.8rem] font-bold text-brand-5 js-count mt-0.5">0</span>
+                            <span class="text-[0.9rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
                         <button id="detail-btn-surprise" class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[2rem]">😲</span>
-                            <span class="text-[0.8rem] font-bold text-brand-5 js-count mt-0.5">0</span>
+                            <span class="text-[0.9rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
                         <button id="detail-btn-sad"      class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
                             <span class="text-[2rem]">😢</span>
-                            <span class="text-[0.8rem] font-bold text-brand-5 js-count mt-0.5">0</span>
+                            <span class="text-[0.9rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
                     </div>
                     <!-- 詳細パネル移動ボタン群 -->
@@ -457,7 +455,7 @@
         <div id="ui-dialog-backdrop" class="z-[1999] absolute inset-0 hidden bg-black/40 flex flex-col items-center justify-end">
             <!-- 下部に「すべて閉じる」ボタンを設置 -->
             <button id="dialog-btn-close-all" 
-                class="mb-10 bg-white hover:bg-white/70 text-black text-[0.8rem] font-bold tracking-widest px-8 py-3 rounded-full border border-white/40 backdrop-blur-md active:scale-95 transition-all shadow-md">
+                class="mb-10 bg-white hover:bg-white/70 text-black text-[0.9rem] font-bold tracking-widest px-8 py-3 rounded-full border border-white/40 backdrop-blur-md active:scale-95 transition-all shadow-md">
                 ✕ CLOSE ALL
             </button>
         </div>
@@ -469,11 +467,11 @@
             <div class="w-[90%] max-w-[480px] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-slate-200">
                 <!-- ヘッダー -->
                 <div class="h-12 flex items-center justify-between px-4 bg-slate-800 text-white">
-                    <span class="font-semibold text-[0.8rem] tracking-wide">
+                    <span class="font-semibold text-[0.9rem] tracking-wide">
                         Help Guide
                     </span>
                     <button onclick="document.getElementById('ui-help-dialog').classList.add('hidden')" 
-                        class="w-8 h-8 text-white text-bold flex items-center justify-center rounded-md bg-slate-700 hover:bg-slate-600 active:scale-95 text-[0.8rem]">
+                        class="w-8 h-8 text-white text-bold flex items-center justify-center rounded-md bg-slate-700 hover:bg-slate-600 active:scale-95 text-[0.9rem]">
                         ✕
                     </button>
                 </div>
