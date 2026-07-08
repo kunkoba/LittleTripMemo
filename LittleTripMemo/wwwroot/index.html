@@ -170,26 +170,27 @@
                                     <div id="detail-display-date-container"></div>
                                 </div>
                             </div>
-                            <!-- タイトル・金額 ＆ 絵文字 ブロック -->
-                            <div class="flex justify-between items-center w-full mt-4">
-                                <!-- 左側：タイトルと金額の縦並び -->
-                                <div class="flex flex-col gap-1 border-l-4 border-brand-3 pl-3 flex-1 min-w-0 pr-2 py-1">
-                                    <h1 id="detail-display-title" class="text-[1.5rem] font-bold text-slate-900 break-words leading-tight"></h1>
-                                    <div id="detail-display-price-wrapper" class="hidden flex items-baseline italic">
-                                        <span id="detail-display-memo_price" class="text-[1.2rem] font-bold italic"></span>
-                                        <span id="detail-display-price-unit" class="text-[1rem] font-bold text-slate-600 ml-2 uppercase"></span>
-                                    </div>
-                                </div>
-                                <!-- 右側：絵文字（大） -->
-                                <span id="detail-display-face_emoji" class="text-[3.5rem] shrink-0 leading-none drop-shadow-md pb-2"></span>
+                            <!-- 2. タイトル -->
+                            <div class="border-l-4 border-brand-3 pl-3 py-2 mt-2 w-full">
+                                <h1 id="detail-display-title" class="text-[1.5rem] font-bold text-slate-900 break-words"></h1>
                             </div>
-                            <!-- 5. 本文（左揃え・1rem以下） -->
+                            <!-- 修正：w-full で幅を確保し、justify-end で右寄せにする -->
+                            <div id="detail-display-price-wrapper" class="hidden w-full justify-end pr-3 mt-1 flex items-baseline italic">
+                                <span id="detail-display-memo_price" class="text-[1.5rem] font-bold"></span>
+                                <span id="detail-display-price-unit" class="text-[1rem] font-bold text-slate-600 ml-3 uppercase"></span>
+                            </div>
+                            <!-- 5. 【新設】ボトムエリア：絵文字（左）＋ リンク（右） -->
+                            <div class="my-2 pb-4 flex justify-between gap-6 w-full pl-2 border-y">
+                                <!-- 巨大絵文字 -->
+                                <div id="detail-display-face_emoji" class="text-[5rem] leading-none drop-shadow-lg shrink-0"></div>
+                                <!-- URLリンクボタン（Generatorで注入） -->
+                                <div id="detail-display-url-wrapper" class="mt-2 flex flex-wrap gap-2"></div>
+                            </div>
+                            <!-- 4. 本文（左揃え・1rem以下） -->
                             <div id="detail-display-body" class="w-full rounded-lg p-2 text-[1rem] text-slate-900 whitespace-pre-wrap break-words leading-[2]"></div>
+
                             <!-- 隠し項目 -->
                             <span id="detail-display-weather_code" class="hidden"></span>
-                            <!-- 下部：Locationカード風のURLリンク -->
-                            <div id="detail-display-url-wrapper" class="hidden w-full mt-2">
-                            </div>
                         </div>
                     </div>
                     <!-- ■ 編集用（編集モード） -->

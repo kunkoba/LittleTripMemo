@@ -72,11 +72,18 @@ const _MarkerCore = {
             // 2. 絵文字を注入
             $Dom.QuerySelector(".js-emoji", el).textContent = row.face_emoji || '😀';
             // 3. LeafletのIconとして設定（innerHTMLで文字列として渡す）
+            // const customIcon = L.divIcon({
+            //     html: el.innerHTML,
+            //     className: '', 
+            //     iconSize: [52, 52],
+            //     iconAnchor: [26, 26] 
+            // });
             const customIcon = L.divIcon({
-                html: el.innerHTML,
+                html: el.outerHTML, // 【修正】innerHTML から outerHTML へ変更
                 className: '', 
-                iconSize: [52, 52],
-                iconAnchor: [26, 26] 
+                // アイコン自体の枠を 60px に設定し、その中心 [30, 30] を LatLng に重ねる
+                iconSize: [60, 60],
+                iconAnchor: [30, 30] 
             });
             const marker = L.marker([row.latitude, row.longitude], {
                 icon: customIcon,
