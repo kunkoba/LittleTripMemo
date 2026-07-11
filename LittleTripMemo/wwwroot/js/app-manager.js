@@ -52,6 +52,7 @@ AppSettingKey: "little_trip_settings",
         localStorage.setItem(this.AppSettingKey, JSON.stringify({
             theme: this.AppData.Owner.Theme,
             mapStyleKey: this.AppData.Owner.MapStyle?.key,
+            isMapGrayscale: this.AppData.Owner.IsMapGrayscale,
             gpsTrackingSec: this.AppData.Owner.GpsTrackingSec,
             token: this.AppData.Owner.Token,
             currency_unit: this.AppData.Owner.Currency_unit,
@@ -65,12 +66,13 @@ AppSettingKey: "little_trip_settings",
         const saved = JSON.parse(localStorage.getItem(this.AppSettingKey) || '{}');
         if (saved.theme) this.AppData.Owner.Theme = saved.theme;
         if (saved.mapStyleKey) this.AppData.Owner.MapStyle = $Map.MAP_STYLE[saved.mapStyleKey];
+        if (saved.isMapGrayscale) this.AppData.Owner.IsMapGrayscale = saved.isMapGrayscale;
         if (saved.gpsTrackingSec !== undefined) this.AppData.Owner.GpsTrackingSec = saved.gpsTrackingSec;
         if (saved.token) this.AppData.Owner.Token = saved.token;
         if (saved.currency_unit) this.AppData.Owner.Currency_unit = saved.currency_unit;
         if (saved.fontSize) this.AppData.Owner.FontSize = saved.fontSize;
         if (saved.lastLoginDate) this.AppData.Owner.LastLoginDate = saved.lastLoginDate;
-        // console.log("_loadSettings:", this.AppData.Owner);
+        console.log("_loadSettings:", this.AppData.Owner);
     },
     // 定期タスクの定義と開始
     _initPollingTasks() {
@@ -226,7 +228,7 @@ AppSettingKey: "little_trip_settings",
             // ユーザ設定反映
             $UI.Init();
             this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
-            this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD);
+            this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD, this.AppData.Owner.IsMapGrayscale || false);
             this.ChangeGpsTracking(this.AppData.Owner.GpsTrackingSec || 0)
             this.ChangeCurrency(this.AppData.Owner.Currency_unit || 'JPY')
             this.ChangeFontSize(this.AppData.Owner.FontSize || '');
@@ -290,7 +292,7 @@ AppSettingKey: "little_trip_settings",
             {
                 this._initPollingTasks();
                 this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
-                this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD);
+                this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD, this.AppData.Owner.IsMapGrayscale || false);
                 this.ChangeGpsTracking(this.AppData.Owner.GpsTrackingSec || 0)
                 this.ChangeCurrency(this.AppData.Owner.Currency_unit || '円')
                 this.ChangeFontSize(this.AppData.Owner.FontSize || 'standard');
@@ -481,10 +483,11 @@ AppSettingKey: "little_trip_settings",
         $UI.ChangeTheme(theme);
     },
     // 【ユーザ設定】カラーテーマ変更
-    ChangeMapStyle(style){
+    ChangeMapStyle(style, isGray){
         this.AppData.Owner.MapStyle = style;
+        this.AppData.Owner.IsMapGrayscale = isGray;
         this._saveSettings(); // 保存実行
-        $Map.SetMapStyle(style);
+        $Map.SetMapStyle(style, isGray);
     },
     // 【ユーザ設定】追従設定の変更メソッド
     ChangeGpsTracking(sec) {

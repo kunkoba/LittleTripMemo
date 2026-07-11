@@ -73,6 +73,11 @@
     filter: grayscale(0.8) brightness(1.08) contrast(0.8);
 }
 
+/* 地図をグレースケールにするクラス */
+.map-grayscale .leaflet-tile-container {
+    filter: grayscale(100%) brightness(1.1) contrast(0.9);
+}
+
 
 /* リスト項目（アクティブ状態） */
 .list-item-active {
@@ -108,37 +113,3 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-
-/* マーカーアイコン関連 */
-:root {
-    --marker-size: 32px; /* ここが基準サイズ */
-}
-.custom-marker-wrapper {
-    /* 重要：Leafletが作るアイコン枠（60px）を flex で埋め尽くして中央に寄せる */
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* 影の設定 */
-    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) drop-shadow(0 0 6px var(--brand-lvl3));
-}
-.marker-diamond-base {
-    width:  var(--marker-size);
-    height: var(--marker-size);
-    background-color: rgba(255, 255, 255, 0.8) !important;
-    /* border: 2px solid var(--brand-lvl5); */
-    transform: rotate(45deg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-}
-.marker-diamond-base .js-emoji {
-    transform: rotate(-45deg);
-    /* font-size: calc(var(--marker-size) * 0.75); */
-    font-size: calc(var(--marker-size) * 1);
-    line-height: 1;
-    display: block;
-    filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.8));
-}

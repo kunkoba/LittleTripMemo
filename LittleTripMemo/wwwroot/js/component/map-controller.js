@@ -73,10 +73,11 @@ const _MapCore = {
         });
     },
     // タイル貼り替えの具象処理
-    setMapStyle(style) {
+    setMapStyle(style, isGray) {
         if (!style?.url) return;
         if (this.currentTileLayer) this._map.removeLayer(this.currentTileLayer);
         this.currentTileLayer = L.tileLayer(style.url, { maxZoom: 18 }).addTo(this._map);
+        this.root.classList.toggle('map-grayscale', isGray);
     },
     // 視点移動の実体
     focusToTargetMarker(marker, delay = 500) {
@@ -181,8 +182,8 @@ const MapController = {
     LockMap(isLock) {
         _MapCore.lockMap(isLock);
     },
-    SetMapStyle(style) {
-        _MapCore.setMapStyle(style);
+    SetMapStyle(style, isGray) {
+        _MapCore.setMapStyle(style, isGray);
     },
     ResizeMap(delay) {
         _MapCore.resizeMap(delay);

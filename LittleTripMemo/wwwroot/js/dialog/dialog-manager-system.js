@@ -151,7 +151,7 @@ export default {
         });
     },
     // （ユーザ設定）マップスタイル設定ダイアログ
-    ShowMapStyleConfig() {
+    ShowMapStyleConfi_2() {
         let isSaved = false;
         const oldStyle = $App.AppData.Owner.MapStyle;
         let selectedStyle = oldStyle;
@@ -198,6 +198,96 @@ export default {
                         isSaved = true;
                         // 選択されたマップスタイルを適用・保存
                         $App.ChangeMapStyle(selectedStyle);
+                        this._core.close();
+                        $Notice.Info("保存しました。");
+                    }
+                }
+            ]]
+        });
+    },
+    // （ユーザ設定）マップスタイル設定ダイアログ
+    ShowMapStyleConfig() {
+        let isSaved = false;
+        const mapEl = document.getElementById('ui-map-id');
+        // 現在の状態を保持（キャンセル時の復元用）
+        const oldStyle = $App.AppData.Owner.MapStyle;
+        const oldGrayscale = !!$App.AppData.Owner.IsMapGrayscale;
+        let selectedStyle = oldStyle;
+        let currentGrayscale = oldGrayscale;
+        const el = document.createElement('div');
+        el.className = "w-full flex flex-col bg-brand-0";
+        // --- 1. 上部固定：グレースケール設定エリア ---
+        const stickyTop = document.createElement('div');
+        stickyTop.className = "sticky top-0 z-20 bg-white border-b-2 border-brand-2 p-5 mb-1 shadow-sm";
+        stickyTop.innerHTML = `
+            <label class="flex items-center gap-4 cursor-pointer group">
+                <input type="checkbox" id="cfg-map-gray" class="w-6 h-6 accent-brand-5" ${currentGrayscale ? 'checked' : ''}>
+                <span class="text-[1rem] font-bold text-slate-700 group-active:scale-95 transition-transform">
+                    グレースケールにする
+                </span>
+            </label>
+        `;
+        el.appendChild(stickyTop);
+        // --- 2. 地図スタイル選択リスト ---
+        const listContainer = document.createElement('div');
+        listContainer.className = "flex flex-col";
+        // プレビュー反映（地図の見た目のみを一時的に変える）
+        const applyPreview = () => {
+            $Map.SetMapStyle(selectedStyle);
+            if (mapEl) mapEl.classList.toggle('map-grayscale', currentGrayscale);
+            // リストのラジオボタン風表示を更新
+            $Dom.QuerySelectorAll('.js-ms-check', listContainer).forEach(span => {
+                const key = span.dataset.key;
+                span.textContent = (key === selectedStyle.key) ? '●' : '○';
+                span.className = (key === selectedStyle.key) 
+                    ? "js-ms-check col-span-1 flex justify-center text-[1.2rem] text-brand-5 font-bold" 
+                    : "js-ms-check col-span-1 flex justify-center text-[1.2rem] text-slate-400";
+            });
+        };
+        Object.values($Map.MAP_STYLE).forEach(style => {
+            const btn = document.createElement('button');
+            btn.className = "w-full h-16 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900";
+            btn.innerHTML = `
+                <span class="js-ms-check col-span-1 flex justify-center text-[1.2rem]" data-key="${style.key}"></span>
+                <span class="col-span-1"></span>
+                <span class="col-span-8 text-left font-bold text-[1rem] uppercase">${style.name}</span>
+            `;
+            btn.onclick = () => {
+                selectedStyle = style;
+                applyPreview();
+            };
+            listContainer.appendChild(btn);
+        });
+        el.appendChild(listContainer);
+        // チェックボックスのイベント
+        $Dom.QuerySelector('#cfg-map-gray', el).onchange = (e) => {
+            currentGrayscale = e.target.checked;
+            applyPreview();
+        };
+        // 初期表示の反映
+        applyPreview();
+        this._core.open({
+            title: "地図スタイル",
+            content: el,
+            help: "地図の種類と、色味の有無を設定できます。\n航空写真をグレースケールにすると視認性が高まります。",
+            onClose: () => {
+                if (isSaved) return;
+                // キャンセル時は元の状態に物理的に戻す
+                $Map.SetMapStyle(oldStyle);
+                if (mapEl) mapEl.classList.toggle('map-grayscale', oldGrayscale);
+            },
+            buttons: [[
+                {
+                    label: "CANCEL",
+                    className: "bg-slate-400 text-white shadow-md",
+                    handler: () => this._core.close()
+                },
+                {
+                    label: "OK",
+                    handler: () => {
+                        isSaved = true;
+                        // AppDataを更新して保存
+                        $App.ChangeMapStyle(selectedStyle, currentGrayscale); 
                         this._core.close();
                         $Notice.Info("保存しました。");
                     }
