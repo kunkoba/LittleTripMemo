@@ -635,7 +635,7 @@ export default {
             });
             if (isOk) {
                 const url = $Util.GetShareUrl('line', shareUrl);
-                OpenExternalLink(url);
+                $Util.OpenExternalLink(url);
             }
 
         };
@@ -647,7 +647,7 @@ export default {
             });
             if (isOk) {
                 const url = $Util.GetShareUrl('x', shareUrl, archive.title);
-                OpenExternalLink(url);
+                $Util.OpenExternalLink(url);
             }
 
         };
@@ -659,7 +659,7 @@ export default {
             });
             if (isOk) {
                 const url = $Util.GetShareUrl('facebook', shareUrl);
-                OpenExternalLink(url);
+                $Util.OpenExternalLink(url);
             }
         };
         this._core.open({ title: "まとめを共有する", content: el, size: 'sm', buttons: [] });

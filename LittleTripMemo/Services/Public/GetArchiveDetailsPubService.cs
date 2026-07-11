@@ -57,6 +57,18 @@ public class GetArchiveDetailsPubService(
                 null,
                 "view"
             ));
+            // --- 追加：閲覧履歴の更新ロジック ---
+            if (_user.login_user_id != Guid.Empty)
+            {
+                var loginUser = await appUserRepository.GetByUserIdAsync(_user.login_user_id);
+                if (loginUser != null)
+                {
+                    loginUser.view_history.Remove(req.archive_id); // 重複除外
+                    loginUser.view_history.Insert(0, req.archive_id); // 先頭挿入
+                    var updatedHistory = loginUser.view_history.Take(20).ToList(); // 20件切り詰め
+                    await appUserRepository.UpdateViewHistoryAsync(_user.login_user_id, updatedHistory);
+                }
+            }
         }
 
         // 4. 明細および関連情報の取得
@@ -83,9 +95,10 @@ public class GetArchiveDetailsPubService(
             is_owner: (ownerAppUser.user_id == _user.login_user_id),
             is_ban: ownerAppUser.ban_flg,
             ownerAppUser.click_stats,
-            ownerAppUser.info_stats,     // 秘密側統計
-            ownerAppUser.info_stats_pub,  // 公開側統計
-            ownerAppUser.report_count
+            ownerAppUser.info_stats, 
+            ownerAppUser.info_stats_pub, 
+            ownerAppUser.report_count,
+            ownerAppUser.view_history
         );
 
         return new Response(archivePub, detailsPub, myReactions, userProfile);

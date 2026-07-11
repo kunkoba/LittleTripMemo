@@ -54,7 +54,8 @@ public class GetReportDetailsService : _BaseService
             user.click_stats,
 			user.info_stats,
 			user.info_stats_pub,
-			user.report_count
+			user.report_count,
+			user.view_history
         );
 
 		// 3. マッピング

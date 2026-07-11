@@ -76,7 +76,8 @@ public record Response(SystemInfoData systemInfo);
                     appUser.click_stats,
                     appUser.info_stats,     // 秘密側統計
                     appUser.info_stats_pub,  // 公開側統計
-                    appUser.report_count
+                    appUser.report_count,
+                    appUser.view_history
                 );
             }
 

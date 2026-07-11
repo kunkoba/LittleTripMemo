@@ -27,6 +27,8 @@ var builder = WebApplication.CreateBuilder(args);
 SqlMapper.AddTypeHandler(new JsonbTypeHandler<Dictionary<string, ClickCountData>>());
 // Dapper の型変換ハンドラーを登録（Dictionary内の各オブジェクトをJSONBとしてシリアライズ/デシリアライズ可能にする）
 SqlMapper.AddTypeHandler(new JsonbTypeHandler<Dictionary<string, object>>());
+// Dapper の型変換ハンドラーを登録
+SqlMapper.AddTypeHandler(new JsonbTypeHandler<List<int>>());
 
 // 2. ログ設定 (Serilog)
 Log.Logger = new LoggerConfiguration()

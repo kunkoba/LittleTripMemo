@@ -976,10 +976,10 @@ export default {
         const isMaint = getVal("MaintenanceMode") === "true";
         const subMaint = $Dom.QuerySelector('#sub-core-maint', el);
         if (isMaint) {
-            subMaint.textContent = "🔴 実行中 (制限あり)";
+            subMaint.textContent = "🔴 メンテナンス中";
             subMaint.classList.add("text-red-500");
         } else {
-            subMaint.textContent = "⚪️ 停止中 (通常稼働)";
+            subMaint.textContent = "⚪️ 通常稼働";
             subMaint.classList.add("text-emerald-500");
         }
         // 個別編集画面への遷移
@@ -996,18 +996,15 @@ export default {
     // アプリバージョン管理 編集
     async ShowAdminCoreVersion(configList) {
         const getVal = (key) => configList.find(c => c.key === key)?.value || "1.0.0";
-        // サーバーから取得した初期値（[1, 0, 0] 形式）
         const origLatArr = getVal("LatestAppVersion").split('.').map(Number);
         const origMinArr = getVal("MinAppVersion").split('.').map(Number);
-        // 作業用状態
         let curLat = [...origLatArr];
         let curMin = [...origMinArr];
-        let isSync = (getVal("LatestAppVersion") === getVal("MinAppVersion")); // 初期状態で一致してれば同期ON
+        let isSync = (getVal("LatestAppVersion") === getVal("MinAppVersion"));
         const el = $Dom.GenerateTemplate("tpl-admin-core-version");
         const btnSync = $Dom.QuerySelector('#btn-version-sync', el);
         const minInputs = $Dom.QuerySelector('#group-min-inputs', el);
         const render = () => {
-            // 同期状態の反映
             if (isSync) {
                 curMin = [...curLat];
                 btnSync.textContent = "同期を解除";
@@ -1018,13 +1015,11 @@ export default {
                 btnSync.className = "px-3 py-1.5 rounded-lg font-bold text-[0.75rem] shadow-md bg-slate-900 text-white";
                 minInputs.classList.remove("opacity-40", "pointer-events-none");
             }
-            // 数値表示の反映
             for (let i = 0; i < 3; i++) {
                 $Dom.QuerySelector(`#v-lat-${i}`, el).textContent = curLat[i];
                 $Dom.QuerySelector(`#v-min-${i}`, el).textContent = curMin[i];
             }
         };
-        // イベント一括登録
         $Dom.QuerySelectorAll('.js-v-btn', el).forEach(btn => {
             btn.onclick = () => {
                 const { target, idx, op } = btn.dataset;
@@ -1035,19 +1030,13 @@ export default {
                 render();
             };
         });
-        btnSync.onclick = () => {
-            isSync = !isSync;
-            render();
-        };
-        // ヘッダーにリセットボタン（初期値に戻す）を追加
+        btnSync.onclick = () => { isSync = !isSync; render(); };
         const headerButtons = [{
             label: "🔄",
             handler: () => {
-                curLat = [...origLatArr];
-                curMin = [...origMinArr];
+                curLat = [...origLatArr]; curMin = [...origMinArr];
                 isSync = (getVal("LatestAppVersion") === getVal("MinAppVersion"));
                 render();
-                $Notice.Info("読み込み時の状態に戻しました");
             }
         }];
         render();
@@ -1061,20 +1050,17 @@ export default {
                     handler: async () => {
                         const latStr = curLat.join('.');
                         const minStr = curMin.join('.');
-                        // バリデーション
+                        // バリデーション（数値化して比較：1.2.3 -> 10203）
                         const toVal = (arr) => arr[0] * 10000 + arr[1] * 100 + arr[2];
-                        const latVal = toVal(curLat);
-                        const minVal = toVal(curMin);
-                        const oLatVal = toVal(origLatArr);
-                        const oMinVal = toVal(origMinArr);
-                        if (latVal < oLatVal) return $Notice.Warn("最新版を現在のバージョンより下げることはできません");
-                        if (minVal < oMinVal) return $Notice.Warn("必須版を現在のバージョンより下げることはできません");
-                        if (latVal < minVal) return $Notice.Warn("最新版は必須版以上である必要があります");
+                        if (toVal(curLat) < toVal(origLatArr)) return $Notice.Warn("最新版を現在より下げることはできません");
+                        if (toVal(curMin) < toVal(origMinArr)) return $Notice.Warn("必須版を現在より下げることはできません");
+                        if (toVal(curLat) < toVal(curMin))     return $Notice.Warn("最新版は必須版以上である必要があります");
                         if (!await $Util.CheckAdminAuth()) return;
+                        // ★リクエストパラメータを { items: [...] } 形式で構築
                         const params = {
-                            configs: [
-                                { key: "LatestAppVersion", value: latStr },
-                                { key: "MinAppVersion",    value: minStr }
+                            items: [
+                                { key: "LatestAppVersion", value: latStr }, // e.g. "1.2.3"
+                                { key: "MinAppVersion",    value: minStr }  // e.g. "1.1.0"
                             ]
                         };
                         if (await $Data.Access.UpdateCoreConfig(params)) {
@@ -1105,6 +1091,7 @@ export default {
                 valMaint.value = "false";
             }
         };
+        // 初期値反映
         updateToggleUI(getVal("MaintenanceMode") === "true");
         txtMsg.value = getVal("MaintenanceMsg");
         btnToggle.onclick = () => updateToggleUI(valMaint.value === "false");
@@ -1117,10 +1104,11 @@ export default {
                     label: "保存",
                     handler: async () => {
                         if (!await $Util.CheckAdminAuth()) return;
+                        // ★リクエストパラメータを { items: [...] } 形式で構築
                         const params = {
-                            configs: [
+                            items: [
                                 { key: "MaintenanceMode", value: valMaint.value },
-                                { key: "MaintenanceMsg", value: txtMsg.value.trim() }
+                                { key: "MaintenanceMsg",  value: txtMsg.value.trim() }
                             ]
                         };
                         if (await $Data.Access.UpdateCoreConfig(params)) {

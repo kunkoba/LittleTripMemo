@@ -128,4 +128,16 @@ public class AppUserRepository : _BaseRepository
         return await QueryAsync<TAppUser>(sql);
     }
 
+    /// <summary>
+    /// ユーザーの閲覧履歴（JSONB配列）を更新する
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="history"></param>
+    /// <returns></returns>
+    public async Task<int> UpdateViewHistoryAsync(Guid userId, List<int> history)
+    {
+        const string sql = "UPDATE t_app_user SET view_history = @history::jsonb, update_tim = CURRENT_TIMESTAMP WHERE user_id = @userId";
+        return await ExecuteAsync(sql, new { userId, history = System.Text.Json.JsonSerializer.Serialize(history) });
+    }
+
 }

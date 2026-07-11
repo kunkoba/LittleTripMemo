@@ -182,7 +182,7 @@ AppSettingKey: "little_trip_settings",
         });
     },
     // アプリ起動時フロー
-    async Init() {
+    async Init_2() {
         console.log("★★★ App.Init ★★★");
         // --- 起動処理 ---
         {
@@ -237,6 +237,77 @@ AppSettingKey: "little_trip_settings",
         this._initServiceWorker();
         // 現在地へ移動
         $Marker.FocusToLocationMarker();
+    },
+    // アプリ起動時フロー
+    async Init() {
+        console.log("★★★ App.Init ★★★");
+        // 1. UI基盤の準備（エラー画面を出せるように最初に行う）
+        this._initViewport();
+        $UI.Init();
+        // テンプレート待機（部品が届くまでメイン処理を待つ）
+        await new Promise(resolve => {
+            const check = () => document.getElementById('tpl-dialog-error') ? resolve() : setTimeout(check, 30);
+            check();
+        });
+        // 2. メインロジック
+        try {
+            // --- 起動処理（Token復元とDB初期化） ---
+            {
+                this._loadSettings(); 
+                await $LocalDb.Init();
+                if (this.AppData.Owner.Token) {
+                    this.AppData.Context.IsLoggedIn = true;
+                    // 【修正点】失敗しても return せず、オフラインとして続行する
+                    try {
+                        await this.SyncActivityLog();
+                        $Data.Access.GetSystemInfo();
+                    } catch (e) {
+                        console.warn("同期スキップ:", e.message);
+                    }
+                }
+            }
+            // --- リクエストパラメータ取得（元のロジックそのまま） ---
+            {
+                const params = new URLSearchParams(location.search);
+                const urlMode = params.get("mode");
+                const targetArchiveId = $Util.DecodeId(params.get("encodedId"));
+                this.AppData.Context.TargetArchiveId = targetArchiveId;
+                if (urlMode) {
+                    this.AppData.Context.ScreenMode = urlMode;
+                } else {
+                    if (this.AppData.Context.TargetArchiveId) {
+                        this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+                    } else {
+                        this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                    }
+                }
+                // Token復元済みなので、ここで勝手にログイン画面が出ることはありません
+                if (!this.AppData.Context.TargetArchiveId && !this.AppData.Context.IsLoggedIn) {
+                    $Dialog.ShowLoginDialog();
+                }
+            }
+            // --- メイン処理（元の設定反映ロジックそのまま） ---
+            {
+                this._initPollingTasks();
+                this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
+                this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD);
+                this.ChangeGpsTracking(this.AppData.Owner.GpsTrackingSec || 0)
+                this.ChangeCurrency(this.AppData.Owner.Currency_unit || '円')
+                this.ChangeFontSize(this.AppData.Owner.FontSize || 'standard');
+            }
+            // --- 最終描画（通信エラーで死なないように保護） ---
+            try {
+                await this.RefreshScreen();
+            } catch (e) {
+                console.warn("描画データ取得失敗:", e.message);
+            }
+            this._initServiceWorker();
+            $Marker.FocusToLocationMarker();
+        } catch (fatalErr) {
+            // 本当に致命的なエラー（プログラムのバグ等）のみ、エラー画面へ
+            console.error("Fatal Error:", fatalErr);
+            $Err.Handle(fatalErr);
+        }
     },
     // 画面モード変更
     async RefreshScreen() {

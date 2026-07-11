@@ -249,7 +249,7 @@ window.$Data = {
             });
         },
         // 【メイン】表示用の日付ルール（マスク・DAY番号）をアタッチ
-        ApplyDisplayRules(details, mode) {
+        ApplyDisplayRules_2(details, mode) {
             if (!details || details.length === 0) return;
             // 1. ソート（時間順）
             this.SortDetails(details);
@@ -287,6 +287,51 @@ window.$Data = {
                     }
                 }
             });
+        },
+        // 【メイン】表示用の日付ルールをアタッチ（モード別分岐版）
+        ApplyDisplayRules(details) {
+            if (!details || details.length === 0) return;
+            // 現在のモードを取得
+            const mode = $App.AppData.Context.ScreenMode;
+            const isArchiveMode = (mode === $Const.SCREEN_MODE.ARCHIVE || mode === $Const.SCREEN_MODE.ARCHIVE_PUB);
+            if (isArchiveMode) {
+                // ■ A. まとめ参照モード（旅行記として扱う）
+                // 1. 日付・時刻で昇順ソート（古い順）
+                this.SortDetails(details);
+                // 2. DAY番号の計算とマスキング
+                let lastDate = "";
+                let dayCounter = 0;
+                const dateList = this._getUniqueDates(details);
+                const isMultiDay = dateList.length > 1;
+                const baseMask = dateList.length > 0 ? this._getMask(dateList[0]) : "";
+                details.forEach((d, index) => {
+                    d.no = index + 1; // 昇順の通し番号
+                    if (d.memo_date !== lastDate) {
+                        dayCounter++;
+                        lastDate = d.memo_date;
+                    }
+                    d.display_day = dayCounter;
+                    // 他人のデータなら「〇月上旬 1day」「2day」等の形式にマスク
+                    if (!d.is_owner) {
+                        if (dayCounter === 1) {
+                            d.memo_date = isMultiDay ? `${baseMask} 1day` : baseMask;
+                        } else {
+                            d.memo_date = `${dayCounter}day`;
+                        }
+                    }
+                });
+            } else {
+                // ■ B. 地図検索・作成モード（サーバーの順序を維持）
+                // 1. ソートは一切せず、取得した順序のまま No だけ付与
+                details.forEach((d, index) => {
+                    d.no = index + 1;
+                    d.display_day = 0; // 検索データにDayの概念はない
+                    // 他人のデータなら「〇月上旬」の単純マスクのみ適用
+                    if (!d.is_owner) {
+                        d.memo_date = this._getMask(d.memo_date);
+                    }
+                });
+            }
         },
     },
     // データ格納・取得
@@ -333,7 +378,8 @@ window.$Data = {
         },
         UpdateDetail(detail) {
             if (!detail) return;
-            const list = $Data.Access._rawData.details;
+            // const list = $Data.Access._rawData.details;
+            const list = this._details;
             let idx = -1;
             if (detail.seq > 0) {
                 idx = list.findIndex(x => x.seq === Number(detail.seq));
@@ -345,23 +391,23 @@ window.$Data = {
             } else {
                 list.push(detail);
             }
-            this.Restore();
+            // this.Restore();
         },
         UpdateArchive(updatedFields) {
             if (!this._archive) return;
             // メモリ上のデータ更新
             Object.assign(this._archive, updatedFields);
-            // 生データも更新する
-            if ($Data.Access._rawData.archive) Object.assign($Data.Access._rawData.archive, updatedFields);
-            if (this._archiveList) {
-                const target = this._archiveList.find(a => a.archive_id === this._archive.archive_id);
-                if (target) Object.assign(target, updatedFields);
-            }
-            // 生リストデータも更新する
-            if ($Data.Access._rawData.archiveList) {
-                const rawTarget = $Data.Access._rawData.archiveList.find(a => a.archive_id === this._archive.archive_id);
-                if (rawTarget) Object.assign(rawTarget, updatedFields);
-            }
+            // // 生データも更新する
+            // if ($Data.Access._rawData.archive) Object.assign($Data.Access._rawData.archive, updatedFields);
+            // if (this._archiveList) {
+            //     const target = this._archiveList.find(a => a.archive_id === this._archive.archive_id);
+            //     if (target) Object.assign(target, updatedFields);
+            // }
+            // // 生リストデータも更新する
+            // if ($Data.Access._rawData.archiveList) {
+            //     const rawTarget = $Data.Access._rawData.archiveList.find(a => a.archive_id === this._archive.archive_id);
+            //     if (rawTarget) Object.assign(rawTarget, updatedFields);
+            // }
         },
         GetUserProfile() {
             return this._userProfile; 

@@ -111,7 +111,7 @@
 
 /* マーカーアイコン関連 */
 :root {
-    --marker-size: 24px; /* ここが基準サイズ */
+    --marker-size: 32px; /* ここが基準サイズ */
 }
 .custom-marker-wrapper {
     /* 重要：Leafletが作るアイコン枠（60px）を flex で埋め尽くして中央に寄せる */
@@ -121,12 +121,12 @@
     align-items: center;
     justify-content: center;
     /* 影の設定 */
-    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3)) drop-shadow(0 0 6px var(--brand-lvl3));
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) drop-shadow(0 0 6px var(--brand-lvl3));
 }
 .marker-diamond-base {
     width:  var(--marker-size);
     height: var(--marker-size);
-    background-color: rgba(255, 255, 255, 0.7) !important;
+    background-color: rgba(255, 255, 255, 0.8) !important;
     /* border: 2px solid var(--brand-lvl5); */
     transform: rotate(45deg);
     display: flex;
@@ -140,5 +140,5 @@
     font-size: calc(var(--marker-size) * 1);
     line-height: 1;
     display: block;
-    filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.5));
+    filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.8));
 }

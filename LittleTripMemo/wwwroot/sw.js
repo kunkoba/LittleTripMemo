@@ -1,5 +1,16 @@
 // キャッシュのバージョン（アップデート時はこの数値を変更する）
 const CACHE_VERSION = 'v0.0.6';
+// キャッシュすべき静的アセット（HTMLテンプレートを含む）
+const CORE_ASSETS = [
+    './',
+    './index.html',
+    './component/template-core.html',
+    './component/template-screen.html',
+    './component/template-list.html',
+    './component/template-admin.html',
+    './css/app-style.css',
+    './css/component-style.css'
+];
 // キャッシュ名の定義
 const CACHE_KEYS = {
     STATIC: `static-cache-${CACHE_VERSION}`,   // 変更がないもの用（Cache First）
@@ -34,6 +45,11 @@ const isStaticRequest = (urlStr) => {
 // 1. インストール処理
 self.addEventListener('install', (event) => {
     // console.log("★SW >> install");
+        event.waitUntil(
+        caches.open(CACHE_KEYS.STATIC).then((cache) => {
+            return cache.addAll(CORE_ASSETS); // 起動に必要なものは最初に全部入れる
+        })
+    );
     // 待機状態をスキップし、即座に新しいSWをインストールする（確実なバージョンアップのため）
     self.skipWaiting();
 });

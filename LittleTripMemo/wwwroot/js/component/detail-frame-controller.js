@@ -68,7 +68,7 @@ const _DetailFrameCore = {
                     if (data.latitude && data.longitude) {
                         const url = `https://earth.google.com/web/search/${data.latitude},${data.longitude}`;
                         // window.open(url, '_blank');
-                        OpenExternalLink(url);
+                        $Util.OpenExternalLink(url);
                     }
                 });
                 // googleMap連携
@@ -84,7 +84,7 @@ const _DetailFrameCore = {
                     if (data.latitude && data.longitude) {
                         const url = `https://www.google.com/maps/search/?api=1&query=${data.latitude},${data.longitude}`;
                         // window.open(url, '_blank');
-                        OpenExternalLink(url);
+                        $Util.OpenExternalLink(url);
                     }
                 });
                 // ★追加：まとめアーカイブへ飛ぶ（フッターボタン）

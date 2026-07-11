@@ -11,7 +11,7 @@ export default {
             linkOfficial.onclick = () => window.open($Const.APP_INFO.OFFICIAL_SITE, '_blank');
             linkOfficial.onclick = () => {
                 // window.open($Const.APP_INFO.OFFICIAL_SITE, '_blank');
-                OpenExternalLink(url);
+                $Util.OpenExternalLink(url);
             };
         } else {
             $Dom.ToggleShow(linkOfficial, false);

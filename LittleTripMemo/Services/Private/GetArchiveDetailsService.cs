@@ -64,9 +64,10 @@ public class GetArchiveDetailsService(
             is_owner: (ownerUser.user_id == _user.login_user_id),
             is_ban: ownerUser.ban_flg,
             ownerUser.click_stats,
-            ownerUser.info_stats,     // 秘密側統計
-            ownerUser.info_stats_pub,  // 公開側統計
-            ownerUser.report_count
+            ownerUser.info_stats, 
+            ownerUser.info_stats_pub,
+            ownerUser.report_count,
+            ownerUser.view_history
         );
 
         return new Response(archive, details, userProfile);

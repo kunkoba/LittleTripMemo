@@ -32,6 +32,7 @@ public class TAppUser
     public Dictionary<string, object> info_stats { get; set; } = new();
     public Dictionary<string, object> info_stats_pub { get; set; } = new();
     public int report_count { get; set; } = 0;
+    public List<int> view_history { get; set; } = new(); // 追加：閲覧履歴IDリスト
 }
 
 // 認証用（Identity標準に戻す）
@@ -364,7 +365,8 @@ public record DtoUserProfile(
     Dictionary<string, ClickCountData> click_stats,
     Dictionary<string, object> info_stats,    
     Dictionary<string, object> info_stats_pub,
-    int report_count
+    int report_count,
+    List<int> view_history 
 );
 
 /// <summary>

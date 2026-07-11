@@ -3,11 +3,16 @@ window.$Err = {
 	_errMode: "fatal",
 	// エラー処理
     Handle(err, mode) {
-        $Notice.Loading.Hide(); // ローディングを消す
-        if ($App.AppData.Context.IsLoggedIn) {
-            $Dialog.ShowErrorDialog(err); // エラー表示画面
+        $Notice.Loading.Hide();
+        console.error("Fatal Error:", err);
+        // ダイアログ基盤が生きているかチェック
+        const errorTemplate = document.getElementById('tpl-dialog-error');
+        if (errorTemplate && window.$Dialog && typeof $Dialog.ShowErrorDialog === 'function') {
+            $Dialog.ShowErrorDialog(err.message || err);
         } else {
-            $Dialog.ShowLoginDialog(); // ログイン画面
+            // ダイアログが使えない場合の最終手段
+            alert("アプリ起動中に致命的なエラーが発生しました。再読み込みしてください。\n\n" + err);
+            location.reload();
         }
     },
 	// エラースロー

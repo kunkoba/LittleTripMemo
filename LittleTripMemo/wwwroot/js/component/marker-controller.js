@@ -98,7 +98,7 @@ const _MarkerCore = {
         });
     },
     // 現在地マーカーの更新
-    refreshCurrentLocation() {
+    async refreshCurrentLocation() {
         $Warn.CatchAsync(async () => {
             const pos = await $Util.GetCurrentPosition();
             const p = [pos.coords.latitude, pos.coords.longitude];
@@ -107,9 +107,8 @@ const _MarkerCore = {
             // 現在地マーカー移動
             if (this.locationMarker) this.locationMarker.setLatLng(p);
             if ($App.AppData.Context.ScreenMode == $Const.SCREEN_MODE.CREATE) {
-                // マップ移動
+                // 現在地まで線を引く
                 this.generateArrowToCurrent();
-                // this.focusToLocationMarker();
             }
         })();
     },
@@ -269,31 +268,32 @@ const MarkerController = {
             },
             onDragEnd: (index, latLng) => {
                 console.log(">onDragEnd:", latLng);
-                _MarkerCore.clearArrow();
-                // 1. メモリ上の原本データを直接更新する
-                const rawDetails = $Data.Access._rawData.details; // 原本を参照
-                if (rawDetails[index]) {
-                    rawDetails[index].latitude = latLng.lat;
-                    rawDetails[index].longitude = latLng.lng;
+                // 1. 【重要】生データ(_rawData)は絶対に触らない
+                // 作業用メモリ(Store)のデータのみを更新する
+                const details = $Data.Store.GetDetails();
+                if (details[index]) {
+                    details[index].latitude = latLng.lat;
+                    details[index].longitude = latLng.lng;
                 }
-                // 2. Storeの状態を同期（クローンを作り直す）
-                $Data.Store.Restore();
-                // 3. 詳細画面の隠しフィールドを現在のマーカー位置で即時更新
-                // これにより、編集モードに切り替えて保存した際に新座標が反映される
+                // 2. 詳細画面の入力項目（緯度経度）を現在のドラッグ位置で即時更新
+                // これにより、このまま「SAVE」を押せば新座標で保存される
                 $DetailContent.SetPos(latLng.lat, latLng.lng);
+                // 3. 矢印の再描画
+                _MarkerCore.clearArrow();
                 if ($App.AppData.Context.ScreenMode !== $Const.SCREEN_MODE.SEARCH) {
                     _MarkerCore.generateArrowList();
                 }
+                // 4. フォーカスとインデックスの維持（Restoreは呼ばない）
                 this._currentIndex = index;
                 this.FocusToCurrentMarker();
             },
         });
     },
     // 画面モード変更時
-    ChangeScreenMode(){
+    async ChangeScreenMode(){
         switch ($App.AppData.Context.ScreenMode) {
             case $Const.SCREEN_MODE.CREATE:
-                _MarkerCore.refreshCurrentLocation();
+                await _MarkerCore.refreshCurrentLocation();
                 if ($App.AppData.Owner.Plan !== "Admin") {
                     // 現在地へ移動
                     this.FocusToLocationMarker();
@@ -382,8 +382,8 @@ const MarkerController = {
     GetCurrentMarkerPos() {
         return _MarkerCore.getCurrentMarkerPos(this._currentIndex);
     },
-    RefreshCurrentLocation() {
-        _MarkerCore.refreshCurrentLocation();
+    async RefreshCurrentLocation() {
+        await _MarkerCore.refreshCurrentLocation();
     },
     RefreshCurrentArrow() {
         _MarkerCore.generateArrowToCurrent();
@@ -411,7 +411,7 @@ const MarkerController = {
         if (detail) {
             const googleMapsUrl = `https://www.google.com/maps?q=${detail.latitude},${detail.longitude}`;
             // window.open(encodeURI(googleMapsUrl), '_blank');
-            OpenExternalLink(url);
+            $Util.OpenExternalLink(url);
         }
     },
     // seqを指定してその地点へジャンプする

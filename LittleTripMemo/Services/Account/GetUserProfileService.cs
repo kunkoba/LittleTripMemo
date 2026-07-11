@@ -39,7 +39,8 @@ public class GetUserProfileService(
             targetUser.click_stats,
             targetUser.info_stats,
             targetUser.info_stats_pub,
-            targetUser.report_count
+            targetUser.report_count,
+            targetUser.view_history
         );
 
         return new Response(profile);
