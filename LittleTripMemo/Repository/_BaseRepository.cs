@@ -90,10 +90,10 @@ public abstract class _BaseRepository
 /// </summary>
 public interface ITransactionProvider : IDisposable
 {
-    /// <summary> 現在有効なDB接続。サービス層のライフサイクル中、常に同一のインスタンスを保持する </summary>
+    // <summary> 現在有効なDB接続。サービス層のライフサイクル中、常に同一のインスタンスを保持する </summary>
     IDbConnection Connection { get; }
 
-    /// <summary> 実行中のトランザクション。未開始の場合は null を返す </summary>
+    // <summary> 実行中のトランザクション。未開始の場合は null を返す </summary>
     IDbTransaction? Transaction { get; }
 
     /// <summary> 
@@ -101,5 +101,8 @@ public interface ITransactionProvider : IDisposable
     /// 開始されたトランザクションは、このインターフェースを参照する全リポジトリで共有される。
     /// </summary>
     IDbTransaction BeginTransaction();
+    
+    // EF Core等の外部で開始された接続とトランザクションをセットする
+    void SetExternalTransaction(IDbConnection connection, IDbTransaction transaction);
 }
 

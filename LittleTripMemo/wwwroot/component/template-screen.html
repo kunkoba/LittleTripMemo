@@ -95,7 +95,7 @@
 
 <!-- 【ダイアログ子】アプリ情報 -->
 <template id="tpl-app-info">
-    <div class="w-full flex flex-col gap-4">
+    <div class="w-full flex flex-col gap-4 mb-4">
         <!-- アプリ情報 -->
         <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3">
             <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
@@ -131,22 +131,24 @@
             </button>
         </div>
         <!-- 全体統計 -->
-        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3">
-            <div class="flex justify-between items-baseline border-b border-slate-200 pb-2 mb-1">
+        <div class="bg-white rounded-[1rem] border border-slate-200 p-4">
+            <div class="flex justify-between items-baseline border-b border-slate-200 pb-2 mb-4">
                 <span class="text-[0.9rem] text-slate-600">最終集計日時</span>
-                <span class="text-[1rem] font-bold text-slate-900 js-last-update"></span>
+                <span class="js-last-update kb-date-tim-sm"></span>
             </div>
-            <div class="flex justify-between items-baseline">
-                <span class="text-[0.9rem] text-slate-600">ユーザ数</span>
-                <span class="text-[1rem] font-bold text-slate-900 js-stat-users">0</span>
-            </div>
-            <div class="flex justify-between items-baseline">
-                <span class="text-[0.9rem] text-slate-600">総まとめ数</span>
-                <span class="text-[1rem] font-bold text-slate-900 js-stat-archives">0</span>
-            </div>
-            <div class="flex justify-between items-baseline">
-                <span class="text-[0.9rem] text-slate-600">総地点メモ数</span>
-                <span class="text-[1rem] font-bold text-slate-900 js-stat-memos">0</span>
+            <div class="px-4 flex flex-col gap-2">
+                <div class="flex justify-between items-baseline">
+                    <span class="text-[0.9rem] text-slate-600">ユーザ数</span>
+                    <span class="text-[1rem] font-bold text-slate-900 js-stat-users">0</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                    <span class="text-[0.9rem] text-slate-600">総まとめ数</span>
+                    <span class="text-[1rem] font-bold text-slate-900 js-stat-archives">0</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                    <span class="text-[0.9rem] text-slate-600">総地点メモ数</span>
+                    <span class="text-[1rem] font-bold text-slate-900 js-stat-memos">0</span>
+                </div>
             </div>
         </div>
     </div>
@@ -197,7 +199,7 @@
             <div id="view-profile-description"
                 class="flex-1 min-h-[200px] p-3 text-[1rem] text-slate-600 leading-[1.8] whitespace-pre-wrap break-words">
             </div>
-            <div id="view-profile-links" class="gap-3 flex m-3 mt-0"></div>
+            <div id="view-profile-links" class="flex flex-col gap-3 mb-2"></div>
         </div>
 	</div>
 </template>
@@ -258,23 +260,20 @@
     <div class="w-full flex flex-col gap-6 text-slate-900 bg-white pb-4">
         <!-- セクション：作成者 -->
         <div class="flex flex-col gap-2">
-            <label class="text-[0.9rem] font-bold text-slate-600 uppercase">作成者</label>
+            <label class="text-[0.9rem] font-bold text-slate-600 uppercase">旅の案内人</label>
             <div id="view-mem-user-wrapper" class="w-fit"></div>
         </div>
         <!-- セクション：タイトル -->
         <div class="flex flex-col gap-1 border-t border-slate-200 pt-4">
-            <label class="text-[0.9rem] font-bold text-slate-600">まとめタイトル</label>
             <h1 id="view-mem-title" class="text-[1rem] font-bold break-words px-1"></h1>
         </div>
         <!-- セクション：説明文 -->
         <div class="flex flex-col gap-1 border-t border-slate-200 pt-4">
-            <label class="text-[0.9rem] font-bold text-slate-600">説明・メモ</label>
             <div id="view-mem-body" class="text-[1rem] leading-[1.8] whitespace-pre-wrap break-words px-1"></div>
         </div>
         <!-- セクション：リンク -->
-        <div class="flex flex-col gap-2 _border-t _border-slate-200 pt-4">
-            <!-- <label class="text-[0.9rem] font-bold text-slate-600">関連リンク</label> -->
-            <div id="view-mem-url-wrapper" class="flex flex-wrap gap-2"></div>
+        <div class="flex flex-col gap-2 _border-t _border-slate-200 py-2">
+            <div id="view-mem-url-wrapper" class="flex flex-col gap-2"></div>
         </div>
         <!-- セクション：統計情報 -->
         <div class="flex flex-col gap-3 border-t border-slate-200 pt-4">
@@ -306,18 +305,17 @@
         </div>
         <!-- セクション：公開設定（オーナー用） -->
         <div id="archive-status-bar-container" class="flex flex-col gap-4 border-t border-slate-200 pt-6 mt-2">
-            <div>
+            <div id="archive-status-bar">
                 <label class="text-[0.9rem] font-bold text-brand-5 mb-2 block">公開ステータスの変更</label>
-                <div id="archive-status-bar" class="flex gap-2">
+                <div id="archive-status-bar1" class="flex gap-2">
                     <button id="btn-status-memo" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">memo</button>
-                    <button id="btn-status-private" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">private</button>
-                    <button id="btn-status-close" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">public</button>
-                    <button id="btn-status-open" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">open</button>
+                    <button id="btn-status-private" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">Private</button>
+                    <button id="btn-status-close" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">Public</button>
+                    <button id="btn-status-open" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">Open</button>
                 </div>
             </div>
             <div id="archive-limit-btn-area">
                 <button id="btn-toggle-limited" class="w-full py-4 font-bold rounded-lg border-2 text-[0.9rem] flex items-center justify-center gap-2">
-                    <span class="js-check-icon">☐</span>
                     <span class="js-label-text">限定公開設定</span>
                 </button>
             </div>
@@ -391,7 +389,7 @@
             <!-- アイコン（通知種別） -->
             <div class="flex justify-between items-baseline border-b border-slate-200 pb-2 mb-1">
                 <span class="text-[0.9rem] text-slate-600">通知種別</span>
-                <span id="view-notice-icon" class="kb-icon-emoji-md"></span>
+                <span id="view-notice-icon" class="kb-icon-emoji-lg"></span>
             </div>
             <!-- 日時 -->
             <div class="flex justify-between items-baseline">
@@ -534,7 +532,7 @@
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">地点メモ一覧</span>
         </button>
-        <button id="btn-app-batch" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+        <button id="btn-app-merge" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 kb-icon-emoji-lg">📦</span>
             <span class="col-span-1"></span>
             <span class="col-span-8 text-left font-bold text-[1rem] uppercase">地点メモをまとめる</span>

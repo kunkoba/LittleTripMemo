@@ -9,6 +9,10 @@ export default {
         const linkOfficial = $Dom.QuerySelector('#link-info-official', el);
         if ($Const.APP_INFO.OFFICIAL_SITE) {
             linkOfficial.onclick = () => window.open($Const.APP_INFO.OFFICIAL_SITE, '_blank');
+            linkOfficial.onclick = () => {
+                // window.open($Const.APP_INFO.OFFICIAL_SITE, '_blank');
+                OpenExternalLink(url);
+            };
         } else {
             $Dom.ToggleShow(linkOfficial, false);
         }
@@ -176,9 +180,8 @@ export default {
             $Dom.ToggleShow(urlWrapper, true);
             urlWrapper.innerHTML = "";
             // システム通知の場合はトラッキング不要（paramsなし）
-            // const btn = $UI.Generator.LinkButton(notice.link_url);
-            // if (btn) urlWrapper.appendChild(btn);
-            $UI.Generator.LinkButton(urlWrapper, notice.link_url);
+            const isAdded = $UI.Generator.LinkButton(urlWrapper, notice.link_url);
+            $Dom.ToggleShow(urlWrapper, isAdded);
         } else {
             $Dom.ToggleShow(urlWrapper, false);
         }

@@ -118,4 +118,14 @@ public class AppUserRepository : _BaseRepository
         return await ExecuteAsync(sql, new { userId, isDeleted });
     }
 
+    /// <summary>
+    /// banユーザを取得する
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IEnumerable<TAppUser>> GetShadowBanUsersAsync()
+    {
+        const string sql = "SELECT * FROM t_app_user WHERE ban_flg = true AND del_flg = false ORDER BY update_tim DESC";
+        return await QueryAsync<TAppUser>(sql);
+    }
+
 }

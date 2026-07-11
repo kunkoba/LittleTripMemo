@@ -74,8 +74,10 @@ window.$Dom = {
     },
     // 表示切替
     ToggleShow(el, isOpen) {
-		// true だと閉じる
-        el.classList.toggle('hidden', !isOpen);
+        if (el) {
+            // true だと閉じる
+            el.classList.toggle('hidden', !isOpen);
+        }
     },
     // テンプレート生成
     GenerateTemplate(templateHtml, rootHtml = 'ui-template-root', isAppend = true){
@@ -204,6 +206,11 @@ window.$Util = {
     // 住所名から座標を検索する（外部API使用）　※プラスコードは不可
     async SearchAddressByWord(keyword) {
         if (!keyword) return null;
+        // オフラインチェック
+        if (!$App.AppData.Context.IsOnline) {
+            $Notice.Warn("オフライン中は、機能が制限されます。");
+            return false;
+        }
         // OpenStreetMapの無料検索APIを利用
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(keyword)}`;
         let res;
@@ -223,9 +230,10 @@ window.$Util = {
     },
     // 地点情報から地点名を検索する
     async GetAddressName(lat, lng, lang = 'jp') {
-        // オフライン時の制御
-        if (typeof AppStatus !== 'undefined' && !AppStatus.isOnLine) {
-            return "Offline...";
+        // オフラインチェック
+        if (!$App.AppData.Context.IsOnline) {
+            $Notice.Warn("オフライン中は、機能が制限されます。");
+            return "オフライン中です";
         }
         // 引数のバリデーション
         if (!lat || !lng || typeof lat === 'undefined' || typeof lng === 'undefined') {
@@ -372,5 +380,15 @@ window.$Util = {
             default:
                 return "";
         }
+    },
+    // 外部リンク連携
+    OpenExternalLink(url) {
+        // オフラインチェック
+        if (!$App.AppData.Context.IsOnline) {
+            $Notice.Warn("オフライン中は、機能が制限されます。");
+            return;
+        }
+        if (!url) return;
+        window.open(url, '_blank', 'noopener,noreferrer');
     },
 };

@@ -624,8 +624,8 @@ export default {
             buttons: []
         });
     },
-    // 【管理者機能】ユーザ解析情報2
-    ShowUserClickStats(profile) {
+    // 【管理者機能】ユーザ解析情報
+    ShowUserClickStats_2(profile) {
         const el = $Dom.GenerateTemplate("tpl-user-click-stats");
         // 1. ユーザバッジ & 通報数
         $UI.Generator.UserBadge($Dom.QuerySelector(".js-user-badge-container", el), profile, { type: 'badge' });
@@ -720,6 +720,98 @@ export default {
             content: el,
             help: help,
             theme: profile.is_owner ? "user" : "admin", // 閲覧者が本人の場合は通常、管理者の場合はAdminテーマ
+            headerButtons: headerButtons
+        });
+    },
+    // 【管理者機能】ユーザ解析情報
+    ShowUserClickStats(profile) {
+        const el = $Dom.GenerateTemplate("tpl-user-click-stats");
+        // --- 1. ユーザバッジ & 通報数（既存通り） ---
+        $UI.Generator.UserBadge($Dom.QuerySelector(".js-user-badge-container", el), profile, { type: 'badge' });
+        $Dom.QuerySelector(".js-report-count", el).textContent = profile.report_count || 0;
+        // --- 2. 実績解析（既存通り） ---
+        const fillStats = (selector, data) => {
+            const target = $Dom.QuerySelector(selector, el);
+            target.innerHTML = "";
+            if (!data) {
+                target.innerHTML = `<span class="text-slate-600 italic">No Data</span>`;
+                return;
+            }
+            const child = $Dom.GenerateTemplate("tpl-user-activity-summary");
+            $Dom.QuerySelector(".js-archive-count", child).textContent = data.archive_count;
+            $Dom.QuerySelector(".js-memo-count", child).textContent = data.detail_count;
+            target.appendChild(child);
+        };
+        fillStats(".js-stats-pvt", profile.info_stats);
+        fillStats(".js-stats-pub", profile.info_stats_pub);
+        // --- 3. クリック集計リスト（既存通り） ---
+        const container = $Dom.QuerySelector(".js-click-container", el);
+        const links = [
+            { id: 'link_1', url: profile.link_1 },
+            { id: 'link_2', url: profile.link_2 },
+            { id: 'link_3', url: profile.link_3 }
+        ];
+        links.forEach(link => {
+            if (!link.url) return;
+            const stats = profile.click_stats?.[link.id] || { t: 0, u: 0, g: 0 };
+            const child = $Dom.GenerateTemplate("tpl-user-click-stats-item");
+            $Dom.QuerySelector(".js-url", child).textContent = `🔗 ${link.url}`;
+            $Dom.QuerySelector(".js-total", child).textContent = stats.t;
+            $Dom.QuerySelector(".js-unique", child).textContent = stats.u;
+            $Dom.QuerySelector(".js-guest", child).textContent = stats.g;
+            container.appendChild(child);
+        });
+        // --- 4. ヘッダーボタン（既存通り） ---
+        const headerButtons = [];
+        if ($App.AppData.Owner.Plan === "Admin") {
+            headerButtons.push({
+                label: "🕒",
+                handler: () => this.ShowAdminUserHistory(profile)
+            });
+            headerButtons.push({
+                label: "✉️",
+                handler: () => this.ShowAdminSendUserNotification(profile)
+            });
+        }
+        // ★★★ 修正箇所：シャドウBANコントロール ★★★
+        const isAdmin = $App.AppData.Owner.Plan === "Admin";
+        if (isAdmin && !profile.is_owner) {
+            const banCtrl = $Dom.QuerySelector('#admin-ban-control', el);
+            const btnBan = $Dom.QuerySelector('#btn-admin-ban', el);
+            const btnUnban = $Dom.QuerySelector('#btn-admin-unban', el);
+            $Dom.ToggleShow(banCtrl, true);
+            // UI更新関数：is_ban の状態を見てボタンを出し分ける
+            const refreshBanUI = () => {
+                const isBanned = !!profile.is_ban; // プロパティ名を is_ban に修正
+                $Dom.ToggleShow(btnBan, !isBanned);   // BANされていないなら「BAN実行」を表示
+                $Dom.ToggleShow(btnUnban, isBanned);  // BANされているなら「解除」を表示
+            };
+            refreshBanUI(); // 初期表示
+            const handleBanUpdate = async (isBanning) => {
+                const title = isBanning ? "CONFIRM BAN" : "CONFIRM UNBAN";
+                const msg = isBanning 
+                    ? "このユーザをシャドウBANしますか？\n（本人の投稿が他人に表示されなくなります）" 
+                    : "シャドウBANを解除しますか？";
+                if (!await this.ShowConfirm({ title, message: msg })) return;
+                if (!await $Util.CheckAdminAuth()) return; // 管理者PW確認
+                const success = await $Data.Access.UpdateUserBanStatus({
+                    target_user_id: profile.user_id,
+                    is_banned: isBanning
+                });
+                if (success) {
+                    profile.is_ban = isBanning; // 内部メモリのフラグを更新
+                    $Notice.Info(isBanning ? "ユーザをBANしました" : "BANを解除しました");
+                    refreshBanUI(); // ボタン表示を切り替え
+                }
+            };
+            btnBan.onclick = () => handleBanUpdate(true);
+            btnUnban.onclick = () => handleBanUpdate(false);
+        }
+        this._core.open({
+            title: "ユーザ情報解析",
+            content: el,
+            help: "管理者のための解析画面です。",
+            theme: profile.is_owner ? "user" : "admin",
             headerButtons: headerButtons
         });
     },

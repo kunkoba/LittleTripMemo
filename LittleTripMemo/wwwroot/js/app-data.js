@@ -55,7 +55,8 @@ const API_ENDPOINTS = {
     GetAdminNotifications:  { method: 'post', url: '/api/Admin/GetAdminNotifications' },
     GetSentUserMailList:    { method: 'post', url: '/api/Admin/GetSentUserMailList' },
     GetUserHistory:         { method: 'post', url: '/api/Admin/GetUserHistory' },
-    UpdateUserBanStatus:    { method: 'post', url: '/api/Admin/UpdateUserBanStatus' },  // 未使用
+    UpdateUserBanStatus:    { method: 'post', url: '/api/Admin/UpdateUserBanStatus' },
+    GetBanUsers:            { method: 'post', url: '/api/Admin/GetBanUsers' },  // 未使用
     // Core
     GetCoreConfig:          { method: 'post', url: '/api/Core/GetCoreConfig' },     // 未使用
     UpdateCoreConfig:       { method: 'post', url: '/api/Core/UpdateCoreConfig' },  // 未使用

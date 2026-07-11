@@ -22,7 +22,8 @@ public class AdminController(
     GetReportSummaryService getReportSummaryService,
     GetAdminNotificationsService getAdminNotificationsService,
     GetSentUserMailListService getSentUserMailListService,
-    GetUserHistoryService getUserHistoryService
+    GetUserHistoryService getUserHistoryService,
+    GetShadowBanUsersService getShadowBanUsersService
 ) : _BaseController(userContext, jwtService)
 {
     /// <summary>
@@ -127,5 +128,13 @@ public class AdminController(
     [HttpPost("GetUserHistory")]
     public async Task<IActionResult> GetUserHistory([FromBody] GetUserHistoryService.GetUserHistoryReq req)
         => OkWithBase(await getUserHistoryService.ExecuteAsync(req));
+
+    /// <summary>
+    /// banユーザーを取得する（管理者のみ）
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost("GetBanUsers")]
+    public async Task<IActionResult> GetBanUsers()
+        => OkWithBase(await getShadowBanUsersService.ExecuteAsync());
 
 }

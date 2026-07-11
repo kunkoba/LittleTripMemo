@@ -186,21 +186,25 @@ const _MarkerCore = {
             }
             const btnAction = $Dom.QuerySelector("#btn-popup-action", el);
             const actionText = $Dom.QuerySelector(".js-action-text", el);
-            // 画面モードによるアクションボタンの制御
-            if ($App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH) {
-                // 画面モードによるアクションボタンの制御（全モード共通で明細を開く）
-                if (actionText) actionText.textContent = "VIEW DETAIL";
-                btnAction.onclick = (e) => {
-                    e.stopPropagation();
-                    $DetailFrame.Open(detail);
-                };
-            } else {
-                if (actionText) actionText.textContent = "VIEW detail";
-                btnAction.onclick = (e) => {
-                    e.stopPropagation();
-                    $DetailFrame.Open(detail);
-                };
-            }
+            // // 画面モードによるアクションボタンの制御
+            // if ($App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH) {
+            //     // 画面モードによるアクションボタンの制御（全モード共通で明細を開く）
+            //     if (actionText) actionText.textContent = "VIEW DETAIL";
+            //     btnAction.onclick = (e) => {
+            //         e.stopPropagation();
+            //         $DetailFrame.Open(detail);
+            //     };
+            // } else {
+            //     if (actionText) actionText.textContent = "このメモを開く";
+            //     btnAction.onclick = (e) => {
+            //         e.stopPropagation();
+            //         $DetailFrame.Open(detail);
+            //     };
+            // }
+            btnAction.onclick = (e) => {
+                e.stopPropagation();
+                $DetailFrame.Open(detail);
+            };
             // ポップアップ
             L.popup({
                 offset:[0, -50],
@@ -406,7 +410,8 @@ const MarkerController = {
         const detail = this.GetDataWithCurrentIndex();
         if (detail) {
             const googleMapsUrl = `https://www.google.com/maps?q=${detail.latitude},${detail.longitude}`;
-            window.open(encodeURI(googleMapsUrl), '_blank');
+            // window.open(encodeURI(googleMapsUrl), '_blank');
+            OpenExternalLink(url);
         }
     },
     // seqを指定してその地点へジャンプする

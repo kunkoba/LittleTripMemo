@@ -360,6 +360,7 @@ public record DtoUserProfile(
     string? description,
     string? link_1, string? link_2, string? link_3,
     bool is_owner,
+    bool is_ban,
     Dictionary<string, ClickCountData> click_stats,
     Dictionary<string, object> info_stats,    
     Dictionary<string, object> info_stats_pub,

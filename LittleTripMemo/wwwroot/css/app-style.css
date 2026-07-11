@@ -76,6 +76,8 @@ button:active {
     color: rgb(15 23 42);
     /* イタリック: italic */
     font-style: italic;
+    /* 文字間隔 */
+    letter-spacing: 0.1em;
 }
 .kb-date-tim-md {
     /* 文字サイズ: text-[0.9rem] */
@@ -86,6 +88,8 @@ button:active {
     color: rgb(15 23 42);
     /* イタリック: italic */
     font-style: italic;
+    /* 文字間隔 */
+    letter-spacing: 0.1em;
 }
 .kb-date-tim-lg {
     /* 文字サイズ: text-[0.9rem] */
@@ -96,6 +100,8 @@ button:active {
     color: rgb(148 163 184);
     /* イタリック: italic */
     font-style: italic;
+    /* 文字間隔 */
+    letter-spacing: 0.1em;
 }
 
 /* 絵文字アイコン用クラス（共通ドロップシャドウを追加） */

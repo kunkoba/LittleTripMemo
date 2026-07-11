@@ -29,10 +29,19 @@ const _DetailFrameCore = {
                 this.btnMoveNext = $Dom.GetElementById("detail-btn-next");
                 this.btnMoveLast = $Dom.GetElementById("detail-btn-last");
                 this.groupReaction = $Dom.GetElementById("detail-group-reaction");
-                // リアクションボタンを定数から一括取得・登録
+                // リアクションボタンを定数から一括生成・登録
                 this.reactionButtons = {};
+                this.groupReaction.innerHTML = "";
                 Object.values($Const.REACTION_TYPE).forEach(type => {
-                    const btn = $Dom.GetElementById(type.btnId);
+                    const btn = document.createElement("button");
+                    btn.id = type.btnId;
+                    // デフォルトは未選択（目立たない）状態
+                    btn.className = "flex-1 rounded-[1rem] py-2 flex flex-col items-center justify-center active:scale-95 transition-all disabled:opacity-50 bg-slate-50 border-2 border-transparent shadow-sm";
+                    btn.innerHTML = `
+                        <span class="kb-icon-emoji-lg mb-1">${type.emoji}</span>
+                        <span class="js-count text-[0.9rem] font-bold text-slate-600">0</span>
+                    `;
+                    this.groupReaction.appendChild(btn);
                     this.reactionButtons[type.id] = btn;
                     btn.addEventListener("click", () => this._onReactionClick(type));
                 });
@@ -58,7 +67,8 @@ const _DetailFrameCore = {
                     const data = $DetailContent.GetFormEditData();
                     if (data.latitude && data.longitude) {
                         const url = `https://earth.google.com/web/search/${data.latitude},${data.longitude}`;
-                        window.open(url, '_blank');
+                        // window.open(url, '_blank');
+                        OpenExternalLink(url);
                     }
                 });
                 // googleMap連携
@@ -73,7 +83,8 @@ const _DetailFrameCore = {
                     const data = $DetailContent.GetFormEditData();
                     if (data.latitude && data.longitude) {
                         const url = `https://www.google.com/maps/search/?api=1&query=${data.latitude},${data.longitude}`;
-                        window.open(url, '_blank');
+                        // window.open(url, '_blank');
+                        OpenExternalLink(url);
                     }
                 });
                 // ★追加：まとめアーカイブへ飛ぶ（フッターボタン）
@@ -319,13 +330,18 @@ const _DetailFrameCore = {
             const localMe     = myLocal[prop] ? 1 : 0;
             const displayCount = serverTotal - serverMe + localMe;
             // 3. UI反映
-            $Dom.QuerySelector('.js-count', btn).textContent = displayCount;
+            const countEl = $Dom.QuerySelector('.js-count', btn);
+            countEl.textContent = displayCount;
             // 自分の選択状態を反映
             const isActive = myLocal[type.prop];
-            btn.classList.toggle('text-brand-5', isActive);
-            btn.classList.toggle('border-brand-3', isActive);
-            btn.classList.toggle('bg-brand-1', isActive);
+            btn.classList.toggle('bg-white', isActive);
+            btn.classList.toggle('border-brand-5', isActive);
             btn.classList.toggle('shadow-md', isActive);
+            btn.classList.toggle('bg-slate-50', !isActive);
+            btn.classList.toggle('border-transparent', !isActive);
+            btn.classList.toggle('shadow-sm', !isActive);
+            countEl.classList.toggle('text-brand-5', isActive);
+            countEl.classList.toggle('text-slate-600', !isActive);
         });
     },
     // リアクションボタンクリック

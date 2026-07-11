@@ -111,7 +111,7 @@
 
 /* マーカーアイコン関連 */
 :root {
-    --marker-size: 32px; /* ここが基準サイズ */
+    --marker-size: 24px; /* ここが基準サイズ */
 }
 .custom-marker-wrapper {
     /* 重要：Leafletが作るアイコン枠（60px）を flex で埋め尽くして中央に寄せる */
@@ -126,7 +126,7 @@
 .marker-diamond-base {
     width:  var(--marker-size);
     height: var(--marker-size);
-    background-color: rgba(255, 255, 255, 0.9) !important;
+    background-color: rgba(255, 255, 255, 0.7) !important;
     /* border: 2px solid var(--brand-lvl5); */
     transform: rotate(45deg);
     display: flex;

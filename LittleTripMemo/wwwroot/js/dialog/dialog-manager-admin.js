@@ -6,6 +6,7 @@ export default {
         $Dom.QuerySelector('#btn-admin-report', el).onclick = () => this.ShowAdminReportList();
         $Dom.QuerySelector('#btn-admin-feedback', el).onclick = () => this.ShowAdminFeedbackList();
         $Dom.QuerySelector('#btn-admin-user-mail', el).onclick = () => this.ShowAdminUserMailList();
+        $Dom.QuerySelector('#btn-admin-ban-users', el).onclick = () => this.ShowAdminBanUserList();
         $Dom.QuerySelector('#btn-admin-core-cfg', el).onclick = () => this.ShowAdminCoreConfig();
         this._core.open({
             title: "管理者ツール",
@@ -43,7 +44,7 @@ export default {
                     badge.textContent = "公開中";
                     badge.className += " border-brand-3 bg-brand-5 text-white";
                 } else if (now < fromDate) {
-                    badge.textContent = "公開前";
+                    badge.textContent = "公開予定";
                     badge.className += " border-slate-200 bg-slate-100 text-slate-600";
                 } else {
                     badge.textContent = "公開終了";
@@ -82,7 +83,7 @@ export default {
         });
     },
     // 通知の編集・新規登録（API通信化）
-    ShowAdminNoticeEdit(noticeItem, onSaved) {
+    ShowAdminNoticeEdit_2(noticeItem, onSaved) {
         const isNew = !noticeItem;
         const target = isNew ? {
             seq: 0, title: "", body: "", kind: 0,
@@ -129,7 +130,7 @@ export default {
         $Dom.QuerySelector('#btn-clear-notice-to', el).onclick = () => inptTo.value = "";
         //
         this._core.open({
-            title: isNew ? "システム通知 登録" : "システム通知 編集",
+            title: isNew ? "システム通知登録" : "システム通知編集",
             content: el,
             theme: "admin",
             help: "",
@@ -171,6 +172,113 @@ export default {
                         await $Data.Access.GetAdminAllInfo();
                         this._core.close(); // 編集ダイアログを閉じる
                         if (onSaved) onSaved(); // 親画面の再描画コールバック
+                    }
+                }
+            ]]
+        });
+    },
+    // 通知の編集・新規登録（三択ボタン形式へ修正）
+    ShowAdminNoticeEdit(noticeItem, onSaved) {
+        const isNew = !noticeItem;
+        const target = isNew ? {
+            seq: 0, title: "", body: "", kind: 2, // 初期値は 2:Notice
+            link_url: "",
+            disp_from: $Util.FormatDate(new Date(), 'YYYY-MM-DD'),
+            disp_to: "2099-12-31",
+        } : { ...noticeItem };
+        const el = $Dom.GenerateTemplate("tpl-admin-notice-edit");
+        // --- 1. 種別選択ボタンの生成ロジック ---
+        const kindGroup = $Dom.QuerySelector('#edit-notice-kind-group', el);
+        const inputKind = $Dom.QuerySelector('#edit-notice-kind-val', el);
+        inputKind.value = target.kind;
+        Object.values($Const.NOTICE_KIND).forEach(type => {
+            const btn = document.createElement("button");
+            // 基本スタイル（メール送信画面と同様）
+            btn.className = "flex-1 rounded-lg py-2 flex flex-col items-center justify-center active:scale-95 transition-all bg-slate-50 border-2 border-transparent shadow-sm";
+            btn.innerHTML = `
+                <span class="text-[1.5rem] mb-1">${type.emoji}</span>
+                <span class="text-[0.8rem] font-bold text-slate-600">${type.label}</span>
+            `;
+            const refreshBtnUI = () => {
+                const isActive = Number(inputKind.value) === type.id;
+                if (isActive) {
+                    btn.classList.add('bg-white', 'border-brand-5', 'shadow-md');
+                    btn.classList.remove('bg-slate-50', 'border-transparent', 'shadow-sm');
+                } else {
+                    btn.classList.remove('bg-white', 'border-brand-5', 'shadow-md');
+                    btn.classList.add('bg-slate-50', 'border-transparent', 'shadow-sm');
+                }
+            };
+            btn.onclick = () => {
+                inputKind.value = type.id;
+                // 全ボタンのUIを更新
+                Array.from(kindGroup.children).forEach(child => {
+                    // 各ボタンに設定された自身の更新処理をキック（またはループで再計算）
+                    // ここではシンプルに全体を再描画する代わりに、クラス操作を直接行います
+                    const b = child;
+                    b.classList.remove('bg-white', 'border-brand-5', 'shadow-md');
+                    b.classList.add('bg-slate-50', 'border-transparent', 'shadow-sm');
+                });
+                btn.classList.add('bg-white', 'border-brand-5', 'shadow-md');
+                btn.classList.remove('bg-slate-50', 'border-transparent', 'shadow-sm');
+            };
+            kindGroup.appendChild(btn);
+            refreshBtnUI(); // 初回状態反映
+        });
+        // --- 2. その他の要素制御（既存のまま） ---
+        const inptTitle = $Dom.QuerySelector('#edit-notice-title', el);
+        const inptBody = $Dom.QuerySelector('#edit-notice-body', el);
+        const inptUrl = $Dom.QuerySelector('#edit-notice-url', el);
+        const inptFrom = $Dom.QuerySelector('#edit-notice-from', el);
+        const inptTo = $Dom.QuerySelector('#edit-notice-to', el);
+        const countTitle = $Dom.QuerySelector('#edit-notice-title-count', el);
+        const countBody = $Dom.QuerySelector('#edit-notice-body-count', el);
+        inptTitle.value = target.title;
+        inptBody.value = target.body;
+        inptUrl.value = target.link_url || "";
+        inptFrom.value = $Util.FormatDate(target.disp_from, 'YYYY-MM-DD');
+        inptTo.value = $Util.FormatDate(target.disp_to, 'YYYY-MM-DD');
+        countTitle.textContent = inptTitle.value.length;
+        countBody.textContent = inptBody.value.length;
+        inptTitle.addEventListener('input', () => countTitle.textContent = inptTitle.value.length);
+        inptBody.addEventListener('input', () => countBody.textContent = inptBody.value.length);
+        $Dom.QuerySelector('#btn-clear-notice-from', el).onclick = () => inptFrom.value = "";
+        $Dom.QuerySelector('#btn-clear-notice-to', el).onclick = () => inptTo.value = "";
+        this._core.open({
+            title: isNew ? "システム通知 登録" : "システム通知 編集",
+            content: el,
+            theme: "admin",
+            isFooterFixed: false,
+            buttons:[[
+                {
+                    label: "CANCEL",
+                    className: "bg-slate-400 text-white shadow-md",
+                    handler: () => this._core.close(),
+                },
+                {
+                    label: "SAVE",
+                    className: "bg-brand-5 text-white shadow-md",
+                    handler: async () => {
+                        const isOk = await this.ShowConfirm({ 
+                            title: isNew ? "NEW NOTICE" : "EDIT NOTICE",
+                            message: "通知情報を保存しますか？" 
+                        });
+                        if (!isOk) return;
+                        const req = {
+                            seq: target.seq,
+                            title: inptTitle.value.trim() || "No Title",
+                            body: inptBody.value.trim(),
+                            link_url: inptUrl.value.trim(),
+                            kind: Number(inputKind.value), // 隠しフィールドから取得
+                            disp_from: (inptFrom.value || $Util.FormatDate(new Date(), 'YYYY-MM-DD')) + "T00:00:00",
+                            disp_to: (inptTo.value || "2099-12-31") + "T23:59:59"
+                        };
+                        const isSuccess = await $Data.Access.UpsertNotification(req);
+                        if (!isSuccess) return;
+                        $Notice.Info("保存しました。");
+                        await $Data.Access.GetAdminAllInfo();
+                        this._core.close();
+                        if (onSaved) onSaved();
                     }
                 }
             ]]
@@ -223,7 +331,7 @@ export default {
         });
     },
     // 【管理者機能】通報詳細
-    async ShowAdminReportDetail(summaryItem) {
+    async ShowAdminReportDetail_2(summaryItem) {
         const isSuccess = await $Data.Access.GetReportDetails({
             target_user_id: summaryItem.target_user_id,
             archive_id: summaryItem.archive_id
@@ -305,6 +413,106 @@ export default {
             size: 'lg',
             theme: "admin", 
             help: "", 
+            buttons: [] 
+        });
+    },
+    // 【管理者機能】通報詳細
+    async ShowAdminReportDetail(summaryItem) {
+        const isSuccess = await $Data.Access.GetReportDetails({
+            target_user_id: summaryItem.target_user_id,
+            archive_id: summaryItem.archive_id
+        });
+        if (!isSuccess) return;
+        const reports = $Data.resData.reports || [];
+        const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
+        // --- ① タイトル表示：加工せずそのまま表示 ---
+        const titleEl = $Dom.QuerySelector(".js-archive-title", el);
+        titleEl.textContent = summaryItem.archive_title || "Unknown Title";
+        // ターゲットユーザー設定（既存通り）
+        const userWrapper = $Dom.QuerySelector("#view-report-target-user-wrapper", el);
+        const profile = $Data.resData.target_userProfile;
+        if (profile) {
+            $UI.Generator.UserBadge(userWrapper, profile, { type: 'button', isOwner: false });
+        }
+        // --- ② ボタンの活性・非活性制御 ---
+        const btnOpenArchive = $Dom.QuerySelector("#btn-admin-report-open-archive", el);
+        const btnClose       = $Dom.QuerySelector("#btn-admin-report-close", el);
+        const btnPrivate     = $Dom.QuerySelector("#btn-admin-report-private", el);
+        const isClosed  = !!summaryItem.is_closed;
+        const isDeleted = !!summaryItem.is_deleted;
+        // 非活性化用の共通処理
+        const setDisabled = (btn) => {
+            btn.disabled = true;
+            btn.classList.add("opacity-30", "cursor-not-allowed", "grayscale");
+            btn.classList.remove("active:scale-95", "hover:bg-slate-700"); // 既存のホバーやアクティブ効果を消す
+            btn.onclick = null;
+        };
+        // CLOSEボタン：既に Close または Delete 済みの場合は押せない
+        if (isClosed || isDeleted) {
+            setDisabled(btnClose);
+            if (isClosed) btnClose.textContent = "CLOSE済み";
+        }
+        // DELETEボタン：既に Delete 済みの場合は押せない
+        if (isDeleted) {
+            setDisabled(btnPrivate);
+            btnPrivate.textContent = "DELETE済み";
+            // 削除済みの場合はアーカイブを開くボタンも無効化
+            setDisabled(btnOpenArchive);
+            $Dom.QuerySelector("span:last-child", btnOpenArchive).textContent = "🚫";
+        }
+        // アーカイブを開くボタンのクリックイベント（削除されていない場合のみ）
+        if (!isDeleted) {
+            btnOpenArchive.onclick = async () => {
+                const isOk = await this.ShowConfirm({ title: "JUMP", message: "この Public まとめデータを開きますか？" });
+                if (!isOk) return;
+                this._core.closeAll();
+                $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+                $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
+                await $App.RefreshScreen();
+            };
+        }
+        // Close実行処理（活性時のみ）
+        if (!btnClose.disabled) {
+            btnClose.onclick = async () => {
+                const isOk = await this.ShowConfirm({ title: "FORCE CLOSE", message: "強制的に公開停止(Close)にしますか？" });
+                if (!isOk) return;
+                const success = await $Data.Access.AdminCloseArchive({ 
+                    archive_id: summaryItem.archive_id, 
+                    target_user_id: summaryItem.target_user_id 
+                });
+                if (success) { $Notice.Info("強制的にCloseしました"); this._core.closeAll(); }
+            };
+        }
+        // Delete実行処理（活性時のみ）
+        if (!btnPrivate.disabled) {
+            btnPrivate.onclick = async () => {
+                const isOk = await this.ShowConfirm({ title: "FORCE DELETE", message: "強制的に非公開(Private)に戻し、削除扱いとしますか？" });
+                if (!isOk) return;
+                const success = await $Data.Access.AdminUnpublishArchive({ 
+                    archive_id: summaryItem.archive_id, 
+                    target_user_id: summaryItem.target_user_id 
+                });
+                if (success) { $Notice.Info("非公開に戻しました"); this._core.closeAll(); }
+            };
+        }
+        // 下部の通報理由リスト描画（既存通り）
+        const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
+        if (reports.length === 0) {
+            listContainer.innerHTML = `<div class="text-[0.9rem] text-slate-600 p-2">詳細データがありません</div>`;
+        } else {
+            reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
+                const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
+                $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim);
+                $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
+                child.onclick = () => this.ShowAdminReportItemDetail(rep);
+                listContainer.appendChild(child);
+            });
+        }
+        this._core.open({ 
+            title: "通報集計詳細", 
+            content: el, 
+            size: 'lg',
+            theme: "admin", 
             buttons: [] 
         });
     },
@@ -472,58 +680,64 @@ export default {
             nick_name: profile.nick_name,
             user_id: profile.user_id
         }, { type: 'badge' });
-        // --- 2. メッセージ用アイコン選択 (明細入力風) ---
-        const previewEmoji = $Dom.QuerySelector('#admin-send-emoji-preview', el);
-        const inputKind = $Dom.QuerySelector('#admin-send-emoji-val', el); // 内部的に ID は reuse
+        // --- 2. メッセージ種別選択 (3ボタン選択制) ---
+        const kindGroup = $Dom.QuerySelector('#admin-send-kind-group', el);
+        const inputKind = $Dom.QuerySelector('#admin-send-emoji-val', el);
         let currentKind = $Const.USER_NOTICE_KIND.INFO;
         inputKind.value = currentKind.id;
-        previewEmoji.textContent = `${currentKind.emoji} ${currentKind.label}`;
-
-        $Dom.QuerySelector('#btn-admin-send-emoji-trigger', el).onclick = () => {
-            // 3つの種別を順番に切り替える単純なトグル（または選択肢が少ないのでこれで十分）
-            const kinds = Object.values($Const.USER_NOTICE_KIND);
-            let nextIdx = (kinds.findIndex(k => k.id === Number(inputKind.value)) + 1) % kinds.length;
-            const nextKind = kinds[nextIdx];
-            inputKind.value = nextKind.id;
-            previewEmoji.textContent = `${nextKind.emoji} ${nextKind.label}`;
-            previewEmoji.className = "text-[1.2rem] font-bold py-1"; // テキストが出るのでサイズ調整
-        };
+        kindGroup.innerHTML = "";
+        Object.values($Const.USER_NOTICE_KIND).forEach(type => {
+            const btn = document.createElement("button");
+            btn.className = "flex-1 rounded-lg py-2 flex flex-col items-center justify-center active:scale-95 transition-all bg-slate-50 border-2 border-transparent shadow-sm";
+            btn.innerHTML = `
+                <span class="text-[1.5rem] mb-1">${type.emoji}</span>
+                <span class="text-[0.8rem] font-bold text-slate-600">${type.label}</span>
+            `;
+            btn.onclick = () => {
+                inputKind.value = type.id;
+                Array.from(kindGroup.children).forEach(b => {
+                    b.classList.remove('bg-white', 'border-brand-5', 'shadow-md');
+                    b.classList.add('bg-slate-50', 'border-transparent', 'shadow-sm');
+                });
+                btn.classList.add('bg-white', 'border-brand-5', 'shadow-md');
+                btn.classList.remove('bg-slate-50', 'border-transparent', 'shadow-sm');
+            };
+            kindGroup.appendChild(btn);
+            if (type.id === currentKind.id) {
+                btn.classList.add('bg-white', 'border-brand-5', 'shadow-md');
+                btn.classList.remove('bg-slate-50', 'border-transparent', 'shadow-sm');
+            }
+        });
         // --- 3. 本文入力の設定 ---
         const inputBody = $Dom.QuerySelector('#admin-send-body', el);
         const countBody = $Dom.QuerySelector('#admin-send-body-count', el);
         countBody.textContent = inputBody.value.length;
         inputBody.addEventListener('input', () => countBody.textContent = inputBody.value.length);
+        
+        inputBody.addEventListener('input', () => countBody.textContent = inputBody.value.length);
+        // 追加：HTML上のボタンに直接イベントをバインド
+        $Dom.QuerySelector('#btn-admin-send-cancel', el).onclick = () => this._core.close();
+        $Dom.QuerySelector('#btn-admin-send-submit', el).onclick = async () => {
+            const body = inputBody.value.trim();
+            if (!body) return $Notice.Warn("本文を入力してください");
+            if (await $Util.CheckAdminAuth()) {
+                const isSuccess = await $Data.Access.SendUserNotification({
+                    target_user_id: profile.user_id,
+                    kind: Number(inputKind.value),
+                    body: body
+                });
+                if (isSuccess) {
+                    $Notice.Info("通知を送信しました。");
+                    this._core.close();
+                }
+            }
+        };
         this._core.open({
-            title: "メール送信",
+            title: "ユーザ個別メール送信",
             content: el,
             theme: "admin",
             help: "",
-            buttons: [[
-                {
-                    label: "CANCEL",
-                    className: "bg-slate-400 text-white shadow-md",
-                    handler: () => this._core.close()
-                },
-                {
-                    label: "SEND",
-                    handler: async () => {
-                        const body = inputBody.value.trim();
-                        if (!body) return $Notice.Warn("本文を入力してください");
-                        // パスワード制御
-                        if (await $Util.CheckAdminAuth()) {
-                            const isSuccess = await $Data.Access.SendUserNotification({
-                                target_user_id: profile.user_id,
-                                kind: Number(inputKind.value), // emoji ではなく kind を送る
-                                body: body
-                            });
-                            if (isSuccess) {
-                                $Notice.Info("通知を送信しました。");
-                                this._core.close();
-                            }
-                        }
-                    }
-                }
-            ]]
+            buttons: [] // フッターボタンは使用しない
         });
     },
     // 【管理者機能】ユーザーメール一覧
@@ -776,6 +990,37 @@ export default {
             content: el,
             theme: "admin",
             size: "lg"
+        });
+    },
+    // 【管理者機能】BANユーザー一覧
+    async ShowAdminBanUserList() {
+        const isSuccess = await $Data.Access.GetBanUsers();
+        if (!isSuccess) return;
+        const banUsers = $Data.resData.banUserList || [];
+        if (banUsers.length === 0) {
+            $Notice.Warn("BANされたユーザーはいません");
+            return;
+        }
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        const sorted = [...banUsers].sort((a, b) => new Date(b.update_tim) - new Date(a.update_tim));
+        sorted.forEach(item => {
+            const child = $Dom.GenerateTemplate("tpl-admin-list-child-ban-user");
+            $Dom.QuerySelector(".js-date", child).textContent = $Util.FormatDate(item.update_tim);
+            // ユーザーバッジをボタン型で生成（タップでプロフィール詳細へ）
+            const userWrapper = $Dom.QuerySelector(".js-user-wrapper", child);
+            $UI.Generator.UserBadge(userWrapper, {
+                user_id: item.user_id,
+                nick_name: item.nick_name,
+                icon: item.icon
+            }, { type: 'button', isOwner: false });
+            root.appendChild(child);
+        });
+        this._core.open({
+            title: "BANユーザー一覧",
+            content: root,
+            theme: "admin",
+            help: "シャドウBANされたユーザーの一覧です。",
+            buttons: []
         });
     },
 };

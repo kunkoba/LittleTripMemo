@@ -171,24 +171,25 @@
                                 </div>
                             </div>
                             <!-- 2. タイトル -->
-                            <div class="border-l-4 border-brand-3 pl-3 py-2 mt-2 w-full">
-                                <h1 id="detail-display-title" class="text-[1.5rem] font-bold text-slate-900 break-words"></h1>
-                            </div>
-                            <!-- 修正：w-full で幅を確保し、justify-end で右寄せにする -->
-                            <div id="detail-display-price-wrapper" class="hidden w-full justify-end pr-3 mt-1 flex items-baseline italic">
-                                <span id="detail-display-memo_price" class="text-[1.5rem] font-bold"></span>
-                                <span id="detail-display-price-unit" class="text-[1rem] font-bold text-slate-600 ml-3 uppercase"></span>
+                            <div class="border-l-4 border-brand-3 pl-3 py-2 mt-4 mb-2 w-full">
+                                <h1 id="detail-display-title" class="text-[1.2rem] font-bold text-slate-900 break-words"></h1>
                             </div>
                             <!-- 5. 【新設】ボトムエリア：絵文字（左）＋ リンク（右） -->
                             <div class="my-2 pt-2 pb-4 flex justify-between gap-6 w-full pl-2 border-y">
                                 <!-- 巨大絵文字 -->
                                 <div id="detail-display-face_emoji" class="text-[5rem] leading-none drop-shadow-lg shrink-0"></div>
-                                <!-- URLリンクボタン（Generatorで注入） -->
-                                <div id="detail-display-url-wrapper" class="m-2 flex flex-wrap gap-2"></div>
+                                <!-- 修正：w-full で幅を確保し、justify-end で右寄せにする -->
+                                <div id="detail-display-price-wrapper" class="hidden w-full justify-end pr-3 mt-1 flex items-baseline italic">
+                                    <span id="detail-display-memo_price" class="text-[1.5rem] font-bold"></span>
+                                    <span id="detail-display-price-unit" class="text-[1rem] font-bold text-slate-600 ml-3 uppercase"></span>
+                                </div>
                             </div>
                             <!-- 4. 本文（左揃え・1rem以下） -->
-                            <div id="detail-display-body" class="w-full rounded-lg p-2 text-[1rem] text-slate-900 whitespace-pre-wrap break-words leading-[2]"></div>
-
+                            <div id="detail-display-body" class="w-full min-h-[200px] p-2 text-[1rem] text-slate-900 whitespace-pre-wrap break-words leading-[2]"></div>
+                            <!-- URLリンクボタン（Generatorで注入） -->
+                            <div id="detail-display-url-wrapper" class="hidden flex flex-col gap-2 w-full mt-2"></div>
+                            <!-- ▼ 追加：リアクションボタン領域 -->
+                            <div id="detail-group-reaction" class="flex justify-between gap-2 w-full mt-4 pt-4 border-t border-slate-200"></div>
                             <!-- 隠し項目 -->
                             <span id="detail-display-weather_code" class="hidden"></span>
                         </div>
@@ -333,25 +334,6 @@
                             <span class="text-[1.2rem] shrink-0">🗂️</span> 
                             <!-- タイトル流し込み用span（長すぎる場合は...で省略） -->
                             <span id="detail-jump-archive-title" class="truncate">VIEW ARCHIVE</span>
-                        </button>
-                    </div>
-                    <!-- （いいねボタン） -->
-                    <div id="detail-group-reaction" class="flex justify-between gap-2 mb-4">
-                        <button id="detail-btn-funny"    class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
-                            <span class="text-[2rem]">🤣</span>
-                            <span class="text-[0.9rem] font-bold text-brand-5 js-count mt-0.5">0</span>
-                        </button>
-                        <button id="detail-btn-love"  class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
-                            <span class="text-[2rem]">😍</span>
-                            <span class="text-[0.9rem] font-bold text-brand-5 js-count mt-0.5">0</span>
-                        </button>
-                        <button id="detail-btn-surprise" class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
-                            <span class="text-[2rem]">😲</span>
-                            <span class="text-[0.9rem] font-bold text-brand-5 js-count mt-0.5">0</span>
-                        </button>
-                        <button id="detail-btn-sad"      class="flex-1 bg-white rounded-[1rem] py-2 shadow-md border border-brand-1 items-center justify-center active:scale-95 disabled:opacity-60 transition-transform">
-                            <span class="text-[2rem]">😢</span>
-                            <span class="text-[0.9rem] font-bold text-brand-5 js-count mt-0.5">0</span>
                         </button>
                     </div>
                     <!-- 詳細パネル移動ボタン群 -->

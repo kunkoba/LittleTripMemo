@@ -1,39 +1,40 @@
 ﻿using LittleTripMemo.Repository;
-using Npgsql; // PostgreSQLの場合
+using Npgsql;
 using System.Data;
-
-namespace LittleTripMemo.DataAccess;
 
 public class TransactionProvider : ITransactionProvider
 {
     private readonly string _connectionString;
-    private IDbConnection _connection;
-    private IDbTransaction _transaction;
+    private IDbConnection? _connection;
+    private IDbTransaction? _transaction;
+    private bool _isExternal = false;
 
-    public TransactionProvider(string connectionString)
+    public TransactionProvider(string connectionString) => _connectionString = connectionString;
+
+    public IDbConnection Connection => _connection ??= new NpgsqlConnection(_connectionString);
+    public IDbTransaction? Transaction => _transaction;
+
+    public void SetExternalTransaction(IDbConnection connection, IDbTransaction transaction)
     {
-        _connectionString = connectionString;
+        _connection = connection;
+        _transaction = transaction;
+        _isExternal = true;
     }
 
-    // Connectionが必要になったタイミングで生成（Lazy Load）
-    public IDbConnection Connection => _connection ??= new NpgsqlConnection(_connectionString);
-
-    // 現在のトランザクション（開始されていなければ null）
-    public IDbTransaction Transaction => _transaction;
-
-    // トランザクション開始
     public IDbTransaction BeginTransaction()
     {
         if (Connection.State != ConnectionState.Open) Connection.Open();
-        _transaction = Connection.BeginTransaction();
-        return _transaction;
+        return _transaction = Connection.BeginTransaction();
     }
 
-    // トランザクション解放
     public void Dispose()
     {
-        _transaction?.Dispose();
-        _connection?.Dispose();
+        // 外部接続の場合は、ここでの破棄を避けてEF側に任せる
+        if (!_isExternal)
+        {
+            _transaction?.Dispose();
+            _connection?.Dispose();
+        }
     }
-}
 
+}

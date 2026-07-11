@@ -35,6 +35,7 @@ public class GetUserProfileService(
             targetUser.link_2,
             targetUser.link_3,
             is_owner: (targetUser.user_id == _user.login_user_id),
+            is_ban: targetUser.ban_flg,
             targetUser.click_stats,
             targetUser.info_stats,
             targetUser.info_stats_pub,

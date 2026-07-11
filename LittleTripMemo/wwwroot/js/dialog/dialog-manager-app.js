@@ -8,7 +8,7 @@ export default {
             archiveList: $Dom.QuerySelector('#btn-app-archive-list', el),
             archiveInfo: $Dom.QuerySelector('#btn-app-info', el),
             pointList:   $Dom.QuerySelector('#btn-app-point-list', el),
-            batch:       $Dom.QuerySelector('#btn-app-batch', el),
+            merge:       $Dom.QuerySelector('#btn-app-merge', el),
             search:      $Dom.QuerySelector('#btn-app-search', el),
             create:      $Dom.QuerySelector('#btn-app-create', el),
         };
@@ -17,10 +17,11 @@ export default {
         $Dom.ToggleShow(b.archiveInfo, isArchive);
         $Dom.ToggleShow(b.search, isLoggedIn && mode !== $Const.SCREEN_MODE.SEARCH);
         $Dom.ToggleShow(b.create, isLoggedIn && mode !== $Const.SCREEN_MODE.CREATE);
+        $Dom.ToggleShow(b.merge, isLoggedIn && mode === $Const.SCREEN_MODE.CREATE);
         b.archiveList.onclick = () => this.ShowArchiveList();
         b.archiveInfo.onclick = () => this.ShowArchiveInfo();
         b.pointList.onclick = () => (mode === $Const.SCREEN_MODE.SEARCH) ? this.ShowDetailsSearchResult() : this.ShowDetailsTimeLine();
-        b.batch.onclick = () => this.ShowMultiSelectTimeline();
+        b.merge.onclick = () => this.ShowMultiSelectTimeline();
         b.search.onclick = () => { 
             this._core.close(); 
             $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH; 

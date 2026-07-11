@@ -62,6 +62,7 @@ public class GetArchiveDetailsService(
             ownerUser.description,
             ownerUser.link_1, ownerUser.link_2, ownerUser.link_3,
             is_owner: (ownerUser.user_id == _user.login_user_id),
+            is_ban: ownerUser.ban_flg,
             ownerUser.click_stats,
             ownerUser.info_stats,     // 秘密側統計
             ownerUser.info_stats_pub,  // 公開側統計

@@ -11,7 +11,9 @@ const _UI_Core = {
 	},
 	// 通知領域テキスト表示
 	updateNoticeBarText(word){
-		this.noticeText.textContent = word;
+		if (this.noticeText) {
+			this.noticeText.textContent = word;
+		}
 	}
 };
 
@@ -26,55 +28,21 @@ const UI_Manager = {
     },
     // パーツ生成を担うジェネレータ
     Generator: {
-        // URLリンクボタンの生成
-        LinkButton_2(parentEl, url, params = null, isOwner = false) {
-			// parentEl.innerHTML = "";	// 消しちゃダメ
-            if (!url) return null;
-			if (!parentEl) return;
-            // テンプレートからボタンDOMを生成
-            const btn = $Dom.GenerateTemplate("tpl-link-button", "ui-template-root");
-            // アイコンの注入（サイズは28px固定）
-            btn.innerHTML = $Util.GetUrlIconHtml(url, 36);
-            // クリック時の振る舞いを定義
-            btn.onclick = async (e) => {
-                e.stopPropagation();
-                // 1. 通信状態の確認
-                if (!$App.AppData.Context.IsOnline) {
-                    $Notice.Warn("オフライン中は、外部リンクを開けません。");
-                    return;
-                }
-                // 2. ホワイトリストによる安全性の判定
-                const isSafe = $Util.IsSafeUrl(url);
-                const title = isSafe ? "外部サイトを開く" : "セキュリティ警告";
-                // 信頼できないURLの場合はGoogle検索を経由する旨をユーザーに通知
-                const message = isSafe 
-                    ? `次のリンクを開きます。よろしいですか？\n\n${url}`
-                    : `安全性が確認されていないURLのため、\nGoogle検索結果を経由して開きます。\n\n${url}`;
-                // 3. ユーザーの最終確認
-                const isOk = await $Dialog.ShowConfirm({ title, message });
-                if (!isOk) return;
-                // 4. クリック統計の送信（他人のデータ、かつパラメータがある場合のみ実行）
-                if (params && !isOwner) {
-                    $Data.Access.AddClick(params);
-                }
-                // 5. 遷移先の決定と実行
-                // 安全なら直接URLへ、不審ならGoogle検索クエリとして構築
-                const finalUrl = isSafe ? url : `https://www.google.com/search?q=${encodeURIComponent(url)}`;
-                window.open(finalUrl, '_blank', 'noopener,noreferrer');
-            };
-			parentEl.appendChild(btn);
-        },
+        // URLリンクボタンの生成（戻り値として true/false を返す）
 		LinkButton(parentEl, url, params = null, isOwner = false) {
             if (!url) return;
             if (!parentEl) return;
+            // 安全な画像DOMを生成
+            const iconDom = $Util.createUrlIconDom(url, 24); // カプセル枠に合わせて少し小さく
+            if (!iconDom) return false; // ★無効なURLなら false を返す
             const btn = $Dom.GenerateTemplate("tpl-link-button", "ui-template-root");
-            const iconDom = $Util.createUrlIconDom(url, 32);
-            if (iconDom) {
-                btn.innerHTML = ""; 
-                btn.appendChild(iconDom);
-            } else {
-                return; // 不正なURLならボタン自体作らない
-            }
+            // 1. アイコンDOMの注入
+            const iconContainer = $Dom.QuerySelector('.js-icon-container', btn);
+            iconContainer.innerHTML = ""; 
+            iconContainer.appendChild(iconDom);
+            // 2. URLテキストの注入
+            const urlText = $Dom.QuerySelector('.js-url-text', btn);
+            urlText.textContent = url;
             btn.onclick = async (e) => {
                 e.stopPropagation();
                 if (!$App.AppData.Context.IsOnline) {
@@ -100,6 +68,7 @@ const UI_Manager = {
                 window.open(finalUrl, '_blank', 'noopener,noreferrer');
             };
             parentEl.appendChild(btn);
+            return true; // ★追加成功時に true を返す
         },
 		// ユーザ情報バッヂの生成
 		UserBadge(parentEl, profile, options = {}) {
@@ -159,10 +128,10 @@ const UI_Manager = {
 			// 1. レイアウト切り替え（detailサイズ時のみ差分クラスをadd）
 			if (size === 'lg') {
 				el.classList.add('gap-6');
-				$Dom.QuerySelector(".js-main-text", el).classList.add('text-[1.3rem]');
-				$Dom.QuerySelector(".js-time-text", el).classList.add('text-[1.3rem]');
+				$Dom.QuerySelector(".js-main-text", el).classList.add('text-[1.2rem]');
+				$Dom.QuerySelector(".js-time-text", el).classList.add('text-[1.2rem]');
 				const badge = $Dom.QuerySelector(".js-day-badge", el);
-				badge.classList.add('w-20', 'h-10', 'text-[1.0rem]'); // テンプレート側のサイズクラスを上書き
+				badge.classList.add('w-20', 'h-10', 'text-[1.2rem]'); // テンプレート側のサイズクラスを上書き
 			} else {
 				el.classList.add('gap-4');
 				$Dom.QuerySelector(".js-main-text", el).classList.add('text-[1rem]');
@@ -183,7 +152,7 @@ const UI_Manager = {
 			if (detail.display_day > 0 && $App.AppData.Context.ScreenMode !== $Const.SCREEN_MODE.SEARCH) {
 				const badge = $Dom.QuerySelector(".js-day-badge", el);
 				$Dom.ToggleShow(badge, true);
-				$Dom.QuerySelector(".js-day-text", badge).textContent = `${detail.display_day} DAY`;
+				$Dom.QuerySelector(".js-day-text", badge).textContent = `${detail.display_day}`;
 			}
 			parentEl.appendChild(el);
 		},

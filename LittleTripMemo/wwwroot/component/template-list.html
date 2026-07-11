@@ -36,7 +36,7 @@
 <template id="tpl-timeline-item">
     <div class="relative flex items-stretch gap-2 group cursor-pointer active:scale-[0.98] transition-transform mb-2 mt-1">
         <div class="shrink-0 w-10 flex flex-col items-center pt-2 z-10">
-            <div class="js-face kb-icon-emoji-lg bg-brand-0 pb-1"></div>
+            <div class="js-face kb-icon-emoji-lg mb-3"></div>
             <div class="text-[0.9rem] font-bold text-slate-900 js-time tracking-wider bg-brand-0 px-1"></div>
         </div>
         <div class="flex-1 bg-white rounded-[1rem] p-3 border border-slate-200 shadow-md relative overflow-hidden flex flex-col items-start gap-2">
@@ -240,17 +240,19 @@
 <template id="tpl-user-click-stats-item">
     <div class="bg-slate-50 rounded-[1rem] p-4 flex flex-col gap-2 border border-slate-200">
         <div class="js-url text-blue-500 font-bold italic break-all text-[0.9rem] mb-1 line-clamp-1"></div>
-        <div class="flex justify-between items-baseline">
-            <span class="text-[0.9rem] text-slate-600">総クリック数</span>
-            <span class="js-total text-[1rem] font-bold text-brand-5">0</span>
-        </div>
-        <div class="flex justify-between items-baseline">
-            <span class="text-[0.9rem] text-slate-600">クリックユーザ数</span>
-            <span class="js-unique text-[1rem] font-bold text-slate-700">0</span>
-        </div>
-        <div class="flex justify-between items-baseline">
-            <span class="text-[0.9rem] text-slate-600">guestクリック数</span>
-            <span class="js-guest text-[1rem] font-bold text-slate-600">0</span>
+        <div class="px-4">
+            <div class="flex justify-between items-baseline">
+                <span class="text-[0.9rem] text-slate-600">総クリック数</span>
+                <span class="js-total text-[1rem] font-bold text-brand-5">0</span>
+            </div>
+            <div class="flex justify-between items-baseline">
+                <span class="text-[0.9rem] text-slate-600">クリックユーザ数</span>
+                <span class="js-unique text-[1rem] font-bold text-slate-700">0</span>
+            </div>
+            <div class="flex justify-between items-baseline">
+                <span class="text-[0.9rem] text-slate-600">Guestクリック数</span>
+                <span class="js-guest text-[1rem] font-bold text-slate-600">0</span>
+            </div>
         </div>
     </div>
 </template>

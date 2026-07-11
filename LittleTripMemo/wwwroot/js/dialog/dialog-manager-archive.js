@@ -231,10 +231,11 @@ export default {
             "● まとめには「非公開」と「公開用」があります",
             "●「公開用」には「公開中」と「非公開中」があります",
             "【まとめ】",
-            "　├─非公開（Public）",
-            "　└─公開用（Private）",
-            "　　　├─公開中（Open）",
-            "　　　└─非公開中（Close）",
+            "　├─公開用（Private）[黒]",
+            "　└─公開用（Public）",
+            "　　　├─非公開中（Close）[グレー]",
+            "　　　└─公開中（Open）[テーマカラー]",
+            "　　　　　└─限定公開（LimitOpen）",
             "",
         ].join('\n');
         this._core.open({
@@ -493,7 +494,8 @@ export default {
             if (!arc.link_url) { $Dom.ToggleShow(urlWrapper, false); return; }
             $Dom.ToggleShow(urlWrapper, true);
             const params = { target_type: 2, target_user_id: arc.user_id, archive_id: arc.archive_id, item_name: "link_url" };
-            $UI.Generator.LinkButton(urlWrapper, arc.link_url, params, arc.is_owner);
+            const isAdded = $UI.Generator.LinkButton(urlWrapper, arc.link_url, params, arc.is_owner);
+            $Dom.ToggleShow(urlWrapper, isAdded);
         };
         const renderStats = (arc, details) => {
             const totalPrice = details.reduce((sum, item) => sum + Number(item.memo_price || 0), 0);
@@ -546,7 +548,7 @@ export default {
             if (!(arc.is_owner && arc.is_public && !arc.closed_flg)) { $Dom.ToggleShow(limitArea, false); return; }
             $Dom.ToggleShow(limitArea, true);
             const isLimited = !!arc.limited_open_flg;
-            $Dom.QuerySelector('.js-label-text', btnLimit).textContent = isLimited ? "限定公開中" : "全体公開中";
+            $Dom.QuerySelector('.js-label-text', btnLimit).textContent = isLimited ? "☑ 限定公開中" : "☐ 限定公開にする";
             btnLimit.className = "w-full h-12 font-bold rounded-lg border-2 active:scale-[0.98] transition-all flex items-center justify-center gap-2 " + 
                 (isLimited ? "bg-brand-1 border-brand-3 text-brand-5" : "bg-slate-50 border-slate-200 text-slate-600");
             btnLimit.onclick = async () => {
@@ -626,13 +628,39 @@ export default {
             navigator.clipboard.writeText(shareUrl).then(() => $Notice.Info("URLをコピーしました！"));
         };
         $Dom.QuerySelector('#btn-share-line', el).onclick = async () => {
-            if (await $Dialog.ShowConfirm({ title: "LINE 連携", message: "LINE を起動しますか？" })) window.open($Util.GetShareUrl('line', shareUrl), '_blank');
+            // if (await $Dialog.ShowConfirm({ title: "LINE 連携", message: "LINE を起動しますか？" })) window.open($Util.GetShareUrl('line', shareUrl), '_blank');
+            const isOk = await $Dialog.ShowConfirm({
+                title: "LINE 連携",
+                message: "LINE を起動しますか？"
+            });
+            if (isOk) {
+                const url = $Util.GetShareUrl('line', shareUrl);
+                OpenExternalLink(url);
+            }
+
         };
         $Dom.QuerySelector('#btn-share-x', el).onclick = async () => {
-            if (await $Dialog.ShowConfirm({ title: "X 連携", message: "X を起動しますか？" })) window.open($Util.GetShareUrl('x', shareUrl, archive.title), '_blank');
+            // if (await $Dialog.ShowConfirm({ title: "X 連携", message: "X を起動しますか？" })) window.open($Util.GetShareUrl('x', shareUrl, archive.title), '_blank');
+            const isOk = await $Dialog.ShowConfirm({
+                title: "X連携",
+                message: "Xを起動しますか？"
+            });
+            if (isOk) {
+                const url = $Util.GetShareUrl('x', shareUrl, archive.title);
+                OpenExternalLink(url);
+            }
+
         };
         $Dom.QuerySelector('#btn-share-fb', el).onclick = async () => {
-            if (await $Dialog.ShowConfirm({ title: "facebook 連携", message: "facebook を起動しますか？" })) window.open($Util.GetShareUrl('facebook', shareUrl), '_blank');
+            // if (await $Dialog.ShowConfirm({ title: "facebook 連携", message: "facebook を起動しますか？" })) window.open($Util.GetShareUrl('facebook', shareUrl), '_blank');
+            const isOk = await $Dialog.ShowConfirm({
+                title: "facebook連携",
+                message: "facebookを起動しますか？"
+            });
+            if (isOk) {
+                const url = $Util.GetShareUrl('facebook', shareUrl);
+                OpenExternalLink(url);
+            }
         };
         this._core.open({ title: "まとめを共有する", content: el, size: 'sm', buttons: [] });
     },

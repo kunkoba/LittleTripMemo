@@ -72,6 +72,7 @@ public record Response(SystemInfoData systemInfo);
                     appUser.link_2,
                     appUser.link_3,
                     is_owner: true,
+                    is_ban: appUser.ban_flg,
                     appUser.click_stats,
                     appUser.info_stats,     // 秘密側統計
                     appUser.info_stats_pub,  // 公開側統計

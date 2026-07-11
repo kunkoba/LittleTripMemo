@@ -1,0 +1,144 @@
+<div class="page">
+    <div class="scroll-area">
+        <header>
+            <span class="site-name">
+                週末の記録
+            </span>
+            <span class="date">
+                2026年7月7日
+            </span>
+        </header>
+        <article>
+            <p class="meta">
+                日記 ・ 6分で読めます
+            </p>
+            <h1>
+                花火大会に行ってきた
+            </h1>
+            <p>
+                土曜日の夜、河川敷まで足を運んだ。人混みをかき分けてシートを広げた頃には、すでに空には煙の匂いが漂っていた。
+            </p>
+            <p>
+                最初の一発が上がった瞬間、あたりの歓声が一斉に上がる。音が届くまでのわずかな間、光だけが先に広がっていくのがなんとも不思議だった。
+            </p>
+            <p>
+                プログラムが進むにつれ、色も形もどんどん変わっていく。定番の丸い大輪もあれば、細かい粒が尾を引いて落ちていくものもあり、飽きることがなかった。
+            </p>
+            <p>
+                フィナーレは複数の花火が同時に打ち上がり、空全体が埋め尽くされるほどだった。歓声と拍手が入り混じって、しばらく鳴りやまなかった。
+            </p>
+            <p>
+                帰り道、まだ耳に音が残っている気がした。来年もこの時期になったら、また同じ場所に来ようと思う。
+            </p>
+        </article>
+        <canvas id="fwCanvas" width="680" height="560"></canvas>
+    </div>
+</div>
+<script>
+    (function () {
+  var canvas = document.getElementById('fwCanvas');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var rockets = [];
+  var particles = [];
+  var colors = ['#ff6f91', '#5ddcff', '#ffd166', '#c792ff', '#ff9f6b', '#8dffb0', '#ff5c5c', '#4d8dff', '#ffe45c', '#ff8ad1'];
+
+  function spawnRocket() {
+    var x = 60 + Math.random() * (W - 120);
+    var targetY = 60 + Math.random() * 140;
+    rockets.push({
+      x: x,
+      y: H - 30,
+      targetY: targetY,
+      vy: -6 - Math.random() * 1.8,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      trail: []
+    });
+  }
+
+  function explode(x, y) {
+    var count = 30 + Math.floor(Math.random() * 14);
+    for (var i = 0; i < count; i++) {
+      var angle = (Math.PI * 2 * i) / count + Math.random() * 0.15;
+      var speed = 1.6 + Math.random() * 2.6;
+      particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 1,
+        decay: 0.008 + Math.random() * 0.012,
+        trail: []
+      });
+    }
+  }
+
+  function drawTrail(p, headSize) {
+    for (var k = 1; k < p.trail.length; k++) {
+      var a = (k / p.trail.length) * Math.max(p.life, 0);
+      ctx.strokeStyle = p.color;
+      ctx.globalAlpha = a * 0.7;
+      ctx.lineWidth = headSize;
+      ctx.beginPath();
+      ctx.moveTo(p.trail[k - 1].x, p.trail[k - 1].y);
+      ctx.lineTo(p.trail[k].x, p.trail[k].y);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  var frame = 0;
+  function loop() {
+    frame++;
+    ctx.clearRect(0, 0, W, H);
+
+    if (frame % 50 === 0 || rockets.length + particles.length === 0) {
+      spawnRocket();
+    }
+
+    for (var i = rockets.length - 1; i >= 0; i--) {
+      var r = rockets[i];
+      r.trail.push({ x: r.x, y: r.y });
+      if (r.trail.length > 8) r.trail.shift();
+      r.y += r.vy;
+      drawTrail(r, 2.4);
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, 2.4, 0, Math.PI * 2);
+      ctx.fillStyle = r.color;
+      ctx.fill();
+      if (r.y <= r.targetY) {
+        explode(r.x, r.y);
+        rockets.splice(i, 1);
+      }
+    }
+
+    for (var j = particles.length - 1; j >= 0; j--) {
+      var p = particles[j];
+      p.trail.push({ x: p.x, y: p.y });
+      if (p.trail.length > 6) p.trail.shift();
+      p.vy += 0.045;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= p.decay;
+      if (p.life <= 0) {
+        particles.splice(j, 1);
+        continue;
+      }
+      drawTrail(p, 2);
+      ctx.globalAlpha = Math.max(p.life, 0);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  spawnRocket();
+  loop();
+})();
+</script>

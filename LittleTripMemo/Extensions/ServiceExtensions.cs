@@ -107,6 +107,7 @@ public static class ServiceExtensions
         services.AddScoped<AdminUnpublishArchiveService>();
         services.AddScoped<UpdateUserBanStatusService>();
         services.AddScoped<GetUserHistoryService>();
+        services.AddScoped<GetShadowBanUsersService>();
 
         // Core (System Config)
         services.AddScoped<GetCoreConfigService>();    // ★新規開放
