@@ -501,3 +501,114 @@
     </div>
 </template>
 
+<!-- 1. 基盤設定メニュー -->
+<template id="tpl-menu-admin-core">
+    <div class="w-full flex flex-col bg-brand-0">
+        <button id="btn-core-version" class="w-full h-16 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">📱</span>
+            <span class="col-span-1"></span>
+            <div class="col-span-8 text-left flex flex-col">
+                <span class="font-bold text-[1rem]">アプリバージョン管理</span>
+                <span id="sub-core-version" class="text-[0.8rem] text-slate-500 italic">最新: --- / 必須: ---</span>
+            </div>
+        </button>
+        <button id="btn-core-maint" class="w-full h-16 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">🚧</span>
+            <span class="col-span-1"></span>
+            <div class="col-span-8 text-left flex flex-col">
+                <span class="font-bold text-[1rem]">メンテナンス設定</span>
+                <span id="sub-core-maint" class="text-[0.8rem] font-bold italic">---</span>
+            </div>
+        </button>
+        <button id="btn-core-info" class="w-full h-16 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">☁️</span>
+            <span class="col-span-1"></span>
+            <div class="col-span-8 text-left flex flex-col">
+                <span class="font-bold text-[1rem]">システム環境情報</span>
+                <span class="text-[0.8rem] text-slate-500 italic">本番環境 / API v1.0</span>
+            </div>
+        </button>
+    </div>
+</template>
+
+<!-- アプリバージョン管理 編集（画像再現レイアウト版） -->
+<template id="tpl-admin-core-version">
+    <div class="w-full text-slate-900 space-y-6 pt-4 px-2">
+        <!-- 最新バージョン (LATEST) -->
+        <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+            <label class="block text-[0.8rem] font-bold text-slate-500 uppercase tracking-wider">最新バージョン (LATEST)</label>
+            <div class="grid grid-cols-3 gap-3">
+                <!-- 各桁の入力 + ボタンセット -->
+                <div class="flex flex-col gap-2">
+                    <div id="v-lat-0" class="h-14 bg-white rounded-xl border-2 border-brand-2 flex items-center justify-center text-[1.5rem] font-black italic">0</div>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button data-target="lat" data-idx="0" data-op="minus" class="js-v-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">－</button>
+                        <button data-target="lat" data-idx="0" data-op="plus"  class="js-v-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div id="v-lat-1" class="h-14 bg-white rounded-xl border-2 border-brand-2 flex items-center justify-center text-[1.5rem] font-black italic">0</div>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button data-target="lat" data-idx="1" data-op="minus" class="js-v-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">－</button>
+                        <button data-target="lat" data-idx="1" data-op="plus"  class="js-v-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div id="v-lat-2" class="h-14 bg-white rounded-xl border-2 border-brand-2 flex items-center justify-center text-[1.5rem] font-black italic">0</div>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button data-target="lat" data-idx="2" data-op="minus" class="js-v-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">－</button>
+                        <button data-target="lat" data-idx="2" data-op="plus"  class="js-v-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 必須バージョン (MIN) -->
+        <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4 relative">
+            <div class="flex justify-between items-center">
+                <label class="block text-[0.8rem] font-bold text-slate-500 uppercase tracking-wider">必須バージョン (MIN)</label>
+                <button id="btn-version-sync" class="px-3 py-1.5 rounded-lg font-bold text-[0.75rem] transition-colors shadow-md active:scale-95"></button>
+            </div>
+            <div id="group-min-inputs" class="grid grid-cols-3 gap-3 transition-opacity duration-300">
+                <div class="flex flex-col gap-2">
+                    <div id="v-min-0" class="h-14 bg-white rounded-xl border-2 border-brand-2 flex items-center justify-center text-[1.5rem] font-black italic">0</div>
+                    <div class="grid grid-cols-2 gap-1 js-min-btns">
+                        <button data-target="min" data-idx="0" data-op="minus" class="js-v-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">－</button>
+                        <button data-target="min" data-idx="0" data-op="plus"  class="js-v-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div id="v-min-1" class="h-14 bg-white rounded-xl border-2 border-brand-2 flex items-center justify-center text-[1.5rem] font-black italic">0</div>
+                    <div class="grid grid-cols-2 gap-1 js-min-btns">
+                        <button data-target="min" data-idx="1" data-op="minus" class="js-v-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">－</button>
+                        <button data-target="min" data-idx="1" data-op="plus"  class="js-v-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div id="v-min-2" class="h-14 bg-white rounded-xl border-2 border-brand-2 flex items-center justify-center text-[1.5rem] font-black italic">0</div>
+                    <div class="grid grid-cols-2 gap-1 js-min-btns">
+                        <button data-target="min" data-idx="2" data-op="minus" class="js-v-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">－</button>
+                        <button data-target="min" data-idx="2" data-op="plus"  class="js-v-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- 3. メンテナンス編集 -->
+<template id="tpl-admin-core-maint">
+    <div class="w-full text-slate-900 space-y-6 pt-2 px-2">
+        <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-brand-2 shadow-sm">
+            <span class="font-bold text-[1rem]">メンテナンスモード</span>
+            <button id="btn-cfg-maint-toggle" class="w-16 h-8 rounded-full bg-slate-300 relative transition-colors shrink-0">
+                <div class="js-dot absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-all"></div>
+            </button>
+            <input type="hidden" id="val-cfg-maint">
+        </div>
+        <div>
+            <label class="block text-[0.9rem] font-bold text-slate-600 mb-1">表示メッセージ</label>
+            <textarea id="cfg-maint-msg" class="w-full border-2 border-brand-3 px-3 py-2 text-[0.9rem] h-32 rounded-lg focus:border-brand-5 outline-none resize-none"></textarea>
+        </div>
+    </div>
+</template>
+

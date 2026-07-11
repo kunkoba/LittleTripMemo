@@ -803,67 +803,6 @@ export default {
             headerButtons: []
         });
     },
-    // 【管理者機能】システム設定の取得と編集
-    async ShowAdminCoreConfig() {
-        const isSuccess = await $Data.Access.GetCoreConfig();
-        if (!isSuccess) return;
-        // 1. 配列データとして取得
-        const configList = $Data.resData.configs || [];
-        const el = $Dom.GenerateTemplate("tpl-admin-core-config");
-        // 2. ヘルパー：配列内から指定キーの「値」を取り出す
-        const getVal = (key) => configList.find(c => c.key === key)?.value || "";
-        // 3. 要素への反映（テンプレート側のIDに合わせる）
-        const inptLatest = $Dom.QuerySelector('#cfg-ver-latest', el);
-        const inptMin    = $Dom.QuerySelector('#cfg-ver-min', el);
-        const btnMaint   = $Dom.QuerySelector('#btn-cfg-maint', el);
-        const valMaint   = $Dom.QuerySelector('#val-cfg-maint', el);
-        const txtMaintMsg = $Dom.QuerySelector('#cfg-maint-msg', el);
-        // 値の流し込み
-        inptLatest.value = getVal("LatestAppVersion");
-        inptMin.value    = getVal("MinAppVersion");
-        txtMaintMsg.value = getVal("MaintenanceMsg");
-        // トグルUIの初期化
-        const updateToggleUI = (isOn) => {
-            const dot = btnMaint.querySelector('.js-dot');
-            if (isOn) {
-                btnMaint.classList.replace('bg-slate-300', 'bg-red-500');
-                dot.style.transform = "translateX(24px)";
-                valMaint.value = "true";
-            } else {
-                btnMaint.classList.replace('bg-red-500', 'bg-slate-300');
-                dot.style.transform = "translateX(0px)";
-                valMaint.value = "false";
-            }
-        };
-        updateToggleUI(getVal("MaintenanceMode") === "true");
-        btnMaint.onclick = () => updateToggleUI(valMaint.value === "false");
-        this._core.open({
-            title: "システム設定",
-            content: el, theme: "admin", size: "md",
-            buttons: [[
-                { label: "CANCEL", className: "bg-slate-400 text-white", handler: () => this._core.close() },
-                {
-                    label: "UPDATE",
-                    handler: async () => {
-                        if (!await $Util.CheckAdminAuth()) return;
-                        // 送信用データの再構築（配列形式で送る）
-                        const params = {
-                            configs: [
-                                { key: "LatestAppVersion", value: inptLatest.value.trim() },
-                                { key: "MinAppVersion",    value: inptMin.value.trim() },
-                                { key: "MaintenanceMode",  value: valMaint.value },
-                                { key: "MaintenanceMsg",   value: txtMaintMsg.value.trim() }
-                            ]
-                        };
-                        if (await $Data.Access.UpdateCoreConfig(params)) {
-                            $Notice.Info("設定を更新しました。");
-                            this._core.close();
-                        }
-                    }
-                }
-            ]]
-        });
-    },
     // 【管理者機能】ユーザー操作履歴一覧
     async ShowAdminUserHistory(item) {
         const isSuccess = await $Data.Access.GetUserHistory({ target_user_id: item.user_id });
@@ -1021,6 +960,176 @@ export default {
             theme: "admin",
             help: "シャドウBANされたユーザーの一覧です。",
             buttons: []
+        });
+    },
+    // 【管理者機能】アプリ基盤設定 メニュー一覧
+    async ShowAdminCoreConfig() {
+        const isSuccess = await $Data.Access.GetCoreConfig();
+        if (!isSuccess) return;
+        const configList = $Data.resData.configs || [];
+        const getVal = (key) => configList.find(c => c.key === key)?.value || "";
+        const el = $Dom.GenerateTemplate("tpl-menu-admin-core");
+        // 現在の値（日本語）を反映
+        const latest = getVal("LatestAppVersion");
+        const min = getVal("MinAppVersion");
+        $Dom.QuerySelector('#sub-core-version', el).textContent = `最新: v${latest} / 必須: v${min}`;
+        const isMaint = getVal("MaintenanceMode") === "true";
+        const subMaint = $Dom.QuerySelector('#sub-core-maint', el);
+        if (isMaint) {
+            subMaint.textContent = "🔴 実行中 (制限あり)";
+            subMaint.classList.add("text-red-500");
+        } else {
+            subMaint.textContent = "⚪️ 停止中 (通常稼働)";
+            subMaint.classList.add("text-emerald-500");
+        }
+        // 個別編集画面への遷移
+        $Dom.QuerySelector('#btn-core-version', el).onclick = () => this.ShowAdminCoreVersion(configList);
+        $Dom.QuerySelector('#btn-core-maint', el).onclick = () => this.ShowAdminCoreMaint(configList);
+        $Dom.QuerySelector('#btn-core-info', el).onclick = () => $Notice.Info("システム環境情報は参照のみです");
+        this._core.open({
+            title: "アプリ基盤設定",
+            content: el,
+            theme: "admin",
+            help: "アプリ全体の挙動を制御する重要な設定です。"
+        });
+    },
+    // アプリバージョン管理 編集
+    async ShowAdminCoreVersion(configList) {
+        const getVal = (key) => configList.find(c => c.key === key)?.value || "1.0.0";
+        // サーバーから取得した初期値（[1, 0, 0] 形式）
+        const origLatArr = getVal("LatestAppVersion").split('.').map(Number);
+        const origMinArr = getVal("MinAppVersion").split('.').map(Number);
+        // 作業用状態
+        let curLat = [...origLatArr];
+        let curMin = [...origMinArr];
+        let isSync = (getVal("LatestAppVersion") === getVal("MinAppVersion")); // 初期状態で一致してれば同期ON
+        const el = $Dom.GenerateTemplate("tpl-admin-core-version");
+        const btnSync = $Dom.QuerySelector('#btn-version-sync', el);
+        const minInputs = $Dom.QuerySelector('#group-min-inputs', el);
+        const render = () => {
+            // 同期状態の反映
+            if (isSync) {
+                curMin = [...curLat];
+                btnSync.textContent = "同期を解除";
+                btnSync.className = "px-3 py-1.5 rounded-lg font-bold text-[0.75rem] shadow-md bg-brand-5 text-white";
+                minInputs.classList.add("opacity-40", "pointer-events-none");
+            } else {
+                btnSync.textContent = "最新と同期する";
+                btnSync.className = "px-3 py-1.5 rounded-lg font-bold text-[0.75rem] shadow-md bg-slate-900 text-white";
+                minInputs.classList.remove("opacity-40", "pointer-events-none");
+            }
+            // 数値表示の反映
+            for (let i = 0; i < 3; i++) {
+                $Dom.QuerySelector(`#v-lat-${i}`, el).textContent = curLat[i];
+                $Dom.QuerySelector(`#v-min-${i}`, el).textContent = curMin[i];
+            }
+        };
+        // イベント一括登録
+        $Dom.QuerySelectorAll('.js-v-btn', el).forEach(btn => {
+            btn.onclick = () => {
+                const { target, idx, op } = btn.dataset;
+                const i = parseInt(idx);
+                const arr = (target === 'lat') ? curLat : curMin;
+                if (op === 'plus') arr[i]++;
+                else if (op === 'minus' && arr[i] > 0) arr[i]--;
+                render();
+            };
+        });
+        btnSync.onclick = () => {
+            isSync = !isSync;
+            render();
+        };
+        // ヘッダーにリセットボタン（初期値に戻す）を追加
+        const headerButtons = [{
+            label: "🔄",
+            handler: () => {
+                curLat = [...origLatArr];
+                curMin = [...origMinArr];
+                isSync = (getVal("LatestAppVersion") === getVal("MinAppVersion"));
+                render();
+                $Notice.Info("読み込み時の状態に戻しました");
+            }
+        }];
+        render();
+        this._core.open({
+            title: "バージョン管理",
+            content: el, theme: "admin", headerButtons,
+            buttons: [[
+                { label: "キャンセル", className: "bg-slate-400 text-white", handler: () => this._core.close() },
+                {
+                    label: "保存",
+                    handler: async () => {
+                        const latStr = curLat.join('.');
+                        const minStr = curMin.join('.');
+                        // バリデーション
+                        const toVal = (arr) => arr[0] * 10000 + arr[1] * 100 + arr[2];
+                        const latVal = toVal(curLat);
+                        const minVal = toVal(curMin);
+                        const oLatVal = toVal(origLatArr);
+                        const oMinVal = toVal(origMinArr);
+                        if (latVal < oLatVal) return $Notice.Warn("最新版を現在のバージョンより下げることはできません");
+                        if (minVal < oMinVal) return $Notice.Warn("必須版を現在のバージョンより下げることはできません");
+                        if (latVal < minVal) return $Notice.Warn("最新版は必須版以上である必要があります");
+                        if (!await $Util.CheckAdminAuth()) return;
+                        const params = {
+                            configs: [
+                                { key: "LatestAppVersion", value: latStr },
+                                { key: "MinAppVersion",    value: minStr }
+                            ]
+                        };
+                        if (await $Data.Access.UpdateCoreConfig(params)) {
+                            $Notice.Info("バージョン設定を更新しました");
+                            this._core.closeAll();
+                        }
+                    }
+                }
+            ]]
+        });
+    },
+    // メンテナンス設定 編集
+    async ShowAdminCoreMaint(configList) {
+        const getVal = (key) => configList.find(c => c.key === key)?.value || "";
+        const el = $Dom.GenerateTemplate("tpl-admin-core-maint");
+        const btnToggle = $Dom.QuerySelector('#btn-cfg-maint-toggle', el);
+        const valMaint = $Dom.QuerySelector('#val-cfg-maint', el);
+        const txtMsg = $Dom.QuerySelector('#cfg-maint-msg', el);
+        const updateToggleUI = (isOn) => {
+            const dot = btnToggle.querySelector('.js-dot');
+            if (isOn) {
+                btnToggle.classList.replace('bg-slate-300', 'bg-red-500');
+                dot.style.transform = "translateX(32px)";
+                valMaint.value = "true";
+            } else {
+                btnToggle.classList.replace('bg-red-500', 'bg-slate-300');
+                dot.style.transform = "translateX(0px)";
+                valMaint.value = "false";
+            }
+        };
+        updateToggleUI(getVal("MaintenanceMode") === "true");
+        txtMsg.value = getVal("MaintenanceMsg");
+        btnToggle.onclick = () => updateToggleUI(valMaint.value === "false");
+        this._core.open({
+            title: "メンテナンス設定",
+            content: el, theme: "admin",
+            buttons: [[
+                { label: "キャンセル", className: "bg-slate-400 text-white", handler: () => this._core.close() },
+                {
+                    label: "保存",
+                    handler: async () => {
+                        if (!await $Util.CheckAdminAuth()) return;
+                        const params = {
+                            configs: [
+                                { key: "MaintenanceMode", value: valMaint.value },
+                                { key: "MaintenanceMsg", value: txtMsg.value.trim() }
+                            ]
+                        };
+                        if (await $Data.Access.UpdateCoreConfig(params)) {
+                            $Notice.Info("メンテナンス設定を更新しました");
+                            this._core.closeAll();
+                        }
+                    }
+                }
+            ]]
         });
     },
 };

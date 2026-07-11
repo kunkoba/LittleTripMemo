@@ -56,7 +56,7 @@ const API_ENDPOINTS = {
     GetSentUserMailList:    { method: 'post', url: '/api/Admin/GetSentUserMailList' },
     GetUserHistory:         { method: 'post', url: '/api/Admin/GetUserHistory' },
     UpdateUserBanStatus:    { method: 'post', url: '/api/Admin/UpdateUserBanStatus' },
-    GetBanUsers:            { method: 'post', url: '/api/Admin/GetBanUsers' },  // 未使用
+    GetBanUsers:            { method: 'post', url: '/api/Admin/GetBanUsers' },
     // Core
     GetCoreConfig:          { method: 'post', url: '/api/Core/GetCoreConfig' },     // 未使用
     UpdateCoreConfig:       { method: 'post', url: '/api/Core/UpdateCoreConfig' },  // 未使用
