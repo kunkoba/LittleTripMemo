@@ -142,7 +142,7 @@ button:active {
 
 /* マーカーアイコン関連 */
 :root {
-    --marker-size: 32px; /* ここが基準サイズ */
+    --marker-size: 24px; /* ここが基準サイズ */
 }
 .custom-marker-wrapper {
     /* 重要：Leafletが作るアイコン枠（60px）を flex で埋め尽くして中央に寄せる */
