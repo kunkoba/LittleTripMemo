@@ -194,14 +194,20 @@ const _DialogCore = {
     // 新着バッヂ更新
     updateNoticeBadge() {
         this.stack.forEach(frame => {
-            // 各フレーム内を探索。$Dom.QuerySelectorは要素不在で例外を出すため、ここでは生のquerySelectorを使用
+            // システム通知
             const btnNotice = frame.querySelector('#btn-sys-notice');
             if (btnNotice) {
-                $UI.Generator.ApplyNewBadge(btnNotice, $App.AppData.Context.UnreadNoticeCount, 'label');
+                $UI.Generator.ApplyNewBadge(btnNotice, $App.AppData.Context.UnreadNoticeCount > 0, 'label');
             }
+            // 受信メール
             const btnMail = frame.querySelector('#btn-user-mail');
             if (btnMail) {
-                $UI.Generator.ApplyNewBadge(btnMail, $App.AppData.Context.UnreadMailCount, 'label');
+                $UI.Generator.ApplyNewBadge(btnMail, $App.AppData.Context.UnreadMailCount > 0, 'label');
+            }
+            // 利用規約
+            const btnLegal = frame.querySelector('#btn-sys-legal');
+            if (btnLegal) {
+                $UI.Generator.ApplyNewBadge(btnLegal, $App.AppData.Context.HasLegalUpdate, 'label');
             }
         });
     },

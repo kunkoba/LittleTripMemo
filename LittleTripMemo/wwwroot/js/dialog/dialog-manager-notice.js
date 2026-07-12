@@ -72,6 +72,7 @@ export default {
         $Dom.QuerySelector('#btn-info-privacy', el).onclick = () => {
             $Util.OpenExternalLink($Const.APP_INFO.OFFICIAL_SITE + "privacy/");
         };
+        // 
         this._core.open({ title: "アプリの詳細情報", content: el, buttons: [] });
     },
     // アプリ評価・レビュー一覧（フィードバック一覧）
@@ -426,5 +427,47 @@ export default {
             help: "",
             buttons: []
         });
+    },
+    // リーガル情報ビューア（3項目一括表示）
+    async ShowLegalDocuments(focusKey = null) {
+        // 1. DBから最新の本文をすべて取得
+        const docs = await $LocalDb.Legal.GetAll();
+        const LT = $Const.LEGAL_TYPE;
+        const root = document.createElement("div");
+        root.className = "w-full flex flex-col gap-8 py-2";
+        // セクション生成ヘルパー
+        const createSection = (title, key) => {
+            const data = docs.find(d => d.id === key);
+            const sec = document.createElement("section");
+            sec.id = `legal-${key}`;
+            sec.innerHTML = `
+                <div class="flex items-center gap-2 border-l-4 border-brand-5 pl-3 mb-3">
+                    <h3 class="text-[1.1rem] font-black text-slate-900">${title}</h3>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 text-[0.9rem] text-slate-600 leading-[1.8] whitespace-pre-wrap shadow-sm">
+                    ${data ? data.body : "内容が登録されていません。"}
+                </div>
+            `;
+            return sec;
+        };
+        root.appendChild(createSection("利用規約", LT.TERMS));
+        root.appendChild(createSection("プライバシーポリシー", LT.PRIVACY));
+        root.appendChild(createSection("オープンソースライセンス", LT.LICENSE));
+        // 2. 既読化処理
+        await $LocalDb.Legal.MarkAllAsRead();
+        await $Data.LocalDb.CheckLegalUnread(); // Contextとバッジを更新
+        this._core.open({
+            title: "規約・ポリシー",
+            content: root,
+            size: 'lg',
+            help: "アプリの利用規約、プライバシーポリシー、および使用しているライセンス情報を確認できます。"
+        });
+        // アンカー移動（指定の項目があればそこへスクロール）
+        if (focusKey) {
+            setTimeout(() => {
+                const el = document.getElementById(`legal-${focusKey}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+        }
     },
 };

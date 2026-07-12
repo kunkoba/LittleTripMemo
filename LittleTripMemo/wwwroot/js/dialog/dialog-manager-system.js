@@ -31,7 +31,8 @@ export default {
         const b = {
             notice:  $Dom.QuerySelector('#btn-sys-notice', el),
             version: $Dom.QuerySelector('#btn-sys-version', el),
-            login:    $Dom.QuerySelector('#btn-sys-login', el),
+            legal:   $Dom.QuerySelector('#btn-sys-legal', el),
+            login:   $Dom.QuerySelector('#btn-sys-login', el),
             admin:   $Dom.QuerySelector('#btn-sys-admin', el),
         };
         // 表示制御
@@ -39,7 +40,10 @@ export default {
         const loginLabel = $Dom.QuerySelector('span:last-child', b.login);
         loginLabel.textContent = isLoggedIn ? "ログアウトする" : "ログイン／サインインする";
         // 新着バッジ更新
-        $UI.Generator.ApplyNewBadge(b.notice, $App.AppData.Context.UnreadNoticeCount, 'label');
+        $UI.Generator.ApplyNewBadge(b.notice, $App.AppData.Context.UnreadNoticeCount > 0, 'label');
+        // 規約更新がある場合「NEW」ラベルを表示
+        const hasLegal = !!$App.AppData.Context.HasLegalUpdate;
+        $UI.Generator.ApplyNewBadge(b.legal, hasLegal, 'label');
         // 各種イベント
         b.notice.onclick = () => this.ShowNoticeList();
         b.version.onclick = () => this.ShowAppInfo();
@@ -70,7 +74,7 @@ export default {
             reports: $Dom.QuerySelector('#btn-sys-my-report', el),
         };
         // 新着バッヂ更新
-        $UI.Generator.ApplyNewBadge(b.mail, $App.AppData.Context.UnreadMailCount, 'label');
+        $UI.Generator.ApplyNewBadge(b.mail, $App.AppData.Context.UnreadMailCount > 0, 'label');
         // 各種イベント
         b.profile.onclick = () => this.ShowUserProfile($App.AppData.Owner.SystemInfo.ownerProfile, true);
         b.mail.onclick    = () => this.ShowUserMailList();

@@ -101,17 +101,17 @@ const UI_Manager = {
 			parentEl.appendChild(el);
 		},
 		// 新規バッヂ生成
-		ApplyNewBadge(parentEl, count, type = 'dot') {
+		ApplyNewBadge(parentEl, isShow, type = 'dot') {
 			if (!parentEl) return;
 			// parentEl.innerHTML = "";	// 消しちゃダメ
 			let badge = parentEl.querySelector('.js-unread-badge');
-			const isShow = count > 0;
+			// const isShow = count > 0;
 			if (isShow && !badge) {
 				parentEl.classList.add('relative');
 				badge = document.createElement('span');
 				badge.className = 'js-unread-badge absolute bg-red-500 text-white font-bold flex items-center justify-center pointer-events-none  whitespace-nowrap ';
 				if (type === 'dot') {
-					badge.className += 'w-3 h-3 rounded-full top-1 right-1 border-2 border-brand-1';
+					badge.className += 'w-3 h-3 rounded-full top-0 right-0 border-2 border-brand-1';
 				} else {
 					badge.className += 'text-[0.9rem] px-2 py-0.5 rounded-full top-1/2 -translate-y-1/2 right-4';
 					badge.textContent = 'NEW';

@@ -107,9 +107,12 @@ const _BottomCore = {
 	// 新着バッヂ更新
 	updateNoticeBadge() {
 		const unreadNotice = $App.AppData.Context.UnreadNoticeCount || 0;
-		$UI.Generator.ApplyNewBadge(this.btnSysMenu, unreadNotice, 'dot');
 		const unreadMail = $App.AppData.Context.UnreadMailCount || 0;
-		$UI.Generator.ApplyNewBadge(this.btnUserMenu, unreadMail, 'dot');
+        const hasLegal = !!$App.AppData.Context.HasLegalUpdate;
+		// $UI.Generator.ApplyNewBadge(this.btnSysMenu, unreadNotice, 'dot');
+		const isShow = unreadNotice + unreadMail + (hasLegal ? 1 : 0);
+		$UI.Generator.ApplyNewBadge(this.btnSysMenu, (isShow), 'dot');
+		$UI.Generator.ApplyNewBadge(this.btnUserMenu, unreadMail > 0, 'dot');
 	},
 	// ユーザアイコン更新
 	updateUserIcon() {
