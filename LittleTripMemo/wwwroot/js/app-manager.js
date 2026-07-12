@@ -25,7 +25,12 @@ AppSettingKey: "little_trip_settings",
             ReportSummary: [],
             FeedbackList:[],
             UserMailList: [],
-        }
+        },
+        Legal: {
+            TermsOfService: { body: "TermsOfService", update_tim: null },
+            PrivacyPolicy:  { body: "PrivacyPolicy",  update_tim: null },
+            License:        { body: "License",        update_tim: null },
+        },
     },
     // iPhoneのキーボード対策（入力中を考慮）
     _initViewport() {
@@ -153,10 +158,11 @@ AppSettingKey: "little_trip_settings",
         // 定期タスク開始-----
         $Polling.Start($Polling.TASKS.OFFLINE_CHECK);
     },
-    // Service Workerの登録と更新監視（Init処理の最後）
-    _initServiceWorker() {
+    // Service Workerの登録と更新監視
+    _initServiceWorker_2() {
         if (!('serviceWorker' in navigator)) return;
-        navigator.serviceWorker.register('./sw.js').then(reg => {
+        const version = $Const.APP_INFO.VERSION;
+        navigator.serviceWorker.register(`./sw.js?v=${version}`).then(reg => {
             console.log('[SW] 登録完了スコープ:', reg.scope);
             // 更新が見つかった場合のイベント
             reg.addEventListener('updatefound', () => {
@@ -182,6 +188,45 @@ AppSettingKey: "little_trip_settings",
         }).catch(err => {
             console.error('[SW] 登録失敗:', err);
         });
+    },
+    // 戦略：バックグラウンドでの自動更新（ユーザーへの確認なし）
+    _initServiceWorker() {
+        if (!('serviceWorker' in navigator)) return;
+        // バージョンをURLに付与することで、app-const.jsの更新時にブラウザへ新SWを検知させる
+        const swUrl = `./sw.js?v=${$Const.APP_INFO.VERSION}`;
+        navigator.serviceWorker.register(swUrl)
+            .then(reg => {
+                console.log('[SW] 登録完了:', reg.scope);
+                // 新しいSWが見つかった際、古いSWを待たずに即座に有効化させるための
+                // updatefoundイベント（sw.js側のskipWaitingと連動して速やかに更新を完了させる）
+                reg.onupdatefound = () => {
+                    const installingWorker = reg.installing;
+                    installingWorker.onstatechange = () => {
+                        if (installingWorker.state === 'installed') {
+                            if (navigator.serviceWorker.controller) {
+                                console.log('[SW] 新しいバージョンをダウンロードしました。次回の起動で反映されます。');
+                            }
+                        }
+                    };
+                };
+            })
+            .catch(err => {
+                console.error('[SW] 登録失敗:', err);
+            });
+        // 使用中に勝手に画面が変わって入力データが消えるのを防ぐため、
+        // controllerchange（自動リロード）の監視は行いません。
+    },
+    // 更新確認ダイアログの共通処理
+    async _confirmUpdate(worker) {
+        const isOk = await $Dialog.ShowConfirm({
+            title: "UPDATE",
+            message: "新しいバージョンが利用可能です。\n最新版に更新しますか？",
+            label: "UPDATE"
+        });
+        if (isOk) {
+            // sw.js側で作った窓口（message）に合図を送る
+            worker.postMessage({ type: 'SKIP_WAITING' });
+        }
     },
     // アプリ起動時フロー
     async Init_2() {
@@ -255,8 +300,9 @@ AppSettingKey: "little_trip_settings",
         try {
             // --- 起動処理（Token復元とDB初期化） ---
             {
-                this._loadSettings(); 
+                this._loadSettings();
                 await $LocalDb.Init();
+                this.RefreshLegalConfigs();     // 規約類の同期を開始（awaitせずバックグラウンドで実行）
                 if (this.AppData.Owner.Token) {
                     this.AppData.Context.IsLoggedIn = true;
                     // 【修正点】失敗しても return せず、オフラインとして続行する
@@ -475,6 +521,40 @@ AppSettingKey: "little_trip_settings",
             return true;
         }
         return false;
+    },
+    // 規約・ポリシー類の差分チェックと同期（1日1回などの定期実行を想定）
+    async RefreshLegalConfigs() {
+        const MIN_DATE = "1900-01-01T00:00:00";
+        // 1. ローカルDBから現在の状態（日時のみ）を取得
+        const localData = await $LocalDb.Legal.GetAll();
+        // 2. リクエスト作成（データがなければ最小値をセット）
+        const targetKeys = Object.values($Const.LEGAL_TYPE);
+        const items = targetKeys.map(key => {
+            const local = localData.find(d => d.id === key);
+            return {
+                key: key,
+                last_sync_tim: local ? local.update_tim : MIN_DATE
+            };
+        });
+        // 3. サーバー照会
+        const isSuccess = await $Data.Access.GetLegalConfigs({ items });
+        if (!isSuccess) return;
+        // 4. 更新があった項目のみDB保存
+        const results = $Data.resData.results || [];
+        let hasUpdate = false;
+        for (const res of results) {
+            if (res.value !== null) {
+                // 本文がある＝更新あり。未読フラグ付きで保存
+                await $LocalDb.Legal.Save(res.key, res.value, res.update_tim, true);
+                hasUpdate = true;
+            }
+        }
+        // 5. 更新があればUIに通知（バッジ表示用フラグの更新など）
+        if (hasUpdate) {
+            // 自分でループしてフラグをチェック（_updateLegalUnreadStatus）するのではなく、
+            // 作法通り、データ管理側の判定ロジックを呼ぶだけにする
+            await $Data.LocalDb.CheckLegalUnread();
+        }
     },
     // 【ユーザ設定】カラーテーマ変更
     ChangeTheme(theme){

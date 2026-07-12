@@ -21,7 +21,7 @@ public class CoreConfigRepository : _BaseRepository
     public async Task<IEnumerable<dynamic>> GetConfigsByCategoryAsync(string category)
     {
         const string sql = @"
-            SELECT key, value, description 
+            SELECT key, value, description, update_tim 
             FROM mgr_sys_config 
             WHERE category = @category";
 

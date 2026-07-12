@@ -2,17 +2,35 @@
 window.$Const = {
     // アプリ情報
     APP_INFO: {
-        NAME: "Little Trip Memo（まとめも）",
+        NAME: "まとめも",
+        DESCRIPTION: "メモをまとめて自分だけの旅行記を作ろう",
         DEVELOPER: "kunkoba",
-        VERSION: "1.0.0",
         OFFICIAL_SITE: "https://hinekulemonstudio.web.app/",
-        LICENSE: "?????????????",
+        VERSION: "1.1.3",
+        VERSION_DESCRIPTION: `
+メジャー.マイナー.パッチの形式で表されます。
+
+■ メジャー（一番左の数字）
+もっとも大きな変更があった時に更新します。既存の機能が動かなくなるような「破壊的な変更」が含まれる場合や、大幅な仕様変更を行った時に数字を上げます。
+
+■ マイナー（真ん中の数字）
+新しい機能を追加した時に更新します。これまでの機能との互換性は保たれるため、アップデートしても基本的にプログラムが壊れることはありません。
+
+■ パッチ（一番右の数字）
+バグの修正や、内部的な微調整のみを行った時に更新します。機能の追加や変更は行わず、既存の動きを安定させるための更新です。
+`,
     },
     // アプリ設定
     APP_CONFIG: {
         ADMIN_PW: "8855",
         SAVE_DETAIL_SEC: 300,
         SAVE_REACTION_SEC: 300,
+    },
+    // リーガル情報の識別キー
+    LEGAL_TYPE: {
+        TERMS:   "TermsOfService",
+        PRIVACY: "PrivacyPolicy",
+        LICENSE: "License",
     },
     // 地図設定
     MAP_CONFIG: {

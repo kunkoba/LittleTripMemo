@@ -110,8 +110,10 @@ public static class ServiceExtensions
         services.AddScoped<GetShadowBanUsersService>();
 
         // Core (System Config)
-        services.AddScoped<GetCoreConfigService>();    // ★新規開放
-        services.AddScoped<UpdateCoreConfigService>(); // ★新規開放
+        services.AddScoped<GetCoreConfigService>();  
+        services.AddScoped<UpdateCoreConfigService>();
+        services.AddScoped<GetLegalConfigsService>();
+        services.AddScoped<UpdateLegalConfigService>();
 
         return services;
     }

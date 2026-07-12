@@ -10,7 +10,7 @@ const getUserId = () => {
 const _LocalDbCore = {
     db: null,
     DB_NAME: "littleTripMemoDb",
-    VERSION: 3, // スキーマ変更のためバージョンを3に引き上げ
+    VERSION: 5,
     // トランザクションモード定義
     TRANSACTION_MODES: {
         READONLY: 'readonly',
@@ -22,6 +22,7 @@ const _LocalDbCore = {
         REACTION: 'reactionStore',
         NOTICE: 'noticeStore',
         MAIL: 'mailStore',
+        LEGAL: 'legalStore',
     },
     // 初期化
     async init() {
@@ -67,7 +68,6 @@ const _LocalDbCore = {
             if (db.objectStoreNames.contains(this.STORE_NAMES.NOTICE)) db.deleteObjectStore(this.STORE_NAMES.NOTICE);
             if (db.objectStoreNames.contains(this.STORE_NAMES.MAIL)) db.deleteObjectStore(this.STORE_NAMES.MAIL);
         }
-
         // 詳細データ（主キーはdbidだが、データ内に user_id を持つ）
         if (!db.objectStoreNames.contains(this.STORE_NAMES.DETAIL)) {
             db.createObjectStore(this.STORE_NAMES.DETAIL, { keyPath: "dbid", autoIncrement: true });
@@ -83,6 +83,11 @@ const _LocalDbCore = {
         // ユーザあて通知（ユーザーごとに既読を管理）
         if (!db.objectStoreNames.contains(this.STORE_NAMES.MAIL)) {
             db.createObjectStore(this.STORE_NAMES.MAIL, { keyPath: ["user_id", "seq"] });
+        }
+        // 規約・ポリシー等（LEGAL）用
+        if (!db.objectStoreNames.contains(this.STORE_NAMES.LEGAL)) {
+            // id（'TermsOfService', 'PrivacyPolicy' 等のキー名）を主キーにする
+            db.createObjectStore(this.STORE_NAMES.LEGAL, { keyPath: "id" });
         }
     },
     // トランザクションからオブジェクトストアを取得
@@ -210,9 +215,6 @@ const _LocalDbCore = {
 };
 
 // 窓口
-// ・ローカル㏈のデータ＝「未保存データ」
-// ・サーバ更新はユーザ主導で行う（ボタンで更新）
-// ・サーバ更新は完全同期処理（成功すればローカル㏈を削除する）
 const LocalDbController = {
     // ※※※※ データベースを削除する ※※※※
     RemoveDB(){
@@ -421,6 +423,35 @@ const LocalDbController = {
             const all = await _LocalDbCore.getAllData(this.storeName); 
             return all.filter(item => item.user_id === uid);
         }
+    },
+    // リーガル情報管理
+    Legal: {
+        storeName: _LocalDbCore.STORE_NAMES.LEGAL,
+        // 保存：本文、日時、および未読フラグをセット
+        async Save(id, body, update_tim, isUnread = false) {
+            return await _LocalDbCore.upsertData(this.storeName, { 
+                id, body, update_tim, is_unread: isUnread 
+            });
+        },
+        // 特定の項目を取得
+        async Get(id) {
+            return await _LocalDbCore.getDataByKey(this.storeName, id);
+        },
+        // 全項目取得（起動時のAppData復元用）
+        async GetAll() {
+            return await _LocalDbCore.getAllData(this.storeName);
+        },
+        // 削除（通常は使わないが作法として）
+        async Delete(id) {
+            return await _LocalDbCore.deleteByKey(this.storeName, id);
+        },
+        // すべて既読にする（画面表示時に呼び出す）
+        async MarkAllAsRead() {
+            return await _LocalDbCore.updateAll(this.storeName, (item) => {
+                item.is_unread = false;
+                return item;
+            });
+        },
     },
 };
 

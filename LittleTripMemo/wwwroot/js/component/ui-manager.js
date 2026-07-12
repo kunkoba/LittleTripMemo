@@ -152,7 +152,7 @@ const UI_Manager = {
 			if (detail.display_day > 0 && $App.AppData.Context.ScreenMode !== $Const.SCREEN_MODE.SEARCH) {
 				const badge = $Dom.QuerySelector(".js-day-badge", el);
 				$Dom.ToggleShow(badge, true);
-				$Dom.QuerySelector(".js-day-text", badge).textContent = `${detail.display_day}`;
+				$Dom.QuerySelector(".js-day-text", badge).textContent = `${detail.display_day} Day`;
 			}
 			parentEl.appendChild(el);
 		},

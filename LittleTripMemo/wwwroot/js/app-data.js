@@ -58,8 +58,10 @@ const API_ENDPOINTS = {
     UpdateUserBanStatus:    { method: 'post', url: '/api/Admin/UpdateUserBanStatus' },
     GetBanUsers:            { method: 'post', url: '/api/Admin/GetBanUsers' },
     // Core
-    GetCoreConfig:          { method: 'post', url: '/api/Core/GetCoreConfig' },     // 未使用
-    UpdateCoreConfig:       { method: 'post', url: '/api/Core/UpdateCoreConfig' },  // 未使用
+    GetCoreConfig:          { method: 'post', url: '/api/Core/GetCoreConfig' },
+    UpdateCoreConfig:       { method: 'post', url: '/api/Core/UpdateCoreConfig' },
+    GetLegalConfigs:        { method: 'post', url: '/api/Core/GetLegalConfigs' },
+    UpdateLegalConfig:      { method: 'post', url: '/api/Core/UpdateLegalConfig' },
 };
 // APIメソッドの自動生成
 const ApiModule = {};
@@ -314,9 +316,9 @@ window.$Data = {
                     // 他人のデータなら「〇月上旬 1day」「2day」等の形式にマスク
                     if (!d.is_owner) {
                         if (dayCounter === 1) {
-                            d.memo_date = isMultiDay ? `${baseMask} 1day` : baseMask;
+                            d.memo_date = isMultiDay ? `${baseMask} 1 Day` : baseMask;
                         } else {
-                            d.memo_date = `${dayCounter}day`;
+                            d.memo_date = `${dayCounter} Day`;
                         }
                     }
                 });
@@ -542,10 +544,8 @@ window.$Data = {
         async CheckUnreadMails() {
             const sysInfo = $App.AppData.Owner.SystemInfo;
             if (!sysInfo || !sysInfo.userNotifications) return;
-
             const readHistory = await $LocalDb.Mail.GetAll();
             let unreadCount = 0;
-
             for (const mail of sysInfo.userNotifications) {
                 const history = readHistory.find(h => h.seq === mail.seq);
                 if (!history || new Date(mail.send_tim) > new Date(history.send_tim)) {
@@ -557,6 +557,17 @@ window.$Data = {
             }
             $App.AppData.Context.UnreadMailCount = unreadCount;
             // 新着バッヂ更新
+            $UI.UpdateNoticeBadge();
+        },
+        // リーガル情報の未読判定
+        async CheckLegalUnread() {
+            // 1. ローカルDBから全件取得
+            const allLegals = await $LocalDb.Legal.GetAll();
+            // 2. 一つでも未読（is_unread: true）があるか判定
+            const hasUpdate = allLegals.some(item => item.is_unread === true);
+            // 3. 判定結果をコンテキストに保持
+            $App.AppData.Context.HasLegalUpdate = hasUpdate;
+            // 4. UIのバッジ描画を更新
             $UI.UpdateNoticeBadge();
         },
     },

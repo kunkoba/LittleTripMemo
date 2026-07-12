@@ -108,7 +108,14 @@ button:active {
 .kb-icon-emoji-sm,
 .kb-icon-emoji-md,
 .kb-icon-emoji-lg {
-    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.8)) drop-shadow(0 0 1px var(--brand-lvl3));
+    filter:
+        drop-shadow(0 0 1px rgba(0,0,0,0.8))
+}
+.kb-icon-emoji-xlg {
+    filter:
+        drop-shadow(0 0 1px rgba(0,0,0,0.8))
+        drop-shadow(0 0 1px rgba(0,0,0,0.8))
+        /* drop-shadow(0 0 1px var(--brand-lvl5)) */
 }
 /* 絵文字アイコン用クラス */
 .kb-icon-emoji-sm {
@@ -133,6 +140,15 @@ button:active {
     font-size: 1.8rem;
     width:     1.8rem;
     height:    1.8rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.kb-icon-emoji-xlg {
+    font-size: 2.8rem;
+    width:     2.8rem;
+    height:    2.8rem;
     line-height: 1;
     display: inline-flex;
     align-items: center;

@@ -2,12 +2,12 @@
 const _ArrowSettings = {
     // color: "blue",
     color: "var(--brand-lvl5)",
-    weight: 10,
-    size: '10px',
-    frequency: '50px',
-    fill: true,
-    yawn: 30,
-    opacity: 0.5
+    weight: 6,      // 線の太さ
+    opacity: 0.5,   // 色の不透明度
+    fill: true,     // 塗りつぶし
+    // size: '8px',         // 矢印のサイズ
+    // frequency: '50px',   // 矢印の間隔
+    // yawn: 30,            // 矢印の開き具合
 };
 
 // マーカー・矢印・ポップアップの物理操作（Privateコア）
@@ -172,10 +172,9 @@ const _MarkerCore = {
             const marker = this._markerList[index];
             const el = $Dom.GenerateTemplate("tpl-marker-popup");
             $Dom.QuerySelector(".index", el).textContent = (index + 1);
-            // $Dom.QuerySelector(".time", el).textContent = detail.memo_date + '  ' + detail.memo_time
-        const dateContainer = $Dom.QuerySelector(".js-date-container", el);
-        // dateContainer.innerHTML = ""; // 念のためクリア
-        $UI.Generator.MemoDateFormatter(dateContainer, detail); // デフォルトサイズで呼び出し
+            $Dom.QuerySelector(".js-face", el).textContent = detail.face_emoji || '😀'; // ★追加
+            const dateContainer = $Dom.QuerySelector(".js-date-container", el);
+            $UI.Generator.MemoDateFormatter(dateContainer, detail); // デフォルトサイズで呼び出し
             $Dom.QuerySelector(".title", el).textContent = detail.title || "";
             const bodyEl = $Dom.QuerySelector(".body", el);
             if (bodyEl) {
@@ -185,21 +184,6 @@ const _MarkerCore = {
             }
             const btnAction = $Dom.QuerySelector("#btn-popup-action", el);
             const actionText = $Dom.QuerySelector(".js-action-text", el);
-            // // 画面モードによるアクションボタンの制御
-            // if ($App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH) {
-            //     // 画面モードによるアクションボタンの制御（全モード共通で明細を開く）
-            //     if (actionText) actionText.textContent = "VIEW DETAIL";
-            //     btnAction.onclick = (e) => {
-            //         e.stopPropagation();
-            //         $DetailFrame.Open(detail);
-            //     };
-            // } else {
-            //     if (actionText) actionText.textContent = "このメモを開く";
-            //     btnAction.onclick = (e) => {
-            //         e.stopPropagation();
-            //         $DetailFrame.Open(detail);
-            //     };
-            // }
             btnAction.onclick = (e) => {
                 e.stopPropagation();
                 $DetailFrame.Open(detail);

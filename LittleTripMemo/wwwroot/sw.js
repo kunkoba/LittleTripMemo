@@ -1,6 +1,19 @@
-// キャッシュのバージョン（アップデート時はこの数値を変更する）
-const CACHE_VERSION = 'v0.0.6';
-// キャッシュすべき静的アセット（HTMLテンプレートを含む）
+/**
+ * Service Worker: Network First with Timeout Strategy
+ * 
+ * 1. オンライン時はネットワークから最新を取得（3秒以内に応答がない場合はキャッシュへ）
+ * 2. オフライン時は即座にキャッシュから取得
+ * 3. 更新時はユーザーの許可を待たず、自動的にバックグラウンドで最新化
+ */
+// --- 設定定数 ---
+const NETWORK_TIMEOUT = 3000; // ネットワークを待つ時間（ミリ秒）
+const urlParams = new URL(self.location).searchParams;
+const CACHE_VERSION = urlParams.get('v') || 'manual-v1';
+const CACHE_KEYS = {
+    STATIC: `static-cache-${CACHE_VERSION}`,   // CDNや画像など（Cache First）
+    DYNAMIC: `dynamic-cache-${CACHE_VERSION}`  // index.htmlや自作JS/CSS（Network First）
+};
+// 起動時に最低限キャッシュしておくべきコアアセット
 const CORE_ASSETS = [
     './',
     './index.html',
@@ -11,60 +24,41 @@ const CORE_ASSETS = [
     './css/app-style.css',
     './css/component-style.css'
 ];
-// キャッシュ名の定義
-const CACHE_KEYS = {
-    STATIC: `static-cache-${CACHE_VERSION}`,   // 変更がないもの用（Cache First）
-    DYNAMIC: `dynamic-cache-${CACHE_VERSION}`  // 頻繁に変わるもの用（Network First）
-};
 // キャッシュ優先（Cache First）にする外部ドメイン群
 const STATIC_DOMAINS = [
     'cdn.tailwindcss.com',
     'unpkg.com',
-    'www.gstatic.com', // Firebase
+    'www.gstatic.com',
     'fonts.googleapis.com',
     'fonts.gstatic.com',
     'cdn.simpleicons.org'
 ];
 // キャッシュ優先（Cache First）にする拡張子
 const STATIC_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2'];
-// キャッシュから除外するもの（API通信など）
+// キャッシュ除外対象（API通信など）
 const isApiRequest = (url) => {
     return url.includes('/api/') || url.includes('ngrok-free.app') || url.includes('localhost:5000');
 };
-// 静的リソース（Cache First対象）の判定
-const isStaticRequest = (urlStr) => {
-    const url = new URL(urlStr);
-    // 地図タイル等の重いリソースはキャッシュしない（ブラウザ任せ）
-    if (url.hostname.includes('tile.openstreetmap') || url.hostname.includes('arcgisonline.com')) return false;
-    // ドメイン判定
-    if (STATIC_DOMAINS.some(domain => url.hostname.includes(domain))) return true;
-    // 拡張子判定
-    if (STATIC_EXTENSIONS.some(ext => url.pathname.toLowerCase().endsWith(ext))) return true;
-    return false;
-};
-// 1. インストール処理
+// --- 1. インストール処理 ---
 self.addEventListener('install', (event) => {
-    // console.log("★SW >> install");
-        event.waitUntil(
+    event.waitUntil(
         caches.open(CACHE_KEYS.STATIC).then((cache) => {
-            return cache.addAll(CORE_ASSETS); // 起動に必要なものは最初に全部入れる
+            return cache.addAll(CORE_ASSETS);
         })
     );
-    // 待機状態をスキップし、即座に新しいSWをインストールする（確実なバージョンアップのため）
+    // 新しいSWが見つかったら、待機せずに即座に入れ替える
     self.skipWaiting();
 });
-// 2. アクティベート処理
+// --- 2. アクティベート処理 ---
 self.addEventListener('activate', (event) => {
-    // console.log("★SW >> activate");
-    // すべてのクライアント（開いているタブ）の制御を即座に奪う
+    // すべてのクライアントを即座に制御下に置く
     event.waitUntil(self.clients.claim());
-    // バージョンが異なる古いキャッシュを全て物理削除する
+    // バージョンが異なる古いキャッシュを物理削除
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    const expectedKeys = Object.values(CACHE_KEYS);
-                    if (!expectedKeys.includes(cacheName)) {
+                    if (!Object.values(CACHE_KEYS).includes(cacheName)) {
                         console.log(`[SW] 古いキャッシュを削除しました: ${cacheName}`);
                         return caches.delete(cacheName);
                     }
@@ -73,42 +67,58 @@ self.addEventListener('activate', (event) => {
         })
     );
 });
-// 3. リクエストの横取り（Fetchイベント）
+// --- 3. リクエストの横取り（Fetchイベント） ---
 self.addEventListener('fetch', (event) => {
-    // console.log("★SW >> fetch");
     const req = event.request;
     const url = new URL(req.url);
-    // GETメソッド以外（POST等）や、API通信はSWで干渉せずそのまま流す
-    if (req.method !== 'GET' || isApiRequest(req.url)) {
-        return;
-    }
-    // 【戦略B：Cache First】（外部CDNや画像など変更がないもの）
-    if (isStaticRequest(req.url)) {
+    // GET以外やAPI通信はSWで干渉しない
+    if (req.method !== 'GET' || isApiRequest(req.url)) return;
+    // 【戦略A：Cache First】（外部CDNや画像など、ほぼ変更がないもの）
+    const isStatic = STATIC_DOMAINS.some(domain => url.hostname.includes(domain)) || 
+                     STATIC_EXTENSIONS.some(ext => url.pathname.toLowerCase().endsWith(ext));
+    if (isStatic) {
         event.respondWith(
             caches.match(req).then((cachedResponse) => {
-                if (cachedResponse) return cachedResponse; // キャッシュがあれば即返す
-                // 無ければネットワークへ取りに行き、キャッシュに保存して返す
+                if (cachedResponse) return cachedResponse;
                 return fetch(req).then((networkResponse) => {
                     return caches.open(CACHE_KEYS.STATIC).then((cache) => {
                         cache.put(req, networkResponse.clone());
                         return networkResponse;
                     });
-                }).catch(() => { /* 失敗時は何もしない */ });
+                });
             })
         );
         return;
     }
-    // 【戦略A：Network First】（index.html、自作JS・CSSなど変更されるもの）
+    // 【戦略B：Network First with Timeout】（index.html、自作JS・CSSなど）
     event.respondWith(
-        fetch(req).then((networkResponse) => {
-            // ネットワーク通信成功：最新版をキャッシュに上書きして返す
-            return caches.open(CACHE_KEYS.DYNAMIC).then((cache) => {
-                cache.put(req, networkResponse.clone());
-                return networkResponse;
-            });
-        }).catch(() => {
-            // ネットワーク通信失敗（オフライン時）：キャッシュから返す
-            return caches.match(req);
-        })
+        (async () => {
+            const cache = await caches.open(CACHE_KEYS.DYNAMIC);
+            // ネットワーク取得とタイムアウト（キャッシュ返し）を競争させる
+            try {
+                const networkResponse = await Promise.race([
+                    fetch(req),
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Timeout')), NETWORK_TIMEOUT)
+                    )
+                ]);
+                // ネットワークが勝った場合：キャッシュを更新して返す
+                if (networkResponse && networkResponse.status === 200) {
+                    cache.put(req, networkResponse.clone());
+                    return networkResponse;
+                }
+            } catch (err) {
+                // タイムアウト、オフライン、またはサーバーエラー時はキャッシュから返す
+                console.warn(`[SW] ネットワーク失敗。キャッシュを返します: ${url.pathname}`);
+            }
+            // キャッシュがあればそれを返し、なければネットワークへ（最後の手段）
+            return (await caches.match(req)) || fetch(req);
+        })()
     );
+});
+// アプリ側からの強制指令（念のため残すが、基本は install 時の skipWaiting で完結）
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });

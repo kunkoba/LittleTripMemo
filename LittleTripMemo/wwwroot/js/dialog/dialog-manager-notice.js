@@ -1,6 +1,6 @@
 export default {
     // （システム）アプリ情報
-    ShowAppInfo() {
+    ShowAppInfo_2() {
         const el = $Dom.GenerateTemplate("tpl-app-info");
         // --- 1. アプリ定数からの基本情報 ---
         $Dom.QuerySelector('.js-app-name', el).textContent = $Const.APP_INFO.NAME;
@@ -41,6 +41,38 @@ export default {
             help: "アプリの基本情報と、公開されているまとめやメモの全体統計を表示します。",
             buttons:[]
         });
+    },
+    ShowAppInfo() {
+        const el = $Dom.GenerateTemplate("tpl-app-info");
+        // アイコン・基本情報
+        $Dom.QuerySelector('#js-app-icon', el).src = "img/ico/icon-512.png";
+        $Dom.QuerySelector('.js-app-name', el).textContent = $Const.APP_INFO.NAME;
+        $Dom.QuerySelector('.js-app-version', el).textContent = $Const.APP_INFO.VERSION;
+        $Dom.QuerySelector('.js-app-developer', el).textContent = $Const.APP_INFO.DEVELOPER;
+        // 統計データ
+        const sysInfo = $App.AppData.Owner.SystemInfo || {};
+        const appInfo = sysInfo.app_info || {};
+        $Dom.QuerySelector('.js-stat-users', el).textContent = (appInfo.total_user_count || 0).toLocaleString();
+        $Dom.QuerySelector('.js-stat-archives', el).textContent = (appInfo.total_archive_pub_count || 0).toLocaleString();
+        $Dom.QuerySelector('.js-stat-memos', el).textContent = (appInfo.total_detail_pub_count || 0).toLocaleString();
+        if (appInfo.last_aggregate_tim) {
+            $Dom.QuerySelector('.js-last-update', el).textContent = $Util.FormatDate(appInfo.last_aggregate_tim, 'YYYY.MM.DD');
+        }
+        // 評価・スコア
+        const scoreAvg = appInfo.avg_score ?? sysInfo.avg_score ?? 0;
+        $Dom.QuerySelector('.js-app-score', el).textContent = `★ ${scoreAvg.toFixed(1)}`;
+        $Dom.QuerySelector('.js-app-feedback-count', el).textContent = appInfo.total_feedback_count || 0;
+        // ボタンイベント
+        $Dom.QuerySelector('#btn-info-review', el).onclick = () => this.ShowReviewList();
+        $Dom.QuerySelector('#link-info-official', el).onclick = () => $Util.OpenExternalLink($Const.APP_INFO.OFFICIAL_SITE);
+        // 新設：規約とポリシー（外部サイト等のURLを想定）
+        $Dom.QuerySelector('#btn-info-terms', el).onclick = () => {
+            $Util.OpenExternalLink($Const.APP_INFO.OFFICIAL_SITE + "terms/");
+        };
+        $Dom.QuerySelector('#btn-info-privacy', el).onclick = () => {
+            $Util.OpenExternalLink($Const.APP_INFO.OFFICIAL_SITE + "privacy/");
+        };
+        this._core.open({ title: "アプリの詳細情報", content: el, buttons: [] });
     },
     // アプリ評価・レビュー一覧（フィードバック一覧）
     ShowReviewList() {

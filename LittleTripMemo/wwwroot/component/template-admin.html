@@ -137,7 +137,7 @@
                 <span class="text-[0.9rem] text-slate-600">対象まとめ</span>
                 <button id="btn-admin-report-open-archive" class="h-10 w-full flex items-center justify-between p-3 bg-white rounded-full active:bg-slate-50 transition-colors text-left shadow-md">
                     <div class="flex-1 min-w-0 pr-2">
-                        <div class="text-[1rem] font-bold text-slate-900 js-archive-title break-words line-clamp-2"></div>
+                        <div class="text-[1rem] font-bold text-slate-900 js-archive-title break-words line-clamp-1"></div>
                     </div>
                     <span class="text-[1rem] ml-2">🗺️</span>
                 </button>
@@ -504,7 +504,8 @@
 <!-- 1. 基盤設定メニュー -->
 <template id="tpl-menu-admin-core">
     <div class="w-full flex flex-col bg-brand-0">
-        <button id="btn-core-version" class="w-full h-16 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+        <button id="btn-core-version" 
+            class="w-full h-16 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 kb-icon-emoji-lg">📱</span>
             <span class="col-span-1"></span>
             <div class="col-span-8 text-left flex flex-col">
@@ -512,12 +513,29 @@
                 <span id="sub-core-version" class="text-[0.8rem] text-slate-500 italic">最新: --- / 必須: ---</span>
             </div>
         </button>
-        <button id="btn-core-maint" class="w-full h-16 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+        <button id="btn-core-maint" 
+            class="w-full h-16 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
             <span class="col-span-1 kb-icon-emoji-lg">🚧</span>
             <span class="col-span-1"></span>
             <div class="col-span-8 text-left flex flex-col">
                 <span class="font-bold text-[1rem]">メンテナンス設定</span>
                 <span id="sub-core-maint" class="text-[0.8rem] font-bold italic">---</span>
+            </div>
+        </button>
+        <button id="btn-core-terms" 
+            class="w-full h-16 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">📜</span>
+            <span class="col-span-1"></span>
+            <div class="col-span-8 text-left">
+                <span class="font-bold text-[1rem]">利用規約の管理</span>
+            </div>
+        </button>
+        <button id="btn-core-privacy" 
+            class="w-full h-16 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">🛡️</span>
+            <span class="col-span-1"></span>
+            <div class="col-span-8 text-left">
+                <span class="font-bold text-[1rem]">プライバシーポリシーの管理</span>
             </div>
         </button>
         <button id="btn-core-info" class="w-full h-16 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
@@ -531,63 +549,49 @@
     </div>
 </template>
 
-<!-- アプリバージョン管理 編集（画像再現レイアウト版） -->
+<!-- アプリバージョン管理 編集（シンプル合理化版） -->
 <template id="tpl-admin-core-version">
-    <div class="w-full text-slate-900 space-y-6 pt-4 px-2">
-        <!-- 最新バージョン (LATEST) -->
+    <div class="w-full text-slate-900 space-y-4 pt-4 px-2">
+        <!-- 最新バージョン (LATEST)：表示のみ -->
         <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
             <label class="block text-[0.8rem] font-bold text-slate-500 uppercase tracking-wider">最新バージョン (LATEST)</label>
-            <div class="grid grid-cols-3 gap-3">
-                <!-- 各桁の入力 + ボタンセット -->
-                <div class="flex flex-col gap-2">
-                    <div id="v-lat-0" class="h-14 bg-white rounded-xl border-2 border-brand-2 flex items-center justify-center text-[1.5rem] font-black italic">0</div>
-                    <div class="grid grid-cols-2 gap-1">
-                        <button data-target="lat" data-idx="0" data-op="minus" class="js-v-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">－</button>
-                        <button data-target="lat" data-idx="0" data-op="plus"  class="js-v-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
-                    </div>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <div id="v-lat-1" class="h-14 bg-white rounded-xl border-2 border-brand-2 flex items-center justify-center text-[1.5rem] font-black italic">0</div>
-                    <div class="grid grid-cols-2 gap-1">
-                        <button data-target="lat" data-idx="1" data-op="minus" class="js-v-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">－</button>
-                        <button data-target="lat" data-idx="1" data-op="plus"  class="js-v-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
-                    </div>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <div id="v-lat-2" class="h-14 bg-white rounded-xl border-2 border-brand-2 flex items-center justify-center text-[1.5rem] font-black italic">0</div>
-                    <div class="grid grid-cols-2 gap-1">
-                        <button data-target="lat" data-idx="2" data-op="minus" class="js-v-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">－</button>
-                        <button data-target="lat" data-idx="2" data-op="plus"  class="js-v-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
-                    </div>
-                </div>
+            <div class="grid grid-cols-3 gap-3 opacity-80">
+                <div id="v-lat-0" class="h-14 bg-slate-100 rounded-xl border-2 border-slate-200 flex items-center justify-center text-[1.5rem] font-black italic text-slate-400">0</div>
+                <div id="v-lat-1" class="h-14 bg-slate-100 rounded-xl border-2 border-slate-200 flex items-center justify-center text-[1.5rem] font-black italic text-slate-400">0</div>
+                <div id="v-lat-2" class="h-14 bg-slate-100 rounded-xl border-2 border-slate-200 flex items-center justify-center text-[1.5rem] font-black italic text-slate-400">0</div>
             </div>
+            <p class="text-[0.7rem] text-right text-brand-5 font-bold italic">※プログラム定数(v<span class="js-app-ver"></span>)から自動取得</p>
+        </div>
+        <!-- アクション：最新を最低にコピー -->
+        <div class="flex justify-center -my-2 relative z-10">
+            <button id="btn-version-copy" class="h-10 px-6 bg-slate-800 text-white rounded-full font-bold text-[0.8rem] shadow-lg active:scale-95 transition-all flex items-center gap-2 border-2 border-white">
+                最新VerをMINにコピー 🔽
+            </button>
         </div>
         <!-- 必須バージョン (MIN) -->
-        <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4 relative">
-            <div class="flex justify-between items-center">
-                <label class="block text-[0.8rem] font-bold text-slate-500 uppercase tracking-wider">必須バージョン (MIN)</label>
-                <button id="btn-version-sync" class="px-3 py-1.5 rounded-lg font-bold text-[0.75rem] transition-colors shadow-md active:scale-95"></button>
-            </div>
-            <div id="group-min-inputs" class="grid grid-cols-3 gap-3 transition-opacity duration-300">
+        <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+            <label class="block text-[0.8rem] font-bold text-slate-500 uppercase tracking-wider">必須バージョン (MIN)</label>
+            <div class="grid grid-cols-3 gap-3">
+                <!-- 桁ごとの操作：リセット or プラス -->
                 <div class="flex flex-col gap-2">
                     <div id="v-min-0" class="h-14 bg-white rounded-xl border-2 border-brand-2 flex items-center justify-center text-[1.5rem] font-black italic">0</div>
-                    <div class="grid grid-cols-2 gap-1 js-min-btns">
-                        <button data-target="min" data-idx="0" data-op="minus" class="js-v-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">－</button>
-                        <button data-target="min" data-idx="0" data-op="plus"  class="js-v-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button data-idx="0" data-op="reset" class="js-v-min-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">R</button>
+                        <button data-idx="0" data-op="plus"  class="js-v-min-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2">
                     <div id="v-min-1" class="h-14 bg-white rounded-xl border-2 border-brand-2 flex items-center justify-center text-[1.5rem] font-black italic">0</div>
-                    <div class="grid grid-cols-2 gap-1 js-min-btns">
-                        <button data-target="min" data-idx="1" data-op="minus" class="js-v-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">－</button>
-                        <button data-target="min" data-idx="1" data-op="plus"  class="js-v-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button data-idx="1" data-op="reset" class="js-v-min-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">R</button>
+                        <button data-idx="1" data-op="plus"  class="js-v-min-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2">
                     <div id="v-min-2" class="h-14 bg-white rounded-xl border-2 border-brand-2 flex items-center justify-center text-[1.5rem] font-black italic">0</div>
-                    <div class="grid grid-cols-2 gap-1 js-min-btns">
-                        <button data-target="min" data-idx="2" data-op="minus" class="js-v-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">－</button>
-                        <button data-target="min" data-idx="2" data-op="plus"  class="js-v-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button data-idx="2" data-op="reset" class="js-v-min-btn h-8 bg-slate-100 rounded-md flex items-center justify-center font-bold text-slate-400 active:scale-90">R</button>
+                        <button data-idx="2" data-op="plus"  class="js-v-min-btn h-8 bg-brand-5 rounded-md flex items-center justify-center font-bold text-white shadow-sm active:scale-90">＋</button>
                     </div>
                 </div>
             </div>
@@ -607,8 +611,23 @@
         </div>
         <div>
             <label class="block text-[0.9rem] font-bold text-slate-600 mb-1">表示メッセージ</label>
-            <textarea id="cfg-maint-msg" class="w-full border-2 border-brand-3 px-3 py-2 text-[0.9rem] h-32 rounded-lg focus:border-brand-5 outline-none resize-none"></textarea>
+            <textarea id="cfg-maint-msg" 
+                class="w-full border-2 border-brand-3 px-3 py-2 text-[1rem] h-32 rounded-lg focus:border-brand-5 outline-none resize-none"></textarea>
         </div>
+    </div>
+</template>
+
+<!-- アプリ基盤設定：長文エディタ（利用規約・プライバシーポリシー用） -->
+<template id="tpl-admin-core-editor">
+    <div class="w-full h-full flex flex-col gap-2 pt-2 px-1">
+        <div class="flex justify-between items-end mb-1">
+            <label id="js-editor-label" class="text-[0.8rem] font-bold text-slate-500 uppercase tracking-widest pl-1"></label>
+            <span class="text-[0.8rem] font-bold text-slate-400"><span id="js-editor-count">0</span>/5000</span>
+        </div>
+        <!-- flex-1 で残りの高さをすべて占有 -->
+        <textarea id="js-editor-input" 
+            class="flex-1 w-full border-2 border-brand-3 p-4 text-[0.95rem] leading-[1.7] rounded-2xl focus:border-brand-5 outline-none resize-none bg-white shadow-inner"
+            placeholder="内容を入力してください..."></textarea>
     </div>
 </template>
 

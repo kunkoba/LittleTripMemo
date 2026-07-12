@@ -331,92 +331,6 @@ export default {
         });
     },
     // 【管理者機能】通報詳細
-    async ShowAdminReportDetail_2(summaryItem) {
-        const isSuccess = await $Data.Access.GetReportDetails({
-            target_user_id: summaryItem.target_user_id,
-            archive_id: summaryItem.archive_id
-        });
-        if (!isSuccess) return;
-        const reports = $Data.resData.reports || [];
-        const el = $Dom.GenerateTemplate("tpl-admin-report-detail");
-        // アーカイブタイトルの反映（CLOSED判定による色変え）
-        const titleEl = $Dom.QuerySelector(".js-archive-title", el);
-        if (summaryItem.is_closed) {
-            titleEl.textContent = `${summaryItem.archive_title || "Unknown Title"} (CLOSED)`;
-            titleEl.classList.replace("text-brand-5", "text-red-500"); // 警告色に変更
-        } else {
-            titleEl.textContent = summaryItem.archive_title || "Unknown Title";
-        }
-        // ターゲットユーザーボタンの設定
-        const userWrapper = $Dom.QuerySelector("#view-report-target-user-wrapper", el);
-        const profile = $Data.resData.target_userProfile;
-        if (profile) {
-            $UI.Generator.UserBadge(userWrapper, profile, { type: 'button', isOwner: false });
-        }
-        // 各種ボタンの取得（Openボタンの代わりにタイトルボタンを取得）
-        const btnOpenArchive = $Dom.QuerySelector("#btn-admin-report-open-archive", el);
-        const btnClose       = $Dom.QuerySelector("#btn-admin-report-close", el);
-        const btnPrivate     = $Dom.QuerySelector("#btn-admin-report-private", el);
-        if (summaryItem.is_closed) {
-            // CLOSED中の場合はCloseボタンのみ非活性
-            btnClose.disabled = true;
-            btnClose.classList.add("opacity-50", "cursor-not-allowed", "grayscale");
-            btnClose.classList.remove("active:scale-95");
-        }
-        // ▼ 修正：タイトルボタンをクリックしたときの処理
-        btnOpenArchive.onclick = async () => {
-            const isOk = await this.ShowConfirm({ title: "JUMP", message: "この Public まとめデータを開きますか？" });
-            if (!isOk) return;
-            this._core.closeAll();
-            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
-            $App.AppData.Context.TargetArchiveId = summaryItem.archive_id;
-            await $App.RefreshScreen();
-        };
-        // 3. Close（強制クローズ：URLを知っている人だけ見れる状態へ）
-        btnClose.onclick = async () => {
-            const isOk = await this.ShowConfirm({ title: "FORCE CLOSE", message: "強制的に公開停止(Close)にしますか？" });
-            if (!isOk) return;
-            const success = await $Data.Access.AdminCloseArchive({ 
-                archive_id: summaryItem.archive_id, 
-                target_user_id: summaryItem.target_user_id 
-            });
-            if (success) { $Notice.Info("強制的にCloseしました"); this._core.closeAll(); }
-        };
-        // 4. Delete（強制Private：本人以外一切見れない状態へ戻す）
-        btnPrivate.onclick = async () => {
-            const isOk = await this.ShowConfirm({ title: "FORCE DELETE", message: "強制的に非公開(Private)に戻し、削除扱いとしますか？" });
-            if (!isOk) return;
-            const success = await $Data.Access.AdminUnpublishArchive({ 
-                archive_id: summaryItem.archive_id, 
-                target_user_id: summaryItem.target_user_id 
-            });
-            if (success) { $Notice.Info("非公開に戻しました"); this._core.closeAll(); }
-        };
-        // 下部の通報理由リスト描画
-        const listContainer = $Dom.QuerySelector("#admin-report-detail-list", el);
-        if (reports.length === 0) {
-            listContainer.innerHTML = `<div class="text-[0.9rem] text-slate-600 p-2">詳細データがありません</div>`;
-        } else {
-            reports.sort((a, b) => new Date(b.report_tim) - new Date(a.report_tim)).forEach(rep => {
-                const child = $Dom.GenerateTemplate("tpl-admin-list-child-report-item");
-                $Dom.QuerySelector(".js-report-tim", child).textContent = $Util.FormatDate(rep.report_tim);
-                $Dom.QuerySelector(".js-report-body", child).textContent = rep.body || "（内容なし）";
-                child.classList.add("cursor-pointer", "active:bg-slate-50");
-                child.onclick = () => this.ShowAdminReportItemDetail(rep);
-                listContainer.appendChild(child);
-            });
-        }
-        // 画面を開く
-        this._core.open({ 
-            title: "通報集計詳細", 
-            content: el, 
-            size: 'lg',
-            theme: "admin", 
-            help: "", 
-            buttons: [] 
-        });
-    },
-    // 【管理者機能】通報詳細
     async ShowAdminReportDetail(summaryItem) {
         const isSuccess = await $Data.Access.GetReportDetails({
             target_user_id: summaryItem.target_user_id,
@@ -985,7 +899,11 @@ export default {
         // 個別編集画面への遷移
         $Dom.QuerySelector('#btn-core-version', el).onclick = () => this.ShowAdminCoreVersion(configList);
         $Dom.QuerySelector('#btn-core-maint', el).onclick = () => this.ShowAdminCoreMaint(configList);
+        $Dom.QuerySelector('#btn-core-terms', el).onclick = () => this.ShowAdminCoreDocumentEditor($Const.LEGAL_TYPE.TERMS, "利用規約");
+        $Dom.QuerySelector('#btn-core-privacy', el).onclick = () => this.ShowAdminCoreDocumentEditor($Const.LEGAL_TYPE.PRIVACY, "プライバシーポリシー");
+        // $Dom.QuerySelector('#btn-core-license', el).onclick = () => this.ShowAdminCoreDocumentEditor($Const.LEGAL_TYPE.LICENSE, "ライセンス");
         $Dom.QuerySelector('#btn-core-info', el).onclick = () => $Notice.Info("システム環境情報は参照のみです");
+        // 
         this._core.open({
             title: "アプリ基盤設定",
             content: el,
@@ -995,72 +913,71 @@ export default {
     },
     // アプリバージョン管理 編集
     async ShowAdminCoreVersion(configList) {
-        const getVal = (key) => configList.find(c => c.key === key)?.value || "1.0.0";
-        const origLatArr = getVal("LatestAppVersion").split('.').map(Number);
-        const origMinArr = getVal("MinAppVersion").split('.').map(Number);
-        let curLat = [...origLatArr];
-        let curMin = [...origMinArr];
-        let isSync = (getVal("LatestAppVersion") === getVal("MinAppVersion"));
+        // 定数（今のプログラム）が「最新」の正解
+        const appVerStr = $Const.APP_INFO.VERSION; 
+        const appVerArr = appVerStr.split('.').map(Number);
+        // サーバーに保存されている「必須バージョン」の初期値
+        const serverMinStr = configList.find(c => c.key === "MinAppVersion")?.value || "1.0.0";
+        const serverMinArr = serverMinStr.split('.').map(Number);
+        // 作業用状態
+        let curMin = [...serverMinArr];
         const el = $Dom.GenerateTemplate("tpl-admin-core-version");
-        const btnSync = $Dom.QuerySelector('#btn-version-sync', el);
-        const minInputs = $Dom.QuerySelector('#group-min-inputs', el);
+        $Dom.QuerySelector('.js-app-ver', el).textContent = appVerStr;
+        // 比較用関数
+        const toVal = (arr) => arr[0] * 10000 + arr[1] * 100 + arr[2];
+        const appVerNum = toVal(appVerArr);
         const render = () => {
-            if (isSync) {
-                curMin = [...curLat];
-                btnSync.textContent = "同期を解除";
-                btnSync.className = "px-3 py-1.5 rounded-lg font-bold text-[0.75rem] shadow-md bg-brand-5 text-white";
-                minInputs.classList.add("opacity-40", "pointer-events-none");
-            } else {
-                btnSync.textContent = "最新と同期する";
-                btnSync.className = "px-3 py-1.5 rounded-lg font-bold text-[0.75rem] shadow-md bg-slate-900 text-white";
-                minInputs.classList.remove("opacity-40", "pointer-events-none");
-            }
+            // LATESTの表示（固定）
             for (let i = 0; i < 3; i++) {
-                $Dom.QuerySelector(`#v-lat-${i}`, el).textContent = curLat[i];
+                $Dom.QuerySelector(`#v-lat-${i}`, el).textContent = appVerArr[i];
                 $Dom.QuerySelector(`#v-min-${i}`, el).textContent = curMin[i];
             }
+            // MINの「＋」ボタン上限ガード
+            $Dom.QuerySelectorAll('.js-v-min-btn', el).forEach(btn => {
+                if (btn.dataset.op === 'plus') {
+                    const idx = parseInt(btn.dataset.idx);
+                    const testArr = [...curMin];
+                    testArr[idx]++;
+                    const isOver = toVal(testArr) > appVerNum;
+                    btn.disabled = isOver;
+                    btn.classList.toggle('opacity-30', isOver);
+                }
+            });
         };
-        $Dom.QuerySelectorAll('.js-v-btn', el).forEach(btn => {
+        // MIN操作イベント
+        $Dom.QuerySelectorAll('.js-v-min-btn', el).forEach(btn => {
             btn.onclick = () => {
-                const { target, idx, op } = btn.dataset;
-                const i = parseInt(idx);
-                const arr = (target === 'lat') ? curLat : curMin;
-                if (op === 'plus') arr[i]++;
-                else if (op === 'minus' && arr[i] > 0) arr[i]--;
+                const idx = parseInt(btn.dataset.idx);
+                if (btn.dataset.op === 'plus') {
+                    curMin[idx]++;
+                } else {
+                    // R(Reset): サーバーに今保存されている値に戻す
+                    curMin[idx] = serverMinArr[idx];
+                }
                 render();
             };
         });
-        btnSync.onclick = () => { isSync = !isSync; render(); };
-        const headerButtons = [{
-            label: "🔄",
-            handler: () => {
-                curLat = [...origLatArr]; curMin = [...origMinArr];
-                isSync = (getVal("LatestAppVersion") === getVal("MinAppVersion"));
-                render();
-            }
-        }];
+        // コピーボタン
+        $Dom.QuerySelector('#btn-version-copy', el).onclick = () => {
+            curMin = [...appVerArr];
+            render();
+            $Notice.Info("最新バージョンをMINに反映しました");
+        };
         render();
         this._core.open({
             title: "バージョン管理",
-            content: el, theme: "admin", headerButtons,
+            content: el, theme: "admin",
             buttons: [[
-                { label: "キャンセル", className: "bg-slate-400 text-white", handler: () => this._core.close() },
+                { label: "cancel", className: "bg-slate-400 text-white", handler: () => this._core.close() },
                 {
-                    label: "保存",
+                    label: "save",
                     handler: async () => {
-                        const latStr = curLat.join('.');
-                        const minStr = curMin.join('.');
-                        // バリデーション（数値化して比較：1.2.3 -> 10203）
-                        const toVal = (arr) => arr[0] * 10000 + arr[1] * 100 + arr[2];
-                        if (toVal(curLat) < toVal(origLatArr)) return $Notice.Warn("最新版を現在より下げることはできません");
-                        if (toVal(curMin) < toVal(origMinArr)) return $Notice.Warn("必須版を現在より下げることはできません");
-                        if (toVal(curLat) < toVal(curMin))     return $Notice.Warn("最新版は必須版以上である必要があります");
+                        if (toVal(curMin) > appVerNum) return $Notice.Warn("プログラムVerを超える設定はできません");
                         if (!await $Util.CheckAdminAuth()) return;
-                        // ★リクエストパラメータを { items: [...] } 形式で構築
                         const params = {
                             items: [
-                                { key: "LatestAppVersion", value: latStr }, // e.g. "1.2.3"
-                                { key: "MinAppVersion",    value: minStr }  // e.g. "1.1.0"
+                                { key: "LatestAppVersion", value: appVerStr }, // 最新Verは定数で上書き
+                                { key: "MinAppVersion",    value: curMin.join('.') }
                             ]
                         };
                         if (await $Data.Access.UpdateCoreConfig(params)) {
@@ -1099,9 +1016,9 @@ export default {
             title: "メンテナンス設定",
             content: el, theme: "admin",
             buttons: [[
-                { label: "キャンセル", className: "bg-slate-400 text-white", handler: () => this._core.close() },
+                { label: "cancel", className: "bg-slate-400 text-white", handler: () => this._core.close() },
                 {
-                    label: "保存",
+                    label: "save",
                     handler: async () => {
                         if (!await $Util.CheckAdminAuth()) return;
                         // ★リクエストパラメータを { items: [...] } 形式で構築
@@ -1114,6 +1031,50 @@ export default {
                         if (await $Data.Access.UpdateCoreConfig(params)) {
                             $Notice.Info("メンテナンス設定を更新しました");
                             this._core.closeAll();
+                        }
+                    }
+                }
+            ]]
+        });
+    },
+    // 長文ドキュメント編集画面（利用規約 / プライバシーポリシー）
+    async ShowAdminCoreDocumentEditor(key, title) {
+        // 1. ローカルDBから該当キーのデータを直接取得
+        const record = await $LocalDb.Legal.Get(key);
+        // 2. 取得した本文（なければ空文字）を初期値にする
+        const initialValue = record ? record.body : "";
+        const el = $Dom.GenerateTemplate("tpl-admin-core-editor");
+        const textarea = $Dom.QuerySelector('#js-editor-input', el);
+        const countLabel = $Dom.QuerySelector('#js-editor-count', el);
+        $Dom.QuerySelector('#js-editor-label', el).textContent = title;
+        // 3. エディタに流し込み
+        textarea.value = initialValue;
+        countLabel.textContent = initialValue.length;
+        textarea.oninput = () => countLabel.textContent = textarea.value.length;
+        this._core.open({
+            title: `${title}の編集`,
+            content: el,
+            size: 'lg',
+            theme: 'admin',
+            help: `${title}の編集画面です。\n保存するとサーバーの更新日時が更新され、全ユーザーに差分が配信されます。`,
+            buttons: [[
+                { label: "cancel", className: "bg-slate-400 text-white", handler: () => this._core.close() },
+                {
+                    label: "save",
+                    handler: async () => {
+                        const newBody = textarea.value.trim();
+                        if (!newBody) return $Notice.Warn("本文を入力してください");
+                        if (!await $Util.CheckAdminAuth()) return;
+                        // 4. 専用エンドポイントへ送信
+                        const params = {
+                            key: key,
+                            value: newBody
+                        };
+                        if (await $Data.Access.UpdateLegalConfig(params)) {
+                            $Notice.Info(`${title}を更新しました`);
+                            this._core.close();
+                            // 任意：管理者自身のローカルDBもこの場で更新しておくと、リロードなしで反映を確認できます
+                            await $LocalDb.Legal.Save(key, newBody, new Date().toISOString(), false);
                         }
                     }
                 }
