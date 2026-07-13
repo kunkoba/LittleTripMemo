@@ -23,13 +23,6 @@ export default {
         // ボタンイベント
         $Dom.QuerySelector('#btn-info-review', el).onclick = () => this.ShowReviewList();
         $Dom.QuerySelector('#link-info-official', el).onclick = () => $Util.OpenExternalLink($Const.APP_INFO.OFFICIAL_SITE);
-        // 新設：規約とポリシー（外部サイト等のURLを想定）
-        $Dom.QuerySelector('#btn-info-terms', el).onclick = () => {
-            $Util.OpenExternalLink($Const.APP_INFO.OFFICIAL_SITE + "terms/");
-        };
-        $Dom.QuerySelector('#btn-info-privacy', el).onclick = () => {
-            $Util.OpenExternalLink($Const.APP_INFO.OFFICIAL_SITE + "privacy/");
-        };
         // 
         this._core.open({ title: "アプリの詳細情報", content: el, buttons: [] });
     },
