@@ -779,9 +779,7 @@ export default {
         // 個別編集画面への遷移
         $Dom.QuerySelector('#btn-core-version', el).onclick = () => this.ShowAdminCoreVersion(configList);
         $Dom.QuerySelector('#btn-core-maint', el).onclick = () => this.ShowAdminCoreMaint(configList);
-        $Dom.QuerySelector('#btn-core-terms', el).onclick = () => this.ShowAdminCoreDocumentEditor($Const.LEGAL_TYPE.TERMS, "利用規約");
-        $Dom.QuerySelector('#btn-core-privacy', el).onclick = () => this.ShowAdminCoreDocumentEditor($Const.LEGAL_TYPE.PRIVACY, "プライバシーポリシー");
-        // $Dom.QuerySelector('#btn-core-license', el).onclick = () => this.ShowAdminCoreDocumentEditor($Const.LEGAL_TYPE.LICENSE, "ライセンス");
+        $Dom.QuerySelector('#btn-core-legal', el).onclick = () => this.ShowLegalDocuments();
         $Dom.QuerySelector('#btn-core-info', el).onclick = () => $Notice.Info("システム環境情報は参照のみです");
         // 
         this._core.open({

@@ -61,6 +61,8 @@ export default {
         b.admin.onclick = async () => {
             this.ShowAdminMenu();
         };
+        b.legal.onclick = () => this.ShowLegalDocuments();
+        //
         this._core.open({ title: "システムメニュー", content: el });
     },
     // 【👤 ユーザーメニュー】
@@ -852,6 +854,82 @@ export default {
             help: "管理者のための解析画面です。",
             theme: profile.is_owner ? "user" : "admin",
             headerButtons: headerButtons
+        });
+    },
+    // リーガル・ドキュメントのメニュー画面（5つのボタンリスト）
+    async ShowLegalDocuments() {
+        // 1. DBから全データを取得
+        const docs = await $LocalDb.Legal.GetAll();
+        const LT = $Const.LEGAL_TYPE;
+        const menuItems = [
+            { key: LT.TERMS,      label: "利用規約",               icon: "📜" },
+            { key: LT.PRIVACY,    label: "プライバシーポリシー",   icon: "🛡️" },
+            { key: LT.SCTLAW,     label: "特定商取引法に基づく表記",icon: "⚖️" },
+            { key: LT.DISCLAIMER, label: "免責事項",               icon: "⚠️" },
+            { key: LT.LICENSE,    label: "ライセンス・権利表記",   icon: "📄" }
+        ];
+        const el = document.createElement("div");
+        el.className = "w-full flex flex-col bg-brand-0";
+        menuItems.forEach(item => {
+            const data = docs.find(d => d.id === item.key);
+            const isUnread = data ? !!data.is_unread : false;
+            const btn = document.createElement("button");
+            btn.className = "w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900 relative";
+            btn.innerHTML = `
+                <span class="col-span-1 kb-icon-emoji-lg flex justify-center">${item.icon}</span>
+                <span class="col-span-1"></span>
+                <span class="col-span-8 text-left font-bold text-[1rem] uppercase">${item.label}</span>
+            `;
+            // NEWバッジの追加（未読時のみ表示）
+            if (isUnread) {
+                const badge = document.createElement("span");
+                badge.className = "absolute right-4 bg-red-500 text-white text-[0.8rem] px-2 py-0.5 rounded-full font-bold";
+                badge.textContent = "NEW";
+                btn.appendChild(badge);
+            }
+            btn.onclick = async () => {
+                // ★ 修正：識別キー(item.key) も一緒に渡す
+                this.ShowLegalDocumentDetail(item.key, item.label, data ? data.body : null);
+                // 開いた項目だけを既読にする
+                if (data && data.is_unread) {
+                    await $LocalDb.Legal.Save(data.id, data.body, data.update_tim, false);
+                    await $Data.LocalDb.CheckLegalUnread();
+                    const badge = btn.querySelector('.bg-red-500');
+                    if (badge) badge.remove();
+                }
+            };
+            el.appendChild(btn);
+        });
+        this._core.open({
+            title: "利用規約とポリシー",
+            content: el,
+            help: "各種リーガル情報を確認できます。",
+            buttons: []
+        });
+    },
+    // ★ 修正：引数に key を追加
+    ShowLegalDocumentDetail(key, title, body) {
+        const el = document.createElement("div");
+        el.className = "w-full p-5 bg-white text-slate-700 text-[0.95rem] leading-[1.8] whitespace-pre-wrap overflow-y-auto";
+        el.textContent = body ? body : "現在、この項目は準備中です。";
+        const headerButtons = [];
+        // ★ 追加：管理者の場合はヘッダーに「編集ボタン」を表示
+        if ($App.AppData.Owner.Plan === "Admin") {
+            headerButtons.push({
+                label: "✏️",
+                theme: "admin",
+                handler: () => {
+                    // dialog-manager 内で統合されているため、管理者のエディタ機能を直接呼び出せます
+                    this.ShowAdminCoreDocumentEditor(key, title);
+                }
+            });
+        }
+        this._core.open({
+            title: title,
+            content: el,
+            size: 'lg',
+            buttons: [],
+            headerButtons: headerButtons // ★ 追加：ヘッダーボタンを配置
         });
     },
 };
