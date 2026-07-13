@@ -412,51 +412,6 @@
 </template>
 
 <!-- 【追加】管理者：ユーザー操作履歴リスト用（子） -->
-<template id="tpl-admin-list-child-history_2">
-    <button class="js-item-card w-full text-left p-4 border-b border-slate-200 active:bg-slate-50 flex flex-col gap-1 transition-colors">
-        <div class="flex justify-between items-center mb-1">
-            <span class="js-date kb-date-tim-sm"></span>
-            <span class="js-action text-[0.9rem] font-bold text-brand-5 px-2 py-0.5 bg-brand-1 rounded uppercase"></span>
-        </div>
-        <div class="text-[1rem] font-bold text-slate-900 line-clamp-2 js-body"></div>
-        <div class="text-right"><span class="text-slate-600 text-[1.2rem]">›</span></div>
-    </button>
-</template>
-
-<!-- 【修正】管理者：ユーザー操作履歴詳細 -->
-<template id="tpl-admin-user-history-detail_2">
-    <div class="w-full text-slate-900 flex flex-col h-full overflow-hidden bg-white gap-5 pt-2">
-        <!-- 日時 -->
-        <div class="border-b border-slate-50 pb-2">
-            <label class="block text-[0.9rem] font-bold text-slate-600 uppercase tracking-widest mb-1">Timestamp</label>
-            <div class="js-tim text-[1.1rem] font-bold text-slate-900 italic"></div>
-        </div>
-        <!-- 操作種別 -->
-        <div class="border-b border-slate-50 pb-2">
-            <label class="block text-[0.9rem] font-bold text-slate-600 uppercase tracking-widest mb-1">Action Kind</label>
-            <div class="js-action text-[1.2rem] font-bold text-brand-5"></div>
-        </div>
-        <!-- 本文 (body) -->
-        <div class="border-b border-slate-50 pb-2">
-            <label class="block text-[0.9rem] font-bold text-slate-600 uppercase tracking-widest mb-1">Message / Reason</label>
-            <div class="js-body text-[1.1rem] font-bold text-slate-900  whitespace-pre-wrap"></div>
-        </div>
-        <!-- ターゲットユーザID -->
-        <div class="border-b border-slate-50 pb-2">
-            <label class="block text-[0.9rem] font-bold text-slate-600 uppercase tracking-widest mb-1">Target User ID</label>
-            <div class="js-user-id text-[1rem] font-mono text-slate-600 break-all"></div>
-        </div>
-        <!-- 操作詳細 (JSON) -->
-        <div class="flex-1 flex flex-col min-h-0">
-            <label class="block text-[0.9rem] font-bold text-slate-600 uppercase mb-1 pl-1">Operation Payload (JSON)</label>
-            <div class="flex-1 bg-slate-900 rounded-xl p-4 overflow-y-auto">
-                <pre class="js-payload text-[1rem] text-emerald-400 font-mono whitespace-pre-wrap break-all "></pre>
-            </div>
-        </div>
-    </div>
-</template>
-
-<!-- 【追加】管理者：ユーザー操作履歴リスト用（子） -->
 <template id="tpl-admin-list-child-history">
     <button class="js-item-card w-full text-left p-4 border-b border-slate-200 active:bg-slate-50 flex flex-col gap-2 transition-colors outline-none">
         <div class="flex justify-between items-baseline w-full">

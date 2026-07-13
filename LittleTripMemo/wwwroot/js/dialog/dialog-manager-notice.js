@@ -1,47 +1,5 @@
 export default {
     // （システム）アプリ情報
-    ShowAppInfo_2() {
-        const el = $Dom.GenerateTemplate("tpl-app-info");
-        // --- 1. アプリ定数からの基本情報 ---
-        $Dom.QuerySelector('.js-app-name', el).textContent = $Const.APP_INFO.NAME;
-        $Dom.QuerySelector('.js-app-version', el).textContent = $Const.APP_INFO.VERSION;
-        $Dom.QuerySelector('.js-app-developer', el).textContent = $Const.APP_INFO.DEVELOPER;
-        const linkOfficial = $Dom.QuerySelector('#link-info-official', el);
-        if ($Const.APP_INFO.OFFICIAL_SITE) {
-            linkOfficial.onclick = () => window.open($Const.APP_INFO.OFFICIAL_SITE, '_blank');
-            linkOfficial.onclick = () => {
-                // window.open($Const.APP_INFO.OFFICIAL_SITE, '_blank');
-                $Util.OpenExternalLink(url);
-            };
-        } else {
-            $Dom.ToggleShow(linkOfficial, false);
-        }
-        // --- 2. API（systemInfo）からの統計情報 ---
-        const sysInfo = $App.AppData.Owner.SystemInfo || {};
-        const appInfo = sysInfo.app_info || {};
-        // 数字の反映 (3桁区切り)
-        $Dom.QuerySelector('.js-stat-users', el).textContent = (appInfo.total_user_count || 0).toLocaleString();
-        $Dom.QuerySelector('.js-stat-archives', el).textContent = (appInfo.total_archive_pub_count || 0).toLocaleString();
-        $Dom.QuerySelector('.js-stat-memos', el).textContent = (appInfo.total_detail_pub_count || 0).toLocaleString();
-        // 最終集計日時
-        if (appInfo.last_aggregate_tim) {
-            $Dom.QuerySelector('.js-last-update', el).textContent = $Util.FormatDate(appInfo.last_aggregate_tim);
-        }
-        // --- 3. スコア・フィードバック数の反映 ---
-        const scoreAvg = appInfo.avg_score ?? sysInfo.avg_score ?? 0;
-        const feedbackCount = appInfo.total_feedback_count || 0;
-        $Dom.QuerySelector('.js-app-score', el).textContent = `★ ${scoreAvg.toFixed(1)}`;
-        $Dom.QuerySelector('.js-app-feedback-count', el).textContent = feedbackCount;
-        // --- 4. ボタンアクション設定 ---
-        $Dom.QuerySelector('#btn-info-review', el).onclick = () => this.ShowReviewList();
-        $Dom.QuerySelector('#btn-info-license', el).onclick = () => $Notice.Info($Const.APP_INFO.LICENSE || "ライセンス情報がありません。");
-        this._core.open({
-            title: "アプリの詳細情報",
-            content: el,
-            help: "アプリの基本情報と、公開されているまとめやメモの全体統計を表示します。",
-            buttons:[]
-        });
-    },
     ShowAppInfo() {
         const el = $Dom.GenerateTemplate("tpl-app-info");
         // アイコン・基本情報
@@ -428,46 +386,61 @@ export default {
             buttons: []
         });
     },
-    // リーガル情報ビューア（3項目一括表示）
-    async ShowLegalDocuments(focusKey = null) {
-        // 1. DBから最新の本文をすべて取得
+    // 法の記事（リーガル・ドキュメント）ビューア
+    async ShowLegalDocuments() {
+        // 1. DBから全データを取得
         const docs = await $LocalDb.Legal.GetAll();
         const LT = $Const.LEGAL_TYPE;
+        // タイトル定義（表示用）
+        const labelMap = {
+            [LT.TERMS]:      "利用規約",
+            [LT.PRIVACY]:    "プライバシーポリシー",
+            [LT.NOTATION]:   "特定商取引法に基づく表記",
+            [LT.DISCLAIMER]: "免責事項",
+            [LT.LICENSE]:    "ライセンス・権利表記"
+        };
         const root = document.createElement("div");
-        root.className = "w-full flex flex-col gap-8 py-2";
-        // セクション生成ヘルパー
-        const createSection = (title, key) => {
+        root.className = "w-full flex flex-col gap-6 py-2";
+        // --- A. クイックナビ（上部固定メニュー風） ---
+        const nav = document.createElement("div");
+        nav.className = "flex flex-wrap gap-2 mb-4 p-4 bg-slate-100 rounded-2xl border border-slate-200";
+        Object.keys(labelMap).forEach(key => {
+            const btn = document.createElement("button");
+            btn.className = "px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-[0.75rem] font-bold text-slate-600 active:scale-95 transition-all shadow-sm";
+            btn.textContent = labelMap[key];
+            btn.onclick = () => {
+                const target = document.getElementById(`section-${key}`);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+            nav.appendChild(btn);
+        });
+        root.appendChild(nav);
+        // --- B. 各セクションの生成 ---
+        Object.keys(labelMap).forEach(key => {
             const data = docs.find(d => d.id === key);
-            const sec = document.createElement("section");
-            sec.id = `legal-${key}`;
-            sec.innerHTML = `
-                <div class="flex items-center gap-2 border-l-4 border-brand-5 pl-3 mb-3">
-                    <h3 class="text-[1.1rem] font-black text-slate-900">${title}</h3>
+            const section = document.createElement("section");
+            section.id = `section-${key}`;
+            section.className = "flex flex-col gap-3 mb-4 scroll-mt-4"; // scroll-mtで余白確保
+            section.innerHTML = `
+                <div class="flex items-center gap-2 border-l-4 border-brand-5 pl-3">
+                    <h3 class="text-[1rem] font-black text-slate-900 uppercase tracking-wider">${labelMap[key]}</h3>
                 </div>
-                <div class="bg-white border border-slate-200 rounded-2xl p-4 text-[0.9rem] text-slate-600 leading-[1.8] whitespace-pre-wrap shadow-sm">
-                    ${data ? data.body : "内容が登録されていません。"}
+                <div class="bg-white border border-slate-200 rounded-[1.5rem] p-5 text-[0.85rem] text-slate-600 leading-[1.8] whitespace-pre-wrap shadow-sm min-h-[100px]">
+                    ${data && data.body ? data.body : `<span class="text-slate-300 italic">現在、この項目は準備中です。</span>`}
                 </div>
             `;
-            return sec;
-        };
-        root.appendChild(createSection("利用規約", LT.TERMS));
-        root.appendChild(createSection("プライバシーポリシー", LT.PRIVACY));
-        root.appendChild(createSection("オープンソースライセンス", LT.LICENSE));
+            root.appendChild(section);
+        });
         // 2. 既読化処理
         await $LocalDb.Legal.MarkAllAsRead();
-        await $Data.LocalDb.CheckLegalUnread(); // Contextとバッジを更新
+        await $Data.LocalDb.CheckLegalUnread();
+        // 3. ダイアログを開く
         this._core.open({
-            title: "規約・ポリシー",
+            title: "法的記事・規約類",
             content: root,
             size: 'lg',
-            help: "アプリの利用規約、プライバシーポリシー、および使用しているライセンス情報を確認できます。"
+            help: "このアプリをご利用いただく上での重要な法的情報をまとめています。",
+            buttons: []
         });
-        // アンカー移動（指定の項目があればそこへスクロール）
-        if (focusKey) {
-            setTimeout(() => {
-                const el = document.getElementById(`legal-${focusKey}`);
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }, 300);
-        }
     },
 };

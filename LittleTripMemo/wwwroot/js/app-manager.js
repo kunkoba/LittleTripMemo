@@ -158,37 +158,6 @@ AppSettingKey: "little_trip_settings",
         // 定期タスク開始-----
         $Polling.Start($Polling.TASKS.OFFLINE_CHECK);
     },
-    // Service Workerの登録と更新監視
-    _initServiceWorker_2() {
-        if (!('serviceWorker' in navigator)) return;
-        const version = $Const.APP_INFO.VERSION;
-        navigator.serviceWorker.register(`./sw.js?v=${version}`).then(reg => {
-            console.log('[SW] 登録完了スコープ:', reg.scope);
-            // 更新が見つかった場合のイベント
-            reg.addEventListener('updatefound', () => {
-                const newWorker = reg.installing;
-                newWorker.addEventListener('statechange', async () => {
-                    // 新しいSWがインストール完了し、かつ既存のSWが存在する場合（＝アップデート時）
-                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        console.log('[SW] 新しいバージョンが利用可能です');
-                        // ユーザーに更新を促すダイアログを表示
-                        const isOk = await $Dialog.ShowConfirm({
-                            title: "UPDATE",
-                            message: "アプリの新しいバージョンが利用可能です。\n最新版に更新しますか？",
-                            label: "UPDATE",
-                            help: ""
-                        });
-                        if (isOk) {
-                            // 画面を強制リロードして最新のキャッシュ(Network First)を適用
-                            window.location.reload(true);
-                        }
-                    }
-                });
-            });
-        }).catch(err => {
-            console.error('[SW] 登録失敗:', err);
-        });
-    },
     // 戦略：バックグラウンドでの自動更新（ユーザーへの確認なし）
     _initServiceWorker() {
         if (!('serviceWorker' in navigator)) return;
@@ -227,63 +196,6 @@ AppSettingKey: "little_trip_settings",
             // sw.js側で作った窓口（message）に合図を送る
             worker.postMessage({ type: 'SKIP_WAITING' });
         }
-    },
-    // アプリ起動時フロー
-    async Init_2() {
-        console.log("★★★ App.Init ★★★");
-        // --- 起動処理 ---
-        {
-            this._initViewport();
-            this._loadSettings();
-            await $LocalDb.Init();
-            // 最初に設定をロードし、トークンがあればログイン状態にしておく
-            if (this.AppData.Owner.Token) {
-                this.AppData.Context.IsLoggedIn = true;
-                // ユーザ存在チェック＆最終ログイン日時設定
-                let isSuccess = await this.SyncActivityLog();
-                if (!isSuccess) return;
-                // システム情報取得
-                $Data.Access.GetSystemInfo();
-            }
-        }
-        // リクエストパラメータ取得
-        {
-            const params = new URLSearchParams(location.search);
-            const urlMode = params.get("mode");
-            const targetArchiveId = $Util.DecodeId(params.get("encodedId"));
-            // URLパラメータの mode を優先、なければ TargetArchiveId の有無で分岐、それ以外は CREATE
-            this.AppData.Context.TargetArchiveId = targetArchiveId;
-            if (urlMode) {
-                this.AppData.Context.ScreenMode = urlMode;
-            } else {
-                if (this.AppData.Context.TargetArchiveId) {
-                    this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
-                } else {
-                    this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                }
-            }
-            // 処理前チェック：TargetArchiveIdが無く、未ログインならダイアログ表示（初期画面としてのCREATE用）
-            if (!this.AppData.Context.TargetArchiveId && !this.AppData.Context.IsLoggedIn) {
-                $Dialog.ShowLoginDialog();
-            }
-        }
-        // メイン処理
-        {
-            this._initPollingTasks();
-            // ユーザ設定反映
-            $UI.Init();
-            this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
-            this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD, this.AppData.Owner.IsMapGrayscale || false);
-            this.ChangeGpsTracking(this.AppData.Owner.GpsTrackingSec || 0)
-            this.ChangeCurrency(this.AppData.Owner.Currency_unit || 'JPY')
-            this.ChangeFontSize(this.AppData.Owner.FontSize || '');
-        }
-        // UI関連
-        await this.RefreshScreen();
-        // Service Worker の初期化（追加）
-        this._initServiceWorker();
-        // 現在地へ移動
-        $Marker.FocusToLocationMarker();
     },
     // アプリ起動時フロー
     async Init() {

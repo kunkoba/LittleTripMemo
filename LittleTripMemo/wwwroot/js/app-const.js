@@ -28,9 +28,11 @@ window.$Const = {
     },
     // リーガル情報の識別キー
     LEGAL_TYPE: {
-        TERMS:   "TermsOfService",
-        PRIVACY: "PrivacyPolicy",
-        LICENSE: "License",
+        TERMS:      "TermsOfService",   // 利用規約
+        PRIVACY:    "PrivacyPolicy",    // プライバシーポリシー
+        SCTLAW:     "SctLaw",           // 特定商取引法に基づく表記
+        DISCLAIMER: "Disclaimer",       // 免責事項
+        LICENSE:    "License",          // ライセンス
     },
     // 地図設定
     MAP_CONFIG: {

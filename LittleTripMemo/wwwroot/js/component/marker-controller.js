@@ -300,16 +300,6 @@ const MarkerController = {
         _MarkerCore.clearAll();
     },
     // 現在の状態に基づくフォーカス実行
-    FocusToCurrentMarker_2(delay = 200) {
-        const marker = _MarkerCore.getMarker(this._currentIndex);
-        if (!marker) return;
-        const details = $Data.Store.GetDetails();
-        $Map.FocusToTargetMarker(marker, delay);
-        _MarkerCore.toggleMarkerPopup(true, this._currentIndex, details[this._currentIndex]);
-        // ハイライト
-        _MarkerCore.highlightMarker(true, this._currentIndex);
-    },
-    // 現在の状態に基づくフォーカス実行
     FocusToCurrentMarker(delay = 200) {
         const details = $Data.Store.GetDetails();
         if (!details) return;

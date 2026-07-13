@@ -16,8 +16,7 @@ public class GetLegalConfigsService(CoreConfigRepository coreRepo)
             string key = db.key;
             DateTime dbTim = db.update_tim;
             var clientItem = req.items.FirstOrDefault(i => i.key == key);
-            // クライアントの日時よりDBが新しい場合のみ本文をセット
-            string? content = (clientItem == null || dbTim > clientItem.last_sync_tim) ? (string)db.value : null;
+            string? content = (clientItem == null || dbTim > (clientItem.last_sync_tim ?? DateTime.MinValue)) ? (string)db.value : null;
             return new LegalResultItem(key, content, dbTim);
         });
         return new Response(results);

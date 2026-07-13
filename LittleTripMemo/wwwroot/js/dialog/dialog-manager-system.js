@@ -155,61 +155,6 @@ export default {
         });
     },
     // （ユーザ設定）マップスタイル設定ダイアログ
-    ShowMapStyleConfi_2() {
-        let isSaved = false;
-        const oldStyle = $App.AppData.Owner.MapStyle;
-        let selectedStyle = oldStyle;
-        // スタイル一覧をループ生成
-        let listHtml = '';
-        Object.values($Map.MAP_STYLE).forEach(style => {
-            listHtml += `
-                <button id="ms-btn-${style.key}" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
-                    <span class="col-span-1 flex justify-center text-[1.2rem]">🗺️</span>
-                    <span class="col-span-1"></span>
-                    <span class="col-span-8 text-left font-bold text-[1rem] uppercase">${style.name}</span>
-                </button>`;
-        });
-        const el = document.createElement('div');
-        el.className = "w-full bg-brand-0";
-        el.innerHTML = listHtml;
-        // 各ボタンにプレビューイベントを紐付け
-        Object.values($Map.MAP_STYLE).forEach(style => {
-            $Dom.QuerySelector(`#ms-btn-${style.key}`, el).onclick = () => {
-                selectedStyle = style;
-                $Map.SetMapStyle(style); // 地図を一時切替
-            };
-        });
-        this._core.open({
-            title: "地図スタイル",
-            content: el,
-            help: "",
-            onClose: () => {
-                if (isSaved) return;
-                // もとに戻す
-                $Map.SetMapStyle(oldStyle);
-            },
-            buttons: [[
-                {
-                    label: "CANCEL",
-                    className: "bg-slate-400 text-white shadow-md",
-                    handler: () => {
-                        this._core.close();
-                    },
-                },
-                {
-                    label: "OK",
-                    handler: () => {
-                        isSaved = true;
-                        // 選択されたマップスタイルを適用・保存
-                        $App.ChangeMapStyle(selectedStyle);
-                        this._core.close();
-                        $Notice.Info("保存しました。");
-                    }
-                }
-            ]]
-        });
-    },
-    // （ユーザ設定）マップスタイル設定ダイアログ
     ShowMapStyleConfig() {
         let isSaved = false;
         const mapEl = document.getElementById('ui-map-id');

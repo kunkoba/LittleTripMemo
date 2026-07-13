@@ -250,46 +250,6 @@ window.$Data = {
                 return Number(a.dbid || 0) - Number(b.dbid || 0);
             });
         },
-        // 【メイン】表示用の日付ルール（マスク・DAY番号）をアタッチ
-        ApplyDisplayRules_2(details, mode) {
-            if (!details || details.length === 0) return;
-            // 1. ソート（時間順）
-            this.SortDetails(details);
-            // 2. 日付のブレーク判定とDAYカウントの準備
-            let lastDate = "";
-            let dayCounter = 0;
-            // 全体の日数を把握するため、先にユニークリストを取得
-            const dateList = this._getUniqueDates(details);
-            const isMultiDay = dateList.length > 1;
-            const baseMask = dateList.length > 0 ? this._getMask(dateList[0]) : "";
-            // 3. ループ処理：DAY番号のアタッチと、memo_date の上書き
-            details.forEach((d, index) => {
-                // 生データに連番(No)を付与
-                d.no = index + 1;
-                // 日付が変わるタイミングでDAYをカウントアップ
-                if (d.memo_date !== lastDate) {
-                    dayCounter++;
-                    lastDate = d.memo_date;
-                }
-                d.display_day = dayCounter; // 丸バッジ等で使う数値
-                // 4. 自分以外のデータであればマスキング実行
-                if (!d.is_owner) {
-                    if (mode === $Const.SCREEN_MODE.ARCHIVE_PUB) {
-                        // 【まとめ参照時】
-                        if (dayCounter === 1) {
-                            // 1日目：旬 ＋ (2日以上あれば) 1day
-                            d.memo_date = isMultiDay ? `${baseMask} 1day` : baseMask;
-                        } else {
-                            // 2日目以降：DAY表記をそのまま日付データとして上書き
-                            d.memo_date = `${dayCounter}day`;
-                        }
-                    } else {
-                        // 【検索時など】単純な旬のマスクのみ
-                        d.memo_date = this._getMask(d.memo_date);
-                    }
-                }
-            });
-        },
         // 【メイン】表示用の日付ルールをアタッチ（モード別分岐版）
         ApplyDisplayRules(details) {
             if (!details || details.length === 0) return;

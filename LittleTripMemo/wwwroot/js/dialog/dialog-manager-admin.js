@@ -82,101 +82,6 @@ export default {
             ]
         });
     },
-    // 通知の編集・新規登録（API通信化）
-    ShowAdminNoticeEdit_2(noticeItem, onSaved) {
-        const isNew = !noticeItem;
-        const target = isNew ? {
-            seq: 0, title: "", body: "", kind: 0,
-            link_url: "",
-            disp_from: $Util.FormatDate(new Date(), 'YYYY-MM-DD'), // 時間を消す
-            disp_to: "2099-12-31", // 時間を消す
-        } : { ...noticeItem };
-        const el = $Dom.GenerateTemplate("tpl-admin-notice-edit");
-        const selKind = $Dom.QuerySelector('#edit-notice-kind', el);
-        const inptTitle = $Dom.QuerySelector('#edit-notice-title', el);
-        const inptBody = $Dom.QuerySelector('#edit-notice-body', el);
-        const inptUrl = $Dom.QuerySelector('#edit-notice-url', el);
-        const inptFrom = $Dom.QuerySelector('#edit-notice-from', el);
-        const inptTo = $Dom.QuerySelector('#edit-notice-to', el);
-        // カウンター要素の取得
-        const countTitle = $Dom.QuerySelector('#edit-notice-title-count', el);
-        const countBody = $Dom.QuerySelector('#edit-notice-body-count', el);
-        // 定数からセレクトボックスの選択肢を動的生成
-        selKind.innerHTML = "";
-        Object.values($Const.NOTICE_KIND).forEach(k => {
-            const opt = document.createElement("option");
-            opt.value = k.id;
-            opt.textContent = `${k.id}: ${k.label} ${k.emoji}`;
-            selKind.appendChild(opt);
-        });
-        // 値をセット
-        selKind.value = target.kind;
-        inptTitle.value = target.title;
-        inptBody.value = target.body;
-        inptUrl.value = target.link_url || "";
-        inptFrom.value = $Util.FormatDate(target.disp_from, 'YYYY-MM-DD');
-        inptTo.value = $Util.FormatDate(target.disp_to, 'YYYY-MM-DD');
-        // --- 即時反映のための初期カウント表示 ---
-        countTitle.textContent = inptTitle.value.length;
-        countBody.textContent = inptBody.value.length;
-        // --- イベントリスナーの登録 (inputイベントを使う) ---
-        inptTitle.addEventListener('input', () => {
-            countTitle.textContent = inptTitle.value.length;
-        });
-        inptBody.addEventListener('input', () => {
-            countBody.textContent = inptBody.value.length;
-        });
-        $Dom.QuerySelector('#btn-clear-notice-from', el).onclick = () => inptFrom.value = "";
-        $Dom.QuerySelector('#btn-clear-notice-to', el).onclick = () => inptTo.value = "";
-        //
-        this._core.open({
-            title: isNew ? "システム通知登録" : "システム通知編集",
-            content: el,
-            theme: "admin",
-            help: "",
-            isFooterFixed: false,   // 編集用
-            buttons:[[
-                {
-                    label: "CANCEL",
-                    className: "bg-slate-400 text-white shadow-md",
-                    handler: () => {
-						this._core.close();
-                    },
-                },
-                {
-                    label: "SAVE",
-                    className: "bg-brand-5 text-white shadow-md",
-                    handler: async () => {
-                        // 確認画面
-                        const isOk = await this.ShowConfirm({ 
-                            title: isNew ? "NEW NOTICE" : "EDIT NOTICE",
-                            help: "", 
-                            message: "通知情報を保存しますか？" 
-                        });
-                        if (!isOk) return;
-                        // 未入力時のデフォルト値判定
-                        const fromVal = inptFrom.value.trim() || $Util.FormatDate(new Date(), 'YYYY-MM-DD');
-                        const toVal   = inptTo.value.trim()   || "2099-12-31";
-                        const req = {
-                            seq: target.seq,
-                            title: inptTitle.value.trim() || "No Title",
-                            body: inptBody.value.trim(),
-                            link_url: inptUrl.value.trim(),
-                            kind: Number(selKind.value),
-                            disp_from: fromVal + "T00:00:00",
-                            disp_to:   toVal   + "T23:59:59"
-                        };
-                        const isSuccess = await $Data.Access.UpsertNotification(req);
-                        if (!isSuccess) return;
-                        $Notice.Info("保存しました。");
-                        await $Data.Access.GetAdminAllInfo();
-                        this._core.close(); // 編集ダイアログを閉じる
-                        if (onSaved) onSaved(); // 親画面の再描画コールバック
-                    }
-                }
-            ]]
-        });
-    },
     // 通知の編集・新規登録（三択ボタン形式へ修正）
     ShowAdminNoticeEdit(noticeItem, onSaved) {
         const isNew = !noticeItem;
@@ -741,31 +646,6 @@ export default {
             content: root, 
             theme: "admin", 
             size: "lg" 
-        });
-    },
-    // 【管理者機能】操作履歴の詳細表示
-    ShowAdminUserHistoryDetail_2(item) {
-        const el = $Dom.GenerateTemplate("tpl-admin-user-history-detail");
-        $Dom.QuerySelector(".js-tim", el).textContent = $Util.FormatDate(item.create_tim);
-        $Dom.QuerySelector(".js-action", el).textContent = item.action_kind;
-        $Dom.QuerySelector(".js-body", el).textContent = item.body || "N/A";
-        $Dom.QuerySelector(".js-user-id", el).textContent = item.user_id;
-        // memo_json の表示
-        const payloadEl = $Dom.QuerySelector(".js-payload", el);
-        if (item.memo_json) {
-            // オブジェクトなら整形、文字列ならそのまま
-            const content = (typeof item.memo_json === 'object') 
-                ? JSON.stringify(item.memo_json, null, 4) 
-                : item.memo_json;
-            payloadEl.textContent = content;
-        } else {
-            payloadEl.textContent = "No detailed payload.";
-        }
-        this._core.open({
-            title: "履歴の詳細",
-            content: el,
-            theme: "admin",
-            size: "lg" // 縦に並ぶのでサイズを大きく確保
         });
     },
     // 【管理者機能】操作履歴の詳細表示

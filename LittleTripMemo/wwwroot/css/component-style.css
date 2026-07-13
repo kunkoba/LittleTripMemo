@@ -68,10 +68,6 @@
     max-width: 400px !important;
     margin: 0;
 }
-/* 地図タイルの情報を「脇役」に押し下げるフィルタ */
-.leaflet-tile_2 {
-    filter: grayscale(0.8) brightness(1.08) contrast(0.8);
-}
 
 /* 地図をグレースケールにするクラス */
 .map-grayscale .leaflet-tile-container {
