@@ -17,10 +17,13 @@ const CACHE_KEYS = {
 const CORE_ASSETS = [
     './',
     './index.html',
-    './component/template-core.html',
-    './component/template-screen.html',
-    './component/template-list.html',
-    './component/template-admin.html',
+    './img/ico/icon-48.png',
+    './img/ico/icon-192.png',
+    './img/ico/icon-512.png',
+    './template/template-core.html',
+    './template/template-screen.html',
+    './template/template-list.html',
+    './template/template-admin.html',
     './css/app-style.css',
     './css/component-style.css'
 ];

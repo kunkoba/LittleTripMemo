@@ -93,138 +93,72 @@
     </div>
 </template>
 
-<!-- 【最終版】アプリ詳細情報：説明文削除・法務ボタン追加 -->
-<template id="tpl-app-info_2">
-    <div class="w-full flex flex-col px-2 pb-8 bg-slate-50/30">
-        <!-- アイコン：最上部に配置 -->
-        <div class="flex flex-col items-center py-8">
-            <div class="w-28 h-28 bg-white rounded-[1.8rem] shadow-[0px_0px_10px_rgba(0,0,0,0.3)] overflow-hidden border border-white">
-                <img id="js-app-icon" src="" class="w-full h-full object-cover">
-            </div>
-        </div>
-        <!-- カード1：基本情報 -->
-        <div class="bg-white rounded-[1rem] border border-slate-200 overflow-hidden mb-4">
-            <div class="p-5 flex flex-col gap-4">
-                <div class="flex justify-between items-baseline">
-                    <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">App Name</span>
-                    <span class="text-[1rem] font-black text-slate-800 js-app-name"></span>
-                </div>
-                <div class="flex justify-between items-baseline border-t border-slate-50 pt-4">
-                    <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest">Version</span>
-                    <span class="text-[1rem] font-bold text-slate-700 js-app-version font-mono"></span>
-                </div>
-            </div>
-        </div>
-        <!-- カード2：全体統計 -->
-        <div class="bg-white rounded-[1rem] border border-slate-200 p-5 mb-4">
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-[0.7rem] font-black text-slate-900 uppercase tracking-widest">Activity Stats</span>
-                <span class="text-[0.65rem] font-bold text-slate-400 italic">Last update: <span class="js-last-update font-mono"></span></span>
-            </div>
-            <div class="grid grid-cols-3 gap-2">
-                <div class="flex flex-col items-center p-3 bg-slate-50 rounded-2xl">
-                    <span class="text-[1.2rem] mb-1">👤</span>
-                    <span class="text-[1rem] font-black text-slate-800 js-stat-users">0</span>
-                    <span class="text-[0.6rem] font-bold text-slate-400 uppercase">Users</span>
-                </div>
-                <div class="flex flex-col items-center p-3 bg-slate-50 rounded-2xl">
-                    <span class="text-[1.2rem] mb-1">📚</span>
-                    <span class="text-[1rem] font-black text-slate-800 js-stat-archives">0</span>
-                    <span class="text-[0.6rem] font-bold text-slate-400 uppercase">Trips</span>
-                </div>
-                <div class="flex flex-col items-center p-3 bg-slate-50 rounded-2xl">
-                    <span class="text-[1.2rem] mb-1">📍</span>
-                    <span class="text-[1rem] font-black text-slate-800 js-stat-memos">0</span>
-                    <span class="text-[0.6rem] font-bold text-slate-400 uppercase">Memos</span>
-                </div>
-            </div>
-        </div>
-        <!-- カード3：評価・開発者・公式サイト -->
-        <div class="bg-white rounded-[1rem] border border-slate-200 overflow-hidden mb-4">
-            <button id="btn-info-review" class="w-full flex justify-between items-center p-5 border-b border-slate-100 active:bg-slate-50 transition-all">
-                <span class="text-[0.8rem] font-bold text-slate-500 uppercase">App Rating</span>
-                <div class="flex items-center gap-2">
-                    <span class="text-[1.1rem] font-black text-amber-400 js-app-score"></span>
-                    <span class="text-[0.8rem] font-bold text-slate-300">(<span class="js-app-feedback-count"></span>)</span>
-                    <span class="text-slate-300 ml-1">≫</span>
-                </div>
-            </button>
-            <div class="p-5 flex justify-between items-center border-b border-slate-100">
-                <span class="text-[0.8rem] font-bold text-slate-500 uppercase">Developer</span>
-                <span class="text-[0.9rem] font-black text-slate-700 js-app-developer"></span>
-            </div>
-            <button id="link-info-official" class="w-full flex justify-between items-center p-5 active:bg-slate-50 transition-all">
-                <span class="text-[0.8rem] font-bold text-slate-500 uppercase">Official Site</span>
-                <span class="text-brand-5 font-black">Link ≫</span>
-            </button>
-        </div>
-    </div>
-</template>
-<!-- 【最終版】アプリ詳細情報：日本語化・アイコン枠内収め・不要ボタン削除 -->
-<!-- 【最終版】アプリ詳細情報：画像デザイン準拠 -->
+<!-- 【最終版】アプリ詳細情報：他のダイアログ作法に完全準拠 -->
 <template id="tpl-app-info">
-    <div class="w-full flex flex-col px-3 pb-8 bg-slate-50/50 pt-4 gap-4">
+    <div class="w-full flex flex-col gap-4 text-slate-900">
         <!-- カード1：アイコンと基本情報 -->
-        <div class="bg-white rounded-[1.2rem] border border-slate-200 overflow-hidden shadow-sm">
-            <div class="p-6 flex flex-col items-center gap-6">
-                <!-- アイコンを枠（カード）内に配置 -->
-                <div class="w-24 h-24 bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.1)] overflow-hidden border border-slate-100 p-2 flex justify-center items-center">
+        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-4">
+            <!-- アイコン -->
+            <div class="flex justify-center py-2">
+                <!-- カスタムシャドウを廃止し、標準の shadow-md と border-slate-200 を使用 -->
+                <div class="w-48 h-48 bg-white rounded-[1rem] shadow-md overflow-hidden border p-2 flex justify-center items-center">
                     <img id="js-app-icon" src="" class="w-full h-full object-contain">
                 </div>
-                <!-- アプリ名 / バージョン -->
-                <div class="w-full flex flex-col gap-4">
-                    <div class="flex justify-between items-baseline">
-                        <span class="text-[0.8rem] font-bold text-slate-500">アプリ名</span>
-                        <span class="text-[1rem] font-black text-slate-800 js-app-name"></span>
-                    </div>
-                    <div class="flex justify-between items-baseline border-t border-slate-100 pt-4">
-                        <span class="text-[0.8rem] font-bold text-slate-500">バージョン</span>
-                        <span class="text-[1rem] font-bold text-slate-800 js-app-version font-mono"></span>
-                    </div>
+            </div>
+            <div class="flex flex-col gap-3 mx-4">
+                <!-- ラベル: 0.9rem slate-600 / 値: 1rem bold slate-900 -->
+                <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
+                    <span class="text-[0.9rem] text-slate-600">アプリ名</span>
+                    <span class="text-[1rem] font-bold text-slate-900 js-app-name"></span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                    <span class="text-[0.9rem] text-slate-600">バージョン</span>
+                    <span class="text-[1rem] font-bold text-slate-900 js-app-version font-mono"></span>
                 </div>
             </div>
         </div>
         <!-- カード2：全体統計 -->
-        <div class="bg-white rounded-[1.2rem] border border-slate-200 p-6 shadow-sm">
-            <div class="flex justify-between items-end mb-6">
-                <span class="text-[1rem] font-black text-slate-900">全体統計</span>
-                <span class="text-[0.7rem] font-bold text-slate-400">最終更新: <span class="js-last-update font-mono"></span></span>
+        <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3">
+            <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
+                <span class="text-[0.9rem] font-bold text-slate-900">全体統計</span>
+                <!-- 作法通りの日付クラス kb-date-tim-sm を使用 -->
+                <div class="text-[0.8rem] text-slate-600">最終更新: <span class="js-last-update kb-date-tim-sm ml-1"></span></div>
             </div>
-            <div class="grid grid-cols-3 gap-2">
-                <div class="flex flex-col items-center">
-                    <span class="text-[1.8rem] mb-2">👤</span>
-                    <span class="text-[1.2rem] font-black text-slate-800 js-stat-users">0</span>
-                    <span class="text-[0.75rem] font-bold text-slate-500 mt-1">ユーザー</span>
+            <div class="grid grid-cols-3 gap-2 mt-1">
+                <div class="flex flex-col items-center bg-slate-50 rounded-lg py-3 border border-slate-100">
+                    <span class="text-[1.5rem] mb-1 drop-shadow-sm">👤</span>
+                    <span class="text-[1.2rem] font-bold text-slate-900 js-stat-users">0</span>
+                    <span class="text-[0.8rem] text-slate-600 mt-1">ユーザー</span>
                 </div>
-                <div class="flex flex-col items-center">
-                    <span class="text-[1.8rem] mb-2">📚</span>
-                    <span class="text-[1.2rem] font-black text-slate-800 js-stat-archives">0</span>
-                    <span class="text-[0.75rem] font-bold text-slate-500 mt-1">まとめ</span>
+                <div class="flex flex-col items-center bg-slate-50 rounded-lg py-3 border border-slate-100">
+                    <span class="text-[1.5rem] mb-1 drop-shadow-sm">📚</span>
+                    <span class="text-[1.2rem] font-bold text-slate-900 js-stat-archives">0</span>
+                    <span class="text-[0.8rem] text-slate-600 mt-1">まとめ</span>
                 </div>
-                <div class="flex flex-col items-center">
-                    <span class="text-[1.8rem] mb-2">📍</span>
-                    <span class="text-[1.2rem] font-black text-slate-800 js-stat-memos">0</span>
-                    <span class="text-[0.75rem] font-bold text-slate-500 mt-1">地点メモ</span>
+                <div class="flex flex-col items-center bg-slate-50 rounded-lg py-3 border border-slate-100">
+                    <span class="text-[1.5rem] mb-1 drop-shadow-sm">📍</span>
+                    <span class="text-[1.2rem] font-bold text-slate-900 js-stat-memos">0</span>
+                    <span class="text-[0.8rem] text-slate-600 mt-1">地点メモ</span>
                 </div>
             </div>
         </div>
-        <!-- カード3：評価・開発者・公式サイト -->
-        <div class="bg-white rounded-[1.2rem] border border-slate-200 overflow-hidden shadow-sm">
-            <button id="btn-info-review" class="w-full flex justify-between items-center p-5 border-b border-slate-100 active:bg-slate-50 transition-all">
-                <span class="text-[0.8rem] font-bold text-slate-500">アプリの評価</span>
+        <!-- カード3：リンク・アクション -->
+        <div class="bg-white rounded-[1rem] border border-slate-200 flex flex-col overflow-hidden">
+            <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-200 active:bg-slate-50 transition-colors">
+                <span class="text-[0.9rem] text-slate-600">アプリの評価</span>
                 <div class="flex items-center gap-2">
-                    <span class="text-[1.1rem] font-black text-amber-400 js-app-score"></span>
-                    <span class="text-[0.8rem] font-bold text-slate-300">(<span class="js-app-feedback-count"></span>)</span>
-                    <span class="text-slate-300 ml-1">≫</span>
+                    <span class="text-[1rem] font-bold text-yellow-500 js-app-score"></span>
+                    <span class="text-[0.9rem] text-slate-600">(<span class="js-app-feedback-count"></span>)</span>
+                    <span class="text-[1rem] text-slate-400 ml-1">▶</span>
                 </div>
             </button>
-            <div class="p-5 flex justify-between items-center border-b border-slate-100">
-                <span class="text-[0.8rem] font-bold text-slate-500">開発者</span>
-                <span class="text-[0.95rem] font-black text-slate-800 js-app-developer"></span>
+            <div class="w-full flex justify-between items-center p-4 border-b border-slate-200">
+                <span class="text-[0.9rem] text-slate-600">開発者</span>
+                <span class="text-[1rem] font-bold text-slate-900 js-app-developer"></span>
             </div>
-            <button id="link-info-official" class="w-full flex justify-between items-center p-5 active:bg-slate-50 transition-all">
-                <span class="text-[0.8rem] font-bold text-slate-500">公式サイト</span>
-                <span class="text-brand-5 font-black">Link ≫</span>
+            <button id="link-info-official" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors">
+                <span class="text-[0.9rem] text-slate-600">公式サイト</span>
+                <span class="text-[1rem] font-bold text-brand-5">Link ▶</span>
             </button>
         </div>
     </div>

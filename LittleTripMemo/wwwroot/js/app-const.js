@@ -6,7 +6,7 @@ window.$Const = {
         DESCRIPTION: "メモをまとめて自分だけの旅行記を作ろう",
         DEVELOPER: "kunkoba",
         OFFICIAL_SITE: "https://hinekulemonstudio.web.app/",
-        VERSION: "1.1.3",
+        VERSION: "1.1.5",
         VERSION_DESCRIPTION: `
 メジャー.マイナー.パッチの形式で表されます。
 
