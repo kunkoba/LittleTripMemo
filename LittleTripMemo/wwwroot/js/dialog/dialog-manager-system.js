@@ -858,7 +858,7 @@ export default {
     },
     // リーガル・ドキュメントのメニュー画面（5つのボタンリスト）
     async ShowLegalDocuments() {
-        // 1. DBから全データを取得
+        // 初回のNEWバッジ表示用に全体を取得
         const docs = await $LocalDb.Legal.GetAll();
         const LT = $Const.LEGAL_TYPE;
         const menuItems = [
@@ -871,8 +871,9 @@ export default {
         const el = document.createElement("div");
         el.className = "w-full flex flex-col bg-brand-0";
         menuItems.forEach(item => {
-            const data = docs.find(d => d.id === item.key);
-            const isUnread = data ? !!data.is_unread : false;
+            // 初期描画時のNEWバッジ判定用
+            const initData = docs.find(d => d.id === item.key);
+            const isUnread = initData ? !!initData.is_unread : false;
             const btn = document.createElement("button");
             btn.className = "w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900 relative";
             btn.innerHTML = `
@@ -888,18 +889,17 @@ export default {
                 btn.appendChild(badge);
             }
             btn.onclick = async () => {
-                // ★ 修正：識別キー(item.key) も一緒に渡す
+                // ★ 修正：ボタン押下時に、ローカルDBから常に最新の1件を取得し直す
+                const latestData = await $LocalDb.Legal.Get(item.key);
                 this.ShowLegalDocumentDetail(
-                    item.key, item.label,
-                    data ? data.body : null,
-                    data ? data.update_tim : null,
+                    item.key, 
+                    item.label, 
+                    latestData ? latestData.body : null,
+                    latestData ? latestData.update_tim : null
                 );
-                // 開いた項目だけを既読にする
-                if (data && data.is_unread) {
-                    await $LocalDb.Legal.Save(
-                        data.id, data.body, 
-                        data.update_tim, false
-                    );
+                // 既読化処理も最新データに基づいて行う
+                if (latestData && latestData.is_unread) {
+                    await $LocalDb.Legal.Save(latestData.id, latestData.body, latestData.update_tim, false);
                     await $Data.LocalDb.CheckLegalUnread();
                     const badge = btn.querySelector('.bg-red-500');
                     if (badge) badge.remove();
