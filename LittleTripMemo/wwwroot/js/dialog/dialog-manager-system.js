@@ -889,10 +889,17 @@ export default {
             }
             btn.onclick = async () => {
                 // ★ 修正：識別キー(item.key) も一緒に渡す
-                this.ShowLegalDocumentDetail(item.key, item.label, data ? data.body : null);
+                this.ShowLegalDocumentDetail(
+                    item.key, item.label,
+                    data ? data.body : null,
+                    data ? data.update_tim : null,
+                );
                 // 開いた項目だけを既読にする
                 if (data && data.is_unread) {
-                    await $LocalDb.Legal.Save(data.id, data.body, data.update_tim, false);
+                    await $LocalDb.Legal.Save(
+                        data.id, data.body, 
+                        data.update_tim, false
+                    );
                     await $Data.LocalDb.CheckLegalUnread();
                     const badge = btn.querySelector('.bg-red-500');
                     if (badge) badge.remove();
@@ -907,20 +914,27 @@ export default {
             buttons: []
         });
     },
-    // ★ 修正：引数に key を追加
-    ShowLegalDocumentDetail(key, title, body) {
-        const el = document.createElement("div");
-        el.className = "w-full p-5 bg-white text-slate-700 text-[0.95rem] leading-[1.8] whitespace-pre-wrap overflow-y-auto";
-        el.textContent = body ? body : "現在、この項目は準備中です。";
+    // 個別の法的情報表示ダイアログ
+    ShowLegalDocumentDetail(key, title, body, updateTim) {
+        const el = $Dom.GenerateTemplate("tpl-view-legal");
+        const dateEl = $Dom.QuerySelector(".js-legal-date", el);
+        const bodyEl = $Dom.QuerySelector(".js-legal-body", el);
+        // ★ 追加：値を画面に反映する処理を関数化
+        const renderView = (currentBody, currentTim) => {
+            dateEl.textContent = currentTim ? $Util.FormatDate(currentTim) : "---";
+            bodyEl.textContent = currentBody ? currentBody : "現在、この項目は準備中です。";
+        };
+        // 初期描画
+        renderView(body, updateTim); 
         const headerButtons = [];
-        // ★ 追加：管理者の場合はヘッダーに「編集ボタン」を表示
         if ($App.AppData.Owner.Plan === "Admin") {
             headerButtons.push({
                 label: "✏️",
-                theme: "admin",
                 handler: () => {
-                    // dialog-manager 内で統合されているため、管理者のエディタ機能を直接呼び出せます
-                    this.ShowAdminCoreDocumentEditor(key, title);
+                    // ★ 修正：第3引数にコールバックを渡し、保存完了時に再描画させる
+                    this.ShowAdminCoreDocumentEditor(key, title, (updatedBody, updatedTim) => {
+                        renderView(updatedBody, updatedTim);
+                    });
                 }
             });
         }
@@ -929,7 +943,7 @@ export default {
             content: el,
             size: 'lg',
             buttons: [],
-            headerButtons: headerButtons // ★ 追加：ヘッダーボタンを配置
+            headerButtons: headerButtons
         });
     },
 };

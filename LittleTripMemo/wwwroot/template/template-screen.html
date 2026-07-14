@@ -812,3 +812,18 @@
     </div>
 </template>
 
+<!-- 【ダイアログ子】法的情報詳細 -->
+<template id="tpl-view-legal">
+    <div class="w-full flex flex-col gap-4 text-slate-900">
+        <!-- 更新日時 -->
+        <div class="flex justify-between items-baseline border-b border-slate-200 pb-2 px-1 mt-2">
+            <span class="text-[0.9rem] font-bold text-slate-600 uppercase tracking-widest">最終更新日時</span>
+            <span class="js-legal-date kb-date-tim-sm"></span>
+        </div>
+        <!-- 本文エリア -->
+        <div class="bg-slate-50 border border-slate-200 rounded-[1rem] p-4 min-h-[300px]">
+            <div class="js-legal-body text-[1rem] text-slate-900 leading-[1.8] whitespace-pre-wrap break-words"></div>
+        </div>
+    </div>
+</template>
+

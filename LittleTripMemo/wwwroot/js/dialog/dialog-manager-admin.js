@@ -916,7 +916,8 @@ export default {
         });
     },
     // 長文ドキュメント編集画面（利用規約 / プライバシーポリシー）
-    async ShowAdminCoreDocumentEditor(key, title) {
+    // ★ 修正：第3引数に onUpdate を追加
+    async ShowAdminCoreDocumentEditor(key, title, onUpdate = null) { 
         // 1. ローカルDBから該当キーのデータを直接取得
         const record = await $LocalDb.Legal.Get(key);
         // 2. 取得した本文（なければ空文字）を初期値にする
@@ -950,9 +951,11 @@ export default {
                         };
                         if (await $Data.Access.UpdateLegalConfig(params)) {
                             $Notice.Info(`${title}を更新しました`);
-                            this._core.close();
-                            // 任意：管理者自身のローカルDBもこの場で更新しておくと、リロードなしで反映を確認できます
-                            await $LocalDb.Legal.Save(key, newBody, new Date().toISOString(), false);
+                            this._core.close(); // ★ 修正：エディタだけを閉じる
+                            const nowStr = new Date().toISOString();
+                            await $LocalDb.Legal.Save(key, newBody, nowStr, false);
+                            // ★ 追加：裏の画面を再描画するためのコールバックを実行
+                            if (onUpdate) onUpdate(newBody, nowStr); 
                         }
                     }
                 }
