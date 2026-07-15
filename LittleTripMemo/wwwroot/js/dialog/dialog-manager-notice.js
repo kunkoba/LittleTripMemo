@@ -355,7 +355,7 @@ export default {
             root.appendChild(child);
         });
         this._core.open({
-            title: "受信メール",
+            title: "受信メール一覧",
             content: root,
             help: "",
         });
@@ -373,7 +373,7 @@ export default {
         const bodyEl = $Dom.QuerySelector('#view-notice-body', el);
         bodyEl.textContent = body.trim() !== "" ? body : item.body;
         this._core.open({
-            title: "受信メール詳細",
+            title: "運営からのメール",
             content: el,
             help: "",
             buttons: []

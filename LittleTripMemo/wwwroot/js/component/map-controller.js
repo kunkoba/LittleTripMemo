@@ -4,8 +4,8 @@ const _MapCore = {
     _elementId: "ui-map-id",
     _map: null,
     currentPoint: null,
-    // locationMarker: null,
     currentTileLayer: null,
+    useFlyTo: true,
     // 物理的な初期化処理
     init() {
         if (!this._map) {
@@ -78,12 +78,14 @@ const _MapCore = {
             // パネルが開く時などは従来通り遅延＋リサイズ追従
             setTimeout(() => {
                 this._map.invalidateSize();
-                this._map.setView(marker.getLatLng());
+                // this._map.setView(marker.getLatLng());
+                this._moveTo(marker.getLatLng());
             }, delay + 100);
             this.resizeMap(delay);
         } else {
             // 遅延0の場合は即座に移動するだけ（resizeMapの座標固定を回避）
-            this._map.setView(marker.getLatLng());
+            // this._map.setView(marker.getLatLng());
+            this._moveTo(marker.getLatLng());
         }
     },
     // 再計算ループ処理
@@ -126,7 +128,19 @@ const _MapCore = {
         console.log("moveMap(lat, lng)");
         if (!this._map) return;
         if (!zoom) zoom = this._map.getZoom();
-        this._map.setView([lat, lng], zoom);
+        // this._map.setView([lat, lng], zoom);
+        this._moveTo([lat, lng], zoom);
+    },
+    // 移動処理の共通ヘルパー（flyTo と setView を分岐）
+    _moveTo(latLng, zoom) {
+        const targetZoom = zoom || this._map.getZoom();
+        const delay = 2;
+        if (this.useFlyTo) {
+            // duration は 0.8秒 にしています（好みに合わせて変更可）
+            this._map.flyTo(latLng, targetZoom, { duration: delay });
+        } else {
+            this._map.setView(latLng, targetZoom);
+        }
     },
 };
 

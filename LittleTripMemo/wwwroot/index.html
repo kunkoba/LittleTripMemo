@@ -337,7 +337,7 @@
                     </div>
                 </div>
                 <!-- アイコンバー -->
-                <div class="mx-2 bg-transparent flex justify-center mb-4">
+                <div class="mx-2 bg-transparent flex justify-center mb-6">
                     <div class="flex-1 min-w-0 w-10">
                         <!-- まとめタイトル -->
                         <div class="p-0 flex justify-center">
@@ -350,6 +350,17 @@
                         </div>
                         <!-- 地点検索関連 -->
                         <div id="ui-sort-group" class="hidden flex flex-col items-center ">
+                            <!-- リアクション種別 -->
+                            <div id="sort-reaction" class="hidden shadow-md w-fit mb-2 h-10 flex  text-[1.5rem] rounded-full overflow-hidden pointer-events-auto">
+                                <button data-value="1" class="ui-btn h-full px-3 bg-brand-3 transition-colors">🤣</button>
+                                <button data-value="2" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😍</button>
+                                <button data-value="3" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😮</button>
+                                <button data-value="4" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😭</button>
+                            </div>
+                            <!-- 検索キーワード入力欄 -->
+                            <div id="sort-word" class="hidden shadow-md w-fit mb-2 h-10 flex  rounded-full overflow-hidden bg-white pointer-events-auto">
+                                <input type="text" id="input-sort-word" class="h-full px-3 text-[1rem] text-slate-900 outline-none bg-transparent w-40 placeholder-slate-300" placeholder="Keyword...">
+                            </div>
                             <!-- 並び順 -->
                             <div id="sort-field" class="shadow-md w-fit mb-2 h-8 flex  rounded-full overflow-hidden pointer-events-auto">
                                 <button data-value="1" class="ui-btn h-full px-3 text-[0.9rem] font-bold bg-brand-3 transition-colors">
@@ -365,17 +376,6 @@
                                 <button data-value="4" class="ui-btn h-full px-3 text-[0.9rem] font-bold bg-brand-0 transition-colors">
                                     Word
                                 </button>
-                            </div>
-                            <!-- リアクション種別 -->
-                            <div id="sort-reaction" class="hidden shadow-md w-fit mb-2 h-10 flex  text-[1.5rem] rounded-full overflow-hidden pointer-events-auto">
-                                <button data-value="1" class="ui-btn h-full px-3 bg-brand-3 transition-colors">🤣</button>
-                                <button data-value="2" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😍</button>
-                                <button data-value="3" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😮</button>
-                                <button data-value="4" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😭</button>
-                            </div>
-                            <!-- 検索キーワード入力欄 -->
-                            <div id="sort-word" class="hidden shadow-md w-fit mb-2 h-10 flex  rounded-full overflow-hidden bg-white pointer-events-auto">
-                                <input type="text" id="input-sort-word" class="h-full px-3 text-[1rem] text-slate-900 outline-none bg-transparent w-40 placeholder-slate-300" placeholder="Keyword...">
                             </div>
                         </div>
                     </div>
@@ -404,7 +404,7 @@
                     <!-- 【上段】動的エリア：②移動カプセル または ③メインアクション（作成・検索） -->
                     <div id="bot-dynamic-area" class="w-full flex justify-center items-end min-h-[52px]">
                         <!-- ② 移動ボタン群（カプセル：高さ共通化のため py-1 / w-10） -->
-                        <div id="bot-group-move" class="hidden h-14 w-full max-w-[500px] flex items-center justify-between bg-black/70 rounded-full px-6 py-1 shadow-md pointer-events-auto">
+                        <div id="bot-group-move" class="hidden h-12 w-full max-w-[500px] flex items-center justify-between bg-black/70 rounded-full px-6 py-1 shadow-md pointer-events-auto">
                             <button id="btn-bot-move-first" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
                                 |＜
                             </button>
