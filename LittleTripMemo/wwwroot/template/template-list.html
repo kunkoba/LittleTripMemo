@@ -1,6 +1,6 @@
 <!-- 【リスト親】フレーム -->
 <template id="tpl-list-parent">
-    <div class="w-full text-slate-600 mb-4"></div>
+    <div class="w-full text-slate-600 p-2"></div>
 </template>
 
 <!-- 【リスト親】グループヘッダー -->
@@ -39,7 +39,7 @@
             <div class="js-face kb-icon-emoji-lg mb-3"></div>
             <div class="text-[0.9rem] font-bold text-slate-900 js-time tracking-wider bg-brand-0 px-1"></div>
         </div>
-        <div class="flex-1 bg-white rounded-[1rem] p-3 border border-slate-200 shadow-md relative overflow-hidden flex flex-col items-start gap-2">
+        <div class="ml-2 flex-1 bg-white rounded-[1rem] p-3 border border-slate-200 shadow-md relative overflow-hidden flex flex-col items-start gap-2">
             <div class="js-index-badge absolute top-2 right-2 w-7 h-7 rounded-full bg-brand-4 text-white font-bold text-[0.9rem] flex items-center justify-center  z-20"></div>
             <button class="js-btn-detach hidden absolute top-2 right-10 w-7 h-7 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center  z-20 hover:bg-slate-100 active:scale-95 transition-all text-[0.9rem]">🗑</button>
             <div class="border-l-4 border-brand-3 pl-2 py-2 w-full mt-2">
@@ -110,15 +110,15 @@
 
 <!-- 【リスト子】まとめ親一覧 -->
 <template id="tpl-list-child-archive">
-    <div class="js-item-card relative bg-white rounded-[1rem] shadow-md border border-brand-1 mb-3 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform">
+    <div class="js-item-card relative bg-white rounded-[1rem] shadow-md mb-3 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform">
         <div class="js-item-border absolute left-0 top-0 bottom-0 w-1"></div>
         <div class="p-3 pl-4 flex flex-col gap-1">
             <div class="flex justify-between items-start mb-1">
                 <!-- 左：日付のみ -->
                 <span class="js-update-tim kb-date-tim-sm"></span>
                 <!-- 右：件数バッジ（背景色はJSで設定） -->
-                <div class="js-count-badge px-2.5 py-0.5 rounded-md text-[0.9rem] font-bold text-white  italic tracking-tight">
-                    <span class="js-count">0</span> memos
+                <div class="js-count-badge px-2.5 py-0.5 rounded-full text-[0.9rem] font-bold text-white italic tracking-tight">
+                    <span class="js-count">0</span>
                 </div>
             </div>
             <div class="js-title text-[0.9rem] font-bold text-slate-900 truncate mb-1"></div>

@@ -1,144 +1,111 @@
-<div class="page">
-    <div class="scroll-area">
-        <header>
-            <span class="site-name">
-                週末の記録
-            </span>
-            <span class="date">
-                2026年7月7日
-            </span>
-        </header>
-        <article>
-            <p class="meta">
-                日記 ・ 6分で読めます
-            </p>
-            <h1>
-                花火大会に行ってきた
-            </h1>
-            <p>
-                土曜日の夜、河川敷まで足を運んだ。人混みをかき分けてシートを広げた頃には、すでに空には煙の匂いが漂っていた。
-            </p>
-            <p>
-                最初の一発が上がった瞬間、あたりの歓声が一斉に上がる。音が届くまでのわずかな間、光だけが先に広がっていくのがなんとも不思議だった。
-            </p>
-            <p>
-                プログラムが進むにつれ、色も形もどんどん変わっていく。定番の丸い大輪もあれば、細かい粒が尾を引いて落ちていくものもあり、飽きることがなかった。
-            </p>
-            <p>
-                フィナーレは複数の花火が同時に打ち上がり、空全体が埋め尽くされるほどだった。歓声と拍手が入り混じって、しばらく鳴りやまなかった。
-            </p>
-            <p>
-                帰り道、まだ耳に音が残っている気がした。来年もこの時期になったら、また同じ場所に来ようと思う。
-            </p>
-        </article>
-        <canvas id="fwCanvas" width="680" height="560"></canvas>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Sentiment UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .temp-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #94a3b8;
+            padding: 12px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 2px solid transparent;
+        }
+        .temp-btn:hover { background: #f8fafc; transform: translateY(-2px); }
+        .temp-btn.active { border-color: currentColor; }
+        
+        /* 5段階のテーマカラー (青～赤) */
+        .temp-btn[data-value="-2"].active { color: #2563eb; background: #dbeafe; } /* 青: 極寒 */
+        .temp-btn[data-value="-1"].active { color: #0891b2; background: #cffafe; } /* 水色: 肌寒い */
+        .temp-btn[data-value="0"].active  { color: #059669; background: #d1fae5; } /* 緑: 快適 */
+        .temp-btn[data-value="1"].active  { color: #ea580c; background: #ffedd5; } /* オレンジ: 暑い */
+        .temp-btn[data-value="2"].active  { color: #dc2626; background: #fee2e2; } /* 赤: 猛暑 */
+        
+        .material-icons { font-size: 40px; }
+    </style>
+</head>
+<body class="bg-slate-50 flex items-center justify-center min-h-screen p-4 font-sans text-slate-800">
+
+    <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-xl w-full max-w-2xl border border-slate-100">
+        <h2 class="text-xl font-bold text-slate-900 mb-2 text-center">今の気温はどう感じますか？</h2>
+        <p class="text-sm text-slate-500 mb-8 text-center">左（青）が極寒、右（赤）が猛暑です</p>
+
+        <div id="temp-container" class="grid grid-cols-5 gap-2 mb-8">
+            <!-- 1. 極寒: Stressed (青系) -->
+            <button class="temp-btn" data-value="-2" title="極寒">
+                <span class="material-icons">sentiment_stressed</span>
+            </button>
+            <!-- 2. 肌寒い: Dissatisfied (水色系) -->
+            <button class="temp-btn" data-value="-1" title="肌寒い">
+                <span class="material-icons">sentiment_dissatisfied</span>
+            </button>
+            <!-- 3. 快適: Satisfied (緑系) -->
+            <button class="temp-btn" data-value="0" title="快適">
+                <span class="material-icons">sentiment_satisfied</span>
+            </button>
+            <!-- 4. 暑い: Frustrated (オレンジ系) -->
+            <button class="temp-btn" data-value="1" title="暑い">
+                <span class="material-icons">sentiment_frustrated</span>
+            </button>
+            <!-- 5. 猛暑: Very Dissatisfied (赤系) -->
+            <button class="temp-btn" data-value="2" title="猛暑">
+                <span class="material-icons">sentiment_very_dissatisfied</span>
+            </button>
+        </div>
+
+        <div id="feedback-text" class="text-center text-sm font-bold text-slate-600 h-12 flex items-center justify-center bg-slate-50 rounded-xl mb-6 border border-slate-100 transition-all duration-300">
+            選択してください
+        </div>
+
+        <button id="submit-btn" disabled class="w-full py-4 bg-slate-100 text-slate-400 rounded-xl font-bold transition-all duration-300">
+            回答を確定する
+        </button>
     </div>
-</div>
-<script>
-    (function () {
-  var canvas = document.getElementById('fwCanvas');
-  var ctx = canvas.getContext('2d');
-  var W = canvas.width, H = canvas.height;
-  var rockets = [];
-  var particles = [];
-  var colors = ['#ff6f91', '#5ddcff', '#ffd166', '#c792ff', '#ff9f6b', '#8dffb0', '#ff5c5c', '#4d8dff', '#ffe45c', '#ff8ad1'];
 
-  function spawnRocket() {
-    var x = 60 + Math.random() * (W - 120);
-    var targetY = 60 + Math.random() * 140;
-    rockets.push({
-      x: x,
-      y: H - 30,
-      targetY: targetY,
-      vy: -6 - Math.random() * 1.8,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      trail: []
-    });
-  }
+    <script>
+        const buttons = document.querySelectorAll('.temp-btn');
+        const feedbackText = document.getElementById('feedback-text');
+        const submitBtn = document.getElementById('submit-btn');
 
-  function explode(x, y) {
-    var count = 30 + Math.floor(Math.random() * 14);
-    for (var i = 0; i < count; i++) {
-      var angle = (Math.PI * 2 * i) / count + Math.random() * 0.15;
-      var speed = 1.6 + Math.random() * 2.6;
-      particles.push({
-        x: x,
-        y: y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        life: 1,
-        decay: 0.008 + Math.random() * 0.012,
-        trail: []
-      });
-    }
-  }
+        const labels = {
+            '-2': '凍えるような寒さです ❄️',
+            '-1': '少し肌寒いです ☁️',
+            '0': 'ちょうど快適です ✨',
+            '1': '暑いですね ☀️',
+            '2': '耐えられない猛暑です 🔥'
+        };
 
-  function drawTrail(p, headSize) {
-    for (var k = 1; k < p.trail.length; k++) {
-      var a = (k / p.trail.length) * Math.max(p.life, 0);
-      ctx.strokeStyle = p.color;
-      ctx.globalAlpha = a * 0.7;
-      ctx.lineWidth = headSize;
-      ctx.beginPath();
-      ctx.moveTo(p.trail[k - 1].x, p.trail[k - 1].y);
-      ctx.lineTo(p.trail[k].x, p.trail[k].y);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  }
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const value = btn.getAttribute('data-value');
+                feedbackText.innerText = labels[value];
+                feedbackText.classList.remove('bg-slate-50');
+                
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('bg-slate-100', 'text-slate-400');
+                submitBtn.classList.add('bg-slate-900', 'text-white');
+            });
+        });
 
-  var frame = 0;
-  function loop() {
-    frame++;
-    ctx.clearRect(0, 0, W, H);
-
-    if (frame % 50 === 0 || rockets.length + particles.length === 0) {
-      spawnRocket();
-    }
-
-    for (var i = rockets.length - 1; i >= 0; i--) {
-      var r = rockets[i];
-      r.trail.push({ x: r.x, y: r.y });
-      if (r.trail.length > 8) r.trail.shift();
-      r.y += r.vy;
-      drawTrail(r, 2.4);
-      ctx.globalAlpha = 1;
-      ctx.beginPath();
-      ctx.arc(r.x, r.y, 2.4, 0, Math.PI * 2);
-      ctx.fillStyle = r.color;
-      ctx.fill();
-      if (r.y <= r.targetY) {
-        explode(r.x, r.y);
-        rockets.splice(i, 1);
-      }
-    }
-
-    for (var j = particles.length - 1; j >= 0; j--) {
-      var p = particles[j];
-      p.trail.push({ x: p.x, y: p.y });
-      if (p.trail.length > 6) p.trail.shift();
-      p.vy += 0.045;
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life -= p.decay;
-      if (p.life <= 0) {
-        particles.splice(j, 1);
-        continue;
-      }
-      drawTrail(p, 2);
-      ctx.globalAlpha = Math.max(p.life, 0);
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-      ctx.globalAlpha = 1;
-    }
-
-    requestAnimationFrame(loop);
-  }
-
-  spawnRocket();
-  loop();
-})();
-</script>
+        submitBtn.addEventListener('click', () => {
+            feedbackText.innerText = "ご回答ありがとうございます！";
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('bg-slate-900');
+            submitBtn.classList.add('bg-emerald-500');
+            submitBtn.innerText = "送信しました";
+        });
+    </script>
+</body>
+</html>

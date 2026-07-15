@@ -177,10 +177,11 @@ const _DetailContentCore = {
             // 通貨単位の決定ロジック
             let displayCurrency = $App.AppData.Owner.Currency_unit || 'JPY';
             if (detail.archive_id > 0) {
-                // 親アーカイブの情報をStoreから探す（一覧または現在開いているアーカイブ）
-                const archiveList = $Data.Store.GetArchiveList() ||[];
-                const targetArc = archiveList.find(a => a.archive_id === detail.archive_id) || $Data.Store.GetArchive();
-                if (targetArc && targetArc.archive_id === detail.archive_id && targetArc.currency_unit) {
+                // 親アーカイブの情報をStoreから探す
+                const archiveList = $Data.Store.GetArchiveList() || [];
+                // Number() で型を確実に合わせて比較する
+                const targetArc = archiveList.find(a => Number(a.archive_id) === Number(detail.archive_id)) || $Data.Store.GetArchive();
+                if (targetArc && Number(targetArc.archive_id) === Number(detail.archive_id) && targetArc.currency_unit) {
                     displayCurrency = targetArc.currency_unit; // 親の通貨で上書き
                 }
             }
