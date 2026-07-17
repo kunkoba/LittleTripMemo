@@ -46,11 +46,11 @@
 
 <!-- 【リスト子】管理者通知一覧用 -->
 <template id="tpl-admin-list-child-notice">
-    <div class="js-item-card flex items-stretch p-0 border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3 relative">
+    <div class="js-item-card flex items-stretch p-0 border-b _border-brand-1 _shadow-md bg-white cursor-pointer active:scale-[0.98] transition-transform overflow-hidden mb-3 relative">
         <div class="flex-1 min-w-0 p-3 pl-4">
             <div class="flex justify-between items-start mb-1">
                 <div class="js-date kb-date-tim-sm"></div>
-                <span class="js-badge-status text-[0.9rem] font-bold px-2 py-0.5 uppercase tracking-wider shadow-md border"></span>
+                <span class="js-badge-status text-[0.9rem] font-bold px-2 py-0.5 uppercase tracking-wider _shadow-md _border"></span>
             </div>
             <div class="text-[0.9rem] font-bold text-slate-900 truncate pr-2 mb-1 js-title"></div>
             <div class="text-[0.9rem] text-slate-600 line-clamp-1 js-body "></div>
@@ -101,7 +101,7 @@
 
 <!-- 【リスト子】管理者フィードバック一覧用 -->
 <template id="tpl-admin-list-child-feedback">
-    <button class="js-item-card w-full flex flex-col p-4 rounded-[1rem] border border-brand-1 bg-white mb-3 shadow-md">
+    <button class="js-item-card w-full flex flex-col bg-white mb-3 py-2 border-b _border-brand-1 _shadow-md _p-4 _rounded-[1rem] ">
         <div class="flex justify-between items-center mb-2">
             <span class="js-date kb-date-tim-sm"></span>
             <span class="js-score text-[0.9rem] text-yellow-500 tracking-widest  drop-"></span>
@@ -112,7 +112,7 @@
 
 <!-- 【リスト子】管理者通報集計一覧用 -->
 <template id="tpl-admin-list-child-report-summary">
-    <div class="relative bg-white border border-brand-1 shadow-md p-3 flex flex-col gap-2 cursor-pointer active:bg-slate-50 mb-3 rounded-[1rem]">
+    <div class="relative bg-white border-b _border-brand-1 _shadow-md _p-3 pb-3 flex flex-col gap-2 cursor-pointer active:bg-slate-50 mb-3 rounded-[1rem]">
         <!-- 右上：通報件数バッジ -->
         <div class="absolute top-3 right-3 bg-red-500 text-white text-[0.9rem] font-bold px-2.5 py-1 rounded-full ">
             <span class="js-report-count js-badge-count">0</span>
@@ -193,7 +193,7 @@
 
 <!-- 管理者用ユーザーメール一覧アイテム -->
 <template id="tpl-admin-list-child-user-mail">
-    <div class="js-item-card flex items-stretch p-0 border border-brand-1 bg-white cursor-pointer active:scale-[0.98] transition-transform shadow-md overflow-hidden mb-3 relative">
+    <div class="js-item-card flex items-stretch p-0 border-b _border-brand-1 _shadow-md bg-white cursor-pointer active:scale-[0.98] transition-transform overflow-hidden mb-3 relative">
         <div class="flex-1 min-w-0 p-3 pl-4">
             <div class="flex justify-between items-start mb-1">
                 <div class="js-date kb-date-tim-sm"></div>
@@ -247,7 +247,7 @@
         <!-- 評価スコア -->
         <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
             <span class="text-[0.9rem] text-slate-600">評価スコア</span>
-            <span class="js-score text-[1rem] text-yellow-500 tracking-widest drop-shadow-md"></span>
+            <span class="js-score text-[1.5rem] text-yellow-500 tracking-widest"></span>
         </div>
         <!-- 投稿ユーザー -->
         <div class="flex flex-col gap-1 border-b border-slate-200 pb-3">
@@ -306,7 +306,7 @@
 
 <!-- 【リスト子】自分の通報履歴アイテム -->
 <template id="tpl-list-child-my-report">
-    <div class="js-item-card bg-white border border-brand-1 p-3 mb-3 shadow-md cursor-pointer active:scale-[0.98] transition-transform">
+    <div class="js-item-card bg-white p-3 mb-3 border-b _border-brand-1 _shadow-md cursor-pointer active:scale-[0.98] transition-transform">
         <div class="flex justify-between items-center mb-1">
             <span class="js-date kb-date-tim-sm"></span>
             <div class="flex gap-1">
@@ -453,7 +453,7 @@
 
 <!-- 追加：管理者BANユーザー一覧用子テンプレート -->
 <template id="tpl-admin-list-child-ban-user">
-    <div class="relative bg-white border border-slate-200 shadow-md p-3 flex flex-col gap-2 mb-3 rounded-[1rem]">
+    <div class="relative bg-white pb-3 flex flex-col gap-2 mb-3 border-b _border-slate-200 _shadow-md _rounded-[1rem]">
         <div class="flex justify-between items-center mb-1">
             <span class="text-[0.9rem] font-bold text-slate-600">BAN日時</span>
             <div class="js-date kb-date-tim-sm text-red-500"></div>

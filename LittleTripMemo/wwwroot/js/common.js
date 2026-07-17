@@ -379,4 +379,9 @@ window.$Util = {
         if (!url) return;
         window.open(url, '_blank', 'noopener,noreferrer');
     },
+    // feel_typeの数値からアイコンパスを取得
+    GetFeelIconPath(val) {
+        const item = Object.values($Const.FEEL_TYPE).find(f => f.val === Number(val));
+        return item ? item.path : $Const.FEEL_TYPE.NORMAL.path;
+    },
 };

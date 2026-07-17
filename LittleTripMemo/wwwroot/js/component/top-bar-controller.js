@@ -12,12 +12,22 @@ const _TopCore = {
                 this.sortField = $Dom.GetElementById('sort-field');
                 this.sortReaction = $Dom.GetElementById('sort-reaction');
                 this.sortWord = $Dom.GetElementById('sort-word');
+                // 追加：マーカー切替スイッチ
+                this.btnMarkerEmoji = $Dom.GetElementById('btn-marker-mode-emoji');
+                this.btnMarkerFeel = $Dom.GetElementById('btn-marker-mode-feel');
             }
             // イベント登録
             {
                 this.btnArchiveTitle.addEventListener('click', (e) => {
                     // まとめ親編集
                     $Dialog.ShowArchiveInfo();
+                });
+                // 追加：マーカー切替イベント
+                [this.btnMarkerEmoji, this.btnMarkerFeel].forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const mode = btn.dataset.mode;
+                        this.updateMarkerMode(mode);
+                    });
                 });
                 this.sortField.addEventListener("click", (e) => {
                     const btn = e.target.closest("button");
@@ -57,6 +67,18 @@ const _TopCore = {
                 }
             }
         }
+    },
+    // マーカー表示モードの更新
+    updateMarkerMode(mode) {
+        $App.AppData.Context.MarkerMode = mode;
+        const isEmoji = mode === $Const.MARKER_MODE.EMOJI;
+        // UIの更新（背景色）
+        this.btnMarkerEmoji.classList.toggle('bg-brand-3', isEmoji);
+        this.btnMarkerEmoji.classList.toggle('bg-brand-0', !isEmoji);
+        this.btnMarkerFeel.classList.toggle('bg-brand-3', !isEmoji);
+        this.btnMarkerFeel.classList.toggle('bg-brand-0', isEmoji);
+        // 地図の再描画
+        $Marker.RefreshPointMarker();
     },
     // 画面モード変更時
     changeScreenMode(){

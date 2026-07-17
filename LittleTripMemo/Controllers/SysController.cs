@@ -1,5 +1,6 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.JWT;
+using LittleTripMemo.Repository;
 using LittleTripMemo.Services.Sys;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,7 @@ namespace LittleTripMemo.Controllers;
 public class SysController(
     UserContext userContext,
     JwtService jwtService,
+    ITransactionProvider provider, // 追加
     GetSystemInfoService getSystemInfoService,
     UpsertFeedbackService upsertFeedbackService,
     GetMyFeedbackService getMyFeedbackService,
@@ -21,7 +23,7 @@ public class SysController(
     GetMyReportService getMyReportService,
     DeleteMyReportService deleteMyReportService,
     GetMyUserNotificationsService getMyUserNotificationsService
-) : _BaseController(userContext, jwtService)
+) : _BaseController(userContext, jwtService, provider)
 {
     /// <summary>
     /// システム全体の基本情報（お知らせ、統計、自分の通知状況等）をまとめて取得する

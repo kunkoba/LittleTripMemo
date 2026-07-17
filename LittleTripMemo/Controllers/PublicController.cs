@@ -1,5 +1,6 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.JWT;
+using LittleTripMemo.Repository;
 using LittleTripMemo.Services;
 using LittleTripMemo.Services.Public;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +18,7 @@ namespace LittleTripMemo.Controllers;
 public class PublicController(
     UserContext userContext,
     JwtService jwtService,
+    ITransactionProvider provider, // 追加
     GetArchiveDetailsPubService getArchiveDetailsPubService,
     SearchByLocationPubService searchByLocationPubService,
     UnpublishArchiveService unpublishArchiveService,
@@ -28,7 +30,7 @@ public class PublicController(
     AddCountQueueService addClickQueueService,
     OpenLimitedArchiveService openLimitedArchiveService,
     CloseLimitedArchiveService closeLimitedArchiveService
-) : _BaseController(userContext, jwtService)
+) : _BaseController(userContext, jwtService, provider)
 {
     #region "未ログイン・ゲスト可"
 

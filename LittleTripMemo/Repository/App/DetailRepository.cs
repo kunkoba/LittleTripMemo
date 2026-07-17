@@ -31,11 +31,11 @@ public class DetailRepository : _BaseRepository
             INSERT INTO t_memo_detail_{_user.table_id} (
                 archive_id, user_id, latitude, longitude, title, body, 
                 memo_date, memo_time, face_emoji, weather_code, link_url, 
-                memo_price, create_tim, update_tim
+                memo_price, feel_type, create_tim, update_tim
             ) VALUES (
                 @archive_id, @user_id, @latitude, @longitude, @title, @body, 
                 @memo_date, @memo_time, @face_emoji, @weather_code, @link_url, 
-                @memo_price, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+                @memo_price, @feel_type, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
             ) RETURNING seq";
 
         return await ExecuteScalarAsync<int>(sql, entity);
@@ -60,6 +60,7 @@ public class DetailRepository : _BaseRepository
                 weather_code = @weather_code,
                 link_url     = @link_url,
                 memo_price   = @memo_price,
+                feel_type    = @feel_type,
                 update_tim   = CURRENT_TIMESTAMP
             WHERE seq        = @seq 
               AND user_id    = @user_id 

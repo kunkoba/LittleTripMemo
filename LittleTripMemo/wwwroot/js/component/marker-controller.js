@@ -66,24 +66,23 @@ const _MarkerCore = {
     },
     // マーカー生成（まとめて）
     generatePointMarkerList(details, callbacks) {
+        const mode = $App.AppData.Context.MarkerMode;
         details.forEach((row, index) => {
-            // 1. テンプレートからDOMを生成
             const el = $Dom.GenerateTemplate("tpl-marker-icon");
-            // 2. 絵文字を注入
-            $Dom.QuerySelector(".js-emoji", el).textContent = row.face_emoji || '😀';
-            // 3. LeafletのIconとして設定（innerHTMLで文字列として渡す）
-            // const customIcon = L.divIcon({
-            //     html: el.innerHTML,
-            //     className: '', 
-            //     iconSize: [52, 52],
-            //     iconAnchor: [26, 26] 
-            // });
+            const iconContainer = $Dom.QuerySelector(".js-emoji", el);
+            if (mode === $Const.MARKER_MODE.FEEL) {
+                // Feelモード：画像を表示
+                const imgPath = $Util.GetFeelIconPath(row.feel_type);
+                iconContainer.innerHTML = `<img src="${imgPath}" class="bg-white w-full h-full object-contain">`;
+            } else {
+                // Emojiモード：絵文字テキストを表示
+                iconContainer.textContent = row.face_emoji || '😀';
+            }
             const customIcon = L.divIcon({
-                html: el.outerHTML, // 【修正】innerHTML から outerHTML へ変更
+                html: el.outerHTML,
                 className: '', 
-                // アイコン自体の枠を 60px に設定し、その中心 [30, 30] を LatLng に重ねる
-                iconSize: [60, 60],
-                iconAnchor: [30, 30] 
+                iconSize: [30, 30],
+                iconAnchor: [15, 15] 
             });
             const marker = L.marker([row.latitude, row.longitude], {
                 icon: customIcon,

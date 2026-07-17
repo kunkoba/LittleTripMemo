@@ -31,7 +31,6 @@ export default {
             this._core.close(); 
             $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; 
             $App.RefreshScreen(); 
-            $Marker.NavigateDefault(); // ★明示的に移動させる
         };
         // 画面を開く
         const help = [

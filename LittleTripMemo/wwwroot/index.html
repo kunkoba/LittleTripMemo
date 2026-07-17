@@ -64,10 +64,21 @@
     <!-- メインコンテンツ（親領域の枠にピッタリはめ込む） -->
     <div class="absolute inset-0">
         <!-- ■　アプリ上部 -->
-        <div id="ui-top-bar" class="absolute top-0 left-0 right-0 z-[1000] pointer-events-none">
+        <div id="ui-top-bar" class="absolute top-0 left-0 right-0 z-[1000] pointer-events-none flex flex-col items-center">
             <!-- ■　通知バー -->
-            <div class="h-8 bg-black/20 flex items-center justify-center">
+            <div class="h-8 bg-black/20 flex items-center justify-center w-full">
                 <div id="notice-bar-text" class="text-[1rem] font-bold text-white"></div>
+            </div>
+            <!-- ■　マーカー切替スイッチ -->
+            <div class="mt-2 pointer-events-auto">
+                <div id="ui-marker-mode-switch" class="shadow-md w-fit h-8 flex rounded-full overflow-hidden bg-white/90 backdrop-blur-sm border border-brand-2">
+                    <button id="btn-marker-mode-emoji" data-mode="emoji" class="px-4 transition-colors bg-brand-3 text-[0.8rem] flex items-center justify-center">
+                        絵文字
+                    </button>
+                    <button id="btn-marker-mode-feel" data-mode="feel" class="px-4 transition-colors bg-brand-0 text-[0.8rem] flex items-center justify-center border-l border-brand-2">
+                        評価
+                    </button>
+                </div>
             </div>
         </div>
         <!-- ■　メイン画面：地図＋詳細パネル -->
@@ -116,7 +127,7 @@
                 <!-- 詳細パネルの内容 (スクロールエリア) -->
                 <div id="ui-detail-content-id" class="flex-1 overflow-y-auto p-4">
                     <!-- ■ 参照用（表示モード）：縦並び・左揃え・1rem 統一版 -->
-                    <div id="detail-display" class="hidden relative flex flex-col bg-white mb-10">
+                    <div id="detail-display" class="hidden relative flex flex-col bg-white mb-2">
                         <!-- 右上の正円インデックスバッジ -->
                         <div class="js-index-badge absolute top-0 right-0 w-10 h-10 rounded-full bg-brand-4 text-white font-bold text-[1.2rem] flex items-center justify-center shadow-md z-20">
                         </div>
@@ -133,12 +144,17 @@
                             <div class="border-l-4 border-brand-3 pl-3 py-2 mt-4 mb-2 w-full">
                                 <h1 id="detail-display-title" class="text-[1.2rem] font-bold text-slate-900 break-words"></h1>
                             </div>
-                            <!-- 5. 【新設】ボトムエリア：絵文字（左）＋ リンク（右） -->
-                            <div class="my-2 pt-2 pb-4 flex justify-between gap-6 w-full pl-2 border-y">
+                            <!-- 5. 絵文字（左）＋ 評価（中央）＋ 金額（右） -->
+                            <div class="my-2 py-2 flex _items-center w-full pl-2 _border-y">
                                 <!-- 巨大絵文字 -->
-                                <div id="detail-display-face_emoji" class="text-[5rem] leading-none drop-shadow-lg shrink-0"></div>
-                                <!-- 修正：w-full で幅を確保し、justify-end で右寄せにする -->
-                                <div id="detail-display-price-wrapper" class="hidden w-full justify-end pr-3 mt-1 flex items-baseline italic">
+                                <div id="detail-display-face_emoji" class="text-[5rem] leading-none shrink-0 mr-4"></div>
+                                <!-- 評価（Feel Type）画像と文字 -->
+                                <div class="flex flex-col items-center justify-center shrink-0">
+                                    <img id="detail-display-feel_image" src="" alt="feel" class="w-[5rem] h-[5rem] object-contain">
+                                    <span id="detail-display-feel_text" class="text-[0.8rem] font-bold tracking-wider"></span>
+                                </div>
+                                <!-- 金額：ml-autoで右寄せ -->
+                                <div id="detail-display-price-wrapper" class="hidden ml-auto pr-3 mt-1 flex items-baseline italic">
                                     <span id="detail-display-memo_price" class="text-[1.5rem] font-bold"></span>
                                     <span id="detail-display-price-unit" class="text-[1rem] font-bold text-slate-600 ml-3 uppercase"></span>
                                 </div>
@@ -146,7 +162,7 @@
                             <!-- 4. 本文（左揃え・1rem以下） -->
                             <div id="detail-display-body" class="w-full min-h-[200px] p-2 text-[1rem] text-slate-900 whitespace-pre-wrap break-words leading-[2]"></div>
                             <!-- URLリンクボタン（Generatorで注入） -->
-                            <div id="detail-display-url-wrapper" class="hidden flex flex-col gap-2 w-full mt-2"></div>
+                            <div id="detail-display-url-wrapper" class="hidden flex flex-col gap-2 w-full my-2"></div>
                             <!-- ▼ 追加：リアクションボタン領域 -->
                             <div id="detail-group-reaction" class="flex justify-between gap-2 w-full mt-4 pt-4 border-t border-slate-200"></div>
                             <!-- 隠し項目 -->
@@ -154,7 +170,7 @@
                         </div>
                     </div>
                     <!-- ■ 編集用（編集モード） -->
-                    <form id="detail-edit" class="hidden space-y-6 text-slate-900">
+                    <form id="detail-edit" class="hidden space-y-6 text-slate-900 mb-6">
                         <!-- DATE & TIME -->
                         <div class="grid grid-cols-2 gap-6">
                             <div>
@@ -243,14 +259,14 @@
                                     <div class="flex items-center border-brand-2 pb-1">
                                         <span class="text-blue-500 font-bold mr-2 text-[1.2rem]">＋</span>
                                         <input id="detail-edit-price_plus" type="number" 
-                                            class="w-full border-2 border-brand-3 px-3 py-1 text-[1.2rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none">
+                                            class="w-full border-2 border-brand-3 px-3 py-1 text-right text-[1.2rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none">
                                     </div>
                                 </div>
                                 <div>
                                     <div class="flex items-center border-brand-2 pb-1">
                                         <span class="text-red-500 font-bold mr-2 text-[1.2rem]">－</span>
                                         <input id="detail-edit-price_minus" type="number" 
-                                            class="w-full border-2 border-brand-3 px-3 py-1 text-[1.2rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none">
+                                            class="w-full border-2 border-brand-3 px-3 py-1 text-right text-[1.2rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white resize-none">
                                     </div>
                                 </div>
                             </div>
@@ -269,6 +285,35 @@
                                     class="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-200 rounded-full text-[0.9rem] active:scale-95 transition-all">✕</button>
                             </div>
                         </div>
+                        <!-- 評価 -->
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="font-bold text-slate-600 text-[0.9rem] uppercase tracking-wider">どうでしたか？</label>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4" id="detail-edit-feel-group">
+                                <!-- data-val を -1 に -->
+                                <button type="button" data-val="-1" class="eval-btn flex flex-col items-center justify-center py-3 rounded-[1rem] border-2 transition-all outline-none active:scale-95 bg-slate-50 border-transparent shadow-sm">
+                                    <span class="eval-icon text-[2rem] leading-none mb-1 drop-shadow-sm grayscale opacity-30">
+                                        <img src="img/face/face_bad.png" alt="bad">
+                                    </span>
+                                    <span class="eval-label text-[0.8rem] font-bold tracking-wider text-slate-400">Bad</span>
+                                </button>
+                                <!-- data-val を 0 に -->
+                                <button type="button" data-val="0" class="eval-btn flex flex-col items-center justify-center py-3 rounded-[1rem] border-2 transition-all outline-none active:scale-95 bg-slate-50 border-transparent shadow-sm">
+                                    <span class="eval-icon text-[2rem] leading-none mb-1 drop-shadow-sm grayscale opacity-30">
+                                        <img src="img/face/face_normal.png" alt="normal">
+                                    </span>
+                                    <span class="eval-label text-[0.8rem] font-bold tracking-wider text-slate-400">Normal</span>
+                                </button>
+                                <!-- data-val を 1 に -->
+                                <button type="button" data-val="1" class="eval-btn flex flex-col items-center justify-center py-3 rounded-[1rem] border-2 transition-all outline-none active:scale-95 bg-slate-50 border-transparent shadow-sm">
+                                    <span class="eval-icon text-[2rem] leading-none mb-1 drop-shadow-sm grayscale opacity-30">
+                                        <img src="img/face/face_good.png" alt="good">
+                                    </span>
+                                    <span class="eval-label text-[0.8rem] font-bold tracking-wider text-slate-400">Good</span>
+                                </button>
+                            </div>
+                        </div>
                         <!-- 隠しフィールド -->
                         <div class="hidden">
                             <input name="archive_id" id="detail-edit-archive_id" type="hidden" value="">
@@ -277,6 +322,7 @@
                             <input name="latitude" id="detail-edit-latitude" type="hidden" value="">
                             <input name="longitude" id="detail-edit-longitude" type="hidden" value="">
                             <input name="memo_price" id="detail-edit-memo_price" type="hidden" value="0">
+                            <input name="feel_type" id="detail-edit-feel" type="hidden" value="0">
                         </div>
                     </form>
                 </div>
@@ -342,8 +388,8 @@
                         <!-- まとめタイトル -->
                         <div class="p-0 flex justify-center">
                             <!-- 初期状態を黒背景にし、内部にアイコンとテキストの要素を分割 -->
-                            <button id="ui-archive-title" class="hidden h-12 py-1 px-6 flex items-center gap-2 bg-slate-800/50 rounded-full 
-                                text-white text-[0.9rem] font-bold shadow-md max-w-full transition-colors pointer-events-auto">
+                            <button id="ui-archive-title" 
+                                class="hidden max-w-[95%] h-12 py-1 px-4 flex items-center gap-2 bg-slate-800/50 rounded-full text-white text-[0.9rem] font-bold shadow-md transition-colors pointer-events-auto">
                                 <span class="js-icon shrink-0 kb-icon-emoji-sm">🔒</span>
                                 <span class="js-text truncate text-[1rem]">タイトル</span>
                             </button>
@@ -449,7 +495,7 @@
         <div id="ui-dialog-backdrop" class="z-[1999] absolute inset-0 hidden bg-black/40 flex flex-col items-center justify-end">
             <!-- 下部に「すべて閉じる」ボタンを設置 -->
             <button id="dialog-btn-close-all" 
-                class="mb-10 bg-white hover:bg-white/70 text-black text-[0.9rem] font-bold tracking-widest px-8 py-3 rounded-full border border-white/40 backdrop-blur-md active:scale-95 transition-all shadow-md">
+                class="mb-16 bg-white hover:bg-white/70 text-black text-[0.9rem] font-bold tracking-widest px-8 py-3 rounded-full border border-white/40 backdrop-blur-md active:scale-95 transition-all shadow-md">
                 ✕ CLOSE ALL
             </button>
         </div>
@@ -458,7 +504,7 @@
         <!-- ヘルプメッセージ -->
         <div id="ui-help-dialog" onclick="if(event.target === this) this.classList.add('hidden')"
             class="fixed inset-0 z-[3000] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
-            <div class="w-[90%] max-w-[480px] bg-white rounded-xl shadow-xl flex flex-col overflow-hidden border border-slate-200">
+            <div class="w-[90%] max-w-[480px] bg-white rounded-xl shadow-md flex flex-col overflow-hidden border border-slate-200">
                 <!-- ヘッダー -->
                 <div class="h-12 flex items-center justify-between px-4 bg-slate-800 text-white">
                     <span class="font-semibold text-[0.9rem] tracking-wide">

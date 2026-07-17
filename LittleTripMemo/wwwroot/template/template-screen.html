@@ -117,6 +117,25 @@
                 </div>
             </div>
         </div>
+        <!-- カード3：リンク・アクション -->
+        <div class="bg-white rounded-[1rem] border border-slate-200 flex flex-col overflow-hidden">
+            <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-200 active:bg-slate-50 transition-colors">
+                <span class="text-[0.9rem] text-slate-600">アプリの評価</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-[1rem] font-bold text-yellow-500 js-app-score"></span>
+                    <span class="text-[0.9rem] text-slate-600">(<span class="js-app-feedback-count"></span>)</span>
+                    <span class="text-[1rem] text-slate-400 ml-1">▶</span>
+                </div>
+            </button>
+            <div class="w-full flex justify-between items-center p-4 border-b border-slate-200">
+                <span class="text-[0.9rem] text-slate-600">開発者</span>
+                <span class="text-[1rem] font-bold text-slate-900 js-app-developer"></span>
+            </div>
+            <button id="link-info-official" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors">
+                <span class="text-[0.9rem] text-slate-600">公式サイト</span>
+                <span class="text-[1rem] font-bold text-brand-5">Link ▶</span>
+            </button>
+        </div>
         <!-- カード2：全体統計 -->
         <div class="bg-white rounded-[1rem] border border-slate-200 p-4 flex flex-col gap-3">
             <div class="flex justify-between items-baseline border-b border-slate-200 pb-2">
@@ -142,32 +161,13 @@
                 </div>
             </div>
         </div>
-        <!-- カード3：リンク・アクション -->
-        <div class="bg-white rounded-[1rem] border border-slate-200 flex flex-col overflow-hidden">
-            <button id="btn-info-review" class="w-full flex justify-between items-center p-4 border-b border-slate-200 active:bg-slate-50 transition-colors">
-                <span class="text-[0.9rem] text-slate-600">アプリの評価</span>
-                <div class="flex items-center gap-2">
-                    <span class="text-[1rem] font-bold text-yellow-500 js-app-score"></span>
-                    <span class="text-[0.9rem] text-slate-600">(<span class="js-app-feedback-count"></span>)</span>
-                    <span class="text-[1rem] text-slate-400 ml-1">▶</span>
-                </div>
-            </button>
-            <div class="w-full flex justify-between items-center p-4 border-b border-slate-200">
-                <span class="text-[0.9rem] text-slate-600">開発者</span>
-                <span class="text-[1rem] font-bold text-slate-900 js-app-developer"></span>
-            </div>
-            <button id="link-info-official" class="w-full flex justify-between items-center p-4 active:bg-slate-50 transition-colors">
-                <span class="text-[0.9rem] text-slate-600">公式サイト</span>
-                <span class="text-[1rem] font-bold text-brand-5">Link ▶</span>
-            </button>
-        </div>
     </div>
 </template>
 
 <template id="tpl-review-list">
     <div class="w-full flex flex-col h-full bg-slate-50 pb-2">
         <div class="shrink-0 flex flex-col items-center justify-center py-6 bg-white border-b border-slate-200  z-10">
-            <span class="text-[0.9rem] font-bold text-slate-600 uppercase tracking-[0.2em] mb-2">Average Rating</span>
+            <span class="text-[0.9rem] font-bold text-slate-600 uppercase tracking-[0.2em] mb-2">総合評価</span>
             <span class="text-[4rem] font-bold text-slate-900  js-avg-score tracking-tighter">0.0</span>
             <span class="text-[1.2rem] text-yellow-500 tracking-widest mt-2 js-avg-stars drop-"></span>
         </div>

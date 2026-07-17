@@ -98,6 +98,7 @@ public class TMemoDetail : IAppRecord
     [SafeUrl(2000)]
     public string? link_url { get; set; } = string.Empty;
     public int memo_price { get; set; } = 0;
+    public int feel_type { get; set; } = 0; // -1:bad, 0:normal, 1:good
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }
     public DateTime update_tim { get; set; }
@@ -122,6 +123,7 @@ public class TMemoDetailPub : IAppRecord
     [SafeUrl(2000)]
     public string? link_url { get; set; } = string.Empty;
     public int memo_price { get; set; } = 0;
+    public int feel_type { get; set; } = 0; // -1:bad, 0:normal, 1:good
     public bool del_flg { get; set; } = false;
     public DateTime create_tim { get; set; }
     public DateTime update_tim { get; set; }

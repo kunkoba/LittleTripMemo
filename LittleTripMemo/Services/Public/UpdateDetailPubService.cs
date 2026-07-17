@@ -29,7 +29,8 @@ public class UpdateDetailPubService : _BaseService
         [Required(ErrorMessage = "表情IDは必須です")] string face_emoji,
         [Required(ErrorMessage = "天気IDは必須です")] string weather_code,
         string? link_url,
-        [Required(ErrorMessage = "金額は必須です")] int memo_price
+        [Required(ErrorMessage = "金額は必須です")] int memo_price,
+        [Required(ErrorMessage = "感情は必須です")] int feel_type
     ) : ILoginUserRequest;
 
     public record Response(long seq);
@@ -97,6 +98,7 @@ public class UpdateDetailPubService : _BaseService
         weather_code = req.weather_code,
         link_url = req.link_url,
         memo_price = req.memo_price,
+        feel_type = req.feel_type, // ★追加漏れ注意
         del_flg = false
     };
 }

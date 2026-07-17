@@ -66,6 +66,22 @@ window.$Const = {
         CAUTION: { id: 8, emoji: '⚠️', label: 'Caution' },
         WARNING: { id: 9, emoji: '🚫', label: 'Warning' },
     },
+    // ▼ 追加：明細の評価種別
+    FEEL_TYPE_2: {
+        GOOD: 1,
+        NORMAL: 0,
+        BAD: -1,
+    },
+    FEEL_TYPE: {
+        GOOD:   { val: 1,  label: 'Good',   path: 'img/face/face_good.png' },
+        NORMAL: { val: 0,  label: 'Normal', path: 'img/face/face_normal.png' },
+        BAD:    { val: -1, label: 'Bad',    path: 'img/face/face_bad.png' },
+    },
+    // マーカー表示モード
+    MARKER_MODE: {
+        EMOJI: 'emoji',
+        FEEL:  'feel',
+    },
 };
 
 // window.$Const の中、あるいは直後に配置

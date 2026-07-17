@@ -4,6 +4,7 @@ AppSettingKey: "little_trip_settings",
     AppData: {
         Context: {
             ScreenMode: $Const.SCREEN_MODE.CREATE,
+            MarkerMode: $Const.MARKER_MODE.EMOJI,
             IsOnline: navigator.onLine,
             IsLoggedIn: false,
             TargetArchiveId: 0,

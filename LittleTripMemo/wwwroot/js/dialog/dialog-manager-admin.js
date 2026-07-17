@@ -481,7 +481,7 @@ export default {
         }, { type: 'button', isOwner: false });
         //
         this._core.open({
-            title: "FEEDBACK DETAILS",
+            title: "フィードバック詳細",
             content: el,
             theme: "admin",
             help: "",

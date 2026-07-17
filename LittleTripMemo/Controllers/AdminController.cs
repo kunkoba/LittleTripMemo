@@ -1,5 +1,6 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.JWT;
+using LittleTripMemo.Repository;
 using LittleTripMemo.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,7 @@ namespace LittleTripMemo.Controllers;
 public class AdminController(
     UserContext userContext,
     JwtService jwtService,
+    ITransactionProvider provider, // 追加
     GetAdminAllInfoService getAdminAllInfoService,
     GetReportDetailsService getReportDetailsService,
     AdminCloseArchivePubService adminCloseArchivePubService,
@@ -24,7 +26,7 @@ public class AdminController(
     GetSentUserMailListService getSentUserMailListService,
     GetUserHistoryService getUserHistoryService,
     GetShadowBanUsersService getShadowBanUsersService
-) : _BaseController(userContext, jwtService)
+) : _BaseController(userContext, jwtService, provider)
 {
     /// <summary>
     /// 管理者情報のすべてを取得する（管理者のみ）

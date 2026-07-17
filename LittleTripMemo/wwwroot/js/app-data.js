@@ -1,5 +1,5 @@
-// const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
-const BaseUrl = "https://localhost:7292";
+const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
+// const BaseUrl = "https://localhost:7292";
 // const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
 const API_ENDPOINTS = {
     // Account
@@ -407,6 +407,7 @@ window.$Data = {
                     link_url: d.link_url,
                     memo_price: d.memo_price,
                     is_public: !!d.is_public,
+                    feel_type: d.feel_type,
                 }))
             };
             // 3. 一括送信

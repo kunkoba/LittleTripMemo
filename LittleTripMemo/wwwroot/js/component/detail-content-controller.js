@@ -13,7 +13,8 @@ const _DetailContentCore = {
                     this.displayIndexBadge = $Dom.QuerySelector(".js-index-badge", this.displayRoot);
                     this.displayDateContainer = $Dom.GetElementById("detail-display-date-container");
                     this.displayFaceEmoji = $Dom.GetElementById("detail-display-face_emoji");
-                    // this.displayFaceEmojiBg = $Dom.GetElementById("detail-display-face_emoji_bg");
+                    this.displayFeelImage = $Dom.GetElementById("detail-display-feel_image");
+                    this.displayFeelText = $Dom.GetElementById("detail-display-feel_text");
                     this.displayWeatherEmoji = $Dom.GetElementById("detail-display-weather_code");
                     this.displayTitle = $Dom.GetElementById("detail-display-title");
                     this.displayBody = $Dom.GetElementById("detail-display-body");
@@ -52,6 +53,10 @@ const _DetailContentCore = {
                     this.countTitle = $Dom.GetElementById("detail-count-title");
                     this.countBody = $Dom.GetElementById("detail-count-body");
                     this.countUrl = $Dom.GetElementById("detail-count-url");
+                    // ▼ 追加：評価エリアの要素取得
+                    this.editEvalGroup = $Dom.GetElementById("detail-edit-feel-group");
+                    this.editEvalInput = $Dom.GetElementById("detail-edit-feel");
+                    this.evalBtns = $Dom.QuerySelectorAll(".eval-btn", this.editEvalGroup);
                 }
             }
             // イベント登録
@@ -91,6 +96,16 @@ const _DetailContentCore = {
                     this.editUrl.value = "";
                     this.countUrl.textContent = "0"; // 文字数カウントもリセット
                 });
+                // ▼ 追加：評価ボタンのクリックイベント
+                if (this.evalBtns) {
+                    this.evalBtns.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const val = btn.dataset.val;
+                            this.editEvalInput.value = val;
+                            this._updateEvalUI(val); // UIを更新
+                        });
+                    });
+                }
                 // 文字数カウント連動（入力イベント）
                 const elements =
                 [
@@ -108,6 +123,45 @@ const _DetailContentCore = {
                 });
             }
         }
+    },
+    // ▼ 追加：評価UIの更新（未選択はグレー、選択時は色・枠線で強調）
+    _updateEvalUI(val) {
+        if (!this.evalBtns) return;
+        // 定数を参照
+        const EV = $Const.FEEL_TYPE;
+        const config = {
+            [EV.GOOD.val]:   { bg: "bg-emerald-50", border: "border-emerald-400", text: "text-emerald-500" },
+            [EV.NORMAL.val]: { bg: "bg-slate-100",  border: "border-slate-400",   text: "text-slate-600" },
+            [EV.BAD.val]:    { bg: "bg-red-50",     border: "border-red-400",     text: "text-red-500" }
+        };
+        this.evalBtns.forEach(btn => {
+            const bVal = Number(btn.dataset.val);
+            const icon = $Dom.QuerySelector(".eval-icon", btn);
+            const label = $Dom.QuerySelector(".eval-label", btn);
+            // 状態によって切り替わる可能性のあるクラスを一旦すべて remove
+            btn.classList.remove(
+                "bg-emerald-50", "border-emerald-400", "shadow-md",
+                "bg-slate-100", "border-slate-400",
+                "bg-red-50", "border-red-400",
+                "bg-slate-50", "border-transparent", "shadow-sm"
+            );
+            icon.classList.remove("grayscale", "opacity-30", "grayscale-0", "opacity-100");
+            label.classList.remove("text-emerald-500", "text-slate-600", "text-red-500", "text-slate-400");
+            // ターゲットの値と一致するかどうかで add するクラスを変える
+            if (bVal === Number(val)) {
+                const c = config[bVal];
+                if (c) {
+                    btn.classList.add(c.bg, c.border, "shadow-md");
+                    icon.classList.add("grayscale-0", "opacity-100");
+                    label.classList.add(c.text);
+                }
+            } else {
+                // 未選択の場合
+                btn.classList.add("bg-slate-50", "border-transparent", "shadow-sm");
+                icon.classList.add("grayscale", "opacity-30");
+                label.classList.add("text-slate-400");
+            }
+        });
     },
     // 画面モード変更時
     changeScreenMode(){
@@ -215,8 +269,27 @@ const _DetailContentCore = {
         }
         // 絵文字
         this.displayFaceEmoji.textContent = detail.face_emoji || '😀';
-        // this.displayFaceEmojiBg.textContent = detail.face_emoji || '😀';
         this.displayWeatherEmoji.textContent = detail.weather_code || '0000';
+        // 評価（Feel Type）画像の反映
+        if (this.displayFeelImage && this.displayFeelText) {
+            const feel = (detail.feel_type !== undefined && detail.feel_type !== null) 
+                ? Number(detail.feel_type) 
+                : $Const.FEEL_TYPE.NORMAL.val;
+            this.displayFeelText.classList.remove("text-emerald-500", "text-slate-600", "text-red-500");
+            if (feel === $Const.FEEL_TYPE.GOOD.val) {
+                this.displayFeelImage.src = $Const.FEEL_TYPE.GOOD.path;
+                this.displayFeelText.textContent = $Const.FEEL_TYPE.GOOD.label;
+                this.displayFeelText.classList.add("text-emerald-500");
+            } else if (feel === $Const.FEEL_TYPE.BAD.val) {
+                this.displayFeelImage.src = $Const.FEEL_TYPE.BAD.path;
+                this.displayFeelText.textContent = $Const.FEEL_TYPE.BAD.label;
+                this.displayFeelText.classList.add("text-red-500");
+            } else {
+                this.displayFeelImage.src = $Const.FEEL_TYPE.NORMAL.path;
+                this.displayFeelText.textContent = $Const.FEEL_TYPE.NORMAL.label;
+                this.displayFeelText.classList.add("text-slate-600");
+            }
+        }
     },
     // 編集用反映
     _renderEditMode(detail) {
@@ -252,6 +325,12 @@ const _DetailContentCore = {
         this.editDbid.value = detail.dbid || "";
         this.editLat.value = detail.latitude;
         this.editLng.value = detail.longitude;
+        // ▼ 追加：評価値の反映（0 を判定から漏らさないように null/undefined チェック）
+        const evalVal = (detail.feel_type !== undefined && detail.feel_type !== null) 
+            ? detail.feel_type
+            : $Const.FEEL_TYPE.NORMAL.val;
+        this.editEvalInput.value = evalVal;
+        this._updateEvalUI(evalVal);
         // 文字数カウンターの同期
         if (this.countTitle) this.countTitle.textContent = (detail.title || "").length;
         if (this.countBody)  this.countBody.textContent  = (detail.body || "").length;
@@ -286,6 +365,9 @@ const _DetailContentCore = {
         // this.editWeatherEmoji.value = 'はれ'; // 新規時は「はれ」を選択
         this.editWeatherEmoji.value = '0000';
         this.spanAtmospherePreview.textContent = '0000';
+        // ▼ 追加：新規作成時は定数を使って NORMAL を選択状態にする
+        this.editEvalInput.value = $Const.FEEL_TYPE.NORMAL.val;
+        this._updateEvalUI($Const.FEEL_TYPE.NORMAL.val);
         // 文字数カウンターを0にリセット
         if (this.countTitle) this.countTitle.textContent = "0";
         if (this.countBody)  this.countBody.textContent  = "0";
@@ -320,6 +402,10 @@ const _DetailContentCore = {
         data.latitude = Number(data.latitude || 0);
         data.longitude = Number(data.longitude || 0);
         data.memo_price = Number(data.memo_price || 0);
+        // ▼ 追加：空文字の場合は定数の NORMAL にする
+        data.feel_type = (data.feel_type !== "" && data.feel_type !== undefined) 
+            ? Number(data.feel_type)
+            : $Const.FEEL_TYPE.NORMAL.val;
         // データストアから元の明細データを取得（新規作成時(seq=0)は空オブジェクト）
         let originalData = {};
         // seq または dbid を使って元データを特定する

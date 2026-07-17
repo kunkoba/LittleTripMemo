@@ -78,7 +78,7 @@ self.addEventListener('fetch', (event) => {
     if (req.method !== 'GET' || isApiRequest(req.url)) return;
     // 【戦略A：Cache First】（外部CDNや画像など、ほぼ変更がないもの）
     const isStatic = STATIC_DOMAINS.some(domain => url.hostname.includes(domain)) || 
-                     STATIC_EXTENSIONS.some(ext => url.pathname.toLowerCase().endsWith(ext));
+                    STATIC_EXTENSIONS.some(ext => url.pathname.toLowerCase().endsWith(ext));
     if (isStatic) {
         event.respondWith(
             caches.match(req).then((cachedResponse) => {
@@ -114,8 +114,15 @@ self.addEventListener('fetch', (event) => {
                 // タイムアウト、オフライン、またはサーバーエラー時はキャッシュから返す
                 console.warn(`[SW] ネットワーク失敗。キャッシュを返します: ${url.pathname}`);
             }
-            // キャッシュがあればそれを返し、なければネットワークへ（最後の手段）
-            return (await caches.match(req)) || fetch(req);
+            // ▼修正後（エラーをキャッチして、コンソールの赤文字を防ぐ）
+            return (await caches.match(req)) || fetch(req).catch(() => {
+                console.warn(`[SW] オフラインかつキャッシュなしのため取得不可: ${url.pathname}`);
+                // エラーでアプリが落ちないようにダミーのレスポンスを返す
+                return new Response("Offline or Not Found", { 
+                    status: 503, 
+                    statusText: "Service Unavailable" 
+                });
+            });
         })()
     );
 });

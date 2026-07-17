@@ -189,12 +189,12 @@ export default {
             $Dom.ToggleShow(badge, isNew);
             if (isNew) {
                 // 【未読】ブランドカラーの太枠 ＋ 強い影 ＋ 白背景
-                el.classList.remove("border-slate-200", "shadow-md", "bg-slate-50");
+                el.classList.remove("border-slate-200_", "shadow-md_", "bg-slate-50");
                 el.classList.add("border-brand-5", "shadow-md", "bg-white");
             } else {
                 // 【既読】薄いグレー枠 ＋ 影なし ＋ わずかにグレー背景
                 el.classList.remove("border-brand-5", "shadow-md", "bg-white");
-                el.classList.add("border-slate-200", "shadow-md", "bg-slate-50");
+                el.classList.add("border-slate-200_", "shadow-md_", "bg-slate-50");
                 // テキストも少し薄くする
                 el.style.opacity = "0.8";
             }
@@ -319,11 +319,11 @@ export default {
             const badge = $Dom.QuerySelector(".js-badge-new", el);
             $Dom.ToggleShow(badge, isNew);
             if (isNew) {
-                el.classList.add("border-brand-5", "shadow-xl", "bg-white");
-                el.classList.remove("border-slate-200", "shadow-md", "bg-slate-50");
+                el.classList.add("border-brand-5", "shadow-md", "bg-white");
+                el.classList.remove("border-slate-200_", "shadow-md_", "bg-slate-50");
             } else {
-                el.classList.remove("border-brand-5", "shadow-xl", "bg-white");
-                el.classList.add("border-slate-200", "shadow-md", "bg-slate-50");
+                el.classList.remove("border-brand-5", "shadow-md", "bg-white");
+                el.classList.add("border-slate-200_", "shadow-md_", "bg-slate-50");
                 el.style.opacity = "0.8";
             }
         };

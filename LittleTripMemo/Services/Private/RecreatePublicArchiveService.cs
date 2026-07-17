@@ -96,6 +96,7 @@ public class RecreatePublicArchiveService : _BaseService
                     weather_code = detail.weather_code,
                     link_url = detail.link_url,
                     memo_price = detail.memo_price,
+                    feel_type = detail.feel_type
                 };
                 await _detailPubRepo.RestoreDetailAsync(pubDetail);
             }

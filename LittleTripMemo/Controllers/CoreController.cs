@@ -1,5 +1,6 @@
 ﻿using LittleTripMemo.Common;
 using LittleTripMemo.JWT;
+using LittleTripMemo.Repository;
 using LittleTripMemo.Services.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +16,12 @@ namespace LittleTripMemo.Controllers;
 public class CoreController(
     UserContext userContext,
     JwtService jwtService,
+    ITransactionProvider provider, // 追加
     GetCoreConfigService getCoreConfigService,
     UpdateCoreConfigService updateCoreConfigService,
     GetLegalConfigsService getLegalConfigsService,
     UpdateLegalConfigService updateLegalConfigService
-) : _BaseController(userContext, jwtService)
+) : _BaseController(userContext, jwtService, provider)
 {
     /// <summary>
     /// 現在のシステム設定一覧を取得（管理者のみ）
