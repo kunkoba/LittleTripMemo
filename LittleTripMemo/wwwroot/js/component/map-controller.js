@@ -5,7 +5,6 @@ const _MapCore = {
     _map: null,
     currentPoint: null,
     currentTileLayer: null,
-    useFlyTo: true,
     // 物理的な初期化処理
     init() {
         if (!this._map) {
@@ -128,19 +127,29 @@ const _MapCore = {
         console.log("moveMap(lat, lng)");
         if (!this._map) return;
         if (!zoom) zoom = this._map.getZoom();
-        // this._map.setView([lat, lng], zoom);
         this._moveTo([lat, lng], zoom);
     },
     // 移動処理の共通ヘルパー（flyTo と setView を分岐）
     _moveTo(latLng, zoom) {
         const targetZoom = zoom || this._map.getZoom();
-        const delay = 2;
-        if (this.useFlyTo) {
-            // duration は 0.8秒 にしています（好みに合わせて変更可）
-            this._map.flyTo(latLng, targetZoom, { duration: delay });
+        const delay = 1.5;
+        // 画面内かつズーム変更なしなら即時移動、それ以外はアニメーション
+        if (this._isInCurrentView(latLng, targetZoom)) {
+            // 画面内は0.5秒のスライド移動
+            this._map.setView(latLng, targetZoom, {
+                animate: true,
+                pan: { duration: delay }
+            });
         } else {
-            this._map.setView(latLng, targetZoom);
+            this._map.flyTo(latLng, targetZoom, { duration: delay });
         }
+    },
+    // 現在の表示範囲内（座標＋ズーム）か判定
+    _isInCurrentView(latLng, targetZoom) {
+        if (!this._map) return false;
+        const isInside = this._map.getBounds().contains(latLng);
+        const isSameZoom = Math.round(this._map.getZoom()) === Math.round(targetZoom);
+        return isInside && isSameZoom;
     },
 };
 
