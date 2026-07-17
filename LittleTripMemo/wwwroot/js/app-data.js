@@ -340,7 +340,6 @@ window.$Data = {
         },
         UpdateDetail(detail) {
             if (!detail) return;
-            // const list = $Data.Access._rawData.details;
             const list = this._details;
             let idx = -1;
             if (detail.seq > 0) {
@@ -359,17 +358,6 @@ window.$Data = {
             if (!this._archive) return;
             // メモリ上のデータ更新
             Object.assign(this._archive, updatedFields);
-            // // 生データも更新する
-            // if ($Data.Access._rawData.archive) Object.assign($Data.Access._rawData.archive, updatedFields);
-            // if (this._archiveList) {
-            //     const target = this._archiveList.find(a => a.archive_id === this._archive.archive_id);
-            //     if (target) Object.assign(target, updatedFields);
-            // }
-            // // 生リストデータも更新する
-            // if ($Data.Access._rawData.archiveList) {
-            //     const rawTarget = $Data.Access._rawData.archiveList.find(a => a.archive_id === this._archive.archive_id);
-            //     if (rawTarget) Object.assign(rawTarget, updatedFields);
-            // }
         },
         GetUserProfile() {
             return this._userProfile; 

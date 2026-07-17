@@ -38,7 +38,7 @@ window.$Const = {
     MAP_CONFIG: {
         MIN_ZOOM: 4,
         MAX_ZOOM: 18,
-        DEFAULT_ZOOM: 12
+        DEFAULT_ZOOM: 15
     },
     // 画面モード
     SCREEN_MODE: {

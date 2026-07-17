@@ -284,12 +284,16 @@ const MarkerController = {
                 break;
             case $Const.SCREEN_MODE.ARCHIVE:
             case $Const.SCREEN_MODE.ARCHIVE_PUB:
+                // 地点指定があれば、そこにフォーカス
                 const seq = $App.AppData.Context.TargetSeq;
+                const defZoom = $Const.MAP_CONFIG.DEFAULT_ZOOM;
                 if (seq > 0) {
-                    $Marker.FocusBySeq(seq);
+                    // seq指定がある場合、その地点へ定数ズームで移動
+                    this.FocusBySeq(seq, defZoom);
                     $App.AppData.Context.TargetSeq = -1;    // 不要になったらクリア
                 } else {
-                    this.FocusFirst();
+                    // 指定がない場合、最初の地点へ定数ズームで移動
+                    this.SelectMarker(0, defZoom);
                 }
                 break;
         }
@@ -299,10 +303,10 @@ const MarkerController = {
         _MarkerCore.clearAll();
     },
     // 現在の状態に基づくフォーカス実行
-    FocusToCurrentMarker(delay = 200) {
+    FocusToCurrentMarker(delay = 200, zoom = null) {
         const details = $Data.Store.GetDetails();
         if (!details) return;
-        // 【追記】すべてのマーカーのZインデックスを一旦リセット（通常階層へ戻す）
+        // すべてのマーカーのZインデックスを一旦リセット
         _MarkerCore._markerList.forEach((m, idx) => {
             if (m && typeof m.setZIndexOffset === 'function') {
                 m.setZIndexOffset(0);
@@ -311,9 +315,9 @@ const MarkerController = {
         // 現在のマーカーを取得
         const marker = _MarkerCore.getMarker(this._currentIndex);
         if (!marker) return;
-        // 【追記】現在選択されているマーカーだけに非常に高い数値を与えて最前面へ強制移動
+        // 現在選択されているマーカーを最前面へ
         marker.setZIndexOffset(1000);
-        $Map.FocusToTargetMarker(marker, delay);
+        $Map.FocusToTargetMarker(marker, delay, zoom);
         _MarkerCore.toggleMarkerPopup(true, this._currentIndex, details[this._currentIndex]);
         // ハイライト
         _MarkerCore.highlightMarker(true, this._currentIndex);
@@ -374,9 +378,9 @@ const MarkerController = {
         this.RefreshPointMarker();
     },
     // 指定インデックスの地点を選択してフォーカス
-    SelectMarker(index) {
+    SelectMarker(index, zoom = null) {
         this._currentIndex = index;
-        this.FocusToCurrentMarker();
+        this.FocusToCurrentMarker(200, zoom);
     },
     // GoogleMap連携（窓口業務）
     LinkGoogleMap() {
@@ -388,13 +392,11 @@ const MarkerController = {
         }
     },
     // seqを指定してその地点へジャンプする
-    FocusBySeq(seq) {
+    FocusBySeq(seq, zoom = null) {
         const details = $Data.Store.GetDetails();
-        // seq が一致するデータの「インデックス番号」を探す
         const index = details.findIndex(d => Number(d.seq) === Number(seq));
         if (index !== -1) {
-            // 見つかったら既存の選択メソッドを実行（移動・強調・ポップアップが走る）
-            this.SelectMarker(index);
+            this.SelectMarker(index, zoom);
         }
     },
     // 選択状態（赤丸）を解除
