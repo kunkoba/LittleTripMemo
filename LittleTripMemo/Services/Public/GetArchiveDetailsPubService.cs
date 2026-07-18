@@ -51,6 +51,7 @@ public class GetArchiveDetailsPubService(
         {
             // アーカイブの閲覧数を＋1（item_name = "view"）
             await addCountQueueService.ExecuteAsync(new AddCountQueueService.AddCountReq(
+                _user.login_user_id,
                 CountTargetType.Archive,
                 archivePub.user_id,
                 archivePub.archive_id,

@@ -71,11 +71,13 @@
             </div>
             <!-- ■　マーカー切替スイッチ -->
             <div class="mt-2 pointer-events-auto">
-                <div id="ui-marker-mode-switch" class="shadow-md w-fit h-8 flex rounded-full overflow-hidden bg-white/90 backdrop-blur-sm border border-brand-2">
-                    <button id="btn-marker-mode-emoji" data-mode="emoji" class="px-4 transition-colors bg-brand-3 text-[0.8rem] flex items-center justify-center">
+                <div id="ui-marker-mode-switch" class="shadow-md w-fit h-8 flex rounded-full overflow-hidden bg-white/90 backdrop-blur-sm">
+                    <button id="btn-marker-mode-emoji" data-mode="emoji" 
+                        class="px-4 transition-colors bg-brand-3 text-[0.8rem] flex items-center justify-center font-bold">
                         絵文字
                     </button>
-                    <button id="btn-marker-mode-feel" data-mode="feel" class="px-4 transition-colors bg-brand-0 text-[0.8rem] flex items-center justify-center border-l border-brand-2">
+                    <button id="btn-marker-mode-feel" data-mode="feel" 
+                        class="px-4 transition-colors bg-brand-0 text-[0.8rem] flex items-center justify-center font-bold">
                         評価
                     </button>
                 </div>
@@ -404,23 +406,23 @@
                                 <button data-value="4" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😭</button>
                             </div>
                             <!-- 検索キーワード入力欄 -->
-                            <div id="sort-word" class="hidden shadow-md w-fit mb-2 h-10 flex  rounded-full overflow-hidden bg-white pointer-events-auto">
+                            <div id="sort-word" class="hidden shadow-md w-fit mb-4 px-2 h-8 flex  rounded-full overflow-hidden bg-white pointer-events-auto">
                                 <input type="text" id="input-sort-word" class="h-full px-3 text-[1rem] text-slate-900 outline-none bg-transparent w-40 placeholder-slate-300" placeholder="Keyword...">
                             </div>
                             <!-- 並び順 -->
                             <div id="sort-field" class="shadow-md w-fit mb-2 h-8 flex  rounded-full overflow-hidden pointer-events-auto">
-                                <button data-value="1" class="ui-btn h-full px-3 text-[0.9rem] font-bold bg-brand-3 transition-colors">
-                                    Created
+                                <button data-value="1" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-3 transition-colors">
+                                    作成順
                                 </button>
-                                <button data-value="2" class="ui-btn h-full px-3 text-[0.9rem] font-bold bg-brand-0 transition-colors">
-                                    Updated
+                                <button data-value="2" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">
+                                    更新順
                                 </button>
-                                <button data-value="3" class="ui-btn h-full px-3 text-[0.9rem] font-bold bg-brand-0 transition-colors">
-                                    Reaction
+                                <button data-value="3" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">
+                                    リアクション順
                                 </button>
                                 <!-- ▼ ここに「Word」を追加 -->
-                                <button data-value="4" class="ui-btn h-full px-3 text-[0.9rem] font-bold bg-brand-0 transition-colors">
-                                    Word
+                                <button data-value="4" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">
+                                    検索ワード
                                 </button>
                             </div>
                         </div>
@@ -500,7 +502,7 @@
             </button>
         </div>
         <!-- ■　Toast を積み上げるコンテナ -->
-        <div id="toast-container" class="absolute bottom-[70px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
+        <div id="toast-container" class="absolute bottom-[20px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
         <!-- ヘルプメッセージ -->
         <div id="ui-help-dialog" onclick="if(event.target === this) this.classList.add('hidden')"
             class="fixed inset-0 z-[3000] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">

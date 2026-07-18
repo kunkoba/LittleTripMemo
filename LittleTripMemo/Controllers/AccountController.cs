@@ -1,6 +1,6 @@
 ﻿using LittleTripMemo.Common;
-using LittleTripMemo.JWT;
 using LittleTripMemo.Repository;
+using LittleTripMemo.JWT;
 using LittleTripMemo.Services.Account;
 using Microsoft.AspNetCore.Mvc;
 
