@@ -1,37 +1,51 @@
-﻿using LittleTripMemo.Common;
+﻿
+using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
+using LittleTripMemo.Repository;
 using LittleTripMemo.Repository.App;
+using LittleTripMemo.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Private;
 
-public class GetArchiveListService : _BaseService
+/// <summary>
+/// ユーザーの秘密まとめと公開まとめを両方取得し、それぞれの公開状態を判定して返すサービス
+/// </summary>
+public class GetArchiveListService(
+UserContext userContext,
+ArchiveRepository archiveRepo,
+ArchivePubRepository archivePubRepo
+) : _BaseService(userContext)
 {
-    private readonly ArchiveRepository _archiveRepo;
-    private readonly ArchivePubRepository _archivePubRepo;
+    public record GetArchiveListReq(
+        [Required] Guid login_user_id
+    ) : ILoginUserRequest;
 
-    public class GetArchiveListReq { }
     public record Response(IEnumerable<DtoArchive> archiveList);
 
-    public GetArchiveListService(
-        UserContext userContext,
-        ArchiveRepository archiveRepo,
-        ArchivePubRepository archivePubRepo)
-        : base(userContext)
+/// <summary>
+/// まとめ一覧取得処理を実行する
+/// </summary>
+public async Task<Response> ExecuteAsync()
     {
-        _archiveRepo = archiveRepo;
-        _archivePubRepo = archivePubRepo;
-    }
-
-    public async Task<Response> ExecuteAsync()
-    {
+        // 1. バリデーション
         await ValidateAsync();
-        var archives = await _archiveRepo.GetAllAsync();
-        var archivesPub = await _archivePubRepo.GetAllAsync();
+
+        // 2. 秘密・公開両方のデータを取得
+        var archives = await archiveRepo.GetAllAsync();
+        var archivesPub = await archivePubRepo.GetAllAsync();
+
         SetAppFlags(archives);
         SetAppFlags(archivesPub);
 
-        // 共通DTOへ変換
+        // 公開側の状態をIDをキーにして文字列化（ToString）して保持
+        var pubStatusMap = archivesPub.ToDictionary(
+            x => x.archive_id,
+            x => (x.del_flg ? PublicStatus.Delete : (x.closed_flg ? PublicStatus.Close : PublicStatus.Open)).ToString()
+        );
+
+        // 3. 秘密側リストの整形（公開側の生存状態を付与）
         var list1 = archives.Select(x => new DtoArchive
         {
             archive_id = x.archive_id,
@@ -44,11 +58,14 @@ public class GetArchiveListService : _BaseService
             del_flg = x.del_flg,
             create_tim = x.create_tim,
             update_tim = x.update_tim,
-            is_public = x.is_public,
+            is_public = false,
             is_owner = x.is_owner,
             detail_count = x.detail_count,
+            // 公開側テーブルの状態を文字列で設定
+            has_public_status = pubStatusMap.GetValueOrDefault(x.archive_id, PublicStatus.Nothing.ToString())
         });
 
+        // 4. 公開側リストの整形
         var list2 = archivesPub.Select(x => new DtoArchive
         {
             archive_id = x.archive_id,
@@ -61,20 +78,20 @@ public class GetArchiveListService : _BaseService
             del_flg = x.del_flg,
             create_tim = x.create_tim,
             update_tim = x.update_tim,
-            is_public = x.is_public,
+            is_public = true,
             is_owner = x.is_owner,
             detail_count = x.detail_count,
+            has_public_status = (x.del_flg ? PublicStatus.Delete : (x.closed_flg ? PublicStatus.Close : PublicStatus.Open)).ToString()
         });
 
-        // 結合
-        var merged = list1.Concat(list2).ToList();
-        return new Response(merged);
+        // 全件結合して更新日順に返却
+        return new Response(list1.Concat(list2).OrderByDescending(x => x.update_tim).ToList());
     }
 
     private async Task ValidateAsync()
     {
-        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         await Task.CompletedTask;
     }
+
 }

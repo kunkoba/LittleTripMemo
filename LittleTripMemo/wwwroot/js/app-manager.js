@@ -351,6 +351,8 @@ AppSettingKey: "little_trip_settings",
         $UI.ChangeScreenMode();
         // マーカー更新
         $Marker.ChangeScreenMode();
+        //
+        console.log("- $App.RefreshScreen -> ", this.AppData.Context.ScreenMode);
     },
     // サーバエラー処理
     async HandleServerFailure(response) {

@@ -1,57 +1,60 @@
-﻿using LittleTripMemo.Common;
+﻿
+using LittleTripMemo.Common;
 using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Repository.App;
+using LittleTripMemo.Services;
 using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Private;
 
-public class PublishArchiveService : _BaseService
+/// <summary>
+/// 秘密データを公開側へコピー（公開）するサービス。
+/// 公開後も秘密データは削除せず、独立して保持する。
+/// </summary>
+public class PublishArchiveService(
+UserContext userContext,
+ITransactionProvider provider,
+ArchiveRepository archiveRepo,
+DetailRepository detailRepo,
+ArchivePubRepository archivePubRepo,
+DetailPubRepository detailPubRepo,
+ReactionPubRepository reactionPubRepo
+) : _BaseService(userContext)
 {
-    private readonly ITransactionProvider _provider;
-    private readonly ArchiveRepository _archiveRepo;
-    private readonly DetailRepository _detailRepo;
-    private readonly ArchivePubRepository _archivePubRepo;
-    private readonly DetailPubRepository _detailPubRepo;
-    private readonly ReactionPubRepository _reactionPubRepo;
-
     public record PublishArchiveReq(
-        [Required] Guid login_user_id,
-        int archive_id
+    [Required] Guid login_user_id,
+    [Required] int archive_id,
+    bool reset_flg // trueの場合、既存の公開統計等をリセットして新規作成
     ) : ILoginUserRequest;
 
-    public record Response(int archiveId);
+public record Response(int archiveId);
 
-    public PublishArchiveService(
-        UserContext userContext,
-        ITransactionProvider provider,
-        ArchiveRepository archiveRepo,
-        DetailRepository detailRepo,
-        ArchivePubRepository archivePubRepo,
-        DetailPubRepository detailPubRepo,
-        ReactionPubRepository reactionPubRepo)
-        : base(userContext)
-    {
-        _provider = provider;
-        _archiveRepo = archiveRepo;
-        _detailRepo = detailRepo;
-        _archivePubRepo = archivePubRepo;
-        _detailPubRepo = detailPubRepo;
-        _reactionPubRepo = reactionPubRepo;
-    }
-
+    /// <summary>
+    /// 公開処理を実行する
+    /// </summary>
     public async Task<Response> ExecuteAsync(PublishArchiveReq req)
     {
+        // 1. バリデーション
         await ValidateAsync(req);
 
-        using var tran = _provider.BeginTransaction();
+        using var tran = provider.BeginTransaction();
         try
         {
-            var archive = await _archiveRepo.GetByKeyAsync(req.archive_id);
-            BusinessException.ThrowIf(archive == null, "アーカイブが見つかりません");
+            // 2. 秘密アーカイブ（元データ）の取得
+            var archive = await archiveRepo.GetByKeyAsync(req.archive_id);
+            BusinessException.ThrowIf(archive == null, "対象のアーカイブが見つかりません。");
 
-            // 公開アーカイブを UPSERT (復活)
+            // 3. リセットフラグが真なら、既存の公開情報を物理削除
+            if (req.reset_flg)
+            {
+                await detailPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
+                await archivePubRepo.DeletePhysicalByKeyAsync(req.archive_id);
+                await reactionPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
+            }
+
+            // 4. 公開アーカイブの登録・復活
             var pubArchive = new TMemoArchivePub
             {
                 archive_id = archive.archive_id,
@@ -61,11 +64,10 @@ public class PublishArchiveService : _BaseService
                 link_url = archive.link_url,
                 currency_unit = archive.currency_unit,
             };
-            await _archivePubRepo.RestoreArchiveAsync(pubArchive);
+            await archivePubRepo.RestoreArchiveAsync(pubArchive);
 
-            var details = await _detailRepo.GetByArchiveIdAsync(req.archive_id);
-
-            // 公開明細を UPSERT (復活)
+            // 5. 公開明細の登録・復活
+            var details = await detailRepo.GetByArchiveIdAsync(req.archive_id);
             foreach (var detail in details)
             {
                 var pubDetail = new TMemoDetailPub
@@ -85,18 +87,14 @@ public class PublishArchiveService : _BaseService
                     memo_price = detail.memo_price,
                     feel_type = detail.feel_type
                 };
-                await _detailPubRepo.RestoreDetailAsync(pubDetail);
+                await detailPubRepo.RestoreDetailAsync(pubDetail);
             }
 
-            // 過去のリアクションがあれば、論理削除状態から復活させる
-            await _reactionPubRepo.RestoreLogicalByArchiveIdAsync(req.archive_id);
+            // 6. リアクションの論理削除を解除（以前のデータがある場合）
+            await reactionPubRepo.RestoreLogicalByArchiveIdAsync(req.archive_id);
 
-            // 秘密アーカイブ・明細を論理削除
-            await _archiveRepo.DeleteLogicalByKeyAsync(req.archive_id);
-            await _detailRepo.DeleteByArchiveIdAsync(req.archive_id);
-
-            // 公開側の件数を反映させる
-            await _archivePubRepo.UpdateDetailCountAsync(req.archive_id);
+            // 7. 公開側の明細件数を同期
+            await archivePubRepo.UpdateDetailCountAsync(req.archive_id);
 
             tran.Commit();
             return new Response(archive.archive_id);
@@ -109,9 +107,9 @@ public class PublishArchiveService : _BaseService
 
     private async Task ValidateAsync(PublishArchiveReq req)
     {
-        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
-        BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
+        BusinessException.ThrowIf(req.archive_id <= 0, "無効なアーカイブIDです");
         await Task.CompletedTask;
     }
+
 }

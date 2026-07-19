@@ -266,6 +266,7 @@
 	</div>
 </template>
 
+<!-- 【ダイアログ子】アーカイブ詳細表示 -->
 <template id="tpl-view-archive">
     <div class="w-full flex flex-col gap-6 text-slate-900 bg-white pb-4">
         <!-- セクション：作成者 -->
@@ -273,20 +274,23 @@
             <label class="text-[0.9rem] font-bold text-slate-600 uppercase">旅の案内人</label>
             <div id="view-mem-user-wrapper" class="w-fit"></div>
         </div>
+        <!-- セクション：ステータス -->
+        <div id="archive-status-bar-container">
+        </div>
         <!-- セクション：タイトル -->
         <div class="flex flex-col gap-1 border-t border-slate-200 pt-4">
-            <h1 id="view-mem-title" class="text-[1rem] font-bold break-words px-1"></h1>
+            <h1 id="view-mem-title" class="text-[1.2rem] font-bold break-words px-1"></h1>
         </div>
         <!-- セクション：説明文 -->
         <div class="flex flex-col gap-1 border-t border-slate-200 pt-4">
             <div id="view-mem-body" class="text-[1rem] leading-[1.8] whitespace-pre-wrap break-words px-1"></div>
         </div>
         <!-- セクション：リンク -->
-        <div class="flex flex-col gap-2 _border-t _border-slate-200 py-2">
-            <div id="view-mem-url-wrapper" class="flex flex-col gap-2"></div>
+        <div id="view-mem-url-wrapper"  class="flex flex-col gap-2 py-2">
+            <div id="view-mem-url-wrapper2" class="flex flex-col gap-2"></div>
         </div>
         <!-- セクション：統計情報 -->
-        <div class="flex flex-col gap-3 border-t border-slate-200 pt-4">
+        <div class="flex flex-col gap-3 border-y border-slate-200 p-4">
             <div class="flex flex-col gap-2 _px-1">
                 <!-- 地点メモ数 -->
                 <div class="flex justify-between items-baseline">
@@ -313,22 +317,40 @@
                 </div>
             </div>
         </div>
-        <!-- セクション：公開設定（オーナー用） -->
-        <div id="archive-status-bar-container" class="flex flex-col gap-4 border-t border-slate-200 pt-6 mt-2">
-            <div id="archive-status-bar">
-                <label class="text-[0.9rem] font-bold text-brand-5 mb-2 block">公開ステータスの変更</label>
-                <div id="archive-status-bar1" class="flex gap-2">
-                    <button id="btn-status-memo" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">memo</button>
-                    <button id="btn-status-private" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">Private</button>
-                    <button id="btn-status-close" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">Public</button>
-                    <button id="btn-status-open" class="flex-1 h-12 font-bold text-[0.9rem] rounded-lg">Open</button>
-                </div>
+    </div>
+</template>
+
+<!-- 【追加】まとめ公開状況管理ステッパー -->
+<template id="tpl-archive-status-stepper">
+    <div class="bg-white flex flex-col gap-2 w-full mx-auto">
+        <!-- タイトル -->
+        <h3 class="font-bold text-slate-900 text-[0.9rem] tracking-tight">現在の公開状況</h3>
+        <!-- カードコンテナ -->
+        <div class="flex gap-2 p-2 h-20">
+            <!-- 非公開 -->
+            <div data-step="1" 
+                class="js-step-card flex-1 flex flex-col items-center justify-center _rounded-[1rem] bg-slate-900 transition-all">
+                <span class="font-bold text-white text-center text-[0.9rem]">🔒<br>非公開</span>
             </div>
-            <div id="archive-limit-btn-area">
-                <button id="btn-toggle-limited" class="w-full py-4 font-bold rounded-lg border-2 text-[0.9rem] flex items-center justify-center gap-2">
-                    <span class="js-label-text">限定公開設定</span>
-                </button>
+            <!-- 公開準備中 -->
+            <div data-step="2" 
+                class="js-step-card flex-1 flex flex-col items-center justify-center _rounded-[1rem] bg-slate-600 transition-all">
+                <span class="font-bold text-white text-center text-[0.9rem]">－<br>公開準備</span>
             </div>
+            <!-- 公開中 -->
+            <div data-step="3" 
+                class="js-step-card flex-1 flex flex-col items-center justify-center _rounded-[1rem] bg-brand-5 transition-all relative">
+                <div id="js-stepper-limited-badge" 
+                    class="absolute top-1 right-1 bg-amber-100 text-amber-600 text-[0.8rem] rounded-full font-black px-1.5 py-0.5 opacity-0 transition-opacity">限定</div>
+                <span class="font-bold text-white text-center text-[0.9rem]">◎<br>公開中</span>
+            </div>
+        </div>
+        <!-- アクションボタン -->
+        <div class="px-2">
+            <button id="btn-archive-status-change" 
+                class="w-full py-3 border-2 border-brand-5 text-slate-900 font-bold rounded-[1rem] shadow-md active:scale-95 transition-all text-[1rem] tracking-wider">
+                ステータスを変更する
+            </button>
         </div>
     </div>
 </template>

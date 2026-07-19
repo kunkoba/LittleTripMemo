@@ -251,6 +251,7 @@ public class DtoArchive
     public bool is_owner { get; set; } = false;
     public int detail_count { get; set; } = 0;
     public int report_count { get; set; } = 0;
+    public string has_public_status { get; set; } = PublicStatus.Nothing.ToString();
 }
 
 /// <summary>

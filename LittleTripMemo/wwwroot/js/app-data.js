@@ -117,7 +117,7 @@ window.$Data = {
             if (options.method !== "GET" && params) {
                 options.headers["Content-Type"] = "application/json";
                 // paramsにプロパティがあるときだけ、全リクエストに login_user_id を自動で混ぜる
-                if (params && Object.keys(params).length > 0 && $App.AppData.Owner.SystemInfo) {
+                if ($App.AppData.Owner.SystemInfo) {
                     params.login_user_id = $App.AppData.Owner.SystemInfo.login_user_id;
                 }
                 options.body = JSON.stringify(params);

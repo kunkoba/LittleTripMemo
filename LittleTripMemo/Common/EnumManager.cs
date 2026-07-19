@@ -37,3 +37,14 @@ public enum UserHistoryActionKind
     AdminUnban      // BAN解除
 }
 
+/// <summary>
+/// 公開側まとめの状態
+/// </summary>
+public enum PublicStatus : short
+{
+    Nothing = 0, // 公開データなし
+    Open = 1,    // 公開中
+    Close = 2,   // 非公開（クローズ）
+    Delete = 3   // 削除済み
+}
+

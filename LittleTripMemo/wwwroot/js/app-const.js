@@ -82,6 +82,13 @@ window.$Const = {
         EMOJI: 'emoji',
         FEEL:  'feel',
     },
+    // 公開側まとめの状態
+    ARCHIVE_TYPE: {
+        Nothing: "nothing",
+        Open:    "open",
+        Close:   "close",
+        Delete:  "delete",
+    },
 };
 
 // window.$Const の中、あるいは直後に配置

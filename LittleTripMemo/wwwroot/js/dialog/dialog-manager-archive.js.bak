@@ -601,7 +601,7 @@ export default {
             content: el, 
             help: help,
             size: 'lg', 
-            headerButtons: headerButtons, 
+            headerButtons: buildHeaderButtons(), 
         });
     },
     // 公開ステータス変更ダイアログ
