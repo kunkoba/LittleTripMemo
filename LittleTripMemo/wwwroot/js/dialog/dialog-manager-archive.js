@@ -470,6 +470,7 @@ export default {
     // まとめ親詳細参照（アーカイブ）
     ShowArchiveInfo() {
         const archive = $Data.Store.GetArchive();
+        const isAdmin = $App.AppData.Context.IsLoggedIn && $App.AppData.Owner.Plan === "Admin";
         // ★修正：データが取得できていない場合は処理を中断
         if (!archive) return;
         const el = $Dom.GenerateTemplate('tpl-view-archive');
@@ -527,11 +528,9 @@ export default {
             if (arc.is_public) {
                 currentStep = arc.closed_flg ? 2 : 3;
             }
-            console.log("currentStep:", currentStep);
             // 2. カードの選択状態更新（未選択は半透明）
             $Dom.QuerySelectorAll('.js-step-card', stepper).forEach(card => {
                 const step = parseInt(card.dataset.step);
-                console.log("- step:", step);
                 const isActive = (step === currentStep);
                 // 現在の状態なら不透明(100%)、それ以外は半透明(50%)
                 card.classList.toggle('opacity-10', !isActive);
@@ -616,11 +615,11 @@ export default {
             else current = 5;
         }
         const statusItems = [
-            { id: 1, label: "野良メモ" },
-            { id: 2, label: "非公開" },
-            { id: 3, label: "公開準備中" },
-            { id: 4, label: "限定公開中" },
-            { id: 5, label: "完全公開中" }
+            { id: 1, label: "✖ まとめ解体" },
+            { id: 2, label: "🔒 非公開中" },
+            { id: 3, label: "－ 公開準備中" },
+            { id: 4, label: "〇 限定公開中" },
+            { id: 5, label: "◎ 完全公開中" }
         ];
         const transitionMap = {
             2: [1, 3],
@@ -634,37 +633,92 @@ export default {
             btn.textContent = item.label;
             btn.className = "w-full py-4 text-[1rem] font-bold rounded-[1rem] transition-all outline-none";
             if (item.id === current) {
-                btn.classList.add("bg-[#ef4444]", "text-white");
+                btn.classList.add("bg-slate-900", "text-white");
             } else if (clickableTargets.includes(item.id)) {
                 btn.classList.add("bg-slate-50", "text-slate-900", "shadow-md", "active:scale-95");
-                btn.onclick = () => {
+                btn.onclick = async () => {
                     const p = { archive_id: arc.archive_id };
                     // 共通メソッド _execStatusChange を用いて確実に状態を同期
                     switch (item.id) {
                         case 1:
-                            this._execStatusChange('DeleteArchive', p, 'RESTORE', 'まとめを解体し、個別のメモに戻しますか？', '解体しました', $Const.SCREEN_MODE.CREATE);
+                            this._execStatusChange('DeleteArchive', p, 'RESTORE', 
+                                'まとめを解体し、個別のメモに戻しますか？', 
+                                '解体しました', $Const.SCREEN_MODE.CREATE
+                            );
                             break;
                         case 2:
-                            this._execStatusChange('UnpublishArchive', p, 'PRIVATE', '非公開に戻しますか？', '戻しました', $Const.SCREEN_MODE.ARCHIVE, () => $Data.Store.UpdateArchive({ is_public: false, closed_flg: false }));
+                            this._execStatusChange('UnpublishArchive', p, 'PRIVATE', 
+                                '公開データを削除しますか？', 
+                                '削除しました', $Const.SCREEN_MODE.ARCHIVE, 
+                                () => $Data.Store.UpdateArchive({ is_public: false, closed_flg: false })
+                            );
                             break;
                         case 3:
-                            if (!arc.is_public) {
-                                this._execStatusChange('PublishArchive', p, 'PUBLISH', '公開準備状態にしますか？', '完了', $Const.SCREEN_MODE.ARCHIVE_PUB, () => $Data.Store.UpdateArchive({ is_public: true, closed_flg: true }));
+                            // 公開準備中（Step 3）への遷移
+                            if (arc.is_public) {
+                                // A. 既に公開中の場合は単なる Close 処理
+                                this._execStatusChange('CloseArchive', p, 'CLOSE', 
+                                    '公開を一時停止し、準備中に戻しますか？', 
+                                    '変更しました', null, 
+                                    () => $Data.Store.UpdateArchive({ closed_flg: true })
+                                );
                             } else {
-                                this._execStatusChange('CloseArchive', p, 'CLOSE', '公開を一時停止し、準備中に戻しますか？', '変更しました', null, () => $Data.Store.UpdateArchive({ closed_flg: true }));
+                                // B. 新たに「公開化」する場合の判定
+                                const status = arc.has_public_status;
+                                const PDS = $Const.PUBLIC_DATA_STATUS;
+                                // ① 有効な公開データが既にある場合は遮断
+                                if (status === PDS.OPEN || status === PDS.CLOSE) {
+                                    return $Notice.Warn("既に有効な公開データが存在するため、公開データは作れません。");
+                                }
+                                // ② 削除済みデータがある場合の選択ロジック
+                                let resetFlg = true;
+                                if (status === PDS.DELETE) {
+                                    // 復活か作り直しかを確認
+                                    const isRecreate = await this.ShowConfirm({
+                                        title: "公開データの復旧選択",
+                                        message: "過去の公開データが見つかりました。\n破棄して作り直しますか？\n\n「OK」：作り直す\n「CANCEL」：復活させる",
+                                        label: "OK"
+                                    });
+                                    resetFlg = isRecreate;
+                                }
+                                // 実行（reset_flg をパラメータに含める）
+                                const params = { ...p, reset_flg: resetFlg };
+                                const confirmMsg = resetFlg ? "公開データを作成します。\n続行しますか？" : "過去の公開データを復活させますか？";
+                                this._execStatusChange('PublishArchive', params, 'PUBLISH', 
+                                    confirmMsg, 
+                                    '完了', $Const.SCREEN_MODE.ARCHIVE_PUB, 
+                                    () => $Data.Store.UpdateArchive({ is_public: true, closed_flg: true })
+                                );
                             }
                             break;
                         case 4:
-                            this._execStatusChange('OpenLimitedArchive', p, 'LIMITED', '限定公開に設定しますか？', '設定しました', null, () => {
-                                if(arc.closed_flg) $Data.Store.UpdateArchive({ closed_flg: false });
-                                $Data.Store.UpdateArchive({ is_public: true, limited_open_flg: true });
-                            });
+                            this._execStatusChange('OpenLimitedArchive', p, 'LIMITED', 
+                                '限定公開に設定しますか？', 
+                                '設定しました', null, () => {
+                                    if(arc.closed_flg) $Data.Store.UpdateArchive({ closed_flg: false });
+                                    $Data.Store.UpdateArchive({ is_public: true, limited_open_flg: true });
+                                }
+                            );
                             break;
                         case 5:
+                            const isOk = await this.ShowConfirm({
+                                title: "セキュリティ喚起",
+                                message: "★★　警告　★★\n\n個人情報が含まれていないことを\n確認しましたか？",
+                                label: "大丈夫"
+                            });
+                            if (!isOk) return;
                             if (current === 4) {
-                                this._execStatusChange('CloseLimitedArchive', p, 'PUBLIC', '限定公開を解除し、全体公開にしますか？', '公開しました', null, () => $Data.Store.UpdateArchive({ limited_open_flg: false }));
+                                this._execStatusChange('CloseLimitedArchive', p, 'PUBLIC', 
+                                    '限定公開を解除し、全体公開にしますか？', 
+                                    '公開しました', null, 
+                                    () => $Data.Store.UpdateArchive({ limited_open_flg: false })
+                                );
                             } else {
-                                this._execStatusChange('OpenArchive', p, 'OPEN', '全体に公開しますか？', '公開しました', null, () => $Data.Store.UpdateArchive({ closed_flg: false, limited_open_flg: false }));
+                                this._execStatusChange('OpenArchive', p, 'OPEN', 
+                                    '全体に公開しますか？', 
+                                    '公開しました', null, 
+                                    () => $Data.Store.UpdateArchive({ closed_flg: false, limited_open_flg: false })
+                                );
                             }
                             break;
                     }

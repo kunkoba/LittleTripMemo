@@ -64,13 +64,13 @@
     <!-- メインコンテンツ（親領域の枠にピッタリはめ込む） -->
     <div class="absolute inset-0">
         <!-- ■　アプリ上部 -->
-        <div id="ui-top-bar" class="absolute top-0 w-full z-[1000] pointer-events-none flex flex-col items-center">
+        <div id="ui-top-bar" class="absolute top-0 left-0 right-0 z-[1000] pointer-events-none flex flex-col items-center">
             <!-- ■　通知バー -->
             <div class="h-8 bg-black/20 flex items-center justify-center w-full">
                 <div id="notice-bar-text" class="text-[1rem] font-bold text-white"></div>
             </div>
             <!-- ■　マーカー切替スイッチ -->
-            <div class="pointer-events-none w-full flex p-2">
+            <div class="mt-2 pointer-events-none w-full flex justify-end mr-4">
                 <div id="ui-marker-mode-switch" class="pointer-events-auto shadow-md w-fit h-8 flex overflow-hidden bg-white/90 backdrop-blur-sm">
                     <button id="btn-marker-mode-emoji" data-mode="emoji" 
                         class="px-4 transition-colors bg-brand-3 text-[0.8rem] flex items-center justify-center font-bold">
@@ -370,8 +370,8 @@
             </div>
         </div>
         <!-- ■　アプリ下部 -->
-        <div class="absolute bottom-4 w-full z-[1001] pointer-events-none mb-4">
-            <div id="ui-bottom-bar" class="w-full flex flex-col gap-6">
+        <div class="absolute bottom-4 left-0 right-2 z-[1001] pointer-events-none">
+            <div id="ui-bottom-bar">
                 <!-- スマホ用広告スペース（PCでは非表示） -->
                 <div id="ad-space-mobile-1" class="hidden lg:hidden mt-6 mx-auto max-w-[320px] h-[50px] pointer-events-auto">
                     <div class="bg-white w-full h-full border border-brand-2 shadow-md">
@@ -384,8 +384,8 @@
                         AD SPACE2
                     </div>
                 </div>
-                <!-- 地点検索・まとめタイトル -->
-                <div class="mx-2 bg-transparent flex justify-center">
+                <!-- アイコンバー -->
+                <div class="mx-2 bg-transparent flex justify-center mb-6">
                     <div class="flex-1 min-w-0 w-10">
                         <!-- まとめタイトル -->
                         <div class="p-0 flex justify-center">
@@ -428,10 +428,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- メニューグループ -->
-                <div class="flex justify-center">
-                    <div id="bot-group-menu" 
-                        class="h-12 max-w-[300px] gap-10 flex items-center justify-between bg-brand-1 rounded-full px-6 py-1 shadow-md pointer-events-auto">
+                <!-- アイコンバー -->
+                <div class="mx-6 bg-transparent mb-3 flex flex-col items-center gap-4">
+                    <!-- 【下段】固定エリア：①メニューグループ（カプセル：装飾なしアイコンを4つ配置） -->
+                    <div id="bot-group-menu" class="h-12 gap-6 flex items-center justify-between bg-brand-1 rounded-full px-6 py-1 shadow-md border border-brand-2 pointer-events-auto">
                         <!-- システムメニュー -->
                         <button id="btn-sys-menu" class="relative kb-icon-emoji-lg">
                             ⚙️
@@ -449,61 +449,36 @@
                             👆
                         </button>
                     </div>
-                </div>
-                <!-- 移動ボタン・メイン -->
-                <div id="bot-dynamic-area" class="w-full flex justify-center items-end">
-                    <!-- 移動ボタン -->
-                    <div id="bot-group-move" class="hidden h-12 max-w-[90%] w-[500px] flex items-center justify-between bg-black/70 rounded-full px-6 py-1 shadow-md pointer-events-auto">
-                        <button id="btn-bot-move-first" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
-                            |＜
-                        </button>
-                        <button id="btn-bot-move-prev" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
-                            ＜
-                        </button>
-                        <button id="btn-bot-move-open" class="w-10 h-10 flex items-center justify-center text-brand-5 font-bold text-[1.2rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full drop-shadow-md">
-                            ●
-                        </button>
-                        <button id="btn-bot-move-next" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
-                            ＞
-                        </button>
-                        <button id="btn-bot-move-last" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
-                            ＞|
-                        </button>
+                    <!-- 【上段】動的エリア：②移動カプセル または ③メインアクション（作成・検索） -->
+                    <div id="bot-dynamic-area" class="w-full flex justify-center items-end min-h-[52px]">
+                        <!-- ② 移動ボタン群（カプセル：高さ共通化のため py-1 / w-10） -->
+                        <div id="bot-group-move" class="hidden h-12 flex items-center justify-between bg-black/70 rounded-full px-6 py-1 shadow-md pointer-events-auto">
+                            <button id="btn-bot-move-first" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
+                                |＜
+                            </button>
+                            <button id="btn-bot-move-prev" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
+                                ＜
+                            </button>
+                            <button id="btn-bot-move-open" class="w-10 h-10 flex items-center justify-center text-brand-5 font-bold text-[1.2rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full drop-shadow-md">
+                                ●
+                            </button>
+                            <button id="btn-bot-move-next" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
+                                ＞
+                            </button>
+                            <button id="btn-bot-move-last" class="w-10 h-10 flex items-center justify-center text-white font-bold text-[1rem] active:scale-95 transition-transform hover:bg-white/20 rounded-full">
+                                ＞|
+                            </button>
+                        </div>
+                        <!-- ③ メインアクション（単体ボタン） -->
+                        <div id="bot-group-action" class="h-16 hidden items-center justify-center gap-4 pointer-events-auto">
+                            <button id="btn-search" class="mr-4 items-center justify-center shadow-md rounded-full transition-all duration-300 focus:outline-none shrink-0">
+                                🔎
+                            </button>
+                            <button id="btn-create" class="items-center justify-center shadow-md rounded-full transition-all duration-300 focus:outline-none shrink-0">
+                                ➕
+                            </button>
+                        </div>
                     </div>
-                    <!-- 地図検索・新規登録 -->
-                    <div id="bot-group-action" class="h-16 hidden items-center justify-center gap-4 pointer-events-auto">
-                        <button id="btn-search" class="mr-4 items-center justify-center shadow-md rounded-full transition-all duration-300 focus:outline-none shrink-0">
-                            🔎
-                        </button>
-                        <button id="btn-create" class="items-center justify-center shadow-md rounded-full transition-all duration-300 focus:outline-none shrink-0">
-                            ➕
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <!-- （仮）メインメニュー、地点リスト -->
-            <div class="hidden">
-                <!-- メインメニュー -->
-                <div class="absolute bottom-32 right-0 m-4 hidden">
-                    <button id="main-menu-btn" class="pointer-events-auto h-12 w-12 bg-brand-1 rounded-[1rem] shadow-md flex justify-center items-center focus:outline-none active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-dots-vertical">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-                            <path d="M11 19a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-                            <path d="M11 5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-                        </svg>
-                    </button>
-                </div>
-                <!-- 地点リスト -->
-                <div class="absolute bottom-32 left-0 m-4 hidden">
-                    <button id="point-list-btn" class="pointer-events-auto h-12 w-12 bg-brand-1 rounded-[1rem] shadow-md flex justify-center items-center focus:outline-none active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-menu-2">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M4 6l16 0" />
-                            <path d="M4 12l16 0" />
-                            <path d="M4 18l16 0" />
-                        </svg>
-                    </button>
                 </div>
             </div>
         </div>
@@ -527,8 +502,7 @@
             </button>
         </div>
         <!-- ■　Toast を積み上げるコンテナ -->
-        <!-- <div id="toast-container" class="absolute bottom-[150px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div> -->
-        <div id="toast-container" class="absolute top-12 w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
+        <div id="toast-container" class="absolute bottom-[20px] w-full flex flex-col gap-3 z-[9999] pointer-events-none"></div>
         <!-- ヘルプメッセージ -->
         <div id="ui-help-dialog" onclick="if(event.target === this) this.classList.add('hidden')"
             class="fixed inset-0 z-[3000] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">

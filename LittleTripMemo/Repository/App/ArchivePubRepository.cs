@@ -65,6 +65,18 @@ public class ArchivePubRepository : _BaseRepository
     }
 
     /// <summary>
+    /// 状態を取得するためアーカイブID以外の条件を除外
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <returns></returns>
+    public async Task<TMemoArchivePub?> GetStatsByKeyAsync(int archiveId)
+    {
+        const string sql = @"
+            SELECT * FROM t_memo_archive_pub WHERE archive_id = @archive_id";
+        return await QuerySingleOrDefaultAsync<TMemoArchivePub>(sql, new { archive_id = archiveId });
+    }
+
+    /// <summary>
     /// 秘密データから公開データへUPSERT（存在すれば最新化して復活、なければ挿入）
     /// </summary>
     public async Task RestoreArchiveAsync(TMemoArchivePub pub)

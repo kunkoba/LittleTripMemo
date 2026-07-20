@@ -1,6 +1,8 @@
 export default {
     // ログイン処理
     ShowLoginDialog() {
+        console.log(">> ShowLoginDialog");
+        console.trace();
         const el = $Dom.GenerateTemplate("tpl-login");
         // Googleログインボタン
         $Dom.QuerySelector("#btn-login-google", el).onclick = $Err.CatchAsync(async () => {
@@ -20,6 +22,20 @@ export default {
             title: "ログイン",
             content: el,
             help: "aaaa",
+        });
+    },
+    // 【📱 メインメニュー】
+    ShowMainMenu() {
+        const el = $Dom.GenerateTemplate('tpl-menu-main');
+        // 各メニューボタンへの遷移設定
+        $Dom.QuerySelector('#btn-main-sys', el).onclick = () => this.ShowSystemMenu();
+        $Dom.QuerySelector('#btn-main-user', el).onclick = () => this.ShowUserMenu();
+        $Dom.QuerySelector('#btn-main-data', el).onclick = () => this.ShowDataMenu();
+        $Dom.QuerySelector('#btn-main-action', el).onclick = () => this.ShowActionMenu();
+        this._core.open({ 
+            title: "メインメニュー", 
+            content: el,
+            help: "全てのメニューにアクセスできます。" 
         });
     },
     // 【⚙️ システムメニュー】

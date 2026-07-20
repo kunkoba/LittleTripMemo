@@ -136,7 +136,7 @@ const _MapCore = {
             // 画面内は0.5秒のスライド移動
             this._map.setView(latLng, targetZoom, {
                 animate: true,
-                pan: { duration: delay }
+                pan: { duration: delay / 2 }
             });
         } else {
             this._map.flyTo(latLng, targetZoom, { duration: delay });

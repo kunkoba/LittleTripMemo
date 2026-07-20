@@ -1,5 +1,5 @@
-const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
-// const BaseUrl = "https://localhost:7292";
+// const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
+const BaseUrl = "https://localhost:7292";
 // const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
 const API_ENDPOINTS = {
     // Account
@@ -116,7 +116,7 @@ window.$Data = {
             }
             if (options.method !== "GET" && params) {
                 options.headers["Content-Type"] = "application/json";
-                // paramsにプロパティがあるときだけ、全リクエストに login_user_id を自動で混ぜる
+                // 全リクエストに login_user_id を自動で混ぜる
                 if ($App.AppData.Owner.SystemInfo) {
                     params.login_user_id = $App.AppData.Owner.SystemInfo.login_user_id;
                 }
@@ -338,7 +338,7 @@ window.$Data = {
         GetMyReactions() {
             return this._myReactions;
         },
-        UpdateDetail(detail) {
+        UpdateDetail_2(detail) {
             if (!detail) return;
             const list = this._details;
             let idx = -1;
@@ -354,10 +354,50 @@ window.$Data = {
             }
             // this.Restore();
         },
-        UpdateArchive(updatedFields) {
+        UpdateArchive_2(updatedFields) {
             if (!this._archive) return;
             // メモリ上のデータ更新
             Object.assign(this._archive, updatedFields);
+        },
+        // 詳細データを更新（作業用と復元用の両方を同期）
+        UpdateDetail(detail) {
+            if (!detail) return;
+            const updateInList = (list) => {
+                let idx = -1;
+                if (detail.seq > 0) {
+                    idx = list.findIndex(x => x.seq === Number(detail.seq));
+                } else if (detail.dbid > 0) {
+                    idx = list.findIndex(x => x.dbid === Number(detail.dbid));
+                }
+                if (idx !== -1) {
+                    list[idx] = { ...list[idx], ...detail };
+                } else {
+                    list.push(structuredClone(detail));
+                }
+            };
+            // 1. 作業用メモリを更新
+            updateInList(this._details);
+            // 2. 復元用の生データを更新（ここを更新しないとRestoreで巻き戻る）
+            updateInList($Data.Access._rawData.details);
+        },
+        // まとめ親情報を更新（作業用と復元用の両方を同期）
+        UpdateArchive(updatedFields) {
+            if (!this._archive) return;
+            // 1. 作業用メモリを更新
+            Object.assign(this._archive, updatedFields);
+            // 2. 復元用の生データを更新
+            if ($Data.Access._rawData.archive) {
+                Object.assign($Data.Access._rawData.archive, updatedFields);
+            }
+            // 3. リスト形式のデータも存在すれば同期
+            if (this._archiveList) {
+                const target = this._archiveList.find(a => a.archive_id === this._archive.archive_id);
+                if (target) Object.assign(target, updatedFields);
+            }
+            if ($Data.Access._rawData.archiveList) {
+                const rawTarget = $Data.Access._rawData.archiveList.find(a => a.archive_id === this._archive.archive_id);
+                if (rawTarget) Object.assign(rawTarget, updatedFields);
+            }
         },
         GetUserProfile() {
             return this._userProfile; 
@@ -372,6 +412,7 @@ window.$Data = {
     LocalDb: {
         // バックグラウンドで明細を一括送信
         async BulkSendDetails() {
+            console.log("> BulkSendDetails()");
             const list = await $LocalDb.Detail.GetAll();
             if (!list || list.length === 0) return;
             // 1. 全件の送信フラグを一旦「送信中(1)」にする
@@ -430,6 +471,7 @@ window.$Data = {
         },
         // バックグラウンドでリアクションを一括送信
         async BulkSendReactions() {
+            console.log("> BulkSendReactions()");
             // 1. 未送信（send_flag = 0）のリアクションデータを全件取得
             const list = await $LocalDb.Reaction.GetUnsentAll();
             if (!list || list.length === 0) return;

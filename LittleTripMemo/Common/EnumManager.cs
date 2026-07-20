@@ -42,9 +42,9 @@ public enum UserHistoryActionKind
 /// </summary>
 public enum PublicStatus : short
 {
-    Nothing = 0, // 公開データなし
-    Open = 1,    // 公開中
-    Close = 2,   // 非公開（クローズ）
-    Delete = 3   // 削除済み
+    Nothing,
+    Open,
+    Close,
+    Delete
 }
 

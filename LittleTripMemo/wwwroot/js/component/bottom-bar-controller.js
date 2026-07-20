@@ -21,11 +21,18 @@ const _BottomCore = {
 			this.btnOpen  = $Dom.GetElementById('btn-bot-move-open');
 			this.btnNext  = $Dom.GetElementById('btn-bot-move-next');
 			this.btnLast  = $Dom.GetElementById('btn-bot-move-last');
+            this.btnMainToggle = $Dom.GetElementById('main-menu-btn');
+            this.btnListBtn = $Dom.GetElementById('point-list-btn');
 			// --- 4. イベント登録 (4つのメニュー) ---
 			this.btnSysMenu.addEventListener('click',  () => $Dialog.ShowSystemMenu());
 			this.btnUserMenu.addEventListener('click', () => $Dialog.ShowUserMenu());
 			this.btnDataMenu.addEventListener('click', () => $Dialog.ShowDataMenu());
 			this.btnAppMenu.addEventListener('click',  () => $Dialog.ShowActionMenu());
+            this.btnMainToggle.addEventListener('click', () => $Dialog.ShowMainMenu());
+			// b.pointList.onclick = () => (mode === $Const.SCREEN_MODE.SEARCH) ? this.ShowDetailsSearchResult() : this.ShowDetailsTimeLine();
+            this.btnListBtn.addEventListener('click', () => ($App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH) 
+				? $Dialog.ShowDetailsSearchResult() 
+				: $Dialog.ShowDetailsTimeLine());
 			// --- 5. イベント登録 (メインアクション・移動ボタン：既存維持) ---
 			this.btnCreate.addEventListener('click', () => {
 				// ★追加：CREATEモードでなければモード切替を実行

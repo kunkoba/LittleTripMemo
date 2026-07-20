@@ -6,7 +6,7 @@ window.$Const = {
         DESCRIPTION: "メモをまとめて自分だけの旅行記を作ろう",
         DEVELOPER: "kunkoba",
         OFFICIAL_SITE: "https://hinekulemonstudio.web.app/",
-        VERSION: "1.1.5",
+        VERSION: "1.1.8",
         VERSION_DESCRIPTION: `
 メジャー.マイナー.パッチの形式で表されます。
 
@@ -66,12 +66,7 @@ window.$Const = {
         CAUTION: { id: 8, emoji: '⚠️', label: 'Caution' },
         WARNING: { id: 9, emoji: '🚫', label: 'Warning' },
     },
-    // ▼ 追加：明細の評価種別
-    FEEL_TYPE_2: {
-        GOOD: 1,
-        NORMAL: 0,
-        BAD: -1,
-    },
+    // 明細の評価種別
     FEEL_TYPE: {
         GOOD:   { val: 1,  label: 'Good',   path: 'img/face/face_good.png' },
         NORMAL: { val: 0,  label: 'Normal', path: 'img/face/face_normal.png' },
@@ -82,12 +77,12 @@ window.$Const = {
         EMOJI: 'emoji',
         FEEL:  'feel',
     },
-    // 公開側まとめの状態
-    ARCHIVE_TYPE: {
-        Nothing: "nothing",
-        Open:    "open",
-        Close:   "close",
-        Delete:  "delete",
+    // 公開用データのステータス
+    PUBLIC_DATA_STATUS: {
+        NOTHING: "Nothing", // 未作成
+        OPEN:    "Open",    // 公開中
+        CLOSE:   "Close",   // 非公開中（準備中）
+        DELETE:  "Delete",  // 削除済み
     },
 };
 

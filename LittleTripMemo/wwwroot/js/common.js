@@ -5,6 +5,8 @@ window.$Err = {
     Handle(err, mode) {
         $Notice.Loading.Hide();
         console.error("Fatal Error:", err);
+        // ★追加：オフライン中は致命的エラーダイアログを出さない
+        if (!navigator.onLine) return;
         // ダイアログ基盤が生きているかチェック
         const errorTemplate = document.getElementById('tpl-dialog-error');
         if (errorTemplate && window.$Dialog && typeof $Dialog.ShowErrorDialog === 'function') {

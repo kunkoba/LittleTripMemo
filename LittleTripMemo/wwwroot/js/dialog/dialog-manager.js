@@ -66,7 +66,7 @@ const _DialogCore = {
                 frame:  ['bg-white', 'border-2', 'border-black'],
                 header: ['bg-black'],
                 title:  ['text-red-500'],
-                footer: ['bg-white', 'border-t', 'border-slate-200']
+                footer: ['bg-white', 'border-t', '']
             },
             user: { // デフォルト
                 frame:  ['bg-brand-0'],

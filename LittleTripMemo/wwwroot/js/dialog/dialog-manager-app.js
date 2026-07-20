@@ -23,12 +23,12 @@ export default {
         b.pointList.onclick = () => (mode === $Const.SCREEN_MODE.SEARCH) ? this.ShowDetailsSearchResult() : this.ShowDetailsTimeLine();
         b.merge.onclick = () => this.ShowMultiSelectTimeline();
         b.search.onclick = () => { 
-            this._core.close(); 
+            this._core.closeAll(); 
             $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.SEARCH; 
             $App.RefreshScreen(); 
         };
         b.create.onclick = () => { 
-            this._core.close(); 
+            this._core.closeAll(); 
             $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; 
             $App.RefreshScreen(); 
         };
@@ -57,11 +57,19 @@ export default {
             pointSearch: $Dom.QuerySelector('#btn-app-point-search', el),
         };
         const mode = $App.AppData.Context.ScreenMode;
-        b.reload.onclick = () => { this._core.close(); $Util.ReloadApp(); };
-        b.refresh.onclick = () => { this._core.close(); $App.RefreshScreen(); };
-        b.restore.onclick = () => { this._core.close(); $Marker.RestoreMarkers(); };
+        b.reload.onclick = () => { 
+            this._core.closeAll(); 
+            // オフラインチェック
+            if (!$App.AppData.Context.IsOnline) {
+                $Notice.Warn("オフライン中は、機能が制限されます。");
+                return false;
+            }
+            $Util.ReloadApp();
+        };
+        b.refresh.onclick = () => { this._core.closeAll(); $App.RefreshScreen(); };
+        b.restore.onclick = () => { this._core.closeAll(); $Marker.RestoreMarkers(); };
         b.current.onclick = () => {
-            this._core.close();
+            this._core.closeAll();
             $Marker.RefreshCurrentLocation();
             $Marker.FocusToLocationMarker(1000);
         };

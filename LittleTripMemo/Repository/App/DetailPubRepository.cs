@@ -149,7 +149,7 @@ public class DetailPubRepository : _BaseRepository
         // これにより GiSTインデックスが効き、2次元エリアで爆速検索されます
         string whereClause = @"
             WHERE point(d.longitude, d.latitude) <@ box(point(@lng_min, @lat_min), point(@lng_max, @lat_max))
-              AND d.user_id   <> @login_user_id
+              -- AND d.user_id   <> @login_user_id
               AND d.del_flg   = false
               AND a.closed_flg = false
               AND a.limited_open_flg = false

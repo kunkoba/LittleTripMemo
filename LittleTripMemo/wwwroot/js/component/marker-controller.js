@@ -240,6 +240,8 @@ const MarkerController = {
     RefreshPointMarker() {
         const details = $Data.Store.GetDetails();
         if (!details) return;
+        // 描画前に日時順でソートを実行
+        $Data.Formatter.SortDetails(details);
         this.Clear();
         _MarkerCore.generateArrowList();
         // マーカー生成
@@ -287,6 +289,7 @@ const MarkerController = {
                 // 地点指定があれば、そこにフォーカス
                 const seq = $App.AppData.Context.TargetSeq;
                 const defZoom = $Const.MAP_CONFIG.DEFAULT_ZOOM;
+                console.log("ChangeScreenMode():", seq);
                 if (seq > 0) {
                     // seq指定がある場合、その地点へ定数ズームで移動
                     this.FocusBySeq(seq, defZoom);
@@ -394,6 +397,7 @@ const MarkerController = {
     // seqを指定してその地点へジャンプする
     FocusBySeq(seq, zoom = null) {
         const details = $Data.Store.GetDetails();
+        // 
         const index = details.findIndex(d => Number(d.seq) === Number(seq));
         if (index !== -1) {
             this.SelectMarker(index, zoom);

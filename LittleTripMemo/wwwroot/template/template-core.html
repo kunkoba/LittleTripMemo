@@ -192,7 +192,7 @@
                     <span id="atm-wind-val" class="w-8 text-[1.5rem] font-bold text-brand-5 text-center italic">0</span>
                     <input id="atm-wind" type="range" min="0" max="9" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5">
                     <div class="flex gap-2 shrink-0">
-                        <button id="btn-wind-minus" class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 text-[1.5rem] font-bold active:scale-90 ">-</button>
+                        <button id="btn-wind-minus" class="w-12 h-12 rounded-xl bg-slate-100 border  flex items-center justify-center text-slate-600 text-[1.5rem] font-bold active:scale-90 ">-</button>
                         <button id="btn-wind-plus"  class="w-12 h-12 rounded-xl bg-brand-5 border border-brand-4 flex items-center justify-center text-white text-[1.5rem] font-bold active:scale-90 shadow-md">+</button>
                     </div>
                 </div>
@@ -204,7 +204,7 @@
                     <span id="atm-density-val" class="w-8 text-[1.5rem] font-bold text-brand-5 text-center italic">0</span>
                     <input id="atm-density" type="range" min="0" max="9" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5">
                     <div class="flex gap-2 shrink-0">
-                        <button id="btn-density-minus" class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 text-[1.5rem] font-bold active:scale-90 ">-</button>
+                        <button id="btn-density-minus" class="w-12 h-12 rounded-xl bg-slate-100 border  flex items-center justify-center text-slate-600 text-[1.5rem] font-bold active:scale-90 ">-</button>
                         <button id="btn-density-plus"  class="w-12 h-12 rounded-xl bg-brand-5 border border-brand-4 flex items-center justify-center text-white text-[1.5rem] font-bold active:scale-90 shadow-md">+</button>
                     </div>
                 </div>
@@ -216,7 +216,7 @@
                     <span id="atm-darkness-val" class="w-8 text-[1.5rem] font-bold text-brand-5 text-center italic">0</span>
                     <input id="atm-darkness" type="range" min="0" max="9" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-5">
                     <div class="flex gap-2 shrink-0">
-                        <button id="btn-dark-minus" class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 text-[1.5rem] font-bold active:scale-90 ">-</button>
+                        <button id="btn-dark-minus" class="w-12 h-12 rounded-xl bg-slate-100 border  flex items-center justify-center text-slate-600 text-[1.5rem] font-bold active:scale-90 ">-</button>
                         <button id="btn-dark-plus"  class="w-12 h-12 rounded-xl bg-brand-5 border border-brand-4 flex items-center justify-center text-white text-[1.5rem] font-bold active:scale-90 shadow-md">+</button>
                     </div>
                 </div>
@@ -283,7 +283,7 @@
 
 <!-- 【部品】ユーザアイコン：バッジタイプ（影なし・反応なし） -->
 <template id="tpl-user-badge">
-	<div class="rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border border-slate-200 flex items-center gap-2 bg-white">
+	<div class="rounded-full pl-2 pr-4 h-10 w-fit max-w-[240px] border  flex items-center gap-2 bg-white">
 		<span class="js-icon kb-icon-emoji-lg"></span>
 		<span class="js-name text-[0.9rem] text-slate-600 tracking-tight line-clamp-1 font-bold"></span>
 	</div>
@@ -314,3 +314,204 @@
         </div>
     </div>
 </template>
+
+
+<!-- ⚙️ システムメニュー用 -->
+<template id="tpl-menu-sys">
+    <div class="w-full flex flex-col bg-brand-0">
+        <button id="btn-sys-notice" 
+            class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">📢</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">システム通知一覧</span>
+        </button>
+        <button id="btn-sys-version" 
+            class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">ℹ️</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">アプリの詳細情報</span>
+        </button>
+        <button id="btn-sys-legal" 
+            class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">📜</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">利用規約とポリシー</span>
+        </button>
+        <button id="btn-sys-admin" 
+            class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-red-100 active:bg-red-200 transition-colors text-red-600 bg-red-50">
+            <span class="col-span-1 kb-icon-emoji-lg">👑</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">管理者ツール</span>
+        </button>
+        <button id="btn-sys-login" 
+            class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">🚪</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase"></span>
+        </button>
+    </div>
+</template>
+
+<!-- 👤 ユーザーメニュー用 -->
+<template id="tpl-menu-user">
+    <div class="w-full flex flex-col bg-brand-0">
+        <button id="btn-sys-user-profile" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">👤</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">ユーザ情報</span>
+        </button>
+        <button id="btn-user-mail" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">📩</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">受信メール一覧</span>
+        </button>
+        <button id="btn-sys-my-report" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">🚫</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">通報まとめ一覧</span>
+        </button>
+        <button id="btn-sys-user-config" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">⚙️</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">利用端末の設定</span>
+        </button>
+    </div>
+</template>
+
+<!-- 🗺️ データメニュー用 -->
+<template id="tpl-menu-data">
+    <div class="w-full flex flex-col bg-brand-0">
+        <button id="btn-app-archive-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">📚</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">まとめ一覧</span>
+        </button>
+        <button id="btn-app-info" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">📖</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">まとめ詳細表示</span>
+        </button>
+        <button id="btn-app-point-list" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">☰</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">地点メモ一覧</span>
+        </button>
+        <button id="btn-app-merge" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">📦</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">地点メモをまとめる</span>
+        </button>
+        <button id="btn-app-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">🔎</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">公開データを検索</span>
+        </button>
+        <button id="btn-app-create" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">➕</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">地点メモを作成する</span>
+        </button>
+    </div>
+</template>
+
+<!-- 👆 アクションメニュー用 -->
+<template id="tpl-menu-action">
+    <div class="w-full flex flex-col bg-brand-0">
+        <button id="btn-app-reload" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <!-- <span class="col-span-1 flex justify-center text-[1.5rem]">🌐</span> -->
+            <span class="col-span-1 kb-icon-emoji-lg">🌐</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">アプリ再起動</span>
+        </button>
+        <button id="btn-app-refresh" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">🔄</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">画面を再読み込み</span>
+        </button>
+        <button id="btn-app-restore" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">♻️</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">マーカーを元に戻す</span>
+        </button>
+        <button id="btn-app-current" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">📍</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">現在地へ移動</span>
+        </button>
+        <button id="btn-app-point-search" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">👇</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">ワードで地点移動</span>
+        </button>
+    </div>
+</template>
+
+<!-- 【ダイアログ子】メインメニュー -->
+<template id="tpl-menu-main">
+    <div class="w-full flex flex-col bg-brand-0">
+        <!-- システム設定 -->
+        <button id="btn-main-sys" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">⚙️</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">システム設定</span>
+        </button>
+        <!-- ユーザーメニュー -->
+        <button id="btn-main-user" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">👤</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">ユーザーメニュー</span>
+        </button>
+        <!-- データ管理 -->
+        <button id="btn-main-data" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">🗺️</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">データ・まとめ管理</span>
+        </button>
+        <!-- アクションメニュー -->
+        <button id="btn-main-action" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 kb-icon-emoji-lg">👆</span>
+            <span class="col-span-1"></span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">操作・ツール</span>
+        </button>
+    </div>
+</template>
+
+<template id="tpl-menu-user-settings">
+    <div class="w-full flex flex-col bg-brand-0">
+        <button id="btn-set-theme" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">🎨</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">テーマカラーの設定</span>
+        </button>
+        <button id="btn-set-map" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">🗺️</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">地図タイプの設定</span>
+        </button>
+        <button id="btn-set-currency" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">💰</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">金額単価の設定</span>
+        </button>
+        <button id="btn-set-gps" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">📍</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">GPSの追従間隔</span>
+        </button>
+        <button id="btn-set-font" class="w-full h-14 grid grid-cols-10 items-center px-4 border-b border-brand-2 hover:bg-brand-1 active:bg-brand-2 transition-colors text-slate-900">
+            <span class="col-span-1 flex justify-center text-[1.5rem]">Aa</span>
+            <span class="col-span-1">
+            </span>
+            <span class="col-span-8 text-left font-bold text-[1rem] uppercase">フォントサイズ</span>
+        </button>
+    </div>
+</template>
+

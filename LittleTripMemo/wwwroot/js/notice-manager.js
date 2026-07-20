@@ -54,14 +54,14 @@ const Notice = {
             }
             // 既存の opacity-100 クラスを消して、直接操作するように変更
             this.el.style.opacity = "1";
-            $Dom.ToggleShow($Dom.GetElementById('ad-space-mobile-1'), false);
-            $Dom.ToggleShow($Dom.GetElementById('ad-space-mobile-2'), false);
+            // $Dom.ToggleShow($Dom.GetElementById('ad-space-mobile-1'), false);
+            // $Dom.ToggleShow($Dom.GetElementById('ad-space-mobile-2'), false);
         },
         Hide() {
             if (!this.el) return;
             this.el.style.opacity = "0";
-            $Dom.ToggleShow($Dom.GetElementById('ad-space-mobile-1'), true);
-            $Dom.ToggleShow($Dom.GetElementById('ad-space-mobile-2'), true);
+            // $Dom.ToggleShow($Dom.GetElementById('ad-space-mobile-1'), true);
+            // $Dom.ToggleShow($Dom.GetElementById('ad-space-mobile-2'), true);
         }
     }
 };

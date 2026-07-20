@@ -58,6 +58,7 @@ public class TMemoArchive : IAppRecord
     public bool is_public { get; set; } = false;
     public bool is_owner { get; set; } = true;
     public int detail_count { get; set; } = 0;
+    public string has_public_status { get; set; } = PublicStatus.Nothing.ToString();
 }
 
 public class TMemoArchivePub : IAppRecord

@@ -82,7 +82,7 @@ AppSettingKey: "little_trip_settings",
     },
     // 定期タスクの定義と開始
     _initPollingTasks() {
-        const checkSec = 10;
+        const checkSec = 1;
         const gpsTrackingSec = $App.AppData.Owner.GpsTrackingSec;
         const saveDetailSec = $Const.APP_CONFIG.SAVE_DETAIL_SEC;
         const saveReactionSec = $Const.APP_CONFIG.SAVE_REACTION_SEC;
@@ -106,56 +106,53 @@ AppSettingKey: "little_trip_settings",
                 $Polling.Stop($Polling.TASKS.SYNC_ACTIVITY);
             }
         }, checkSec);
-        // オンライン監視
-        if ($App.AppData.Context.IsOnline) {
-            // GPSトラッキング
-            if (gpsTrackingSec > 0) {
-                // 現在地追従（保存された秒数で登録）
-                $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
-                    $Marker.RefreshCurrentLocation();
-                }, gpsTrackingSec);
-                $Polling.Start($Polling.TASKS.GPS_FOLLOW);
+        // GPSトラッキング
+        if (gpsTrackingSec > 0) {
+            // 現在地追従（保存された秒数で登録）
+            $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
+                $Marker.RefreshCurrentLocation();
+            }, gpsTrackingSec);
+            $Polling.Start($Polling.TASKS.GPS_FOLLOW);
+        }
+        // データ送信処理
+        $Polling.Add($Polling.TASKS.DATA_DETAIL, async () => {
+            if (!$App.AppData.Context.IsLoggedIn) return;
+            if (await $LocalDb.Detail.GetCount() === 0) return;
+            // 全て $Data.LocalDb に任せる
+            const isSuccess = await $Data.LocalDb.BulkSendDetails();
+            if (isSuccess) {
+                // 最新データをサーバーから再取得し、マーカーを再描画する
+                await this.RefreshScreen(); 
+                // 通知
+                const msg = "バックグラウンド同期は成功しました：明細メモ"
+                $Notice.Info(msg);
             }
-            // データ送信処理
-            $Polling.Add($Polling.TASKS.DATA_DETAIL, async () => {
-                if (!$App.AppData.Context.IsLoggedIn) return;
-                if (await $LocalDb.Detail.GetCount() === 0) return;
-                // 全て $Data.LocalDb に任せる
-                const isSuccess = await $Data.LocalDb.BulkSendDetails();
-                if (isSuccess) {
-                    // 最新データをサーバーから再取得し、マーカーを再描画する
-                    await this.RefreshScreen(); 
-                    // 通知
-                    const msg = "バックグラウンド同期は成功しました：明細メモ"
-                    $Notice.Info(msg);
-                    console.log(msg);
-                }
-            }, saveDetailSec);
-            // リアクションデータ送信処理
-            $Polling.Add($Polling.TASKS.DATA_REACTION, async () => {
-                if (!$App.AppData.Context.IsLoggedIn) return;
-                const unsent = await $LocalDb.Reaction.GetUnsentAll();
-                if (!unsent || unsent.length === 0) return;
-                // 全て $Data.LocalDb に任せる
-                const isSuccess = await $Data.LocalDb.BulkSendReactions();
-                if (isSuccess) {
-                    // 通知
-                    const msg = "バックグラウンド同期は成功しました：リアクション"
-                    $Notice.Info(msg);
-                    console.log(msg);
-                }
-            }, saveReactionSec);
-            // ログインチェック
-            $Polling.Add($Polling.TASKS.SYNC_ACTIVITY, async () => {
-                // console.log("$Polling.TASKS.SYNC_ACTIVITY");
+        }, saveDetailSec);
+        // リアクションデータ送信処理
+        $Polling.Add($Polling.TASKS.DATA_REACTION, async () => {
+            if (!$App.AppData.Context.IsLoggedIn) return;
+            const unsent = await $LocalDb.Reaction.GetUnsentAll();
+            if (!unsent || unsent.length === 0) return;
+            // 全て $Data.LocalDb に任せる
+            const isSuccess = await $Data.LocalDb.BulkSendReactions();
+            if (isSuccess) {
+                // 通知
+                const msg = "バックグラウンド同期は成功しました：リアクション"
+                $Notice.Info(msg);
+                console.log(msg);
+            }
+        }, saveReactionSec);
+        // ログインチェック
+        $Polling.Add($Polling.TASKS.SYNC_ACTIVITY, async () => {
+            if ($App.AppData.Context.IsLoggedIn) {
                 // ユーザ存在チェック＆最終ログイン日時設定
                 let isSuccess = await this.SyncActivityLog();
                 if (!isSuccess) {
                     $Dialog.ShowLoginDialog();
                     return;
                 }
-            }, activityCheckSec);
-        }
+            }
+        }, activityCheckSec);
         // 定期タスク開始-----
         $Polling.Start($Polling.TASKS.OFFLINE_CHECK);
     },
@@ -204,6 +201,10 @@ AppSettingKey: "little_trip_settings",
         // 1. UI基盤の準備（エラー画面を出せるように最初に行う）
         this._initViewport();
         $UI.Init();
+        // オフラインチェック
+        if (!navigator.onLine) {
+            return;
+        }
         // テンプレート待機（部品が届くまでメイン処理を待つ）
         await new Promise(resolve => {
             const check = () => document.getElementById('tpl-dialog-error') ? resolve() : setTimeout(check, 30);
@@ -221,7 +222,7 @@ AppSettingKey: "little_trip_settings",
                     // 【修正点】失敗しても return せず、オフラインとして続行する
                     try {
                         await this.SyncActivityLog();
-                        $Data.Access.GetSystemInfo();
+                        await $Data.Access.GetSystemInfo();
                     } catch (e) {
                         console.warn("同期スキップ:", e.message);
                     }
@@ -245,6 +246,7 @@ AppSettingKey: "little_trip_settings",
                 // Token復元済みなので、ここで勝手にログイン画面が出ることはありません
                 if (!this.AppData.Context.TargetArchiveId && !this.AppData.Context.IsLoggedIn) {
                     $Dialog.ShowLoginDialog();
+                    return;
                 }
             }
             // --- メイン処理（元の設定反映ロジックそのまま） ---
@@ -263,7 +265,7 @@ AppSettingKey: "little_trip_settings",
                 console.warn("描画データ取得失敗:", e.message);
             }
             this._initServiceWorker();
-            $Marker.FocusToLocationMarker();
+            // $Marker.FocusToLocationMarker();
         } catch (fatalErr) {
             // 本当に致命的なエラー（プログラムのバグ等）のみ、エラー画面へ
             console.error("Fatal Error:", fatalErr);
@@ -297,7 +299,7 @@ AppSettingKey: "little_trip_settings",
                 if (this.AppData.Context.IsLoggedIn) {
                     isSuccess = await $Data.Access.GetArchiveDetails({ archive_id: archiveId });
                     if (!isSuccess) {
-                        this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+                        // this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
                     } else {
                         const archive = $Data.Store.GetArchive();
                         $TopBar.ChangeTitle(archive?.title || "");
@@ -333,6 +335,7 @@ AppSettingKey: "little_trip_settings",
                 break;
             default:
                 // 不正か？
+                console.error("不正ログイン！！")
                 $Dialog.ShowLoginDialog();
                 return;
         }
@@ -374,7 +377,7 @@ AppSettingKey: "little_trip_settings",
             }
         } else {
             // オフライン判定時のモード別コントロール
-            if (!this.AppData.Context.IsOnline) {
+            if (!navigator.onLine) {
                 $Notice.Warn("オフライン中は、機能が制限されます。");
                 return;
             } else {

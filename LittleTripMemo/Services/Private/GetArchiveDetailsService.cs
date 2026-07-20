@@ -14,6 +14,7 @@ public class GetArchiveDetailsService(
     UserContext userContext,
     ArchiveRepository archiveRepository,
     DetailRepository detailRepository,
+    ArchivePubRepository archivePubRepository, // 注入が必要
     AppUserRepository appUserRepository
 ) : _BaseService(userContext)
 {
@@ -47,6 +48,15 @@ public class GetArchiveDetailsService(
         // 4. 所有者情報の取得
         var ownerUser = await appUserRepository.GetByUserIdAsync(archive!.user_id);
         BusinessException.ThrowIf(ownerUser == null, $"まとめの所有者情報が見つかりません。(id: {req.archive_id})");
+
+        // 秘密側の編集画面で「今公開中ですよ」「非公開（限定URL）ですよ」と出すために必須
+        var pub = await archivePubRepository.GetStatsByKeyAsync(req.archive_id);
+        string status = PublicStatus.Nothing.ToString();
+        if (pub != null)
+        {
+            status = (pub.del_flg ? PublicStatus.Delete : (pub.closed_flg ? PublicStatus.Close : PublicStatus.Open)).ToString();
+            archive.has_public_status = status;
+        }
 
         // 5. フラグセットと返却準備
         SetAppFlags(archive);
