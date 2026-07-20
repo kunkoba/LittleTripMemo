@@ -496,7 +496,7 @@
 </template>
 
 <!-- 【ダイアログ子】リンク1件分のアイテム -->
-<template id="tpl-archive-click-stats">
+<template id="tpl-archive-click-stats_2">
     <div class="w-full flex flex-col gap-6 text-slate-900 p-2">
         <!-- アーカイブ基本情報 -->
         <div class="bg-white flex flex-col gap-4">
@@ -553,7 +553,7 @@
     </div>
 </template>
 <!-- 【ダイアログ子】アーカイブ・明細クリック集計表示用親枠 -->
-<template id="tpl-archive-click-stats-item">
+<template id="tpl-archive-click-stats-item_2">
     <div class="relative bg-white rounded-[1rem] p-4 shadow-sm overflow-hidden flex flex-col gap-4">
         <!-- 左端のアクセントライン -->
         <div class="absolute left-0 top-0 bottom-0 w-1 bg-brand-5 opacity-50"></div>
@@ -587,6 +587,94 @@
                 <div class="flex flex-col">
                     <span class="text-[0.7rem] text-slate-500 font-bold">Guest</span>
                     <span class="js-dtl-guest text-[1rem] font-black">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="tpl-archive-click-stats">
+    <div class="w-full flex flex-col gap-5 text-slate-900 bg-white">
+        <!-- セクション：対象まとめ -->
+        <div class="flex flex-col gap-1">
+            <label class="text-[0.9rem] font-bold text-slate-600">対象まとめ</label>
+            <div class="px-4 py-1 flex flex-col gap-2">
+                <div class="text-[1rem] font-bold text-slate-900 js-arc-title line-clamp-2"></div>
+                <!-- ステータス・オーナーバッジ -->
+                <div class="flex gap-2 items-center">
+                    <span class="js-arc-status-badge px-2 py-0.5 rounded text-[0.8rem] font-bold"></span>
+                    <span class="js-arc-owner-badge hidden bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[0.7rem] font-bold border border-blue-100 uppercase">OWNER</span>
+                </div>
+            </div>
+        </div>
+        <!-- セクション：累計閲覧数 -->
+        <div class="flex flex-col gap-1 border-t border-slate-200 pt-3">
+            <label class="text-[0.9rem] font-bold text-slate-600">累計閲覧数</label>
+            <div class="text-[1.1rem] font-bold text-brand-5 px-4"><span class="js-arc-view-count">0</span> 回</div>
+        </div>
+        <!-- セクション：リンク解析 -->
+        <div class="flex flex-col gap-1 border-t border-slate-200 pt-3">
+            <label class="text-[0.9rem] font-bold text-slate-600">リンク解析</label>
+            <div class="js-arc-link-container flex flex-col gap-3 mt-1">
+                <div class="bg-slate-50 rounded-[1rem] p-4 flex flex-col gap-2 border border-slate-200">
+                    <div class="js-arc-url text-blue-500 font-bold italic break-all text-[0.9rem] mb-1 line-clamp-1"></div>
+                    <div class="px-4">
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-[0.9rem] text-slate-600">総クリック数</span>
+                            <span class="js-arc-total text-[1rem] font-bold text-brand-5">0</span>
+                        </div>
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-[0.9rem] text-slate-600">クリックユーザ数</span>
+                            <span class="js-arc-unique text-[1rem] font-bold text-slate-700">0</span>
+                        </div>
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-[0.9rem] text-slate-600">Guestクリック数</span>
+                            <span class="js-arc-guest text-[1rem] font-bold text-slate-600">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- セクション：地点別詳細 -->
+        <div class="flex flex-col gap-1 border-t border-slate-200 pt-3">
+            <label class="text-[0.9rem] font-bold text-slate-600">地点メモ別統計</label>
+            <div class="js-details-container flex flex-col"></div>
+        </div>
+    </div>
+</template>
+<template id="tpl-archive-click-stats-item">
+    <div class="flex flex-col gap-2 py-6 border-b">
+        <!-- 地点ヘッダー -->
+        <div class="flex items-center gap-2">
+            <span class="js-dtl-seq w-6 h-6 bg-slate-800 text-white text-[0.8rem] font-bold rounded-full flex items-center justify-center shrink-0"></span>
+            <span class="js-dtl-title text-[1rem] font-bold text-slate-900 truncate flex-1"></span>
+            <span class="js-dtl-icon kb-icon-emoji-md shrink-0"></span>
+        </div>
+        <div class="flex flex-col gap-1 py-1 px-4">
+            <!-- リアクション -->
+            <div class="flex justify-between items-baseline">
+                <!-- <span class="text-[0.9rem] text-slate-600">リアクション数</span> -->
+                <div class="js-dtl-reactions flex gap-3 text-[1rem] font-bold"></div>
+            </div>
+            <!-- 個別リンク統計 -->
+            <div class="js-dtl-stats-box hidden mt-2 flex flex-col gap-2">
+                <div class="bg-slate-50 rounded-[1rem] p-4 flex flex-col gap-2 border border-slate-200">
+                    <div class="js-dtl-url text-blue-500 font-bold italic break-all text-[0.9rem] mb-1 line-clamp-1"></div>
+                    <div class="px-4">
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-[0.9rem] text-slate-600">総クリック数</span>
+                            <span class="js-dtl-total text-[1rem] font-bold text-brand-5">0</span>
+                        </div>
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-[0.9rem] text-slate-600">クリックユーザ数</span>
+                            <span class="js-dtl-unique text-[1rem] font-bold text-slate-700">0</span>
+                        </div>
+                        <!-- js-dtl-guest を復活 -->
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-[0.9rem] text-slate-600">Guestクリック数</span>
+                            <span class="js-dtl-guest text-[1rem] font-bold text-slate-600">0</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

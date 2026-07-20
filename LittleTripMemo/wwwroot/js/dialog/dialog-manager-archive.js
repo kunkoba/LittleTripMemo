@@ -853,18 +853,18 @@ export default {
         const arcViewCount = archive.click_count || (archive.click_stats && archive.click_stats.view && archive.click_stats.view.t) || 0;
         const arcViewCountEl = $Dom.QuerySelector('.js-arc-view-count', el);
         if (arcViewCountEl) arcViewCountEl.textContent = arcViewCount;
-        const statusBadge = $Dom.QuerySelector('.js-arc-status-badge', el);
-        if (!archive.is_public) {
-            statusBadge.textContent = "非公開";
-            statusBadge.className += " bg-slate-200 text-slate-900";
-        } else if (archive.closed_flg) {
-            statusBadge.textContent = "CLOSE";
-            statusBadge.className += " bg-slate-400 text-white";
-        } else {
-            statusBadge.textContent = "公開中";
-            statusBadge.className += " bg-emerald-100 text-emerald-600";
-        }
-        if (archive.is_owner) $Dom.ToggleShow($Dom.QuerySelector('.js-arc-owner-badge', el), true);
+        // const statusBadge = $Dom.QuerySelector('.js-arc-status-badge', el);
+        // if (!archive.is_public) {
+        //     statusBadge.textContent = "非公開";
+        //     statusBadge.className += " bg-slate-200 text-slate-900";
+        // } else if (archive.closed_flg) {
+        //     statusBadge.textContent = "CLOSE";
+        //     statusBadge.className += " bg-slate-400 text-white";
+        // } else {
+        //     statusBadge.textContent = "公開中";
+        //     statusBadge.className += " bg-emerald-100 text-emerald-600";
+        // }
+        // if (archive.is_owner) $Dom.ToggleShow($Dom.QuerySelector('.js-arc-owner-badge', el), true);
         // --- 2. 明細情報の反映 ---
         const detailsContainer = $Dom.QuerySelector('.js-details-container', el);
         const details = $Data.Store.GetDetails() || [];
@@ -897,7 +897,7 @@ export default {
                     const dStats = (dtl.click_stats && dtl.click_stats.link_url) ? dtl.click_stats.link_url : { t: 0, u: 0, g: 0 };
                     $Dom.QuerySelector('.js-dtl-total', child).textContent = dStats.t || 0;
                     $Dom.QuerySelector('.js-dtl-unique', child).textContent = dStats.u || 0;
-                    $Dom.QuerySelector('.js-dtl-guest', child).textContent = dStats.g || 0;
+                    // $Dom.QuerySelector('.js-dtl-guest', child).textContent = dStats.g || 0;
                     $Dom.ToggleShow(statsBox, true);
                 } else {
                     urlEl.textContent = "リンクなし";
