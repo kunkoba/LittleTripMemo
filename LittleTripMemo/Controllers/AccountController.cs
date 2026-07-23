@@ -28,7 +28,7 @@ public class AccountController(
     [HttpPost("LoginFirebase")]
     public async Task<IActionResult> FirebaseLogin([FromBody] RegistrationUserService.FirebaseLoginRequest req)
     {
-        var result = await registrationUserService.LoginOrRegisterAsync(req);
+        var result = await registrationUserService.ExecuteAsync(req);
 
         if (!result.is_success) return BadRequest(new { result.message });
 

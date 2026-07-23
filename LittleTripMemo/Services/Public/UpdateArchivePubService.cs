@@ -13,6 +13,7 @@ public class UpdateArchivePubService : _BaseService
     public record UpdateArchivePubReq(
         [Required] Guid login_user_id,
         int archive_id,
+        string category,
         string title,
         string memo,
         string? link_url,
@@ -35,6 +36,7 @@ public class UpdateArchivePubService : _BaseService
         await _archivePubRepo.UpdateByKeyAsync(new TMemoArchivePub
         {
             archive_id = req.archive_id,
+            category = req.category,
             title = req.title,
             memo = req.memo,
             link_url = req.link_url,

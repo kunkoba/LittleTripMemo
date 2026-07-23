@@ -110,12 +110,15 @@ button:active {
 .kb-icon-emoji-lg {
     filter:
         drop-shadow(0 0 1px rgba(0,0,0,0.8))
+        drop-shadow(0 1px 1px rgba(0,0,0,0.8))
+        ;
 }
 .kb-icon-emoji-xlg {
     filter:
         drop-shadow(0 0 1px rgba(0,0,0,0.8))
-        drop-shadow(0 0 1px rgba(0,0,0,0.8))
+        drop-shadow(0 1px 1px rgba(0,0,0,0.8))
         /* drop-shadow(0 0 1px var(--brand-lvl5)) */
+        ;
 }
 /* 絵文字アイコン用クラス */
 .kb-icon-emoji-sm {
@@ -169,8 +172,9 @@ button:active {
     justify-content: center;
     /* 影の設定 */
     filter: 
-        drop-shadow(0 0px 1px rgba(0,0,0,0.7)) 
-        drop-shadow(0 0px 1px var(--brand-lvl3));
+        /* drop-shadow(0 0px 1px rgba(0,0,0,0.7)) */
+        drop-shadow(0 1px 1px var(--brand-lvl3))
+        ;
 }
 .marker-diamond-base {
     width:  var(--marker-size);
@@ -190,8 +194,11 @@ button:active {
     line-height: 1;
     display: block;
     filter: 
-        drop-shadow(0 2px 1px rgba(0,0,0,0.7)) 
-        drop-shadow(0 0px 1px var(--brand-lvl3));
+        drop-shadow(0 1px 1px rgba(0,0,0,0.7))
+        drop-shadow(0 1px 1px rgba(0,0,0,0.7))
+        drop-shadow(0 1px 1px rgba(0,0,0,0.7))
+        /* drop-shadow(0 0px 1px var(--brand-lvl3)) */
+        ;
 }
 
 .shadow-md {

@@ -23,6 +23,7 @@ public class TAppUser
     public string? link_2 { get; set; }
     [SafeUrl(2000)]
     public string? link_3 { get; set; }
+    public bool anonymous_flg { get; set; } = false; // 追加
     public bool ban_flg { get; set; } = false;
     public DateTime last_login_tim { get; set; }
     public bool del_flg { get; set; } = false;
@@ -364,6 +365,7 @@ public record DtoUserProfile(
     string? nick_name,
     string? description,
     string? link_1, string? link_2, string? link_3,
+    bool anonymous_flg, // 追加
     bool is_owner,
     bool is_ban,
     Dictionary<string, ClickCountData> click_stats,

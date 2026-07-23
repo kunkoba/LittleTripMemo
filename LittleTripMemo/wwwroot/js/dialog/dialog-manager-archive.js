@@ -483,6 +483,7 @@ export default {
         const imgPreload = new Image();
         imgPreload.src = qrImageUrl;
         const renderTitleAndBody = (arc) => {
+            $Dom.QuerySelector('#view-mem-category', el).textContent = arc.category || "";
             $Dom.QuerySelector('#view-mem-title', el).textContent = arc.title || "";
             $Dom.QuerySelector('#view-mem-body', el).textContent = arc.memo || "";
         };
@@ -708,7 +709,7 @@ export default {
                             });
                             if (!isOk) return;
                             if (current === 4) {
-                                this._execStatusChange('CloseLimitedArchive', p, 'PUBLIC', 
+                                this._execStatusChange('OpenArchive', p, 'OPEN', 
                                     '限定公開を解除し、全体公開にしますか？', 
                                     '公開しました', null, 
                                     () => $Data.Store.UpdateArchive({ limited_open_flg: false })
@@ -781,21 +782,26 @@ export default {
     // まとめ親編集（上にスタックされる）
     ShowEditArchive(archive, onUpdate) {
         const el = $Dom.GenerateTemplate('tpl-edit-archive');
+        const editCategory = $Dom.QuerySelector('#edit-mem-category', el);
         const editTitle = $Dom.QuerySelector('#edit-mem-title', el);
         const editBody = $Dom.QuerySelector('#edit-mem-body', el);
         const editUrl = $Dom.QuerySelector('#edit-mem-url', el);
-        const btnUrlClear = $Dom.QuerySelector('#btn-edit-mem-url-clear', el); // 追記
-        btnUrlClear.onclick = () => { editUrl.value = ""; }; // 追記
+        const btnUrlClear = $Dom.QuerySelector('#btn-edit-mem-url-clear', el);
+        btnUrlClear.onclick = () => { editUrl.value = ""; };
         const editCurrency = $Dom.QuerySelector('#edit-mem-currency', el);
+        editCategory.value = archive.category || "";
         editTitle.value = archive.title || "";
         editBody.value = archive.memo || "";
         editUrl.value = archive.link_url || "";
         editCurrency.value = archive.currency_unit || $App.AppData.Owner.Currency_unit || 'JPY';
         // --- 文字数カウント制御 ---
+        const cCategory = $Dom.QuerySelector('#edit-mem-category-count', el); // 追加
         const cTitle = $Dom.QuerySelector('#edit-mem-title-count', el);
         const cBody  = $Dom.QuerySelector('#edit-mem-body-count', el);
+        cCategory.textContent = editCategory.value.length;
         cTitle.textContent = editTitle.value.length;
         cBody.textContent  = editBody.value.length;
+        editCategory.addEventListener('input', () => cCategory.textContent = editCategory.value.length);
         editTitle.addEventListener('input', () => cTitle.textContent = editTitle.value.length);
         editBody.addEventListener('input',  () => cBody.textContent  = editBody.value.length);
         //
@@ -818,6 +824,7 @@ export default {
                         className: "",
                         handler: $Warn.CatchAsync(async () => {
                             const updatedFields = {
+                                category: editCategory.value.trim(),
                                 title: editTitle.value,
                                 memo: editBody.value,
                                 link_url: editUrl.value,

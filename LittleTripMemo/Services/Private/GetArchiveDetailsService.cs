@@ -71,6 +71,7 @@ public class GetArchiveDetailsService(
             ownerUser.nick_name,
             ownerUser.description,
             ownerUser.link_1, ownerUser.link_2, ownerUser.link_3,
+            ownerUser.anonymous_flg,
             is_owner: (ownerUser.user_id == _user.login_user_id),
             is_ban: ownerUser.ban_flg,
             ownerUser.click_stats,

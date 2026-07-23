@@ -42,6 +42,7 @@ public class ArchivePubRepository : _BaseRepository
         const string sql = @"
             UPDATE t_memo_archive_pub SET
                 title            = @title,
+                category         = @category,
                 memo             = @memo,
                 link_url         = @link_url,
                 currency_unit    = @currency_unit,
@@ -118,38 +119,6 @@ public class ArchivePubRepository : _BaseRepository
     {
         const string sql = @"
             DELETE FROM t_memo_archive_pub
-            WHERE archive_id = @archive_id
-              AND user_id    = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
-    }
-
-    /// <summary>
-    /// 公開（open）化
-    /// </summary>
-    /// <param name="archiveId"></param>
-    /// <returns></returns>
-    public async Task<int> OpenByKeyAsync(int archiveId)
-    {
-        const string sql = @"
-        UPDATE t_memo_archive_pub
-        SET closed_flg = false,
-            update_tim = CURRENT_TIMESTAMP
-        WHERE archive_id = @archive_id
-          AND user_id    = @user_id";
-        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
-    }
-
-    /// <summary>
-    /// 公開解除（close）化
-    /// </summary>
-    /// <param name="archiveId"></param>
-    /// <returns></returns>
-    public async Task<int> CloseByKeyAsync(int archiveId)
-    {
-        const string sql = @"
-            UPDATE t_memo_archive_pub
-            SET closed_flg = true,
-                update_tim = CURRENT_TIMESTAMP
             WHERE archive_id = @archive_id
               AND user_id    = @user_id";
         return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
@@ -246,6 +215,23 @@ public class ArchivePubRepository : _BaseRepository
     }
 
     /// <summary>
+    /// 公開（open）化
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <returns></returns>
+    public async Task<int> OpenByKeyAsync(int archiveId)
+    {
+        const string sql = @"
+        UPDATE t_memo_archive_pub
+        SET closed_flg = false,
+            limited_open_flg = false,
+            update_tim = CURRENT_TIMESTAMP
+        WHERE archive_id = @archive_id
+          AND user_id    = @user_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
+    }
+
+    /// <summary>
     /// 更新：限定公開フラグの変更
     /// </summary>
     /// <param name="archiveId"></param>
@@ -256,10 +242,28 @@ public class ArchivePubRepository : _BaseRepository
         const string sql = @"
         UPDATE t_memo_archive_pub
         SET limited_open_flg = @isLimited,
+            closed_flg = false,
             update_tim = CURRENT_TIMESTAMP
         WHERE archive_id = @archiveId
           AND user_id    = @user_id";
         return await ExecuteAsync(sql, new { archiveId, isLimited, user_id = _user.login_user_id });
+    }
+
+
+    /// <summary>
+    /// 公開解除（close）化
+    /// </summary>
+    /// <param name="archiveId"></param>
+    /// <returns></returns>
+    public async Task<int> CloseByKeyAsync(int archiveId)
+    {
+        const string sql = @"
+            UPDATE t_memo_archive_pub
+            SET closed_flg = true,
+                update_tim = CURRENT_TIMESTAMP
+            WHERE archive_id = @archive_id
+              AND user_id    = @user_id";
+        return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
     }
 
 }

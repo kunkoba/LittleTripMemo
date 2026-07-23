@@ -49,6 +49,7 @@ public class GetReportDetailsService : _BaseService
 			user.nick_name,
 			user.description,
 			user.link_1, user.link_2, user.link_3,
+			user.anonymous_flg,
 			is_owner: (user.user_id == _user.login_user_id),
 			is_ban: user.ban_flg,
             user.click_stats,

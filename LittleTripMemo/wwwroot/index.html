@@ -67,7 +67,7 @@
         <div id="ui-top-bar" class="absolute top-0 w-full z-[1000] pointer-events-none flex flex-col items-center">
             <!-- ■　通知バー -->
             <div class="h-8 bg-black/20 flex items-center justify-center w-full">
-                <div id="notice-bar-text" class="text-[1rem] font-bold text-white"></div>
+                <div id="notice-bar-text" class="text-[0.9rem] font-bold text-white"></div>
             </div>
             <!-- ■　マーカー切替スイッチ -->
             <div class="pointer-events-none w-full flex p-2">
@@ -399,31 +399,20 @@
                         <!-- 地点検索関連 -->
                         <div id="ui-sort-group" class="hidden flex flex-col items-center ">
                             <!-- リアクション種別 -->
-                            <div id="sort-reaction" class="hidden shadow-md w-fit mb-2 h-10 flex  text-[1.5rem] rounded-full overflow-hidden pointer-events-auto">
-                                <button data-value="1" class="ui-btn h-full px-3 bg-brand-3 transition-colors">🤣</button>
-                                <button data-value="2" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😍</button>
-                                <button data-value="3" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😮</button>
-                                <button data-value="4" class="ui-btn h-full px-3 bg-brand-0 transition-colors">😭</button>
-                            </div>
+                            <div id="sort-reaction" class="hidden shadow-md w-fit mb-2 h-10 flex text-[1.5rem] rounded-full overflow-hidden pointer-events-auto"></div>
+                            <!-- 評価（Feel）種別 -->
+                            <div id="sort-feel" class="hidden shadow-md w-fit mb-2 h-10 flex rounded-full overflow-hidden bg-white pointer-events-auto"></div>
                             <!-- 検索キーワード入力欄 -->
-                            <div id="sort-word" class="hidden shadow-md w-fit mb-4 px-2 h-8 flex  rounded-full overflow-hidden bg-white pointer-events-auto">
+                            <div id="sort-word" class="hidden shadow-md w-fit mb-2 h-10 flex rounded-full overflow-hidden bg-white pointer-events-auto">
                                 <input type="text" id="input-sort-word" class="h-full px-3 text-[1rem] text-slate-900 outline-none bg-transparent w-40 placeholder-slate-300" placeholder="Keyword...">
                             </div>
-                            <!-- 並び順 -->
-                            <div id="sort-field" class="shadow-md w-fit mb-2 h-8 flex  rounded-full overflow-hidden pointer-events-auto">
-                                <button data-value="1" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-3 transition-colors">
-                                    作成順
-                                </button>
-                                <button data-value="2" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">
-                                    更新順
-                                </button>
-                                <button data-value="3" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">
-                                    リアクション順
-                                </button>
-                                <!-- ▼ ここに「Word」を追加 -->
-                                <button data-value="4" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">
-                                    検索ワード
-                                </button>
+                            <!-- 検索種別 -->
+                            <div id="sort-field" class="shadow-md w-fit mb-2 h-8 flex rounded-full overflow-hidden pointer-events-auto">
+                                <button data-value="1" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-3 transition-colors">Created</button>
+                                <button data-value="2" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">Updated</button>
+                                <button data-value="3" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">Reaction</button>
+                                <button data-value="4" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">Word</button>
+                                <button data-value="5" class="ui-btn h-full px-3 text-[0.8rem] font-bold bg-brand-0 transition-colors">Feel</button>
                             </div>
                         </div>
                     </div>

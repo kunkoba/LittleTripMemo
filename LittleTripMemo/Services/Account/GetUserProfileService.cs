@@ -23,24 +23,28 @@ public class GetUserProfileService(
         BusinessException.ThrowIf(targetUser == null, "ユーザーが存在しません", "USER_NOT_FOUND");
 
         // 2. 共通DTOへマッピング（member_no, user_category, user_rank を含む最新版）
+        bool is_owner = (targetUser.user_id == _user.login_user_id);
+        bool hide = targetUser.anonymous_flg && !is_owner;
+
         var profile = new DtoUserProfile(
             targetUser.user_id,
-            targetUser.member_no,
-            targetUser.user_category,
-            targetUser.user_rank,
-            targetUser.icon,
-            targetUser.nick_name,
-            targetUser.description,
-            targetUser.link_1,
-            targetUser.link_2,
-            targetUser.link_3,
-            is_owner: (targetUser.user_id == _user.login_user_id),
-            is_ban: targetUser.ban_flg,
-            targetUser.click_stats,
-            targetUser.info_stats,
-            targetUser.info_stats_pub,
-            targetUser.report_count,
-            targetUser.view_history
+            hide ? 0 : targetUser.member_no,
+            hide ? null : targetUser.user_category,
+            hide ? 0 : targetUser.user_rank,
+            hide ? "👤" : targetUser.icon,
+            hide ? "匿名" : targetUser.nick_name,
+            hide ? null : targetUser.description,
+            hide ? null : targetUser.link_1,
+            hide ? null : targetUser.link_2,
+            hide ? null : targetUser.link_3,
+            targetUser.anonymous_flg,
+            is_owner,
+            targetUser.ban_flg,
+            hide ? new() : targetUser.click_stats,
+            hide ? new() : targetUser.info_stats,
+            hide ? new() : targetUser.info_stats_pub,
+            hide ? 0 : targetUser.report_count,
+            hide ? new() : targetUser.view_history
         );
 
         return new Response(profile);

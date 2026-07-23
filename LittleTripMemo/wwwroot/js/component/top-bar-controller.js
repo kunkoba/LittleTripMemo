@@ -12,6 +12,7 @@ const _TopCore = {
                 this.sortField = $Dom.GetElementById('sort-field');
                 this.sortReaction = $Dom.GetElementById('sort-reaction');
                 this.sortWord = $Dom.GetElementById('sort-word');
+                this.sortFeel = $Dom.GetElementById('sort-feel'); // 追加
                 // 追加：マーカー切替スイッチ
                 this.btnMarkerEmoji = $Dom.GetElementById('btn-marker-mode-emoji');
                 this.btnMarkerFeel = $Dom.GetElementById('btn-marker-mode-feel');
@@ -43,6 +44,7 @@ const _TopCore = {
                     const val = btn.dataset.value;
                     if (this.sortReaction) $Dom.ToggleShow(this.sortReaction, val === '3');
                     if (this.sortWord) $Dom.ToggleShow(this.sortWord, val === '4');
+                    if (this.sortFeel) $Dom.ToggleShow(this.sortFeel, val === '5'); // 追加
                 });
                 // リアクション種別（アイコン）のクリックイベント
                 if (this.sortReaction) {
@@ -63,6 +65,23 @@ const _TopCore = {
                         });
                         btn.classList.remove("bg-brand-0");
                         btn.classList.add("bg-brand-3");
+                    });
+                }
+                // 評価（Feel）種別のボタン生成とイベント登録
+                if (this.sortFeel) {
+                    const feelTypes = Object.values($Const.FEEL_TYPE);
+                    this.sortFeel.innerHTML = feelTypes.map((f, idx) => `
+                        <button data-value="${f.val}" class="ui-btn h-full px-3 transition-colors flex items-center ${idx === 1 ? 'bg-brand-3' : 'bg-brand-0'}">
+                            <img src="${f.path}" class="w-6 h-6 object-contain pointer-events-none">
+                        </button>
+                    `).join('');
+                    this.sortFeel.addEventListener("click", (e) => {
+                        const btn = e.target.closest("button");
+                        if (!btn) return;
+                        this.sortFeel.querySelectorAll("button").forEach((b) => {
+                            b.classList.remove("bg-brand-3"); b.classList.add("bg-brand-0");
+                        });
+                        btn.classList.remove("bg-brand-0"); btn.classList.add("bg-brand-3");
                     });
                 }
             }
@@ -143,6 +162,7 @@ const _TopCore = {
         const sortField = this._getSelectedValue("sort-field"); 
         let reactionType = null;
         let searchWord = null;
+        let feelType = null;
         // 常にPublic前提のロジック
         if (sortField === '3') {
             reactionType = this._getSelectedValue("sort-reaction");
@@ -151,12 +171,16 @@ const _TopCore = {
             const input = $Dom.GetElementById('input-sort-word');
             if (input) searchWord = input.value.trim();
         }
+        if (sortField === '5') {
+            feelType = this._getSelectedValue("sort-feel"); // 追加
+        }
         //
         return {
             isPublic: true, // 常にtrue
             sortField: parseInt(sortField || '1', 10),
             reactionType: reactionType ? parseInt(reactionType, 10) : null,
             keyword: searchWord,
+            feelType: feelType !== null ? parseInt(feelType, 10) : null // 追加
         };
     },
     // 選択されているボタンの data-value を取得する

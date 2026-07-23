@@ -20,7 +20,13 @@ public class RegistrationUserService : _BaseService
     private readonly JwtService _jwtService;
 
 public record FirebaseLoginRequest(string Email);
-    public record Response(bool is_success, string message, string? token = null, Guid? userId = null, string? plan = null);
+    public record Response(
+        bool is_success, 
+        string message, 
+        string? token = null, 
+        Guid? userId = null, 
+        string? plan = null
+    );
 
     public RegistrationUserService(
         UserContext user,
@@ -36,7 +42,7 @@ public record FirebaseLoginRequest(string Email);
         _jwtService = jwtService;
     }
 
-    public async Task<Response> LoginOrRegisterAsync(FirebaseLoginRequest request)
+    public async Task<Response> ExecuteAsync(FirebaseLoginRequest request)
     {
         // 1. バリデーション
         await ValidateAsync(request);
@@ -66,6 +72,11 @@ public record FirebaseLoginRequest(string Email);
         await Task.CompletedTask;
     }
 
+    /// <summary>
+    /// メルアドを元に、Identityユーザーとアプリユーザーを新規登録する内部処理
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns></returns>
     private async Task<Response> RegisterInternalAsync(string email)
     {
         var identityUser = new MyAppUser { Email = email, UserName = email };
@@ -86,6 +97,10 @@ public record FirebaseLoginRequest(string Email);
         return new Response(true, "成功");
     }
 
+    /// <summary>
+    /// テーブルIDを選択する。最もレコード数が少ないテーブルを優先的に選ぶ。
+    /// </summary>
+    /// <returns></returns>
     private async Task<int> SelectTableIdAsync()
     {
         var stats = await _statsRepo.GetAllStatsAsync();

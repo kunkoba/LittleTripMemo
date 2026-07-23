@@ -3,6 +3,7 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Repository.App;
 using System.ComponentModel.DataAnnotations;
+using static LittleTripMemo.Services.Public.GetArchiveDetailsPubService;
 
 namespace LittleTripMemo.Services.Private;
 
@@ -32,7 +33,7 @@ public class DeleteStrayDetailsService : _BaseService
 
     public async Task<Response> ExecuteAsync(DeleteStrayDetailsReq req)
     {
-        BusinessException.ThrowIf(req.seqs.Length == 0, "削除対象が選択されていません。");
+        await ValidateAsync(req);
 
         using var tran = _provider.BeginTransaction();
         try
@@ -47,4 +48,9 @@ public class DeleteStrayDetailsService : _BaseService
         }
     }
 
+    private async Task ValidateAsync(DeleteStrayDetailsReq req)
+    {
+        BusinessException.ThrowIf(req.seqs.Length == 0, "削除対象が選択されていません。");
+        await Task.CompletedTask;
+    }
 }

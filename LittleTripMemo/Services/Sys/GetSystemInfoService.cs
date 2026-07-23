@@ -71,6 +71,7 @@ public record Response(SystemInfoData systemInfo);
                     appUser.link_1,
                     appUser.link_2,
                     appUser.link_3,
+                    appUser.anonymous_flg,
                     is_owner: true,
                     is_ban: appUser.ban_flg,
                     appUser.click_stats,

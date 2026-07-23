@@ -46,6 +46,7 @@ public class ArchiveRepository : _BaseRepository
 
         const string sql = @"
             UPDATE t_memo_archive SET
+                categiry   = @category,
                 title      = @title,
                 memo       = @memo,
                 link_url   = @link_url,

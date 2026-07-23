@@ -84,23 +84,29 @@ public class GetArchiveDetailsPubService(
         var ownerAppUser = await appUserRepository.GetByUserIdAsync(archivePub.user_id)
             ?? throw new BusinessException("ユーザーが存在しません");
 
+        bool is_owner = (ownerAppUser.user_id == _user.login_user_id);
+        bool hide = ownerAppUser.anonymous_flg && !is_owner;
+
         var userProfile = new DtoUserProfile(
-            ownerAppUser.user_id,
-            ownerAppUser.member_no,
-            ownerAppUser.user_category,
-            ownerAppUser.user_rank,
-            ownerAppUser.icon,
-            ownerAppUser.nick_name,
-            ownerAppUser.description,
-            ownerAppUser.link_1, ownerAppUser.link_2, ownerAppUser.link_3,
-            is_owner: (ownerAppUser.user_id == _user.login_user_id),
-            is_ban: ownerAppUser.ban_flg,
-            ownerAppUser.click_stats,
-            ownerAppUser.info_stats, 
-            ownerAppUser.info_stats_pub, 
-            ownerAppUser.report_count,
-            ownerAppUser.view_history
-        );
+                ownerAppUser.user_id,
+                hide ? 0 : ownerAppUser.member_no,
+                hide ? null : ownerAppUser.user_category,
+                hide ? 0 : ownerAppUser.user_rank,
+                hide ? "👤" : ownerAppUser.icon,
+                hide ? "匿名" : ownerAppUser.nick_name,
+                hide ? null : ownerAppUser.description,
+                hide ? null : ownerAppUser.link_1,
+                hide ? null : ownerAppUser.link_2,
+                hide ? null : ownerAppUser.link_3,
+                ownerAppUser.anonymous_flg,
+                is_owner,
+                ownerAppUser.ban_flg,
+                hide ? new() : ownerAppUser.click_stats,
+                hide ? new() : ownerAppUser.info_stats,
+                hide ? new() : ownerAppUser.info_stats_pub,
+                hide ? 0 : ownerAppUser.report_count,
+                hide ? new() : ownerAppUser.view_history
+            );
 
         return new Response(archivePub, detailsPub, myReactions, userProfile);
     }

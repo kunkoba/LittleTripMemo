@@ -13,6 +13,7 @@ public class UpdateArchiveService : _BaseService
     public record UpdateArchiveReq(
         [Required] Guid login_user_id,
         int archive_id,
+        string category,
         string title,
         string memo,
         string? link_url,
@@ -35,6 +36,7 @@ public class UpdateArchiveService : _BaseService
         int affected = await _archiveRepo.UpdateByKeyAsync(new TMemoArchive
         {
             archive_id = req.archive_id,
+            category = req.category,
             title = req.title,
             memo = req.memo,
             link_url = req.link_url,

@@ -7,6 +7,7 @@ public enum PlanType
     Free,       // 無料プラン
     Standard,   // 標準プラン
     Premium,    // プレミアムプラン
+    Test,       // テスト用（無制限）
 }
 
 // メール（個別通知）種別

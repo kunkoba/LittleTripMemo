@@ -134,7 +134,8 @@ public class DetailPubRepository : _BaseRepository
     /// <returns></returns>
     public async Task<IEnumerable<TMemoDetailPub>> SearchByLocationAsync(
         decimal latMin, decimal latMax, decimal lngMin, decimal lngMax,
-        string? keyword, int sortField, int? reactionType, Guid loginUserId, int limit = 20)
+        string? keyword, int sortField, int? reactionType, Guid loginUserId, int? feelType
+        ,int limit = 20)
     {
         var parameters = new DynamicParameters();
         parameters.Add("lng_min", lngMin);
@@ -175,6 +176,17 @@ public class DetailPubRepository : _BaseRepository
             orderBy = orderQuery;
             whereClause += $" AND d.{colName} > 0";
         }
+        else if (sortField == 5)
+        {
+            if (feelType.HasValue && feelType < 0)
+            {
+                orderBy = "d.feel_type ASC";
+            }
+            else
+            {
+                orderBy = "d.feel_type DESC";
+            }
+        }
 
         if (!string.IsNullOrWhiteSpace(keyword))
         {
@@ -192,7 +204,7 @@ public class DetailPubRepository : _BaseRepository
             INNER JOIN t_memo_archive_pub a ON d.archive_id = a.archive_id
             INNER JOIN t_app_user u ON d.user_id = u.user_id
             {whereClause}
-            ORDER BY {orderBy}, d.seq DESC
+            ORDER BY {orderBy}, d.create_tim DESC
             LIMIT @limit";
 
         return await QueryAsync<TMemoDetailPub>(sql, parameters);

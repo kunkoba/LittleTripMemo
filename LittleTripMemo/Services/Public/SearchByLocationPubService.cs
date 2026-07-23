@@ -15,6 +15,7 @@ public class SearchByLocationPubService : _BaseService
         int sortField,     // 1:作成順, 2:更新順, 3:リアクション順
         int? reactionType,  // 1:funny, 2:love, 3:surprise, 4:sad (sortField=3の時使用)
         string? keyword,
+        int? feelType,
         int limit = 20
     );
     public record Response(IEnumerable<TMemoDetailPub> details);
@@ -37,6 +38,7 @@ public class SearchByLocationPubService : _BaseService
             req.sortField,
             req.reactionType,
             _user.login_user_id,
+            req.feelType,
             req.limit
         );
 
