@@ -143,7 +143,7 @@ export default {
         });
         this._core.open({ title: "検索の結果", content: el });
     },
-    async ShowArchiveList() {
+    async ShowArchiveList_2() {
         const isSuccess = await $Data.Access.GetArchiveList();
         if (!isSuccess) return;
         const archives = $Data.Store.GetArchiveList() || [];
@@ -235,8 +235,8 @@ export default {
             "　└─公開用（Public）",
             "　　　├─非公開中（Close）[グレー]",
             "　　　└─公開中（Open）[テーマカラー]",
-            "　　　　　└─限定公開（LimitOpen）",
-            "",
+            "　　　　　├─限定公開（LimitedOpen）",
+            "　　　　　└─完全公開（Open）",
         ].join('\n');
         this._core.open({
             title: "まとめ一覧", 
@@ -244,6 +244,89 @@ export default {
             content: root, 
             help: help, 
         });
+    },
+    // まとめ一覧表示
+    async ShowArchiveList() {
+        const isSuccess = await $Data.Access.GetArchiveList();
+        if (!isSuccess) return;
+        const archives = $Data.Store.GetArchiveList() || [];
+        if (archives.length === 0) return $Notice.Warn("データはありません");
+        const root = document.createElement("div");
+        root.className = "w-full flex flex-col";
+        // 1. 固定ヘッダー構築
+        const stickyHeader = document.createElement("div");
+        stickyHeader.className = "sticky top-0 z-20 bg-white pb-2 flex flex-col gap-1";
+        const searchBar = $Dom.GenerateTemplate("tpl-dialog-search-bar", "ui-template-root", false);
+        const filterToggle = $Dom.GenerateTemplate("tpl-archive-list-filter", "ui-template-root", false);
+        stickyHeader.appendChild(searchBar);
+        stickyHeader.appendChild(filterToggle);
+        root.appendChild(stickyHeader);
+        const listContainer = document.createElement("div");
+        root.appendChild(listContainer);
+        // 2. 状態管理
+        let filterText = "";
+        let isShowPublic = false;
+        // 3. 描画ロジック
+        const render = () => {
+            listContainer.innerHTML = "";
+            const query = filterText.toLowerCase().trim();
+            // ボタンの見た目制御（classListを使用）
+            $Dom.QuerySelectorAll('.js-filter-btn', filterToggle).forEach(btn => {
+                const isBtnPub = (btn.dataset.pub === "true");
+                const isActive = (isBtnPub === isShowPublic);
+                btn.classList.toggle('shadow-md', isActive);
+                btn.classList.remove('bg-slate-900', 'bg-brand-5', 'text-white', 'text-white', 'border-slate-100', 'text-slate-300', 'bg-white');
+                if (isActive) {
+                    btn.classList.add(isBtnPub ? 'bg-brand-5' : 'bg-slate-900');
+                    btn.classList.add(isBtnPub ? 'text-white' : 'text-white');
+                    btn.classList.add('border-transparent');
+                } else {
+                    btn.classList.add('bg-white', 'border-slate-100', 'text-slate-300');
+                }
+            });
+            // フィルタ実行
+            const filtered = archives.filter(item => {
+                if (item.is_public !== isShowPublic) return false;
+                return !query || (item.title + (item.memo || "")).toLowerCase().includes(query);
+            });
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `<div class="text-center text-[0.9rem] font-bold text-slate-600 py-10">該当なし</div>`;
+                return;
+            }
+            // アイテム描画
+            filtered.forEach(item => {
+                const child = $Dom.GenerateTemplate("tpl-list-child-archive");
+                $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
+                $Dom.QuerySelector(".js-title", child).textContent = item.title;
+                $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
+                $Dom.QuerySelector(".js-count", child).textContent = item.detail_count || "0";
+                const colorClass = isShowPublic ? (item.closed_flg ? "bg-slate-400" : "bg-brand-5") : "bg-slate-800";
+                $Dom.QuerySelector(".js-item-border", child).classList.add(colorClass);
+                $Dom.QuerySelector(".js-count-badge", child).classList.add(colorClass);
+                child.onclick = () => {
+                    this._core.closeAll();
+                    $App.AppData.Context.ScreenMode = isShowPublic ? $Const.SCREEN_MODE.ARCHIVE_PUB : $Const.SCREEN_MODE.ARCHIVE;
+                    $App.AppData.Context.TargetArchiveId = item.archive_id;
+                    $App.RefreshScreen();
+                };
+                listContainer.appendChild(child);
+            });
+        };
+        // 4. イベント登録
+        $Dom.QuerySelector(".js-input", searchBar).oninput = (e) => {
+            filterText = e.target.value;
+            $Dom.ToggleShow($Dom.QuerySelector(".js-clear", searchBar), filterText.length > 0);
+            render();
+        };
+        $Dom.QuerySelector(".js-clear", searchBar).onclick = () => {
+            $Dom.QuerySelector(".js-input", searchBar).value = "";
+            filterText = ""; render();
+        };
+        $Dom.QuerySelectorAll('.js-filter-btn', filterToggle).forEach(btn => {
+            btn.onclick = () => { isShowPublic = (btn.dataset.pub === "true"); render(); };
+        });
+        render();
+        this._core.open({ title: "まとめ一覧", size: "lg", content: root });
     },
     // 既存まとめへの追加先選択ダイアログ
     SelectArchiveForAdd(seqs) {
@@ -974,7 +1057,7 @@ export default {
             root.appendChild(child);
         });
         this._core.open({
-            title: `「${profile.nick_name} 」さんのまとめ`,
+            title: `公開まとめ一覧`,
             content: root,
             size: "",
             help: "このユーザが全体に公開している「まとめ」の一覧です。"

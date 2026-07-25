@@ -1,5 +1,5 @@
 <!-- 【ダイアログ子】ログイン -->
-<template id="tpl-login">
+<template id="tpl-login_2">
     <div class="w-full text-slate-900 my-3 space-y-5 px-2">
         <div class="border-l-4 border-brand-3 pl-3">
             <strong class="text-[1rem] tracking-wide">ログイン</strong>
@@ -11,6 +11,58 @@
             Googleでログイン
         </button>
         <p class="text-[0.9rem] text-slate-600 text-center">※ログインにはGoogleアカウントが必要です</p>
+    </div>
+</template>
+<!-- 【ダイアログ子】ログイン -->
+<template id="tpl-login">
+    <div class="w-full flex flex-col gap-6 text-slate-900 pb-4 px-2">
+        <!-- アプリアイコン表示 -->
+        <div class="flex justify-center py-2">
+            <div class="w-48 h-48 bg-white rounded-[1rem] shadow-md overflow-hidden border p-2 flex justify-center items-center">
+                <img id="js-login-app-icon" src="img/ico/icon-512.png" class="w-full h-full object-contain">
+            </div>
+        </div>
+        <!-- メール・パスワード認証セクション -->
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2">
+                <!-- <label class="text-[0.9rem] font-bold text-slate-600 ml-1">Email</label> -->
+                <input id="input-login-email" type="email" placeholder="example@mail.com" 
+                    class="w-full border-2 border-brand-3 px-4 py-2.5 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
+            </div>
+            <div class="flex flex-col gap-2">
+                <!-- <label class="text-[0.9rem] font-bold text-slate-600 ml-1">Password</label> -->
+                <input id="input-login-password" type="password" placeholder="password" 
+                    class="w-full border-2 border-brand-3 px-4 py-2.5 text-[1rem] rounded-[1rem] focus:outline-none focus:border-brand-5 bg-white">
+            </div>
+            <!-- アクションボタン（メール） -->
+            <div class="flex gap-3 mt-2">
+                <button id="btn-login-mail" 
+                    class="flex-1 h-12 rounded-[1rem] shadow-md active:scale-95 transition-transform uppercase font-bold bg-brand-5 text-white">
+                    Login
+                </button>
+                <button id="btn-signup-mail" 
+                    class="flex-1 h-12 rounded-[1rem] shadow-md active:scale-95 transition-transform uppercase font-bold bg-white text-brand-5">
+                    Sign Up
+                </button>
+            </div>
+            <button id="btn-forgot-password" 
+                class="text-[0.85rem] text-slate-500 font-bold text-center hover:underline outline-none">
+                パスワードを忘れた場合
+            </button>
+        </div>
+        <!-- 区切り線 -->
+        <div class="flex items-center gap-4 px-2">
+            <div class="h-px bg-slate-200 flex-1"></div>
+            <span class="text-[0.8rem] font-bold text-slate-400">OR</span>
+            <div class="h-px bg-slate-200 flex-1"></div>
+        </div>
+        <!-- Google認証セクション -->
+        <div class="flex flex-col gap-3">
+            <button id="btn-login-google" class="w-full flex items-center justify-center gap-3 bg-white px-4 py-3 text-[1rem] text-slate-700 font-bold rounded-[1rem] shadow-md active:scale-95 transition-all">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
+                Googleでログイン
+            </button>
+        </div>
     </div>
 </template>
 

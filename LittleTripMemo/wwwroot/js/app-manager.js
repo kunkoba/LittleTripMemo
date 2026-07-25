@@ -214,9 +214,7 @@ const AppManager = {
             License: null
         }
     },
-    // 初期化司令
-    // アプリ起動時の一連の初期化処理（描画基盤 → ローカル復元 → ログイン確認 →
-    // 画面描画 → ポーリング開始 → SW登録）をまとめて実行する
+    // アプリ起動時の一連の初期化処理（描画基盤 → ローカル復元 → ログイン確認 → 画面描画 → ポーリング開始 → SW登録）をまとめて実行する
     async Init() {
         try {
             // Phase 1〜2: 描画基盤とローカル設定の復元
@@ -252,7 +250,6 @@ const AppManager = {
             $Err.Handle(e, 'fatal');
         }
     },
-    // 画面再描画
     // 現在のスクリーンモードに応じてデータを取得し直し、UI・マーカーを更新する
     async RefreshScreen() {
         $Data.Clear();
@@ -292,9 +289,7 @@ const AppManager = {
         $Marker.ChangeScreenMode();
     },
     // サーバ通信エラー処理
-    // @param {Response} response - fetch のレスポンス（無い場合はサーバ未応答扱い）
-    // @returns {Promise<boolean>} 常に false（呼び出し元で失敗として扱わせるため）
-    async HandleServerFailure(response) {
+    async HandleServerFailure_2(response) {
         $Notice.Loading.Hide();
         // オフラインの場合はその旨だけ通知
         if (!navigator.onLine) {
@@ -320,9 +315,34 @@ const AppManager = {
         $Notice.Error(msg);
         return false;
     },
-    // ログイン実行
+    // サーバ通信エラー処理（画面を中断せず通知のみに留める）
+    async HandleServerFailure(response) {
+        console.warn(">> HandleServerFailure", response?.status);
+        $Notice.Loading.Hide();
+        // 1. ログインエラー (401) は認証をクリアするのみ
+        if (response && response.status === 401) {
+            this.AppData.Context.IsLoggedIn = false;
+            this.AppData.Owner.Token = null;
+            $Notice.Warn("ログインセッションが切れました。再度ログインが必要です。");
+            return false;
+        }
+        // 2. 通信・サーバエラーの判定
+        let msg = "サーバへ接続できません。ローカル機能のみ利用可能です。";
+        if (response) {
+            try {
+                const res = await response.json();
+                msg = res.message || "サーバでエラーが発生しました。";
+            } catch (e) {
+                msg = "データの取得に失敗しました。";
+            }
+        } else if (!navigator.onLine) {
+            msg = "オフラインのため通信をスキップしました。";
+        }
+        // 全てトースト通知で処理し、例外は投げない
+        $Notice.Error(msg);
+        return false;
+    },
     // Google認証でメールアドレスを取得し、Firebase経由でログイン処理を行う
-    // @returns {Promise<boolean>} ログイン成功時 true
     async ExecuteLoginFlow() {
         return await $Warn.CatchAsync(async () => {
             const email = await $Auth.GetVerifiedEmailByGoogle();
@@ -334,7 +354,6 @@ const AppManager = {
             return false;
         })();
     },
-    // ログアウト
     // Firebaseからサインアウトし、ローカルの認証状態をクリアする
     async Logout() {
         if (firebase.apps.length) {
@@ -343,6 +362,52 @@ const AppManager = {
         this.AppData.Context.IsLoggedIn = false;
         this.AppData.Owner.Token = null;
         _AppCore.save(this.AppData.Owner);
+    },
+// メール認証実行フロー
+    async ExecuteEmailAuthFlow(email, password, isSignUp = false) {
+        return await $Warn.CatchAsync(async () => {
+            if (!email || !password) {
+                $Notice.Warn("メールアドレスとパスワードを入力してください");
+                return false;
+            }
+            $Notice.Info(isSignUp ? "処理中..." : "ログイン中...");
+            try {
+                // 1. Firebase認証実行
+                const verifiedEmail = isSignUp 
+                    ? await $Auth.SignUpEmail(email, password)
+                    : await $Auth.SignInEmail(email, password);
+                // 2. 自サーバへログイン通知
+                if (verifiedEmail && await $Data.Access.LoginFirebase({ Email: verifiedEmail })) {
+                    this.AppData.Context.IsLoggedIn = true;
+                    _AppCore.save(this.AppData.Owner);
+                    return true;
+                }
+            } catch (e) {
+                // Firebase固有のエラーコードを判定
+                let msg = "認証に失敗しました";
+                switch (e.code) {
+                    case 'auth/email-already-in-use':
+                        msg = "このアドレスは登録済みです。Googleログインを試してください。";
+                        break;
+                    case 'auth/wrong-password':
+                        msg = "パスワードが正しくありません。";
+                        break;
+                    case 'auth/user-not-found':
+                        msg = "アカウントが見つかりません。新規登録してください。";
+                        break;
+                    case 'auth/weak-password':
+                        msg = "パスワードが短すぎます（6文字以上必要です）。";
+                        break;
+                    case 'auth/invalid-email':
+                        msg = "メールアドレスの形式が正しくありません。";
+                        break;
+                    default:
+                        msg = `エラー: ${e.message}`;
+                }
+                $Notice.Error(msg);
+            }
+            return false;
+        })();
     },
     // テーマ変更
     ChangeTheme(theme) {

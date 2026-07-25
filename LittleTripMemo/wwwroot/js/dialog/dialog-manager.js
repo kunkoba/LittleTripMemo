@@ -113,7 +113,7 @@ const _DialogCore = {
                 helpBody.innerHTML = ""; // 一旦クリア
                 // 1行目のスタイル適用
                 const titleEl = document.createElement('div');
-                titleEl.className = "text-[1.2rem] font-bold text-slate-900 pb-2";
+                titleEl.className = "text-[1rem] font-bold text-slate-900 pb-2";
                 titleEl.textContent = firstLine;
                 helpBody.appendChild(titleEl);
                 // 2行目以降の適用

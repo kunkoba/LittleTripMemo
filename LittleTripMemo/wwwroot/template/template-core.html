@@ -538,3 +538,18 @@
         </p>
     </div>
 </template>
+
+<!-- 【追加】まとめ一覧用フィルタスイッチ -->
+<template id="tpl-archive-list-filter">
+    <div class="flex gap-2 px-1 py-1 pt-3 bg-white">
+        <button id="btn-list-filter-pvt" data-pub="false" 
+            class="js-filter-btn flex-1 flex items-center justify-center gap-2 h-10 rounded-full font-black text-[0.9rem] transition-all active:scale-95 border-2">
+            <span>🔒</span> PRIVATE
+        </button>
+        <button id="btn-list-filter-pub" data-pub="true" 
+            class="js-filter-btn flex-1 flex items-center justify-center gap-2 h-10 rounded-full font-black text-[0.9rem] transition-all active:scale-95 border-2">
+            <span>◎</span> PUBLIC
+        </button>
+    </div>
+</template>
+
