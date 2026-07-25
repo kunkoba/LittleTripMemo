@@ -3,7 +3,6 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.Models;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Repository.App;
-using LittleTripMemo.Services.Common;
 using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Private;
@@ -27,9 +26,7 @@ public class DetachDetailsService(
 
     public record Response(int detached_count, bool is_archive_deleted);
 
-    /// <summary>
-    /// 切り離し処理を実行する
-    /// </summary>
+    /// <summary>切り離し処理を実行（明細数0で親を自動削除）</summary>
     public async Task<Response> ExecuteAsync(DetachDetailsReq req)
     {
         // 1. バリデーション
@@ -52,7 +49,7 @@ public class DetachDetailsService(
                 // ③ 最新のアーカイブ情報を取得して件数を確認
                 var archive = await archiveRepository.GetByKeyAsync(req.archive_id);
 
-                // 明細が0件になった場合は、まとめ自体を削除（解除と同じ挙動）
+                // 明細が0件になった場合は、まとめ自体を削除
                 if (archive != null && archive.detail_count <= 0)
                 {
                     await archiveRepository.DeletePhysicalByKeyAsync(req.archive_id);
@@ -69,9 +66,7 @@ public class DetachDetailsService(
         }
     }
 
-    /// <summary>
-    /// 業務バリデーション
-    /// </summary>
+    /// <summary>業務バリデーション</summary>
     private async Task ValidateAsync(DetachDetailsReq req)
     {
         BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");

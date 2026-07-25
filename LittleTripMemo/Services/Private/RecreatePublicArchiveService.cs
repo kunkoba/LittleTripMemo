@@ -10,61 +10,44 @@ namespace LittleTripMemo.Services.Private;
 /// <summary>
 /// 公開済みデータを完全に消去し、秘密側の最新状態で作り直すサービス
 /// </summary>
-public class RecreatePublicArchiveService : _BaseService
+public class RecreatePublicArchiveService(
+    UserContext userContext,
+    ITransactionProvider provider,
+    ArchiveRepository archiveRepo,
+    DetailRepository detailRepo,
+    ArchivePubRepository archivePubRepo,
+    DetailPubRepository detailPubRepo,
+    ReactionPubRepository reactionPubRepo
+) : _BaseService(userContext)
 {
-    private readonly ITransactionProvider _provider;
-    private readonly ArchiveRepository _archiveRepo;
-    private readonly DetailRepository _detailRepo;
-    private readonly ArchivePubRepository _archivePubRepo;
-    private readonly DetailPubRepository _detailPubRepo;
-    private readonly ReactionPubRepository _reactionPubRepo;
-
     public record RecreatePublicArchiveReq(
         [Required] Guid login_user_id,
-        int archive_id
+        [Required] int archive_id
     ) : ILoginUserRequest;
 
     public record Response(int archiveId);
 
-    public RecreatePublicArchiveService(
-        UserContext userContext,
-        ITransactionProvider provider,
-        ArchiveRepository archiveRepo,
-        DetailRepository detailRepo,
-        ArchivePubRepository archivePubRepo,
-        DetailPubRepository detailPubRepo,
-        ReactionPubRepository reactionPubRepo)
-        : base(userContext)
-    {
-        _provider = provider;
-        _archiveRepo = archiveRepo;
-        _detailRepo = detailRepo;
-        _archivePubRepo = archivePubRepo;
-        _detailPubRepo = detailPubRepo;
-        _reactionPubRepo = reactionPubRepo;
-    }
-
+    /// <summary>
+    /// 公開データを物理削除した後、秘密データから再構築する
+    /// </summary>
     public async Task<Response> ExecuteAsync(RecreatePublicArchiveReq req)
     {
         await ValidateAsync(req);
 
-        using var tran = _provider.BeginTransaction();
+        using var tran = provider.BeginTransaction();
         try
         {
-            // 1. 秘密アーカイブ取得（マスターデータ）
-            // ※公開済み（del_flg=true）のものを取得するため、専用の取得かフラグ無視の取得が必要
-            var archive = await _archiveRepo.GetByKeyWithDeletedAsync(req.archive_id);
+            // 1. 元データの取得（論理削除済みも対象）
+            var archive = await archiveRepo.GetByKeyWithDeletedAsync(req.archive_id);
             BusinessException.ThrowIf(archive == null, "元データが見つかりません");
 
-            // 2. 既存の公開データを「物理削除」してリセット
-            await _detailPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
-            await _archivePubRepo.DeletePhysicalByKeyAsync(req.archive_id);
+            // 2. 既存公開データの完全消去
+            await detailPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
+            await archivePubRepo.DeletePhysicalByKeyAsync(req.archive_id);
+            await reactionPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
 
-            // 3. リアクションもリセット（古い構成のデータのため）
-            await _reactionPubRepo.DeletePhysicalByArchiveIdAsync(req.archive_id);
-
-            // 4. 公開アーカイブへ新規コピー（RestoreArchiveAsync を使用）
-            var pubArchive = new TMemoArchivePub
+            // 3. 公開アーカイブの再作成
+            await archivePubRepo.RestoreArchiveAsync(new TMemoArchivePub
             {
                 archive_id = archive.archive_id,
                 user_id = archive.user_id,
@@ -72,16 +55,13 @@ public class RecreatePublicArchiveService : _BaseService
                 memo = archive.memo,
                 link_url = archive.link_url,
                 currency_unit = archive.currency_unit,
-            };
-            await _archivePubRepo.RestoreArchiveAsync(pubArchive);
+            });
 
-            // 5. 秘密明細取得（del_flg=true のものも含めて取得）
-            var details = await _detailRepo.GetByArchiveIdWithDeletedAsync(req.archive_id);
-
-            // 6. 公開明細へ新規コピー
+            // 4. 公開明細の再作成
+            var details = await detailRepo.GetByArchiveIdWithDeletedAsync(req.archive_id);
             foreach (var detail in details)
             {
-                var pubDetail = new TMemoDetailPub
+                await detailPubRepo.RestoreDetailAsync(new TMemoDetailPub
                 {
                     archive_id = detail.archive_id,
                     seq = detail.seq,
@@ -97,12 +77,11 @@ public class RecreatePublicArchiveService : _BaseService
                     link_url = detail.link_url,
                     memo_price = detail.memo_price,
                     feel_type = detail.feel_type
-                };
-                await _detailPubRepo.RestoreDetailAsync(pubDetail);
+                });
             }
 
-            // 7. 公開側の件数を最新にする
-            await _archivePubRepo.UpdateDetailCountAsync(req.archive_id);
+            // 5. 件数同期
+            await archivePubRepo.UpdateDetailCountAsync(req.archive_id);
 
             tran.Commit();
             return new Response(archive.archive_id);
@@ -115,8 +94,9 @@ public class RecreatePublicArchiveService : _BaseService
 
     private async Task ValidateAsync(RecreatePublicArchiveReq req)
     {
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが無効です");
+
         await Task.CompletedTask;
     }
 

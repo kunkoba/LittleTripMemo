@@ -484,6 +484,10 @@ export default {
         renderView();
 		const headerButtons = [];
         const isAdmin = $App.AppData.Owner.Plan === "Admin"; // 管理者判定
+        headerButtons.push({
+            label: "📚",
+            handler: () => this.ShowUserArchiveList(profile)
+        });
         if (isOwner || isAdmin) {
             // 統計アイコン
             headerButtons.push({
@@ -1058,6 +1062,36 @@ export default {
             content: root,
             size: "lg",
             help: "最近閲覧した「公開まとめ」の一覧です。\n※現在公開を停止しているものは開くことができません。"
+        });
+    },
+    // 外部リンク起動確認ダイアログ
+    async ShowLinkOpen({ url, onOpen }) {
+        const el = $Dom.GenerateTemplate("tpl-dialog-link-confirm");
+        $Dom.QuerySelector(".js-url", el).textContent = url;
+        const help = "【セキュリティ警告】\n直接リンクを開く際のリスクについて\n\n悪意のあるサイト（フィッシング詐欺等）により個人情報が盗まれる可能性があります。信頼できないサイトの場合は、直接開かずに「Google検索」ボタンからサイトの評判を確認することをお勧めします。";
+        this._core.open({
+            title: "外部リンクの確認",
+            content: el,
+            help: help,
+            buttons: [[
+                {
+                    label: "Google検索",
+                    className: "bg-slate-500 text-white shadow-md",
+                    handler: () => {
+                        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(url)}`;
+                        window.open(searchUrl, '_blank', 'noopener,noreferrer');
+                        this._core.close();
+                    }
+                },
+                {
+                    label: "直接開く",
+                    handler: () => {
+                        if (onOpen) onOpen(); // クリック集計等のコールバック実行
+                        window.open(url, '_blank', 'noopener,noreferrer');
+                        this._core.close();
+                    }
+                }
+            ]]
         });
     },
 };

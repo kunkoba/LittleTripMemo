@@ -84,6 +84,7 @@ public static class ServiceExtensions
         services.AddScoped<AddCountQueueService>();
         services.AddScoped<OpenLimitedArchiveService>();
         services.AddScoped<GetArchiveListByIdsService>();
+        services.AddScoped<GetArchiveListByUserService>();
 
         // Sys
         services.AddScoped<GetSystemInfoService>();

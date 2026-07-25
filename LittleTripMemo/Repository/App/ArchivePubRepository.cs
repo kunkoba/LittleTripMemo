@@ -276,4 +276,21 @@ public class ArchivePubRepository : _BaseRepository
         return await QueryAsync<TMemoArchivePub>(sql, new { ids = ids.ToArray() });
     }
 
+    /// <summary>
+    /// 指定ユーザーの公開中のまとめ一覧を取得する（第三者参照用）
+    /// </summary>
+    public async Task<IEnumerable<TMemoArchivePub>> GetPublicListByUserIdAsync(Guid targetUserId)
+    {
+        const string sql = @"
+        SELECT * FROM t_memo_archive_pub
+        WHERE user_id    = @targetUserId
+          AND del_flg    = false
+          AND closed_flg = false
+          AND limited_open_flg = false
+        ORDER BY update_tim DESC
+        LIMIT 100";
+
+        return await QueryAsync<TMemoArchivePub>(sql, new { targetUserId });
+    }
+
 }

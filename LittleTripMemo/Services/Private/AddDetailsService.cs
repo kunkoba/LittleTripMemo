@@ -12,12 +12,13 @@ namespace LittleTripMemo.Services.Private;
 /// 1. t_memo_archive を新規作成（archive_id を取得）
 /// 2. 指定された seq の明細に archive_id をセット
 /// </summary>
-public class AddDetailsService : _BaseService
+public class AddDetailsService(
+    UserContext userContext,
+    ITransactionProvider provider,
+    DetailRepository detailRepo,
+    ArchiveRepository archiveRepo
+) : _BaseService(userContext)
 {
-    private readonly ITransactionProvider _provider;
-    private readonly DetailRepository _detailRepo;
-    private readonly ArchiveRepository _archiveRepo;
-
     public record AddDetailsReq(
         [Required] Guid login_user_id,
         [Required(ErrorMessage = "seqリストは必須です")] long[] seqs,
@@ -25,18 +26,6 @@ public class AddDetailsService : _BaseService
     ) : ILoginUserRequest;
 
     public record Response(int archiveId, int updatedCount);
-
-    public AddDetailsService(
-        UserContext userContext,
-        ITransactionProvider provider,
-        DetailRepository detailRepo,
-        ArchiveRepository archiveRepo)
-        : base(userContext)
-    {
-        _provider = provider;
-        _detailRepo = detailRepo;
-        _archiveRepo = archiveRepo;
-    }
 
     /// <summary>
     /// 実行（1.検証 → 2.実行）
@@ -47,15 +36,15 @@ public class AddDetailsService : _BaseService
         await ValidateAsync(req);
 
         // 2. 実行
-        using var tran = _provider.BeginTransaction();
+        using var tran = provider.BeginTransaction();
         try
         {
             var archiveId = req.archive_id;
             // 対象の明細に 指定のarchive_id をセット
-            var updatedCount = await _detailRepo.UpdateArchiveIdBySeqsAsync(archiveId, req.seqs);
+            var updatedCount = await detailRepo.UpdateArchiveIdBySeqsAsync(archiveId, req.seqs);
 
             // 親の件数を更新
-            await _archiveRepo.UpdateDetailCountAsync(req.archive_id);
+            await archiveRepo.UpdateDetailCountAsync(req.archive_id);
 
             tran.Commit();
             return new Response(archiveId, updatedCount);
@@ -67,12 +56,11 @@ public class AddDetailsService : _BaseService
     }
 
     /// <summary>
-    /// 1. 検証（業務チェック）
+    /// 業務バリデーション
     /// </summary>
     private async Task ValidateAsync(AddDetailsReq req)
     {
-        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(req.seqs.Length == 0, "seqリストが空です");
         BusinessException.ThrowIf(req.archive_id == 0, "archiveIdが無効です");
         await Task.CompletedTask;

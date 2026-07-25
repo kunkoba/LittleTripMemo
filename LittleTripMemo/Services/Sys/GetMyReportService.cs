@@ -5,28 +5,22 @@ using LittleTripMemo.Repository.Sys;
 
 namespace LittleTripMemo.Services.Sys;
 
-public class GetMyReportService : _BaseService
+/// <summary>特定のアーカイブに対する自分の通報取得</summary>
+public class GetMyReportService(UserContext user, SysReportRepository repo) : _BaseService(user)
 {
-    private readonly SysReportRepository _repo;
-
     public record GetMyReportReq(long archive_id);
     public record Response(TSysReport? myReport);
-
-    public GetMyReportService(UserContext user, SysReportRepository repo) : base(user)
-    {
-        _repo = repo;
-    }
 
     public async Task<Response> ExecuteAsync(GetMyReportReq req)
     {
         await ValidateAsync(req);
-        var result = await _repo.GetMyReportByArchiveIdAsync(req.archive_id);
+        var result = await repo.GetMyReportByArchiveIdAsync(req.archive_id);
         return new Response(result);
     }
 
     private async Task ValidateAsync(GetMyReportReq req)
     {
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(req.archive_id <= 0, "アーカイブIDが無効です");
         await Task.CompletedTask;
     }

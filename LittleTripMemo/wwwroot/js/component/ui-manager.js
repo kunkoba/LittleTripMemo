@@ -43,29 +43,22 @@ const UI_Manager = {
             // 2. URLテキストの注入
             const urlText = $Dom.QuerySelector('.js-url-text', btn);
             urlText.textContent = url;
-            btn.onclick = async (e) => {
+			btn.onclick = (e) => {
                 e.stopPropagation();
                 if (!$App.AppData.Context.IsOnline) {
-                    $Notice.Warn("オフライン中は、外部リンクを開けません。");
-                    return;
-                }
+					$Notice.Warn("オフライン中は、機能が制限されます。");
+					return;
+				}
                 const safeUrl = $Util.getSafeUrl(url);
-                if (!safeUrl) {
-                    $Notice.Error("無効なURLです。");
-                    return;
-                }
-                const isSafe = $Util.IsSafeUrl(safeUrl);
-                const title = isSafe ? "外部サイトを開く" : "セキュリティ警告";
-                const message = isSafe 
-                    ? `次のリンクを開きます。よろしいですか？\n\n${safeUrl}`
-                    : `安全性が確認されていないURLのため、\nGoogle検索結果を経由して開きます。\n\n${safeUrl}`;
-                const isOk = await $Dialog.ShowConfirm({ title, message });
-                if (!isOk) return;
-                if (params && !isOwner) {
-                    $Data.Access.AddClick(params);
-                }
-                const finalUrl = isSafe ? safeUrl : `https://www.google.com/search?q=${encodeURIComponent(safeUrl)}`;
-                window.open(finalUrl, '_blank', 'noopener,noreferrer');
+                if (!safeUrl) return $Notice.Error("無効なURLです。");
+                // 専用ダイアログを表示
+                $Dialog.ShowLinkOpen({
+                    url: safeUrl,
+                    onOpen: () => {
+                        // 直接開く選択時のみ、オーナー以外ならクリック集計を送信
+                        if (params && !isOwner) $Data.Access.AddClick(params);
+                    }
+                });
             };
             parentEl.appendChild(btn);
             return true; // ★追加成功時に true を返す

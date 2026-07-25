@@ -252,7 +252,8 @@ window.$Util = {
             return `${primary}${secondary}`;
         } catch (error) {
             console.log("error:", error);
-            return "住所を取得できませんでした。";
+            $Notice.Warn("住所を取得できませんでした");
+            return null;
         }
     },
     // 絵文字ピッカー

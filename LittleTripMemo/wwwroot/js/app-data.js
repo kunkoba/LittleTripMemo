@@ -1,5 +1,5 @@
 // const BaseUrl = "https://eminently-meet-terrapin.ngrok-free.app";  // ngrok　※外部に公開
-const BaseUrl = "https://localhost:7292";
+// const BaseUrl = "https://localhost:7292";
 // const BaseUrl = "http://localhost:5000";   // Docker環境のapi_server（5000番ポート）に向けた接続先URL
 const API_ENDPOINTS = {
     // Account
@@ -35,6 +35,7 @@ const API_ENDPOINTS = {
     BulkSyncReactions:      { method: 'post', url: '/api/Public/BulkSyncReactions' },
     OpenLimitedArchive:     { method: 'post', url: '/api/Public/OpenLimitedArchive' },
     GetArchiveListByIds:    { method: 'post', url: '/api/Public/GetArchiveListByIds' },
+    GetArchiveListByUser:   { method: 'post', url: '/api/Public/GetArchiveListByUser' },
     // Sys
     UpsertFeedback:         { method: 'post', url: '/api/Sys/UpsertFeedback' },
     UpsertReport:           { method: 'post', url: '/api/Sys/UpsertReport' },
@@ -94,7 +95,8 @@ window.$Data = {
             userProfile: null,
         },
         // サーバー通信の基礎
-        async _fetchData(method, url, params, isDebug = false) {
+        async _fetchData(method, url, params, isDebug = false) {// 設定ファイルから取得
+            const BaseUrl = window.ENV_CONFIG.BASE_URL;
             console.log("▼ Access:", BaseUrl + url, params);
             // オフラインチェック
             if (!$App.AppData.Context.IsOnline) {

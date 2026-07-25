@@ -3,18 +3,16 @@ using LittleTripMemo.Exceptions;
 using LittleTripMemo.Repository;
 using LittleTripMemo.Repository.App;
 using System.ComponentModel.DataAnnotations;
-using static LittleTripMemo.Services.Public.GetArchiveDetailsPubService;
 
 namespace LittleTripMemo.Services.Private;
 
-/// <summary>
-/// 未まとめ明細（archive_id=0）を削除（論理削除）するサービス
-/// </summary>
-public class DeleteStrayDetailsService : _BaseService
+/// <summary>未まとめ明細（archive_id=0）を削除するサービス</summary>
+public class DeleteStrayDetailsService(
+    UserContext userContext,
+    ITransactionProvider provider,
+    DetailRepository detailRepo
+) : _BaseService(userContext)
 {
-    private readonly ITransactionProvider _provider;
-    private readonly DetailRepository _detailRepo;
-
     public record DeleteStrayDetailsReq(
         [Required] Guid login_user_id,
         [Required(ErrorMessage = "削除対象のseqリストは必須です")] long[] seqs
@@ -22,23 +20,15 @@ public class DeleteStrayDetailsService : _BaseService
 
     public record Response(int deletedCount);
 
-    public DeleteStrayDetailsService(
-        UserContext userContext,
-        ITransactionProvider provider,
-        DetailRepository detailRepo) : base(userContext)
-    {
-        _provider = provider;
-        _detailRepo = detailRepo;
-    }
-
+    /// <summary>選択された未まとめ明細の論理削除を実行</summary>
     public async Task<Response> ExecuteAsync(DeleteStrayDetailsReq req)
     {
         await ValidateAsync(req);
 
-        using var tran = _provider.BeginTransaction();
+        using var tran = provider.BeginTransaction();
         try
         {
-            var count = await _detailRepo.DeleteStrayBySeqsAsync(req.seqs);
+            var count = await detailRepo.DeleteStrayBySeqsAsync(req.seqs);
             tran.Commit();
             return new Response(count);
         }
@@ -50,7 +40,9 @@ public class DeleteStrayDetailsService : _BaseService
 
     private async Task ValidateAsync(DeleteStrayDetailsReq req)
     {
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(req.seqs.Length == 0, "削除対象が選択されていません。");
         await Task.CompletedTask;
     }
+
 }

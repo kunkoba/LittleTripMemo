@@ -931,4 +931,53 @@ export default {
             size: 'lg'
         });
     },
+    // 新設：特定ユーザの公開まとめリストを表示
+    async ShowUserArchiveList(profile) {
+        // サーバーから対象ユーザの「完全公開」まとめのみ取得
+        const isSuccess = await $Data.Access.GetArchiveListByUser({ 
+            target_user_id: profile.user_id 
+        });
+        if (!isSuccess) return;
+        // API側で archives にリストが入ってくる想定
+        const archives = $Data.resData.archives || [];
+        if (archives.length === 0) {
+            $Notice.Info("公開されているまとめはありません。");
+            return;
+        }
+        // ③ まとめリストのテンプレートを使いまわす
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        const PDS = $Const.PUBLIC_DATA_STATUS;
+        archives.forEach(item => {
+            const child = $Dom.GenerateTemplate("tpl-list-child-archive");
+            $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
+            $Dom.QuerySelector(".js-title", child).textContent = item.title;
+            $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
+            $Dom.QuerySelector(".js-count", child).textContent = item.detail_count || "0";
+            // 完全公開（OPEN）前提なので、ブランドカラーで統一
+            const border = $Dom.QuerySelector(".js-item-border", child);
+            const countBadge = $Dom.QuerySelector(".js-count-badge", child);
+            border.classList.add("bg-brand-5");
+            countBadge.classList.add("bg-brand-5");
+            // クリックで確認後に詳細へジャンプ
+            child.onclick = async () => {
+                const isOk = await this.ShowConfirm({
+                    title: "OPEN ARCHIVE",
+                    message: `「${item.title}」を開きますか？`,
+                    label: "OPEN"
+                });
+                if (!isOk) return;
+                this._core.closeAll();
+                $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+                $App.AppData.Context.TargetArchiveId = item.archive_id;
+                await $App.RefreshScreen();
+            };
+            root.appendChild(child);
+        });
+        this._core.open({
+            title: `「${profile.nick_name} 」さんのまとめ`,
+            content: root,
+            size: "",
+            help: "このユーザが全体に公開している「まとめ」の一覧です。"
+        });
+    },
 };

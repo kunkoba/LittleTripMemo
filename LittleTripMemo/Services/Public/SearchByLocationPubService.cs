@@ -5,52 +5,30 @@ using LittleTripMemo.Repository.App;
 
 namespace LittleTripMemo.Services.Public;
 
-public class SearchByLocationPubService : _BaseService
+/// <summary>位置情報に基づく公開明細の検索サービス</summary>
+public class SearchByLocationPubService(UserContext userContext, DetailPubRepository detailPubRepo) : _BaseService(userContext)
 {
-    private readonly DetailPubRepository _detailPubRepo;
-
     public record SearchByLocationPubReq(
-        decimal lat_min, decimal lat_max,
-        decimal lng_min, decimal lng_max,
-        int sortField,     // 1:作成順, 2:更新順, 3:リアクション順
-        int? reactionType,  // 1:funny, 2:love, 3:surprise, 4:sad (sortField=3の時使用)
-        string? keyword,
-        int? feelType,
-        int limit = 20
+        decimal lat_min, decimal lat_max, decimal lng_min, decimal lng_max,
+        int sortField, int? reactionType, string? keyword, int? feelType, int limit = 20
     );
     public record Response(IEnumerable<TMemoDetailPub> details);
-
-    public SearchByLocationPubService(
-        UserContext userContext,
-        DetailPubRepository detailPubRepo)
-        : base(userContext)
-    {
-        _detailPubRepo = detailPubRepo;
-    }
 
     public async Task<Response> ExecuteAsync(SearchByLocationPubReq req)
     {
         await ValidateAsync(req);
-
-        var result = await _detailPubRepo.SearchByLocationAsync(
+        var result = await detailPubRepo.SearchByLocationAsync(
             req.lat_min, req.lat_max, req.lng_min, req.lng_max,
-            req.keyword,
-            req.sortField,
-            req.reactionType,
-            _user.login_user_id,
-            req.feelType,
-            req.limit
+            req.keyword, req.sortField, req.reactionType, _user.login_user_id, req.feelType, req.limit
         );
-
-        // 所有者フラグなどをセット
         SetAppFlags(result);
-
         return new Response(result);
     }
 
     private async Task ValidateAsync(SearchByLocationPubReq req)
     {
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         await Task.CompletedTask;
     }
+
 }

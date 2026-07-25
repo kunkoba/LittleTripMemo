@@ -520,3 +520,21 @@
     </div>
 </template>
 
+<!-- 【ダイアログ子】リンク起動確認 -->
+<template id="tpl-dialog-link-confirm">
+    <div class="w-full flex flex-col gap-4 p-2 text-slate-900">
+        <div class="text-[0.9rem] font-bold text-red-500 border-l-4 border-red-500 pl-3">
+            外部サイトへ移動します。<br>リンク先の安全性に注意してください。
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="text-[0.8rem] font-bold text-slate-500 uppercase tracking-widest">Target URL</label>
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                <!-- break-all で長いURLを強制改行して全表示 -->
+                <div class="js-url text-[0.9rem] text-blue-600 font-bold break-all leading-relaxed select-all"></div>
+            </div>
+        </div>
+        <p class="text-[0.85rem] text-slate-600 px-1">
+            安全性が不明な場合は、Google検索を経由してサイトを確認することをお勧めします。
+        </p>
+    </div>
+</template>

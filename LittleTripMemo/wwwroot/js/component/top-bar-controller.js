@@ -130,6 +130,7 @@ const _TopCore = {
     // まとめ親タイトル変更
     changeTitle(title){
         const archive = $Data.Store.GetArchive();
+        console.log("changeTitle:", archive);
         const iconEl = $Dom.QuerySelector('.js-icon', this.btnArchiveTitle);
         const textEl = $Dom.QuerySelector('.js-text', this.btnArchiveTitle);
         // テキストの更新

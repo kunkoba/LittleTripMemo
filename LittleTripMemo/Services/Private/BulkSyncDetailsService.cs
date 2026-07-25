@@ -7,9 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Private;
 
-/// <summary>
-/// 未まとめ明細（archive_id=0, seq=0）を一括で新規登録するサービス
-/// </summary>
+/// <summary>未まとめ明細（archive_id=0）を一括で新規登録するサービス</summary>
 public class BulkSyncDetailsService(
     UserContext userContext,
     ITransactionProvider provider,
@@ -36,6 +34,7 @@ public class BulkSyncDetailsService(
 
     public record Response(int insertedCount);
 
+    /// <summary>一括登録の実行</summary>
     public async Task<Response> ExecuteAsync(BulkSyncReq req)
     {
         await ValidateAsync(req);
@@ -46,7 +45,6 @@ public class BulkSyncDetailsService(
             int totalInserted = 0;
             foreach (var item in req.items)
             {
-                // 全て archive_id = 0, seq = 0 としてインサート
                 var entity = MapToEntity(item);
                 await detailRepo.InsertAsync(entity);
                 totalInserted++;
@@ -63,8 +61,7 @@ public class BulkSyncDetailsService(
 
     private async Task ValidateAsync(BulkSyncReq req)
     {
-        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(req.items == null || !req.items.Any(), "登録するデータがありません");
         await Task.CompletedTask;
     }
@@ -72,7 +69,7 @@ public class BulkSyncDetailsService(
     private TMemoDetail MapToEntity(BulkSyncItem item) => new()
     {
         seq = 0,
-        archive_id = 0, // 未まとめ確定
+        archive_id = 0,
         user_id = _user.login_user_id,
         latitude = item.latitude,
         longitude = item.longitude,
@@ -86,4 +83,5 @@ public class BulkSyncDetailsService(
         memo_price = item.memo_price,
         del_flg = false
     };
+
 }

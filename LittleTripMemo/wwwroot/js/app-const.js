@@ -22,7 +22,7 @@ window.$Const = {
     },
     // アプリ設定
     APP_CONFIG: {
-        ADMIN_PW: "8855",
+        ADMIN_PW: window.ENV_CONFIG.ADMIN_PW,
         SAVE_DETAIL_SEC: 300,
         SAVE_REACTION_SEC: 300,
     },

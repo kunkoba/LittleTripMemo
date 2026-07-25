@@ -5,30 +5,22 @@ using LittleTripMemo.Repository.Sys;
 
 namespace LittleTripMemo.Services.Sys;
 
-public class GetMyFeedbackService : _BaseService
+/// <summary>自分のフィードバック取得</summary>
+public class GetMyFeedbackService(UserContext user, SysFeedbackRepository repo) : _BaseService(user)
 {
-    private readonly SysFeedbackRepository _repo;
-
     public record Response(TSysFeedback? myFeedback);
-
-    public GetMyFeedbackService(UserContext user, SysFeedbackRepository repo) : base(user)
-    {
-        _repo = repo;
-    }
 
     public async Task<Response> ExecuteAsync()
     {
         await ValidateAsync();
-
-        // 1件取得
-        var result = await _repo.GetMyFeedbacksAsync();
-
+        var result = await repo.GetMyFeedbacksAsync();
         return new Response(result);
     }
 
     private async Task ValidateAsync()
     {
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         await Task.CompletedTask;
     }
+
 }

@@ -17,12 +17,6 @@ public class MergeDetailsService(
     DetailRepository detailRepository
 ) : _BaseService(userContext)
 {
-    /// <summary>
-    /// まとめ作成リクエストモデル
-    /// </summary>
-    /// <param name="login_user_id">操作ユーザーID</param>
-    /// <param name="seqs">統合対象とする明細のシーケンス番号リスト</param>
-    /// <param name="title">まとめのタイトル（未指定の場合はサーバー側で自動生成）</param>
     public record MergeDetailsReq(
         [Required] Guid login_user_id,
         [Required(ErrorMessage = "対象の明細が選択されていません")] long[] seqs,
@@ -32,19 +26,19 @@ public class MergeDetailsService(
     public record Response(int archiveId);
 
     /// <summary>
-    /// 明細の統合処理を実行する
+    /// アーカイブを新規作成し、指定された明細を紐付ける
     /// </summary>
     public async Task<Response> ExecuteAsync(MergeDetailsReq req)
     {
         // 1. バリデーション
         await ValidateAsync(req);
 
-        // 2. タイトルの決定（未入力なら現在日時を含めた名称を自動生成）
+        // 2. タイトルの決定
         var archiveTitle = string.IsNullOrWhiteSpace(req.title)
             ? $"旅のまとめのタイトル_{DateTime.Now:_HHmm}"
             : req.title;
 
-        // 3. 実行（アーカイブ作成と明細更新を同一トランザクションで実行）
+        // 3. 実行
         using var transaction = transactionProvider.BeginTransaction();
         try
         {
@@ -56,30 +50,24 @@ public class MergeDetailsService(
                 link_url = string.Empty
             });
 
-            // ② 指定された明細（子）に作成したアーカイブIDをセットして紐付ける
+            // ② 明細（子）をアーカイブに紐付ける
             await detailRepository.UpdateArchiveIdBySeqsAsync(archiveId, req.seqs);
 
-            // ③ アーカイブ側の明細件数カウントを最新状態に更新
+            // ③ 件数カウントを更新
             await archiveRepository.UpdateDetailCountAsync(archiveId);
 
             transaction.Commit();
-
             return new Response(archiveId);
         }
         catch
         {
-            // ロールバックは provider の Dispose で自動実行される
             throw;
         }
     }
 
-    /// <summary>
-    /// 業務バリデーション
-    /// </summary>
     private async Task ValidateAsync(MergeDetailsReq req)
     {
         BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
-        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
         BusinessException.ThrowIf(req.seqs == null || req.seqs.Length == 0, "統合する明細が選択されていません");
 
         await Task.CompletedTask;

@@ -29,7 +29,8 @@ public class PublicController(
     BulkSyncReactionService bulkSyncReactionService,
     AddCountQueueService addClickQueueService,
     OpenLimitedArchiveService openLimitedArchiveService,
-    GetArchiveListByIdsService getArchiveListByIdsService
+    GetArchiveListByIdsService getArchiveListByIdsService,
+    GetArchiveListByUserService getArchiveListByUserService
 ) : _BaseController(userContext, jwtService, provider)
 {
     #region "未ログイン・ゲスト可"
@@ -125,6 +126,15 @@ public class PublicController(
     [HttpPost("GetArchiveListByIds")]
     public async Task<IActionResult> GetArchiveListByIds([FromBody] GetArchiveListByIdsService.GetArchiveListByIdsReq req)
         => OkWithBase(await getArchiveListByIdsService.ExecuteAsync(req));
+
+    /// <summary>
+    /// ユーザに紐づくまとめリスト
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost("GetArchiveListByUser")]
+    public async Task<IActionResult> GetArchiveListByIds([FromBody] GetArchiveListByUserService.GetArchiveListByUserReq req)
+        => OkWithBase(await getArchiveListByUserService.ExecuteAsync(req));
 
     #endregion
 

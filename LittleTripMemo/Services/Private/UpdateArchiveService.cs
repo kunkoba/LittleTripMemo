@@ -6,15 +6,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Private;
 
-public class UpdateArchiveService : _BaseService
+/// <summary>
+/// 秘密側のまとめ（アーカイブ）情報を更新するサービス
+/// </summary>
+public class UpdateArchiveService(
+    UserContext userContext,
+    ArchiveRepository archiveRepo
+) : _BaseService(userContext)
 {
-    private readonly ArchiveRepository _archiveRepo;
-
     public record UpdateArchiveReq(
         [Required] Guid login_user_id,
-        int archive_id,
+        [Required] int archive_id,
         string category,
-        string title,
+        [Required] string title,
         string memo,
         string? link_url,
         string currency_unit
@@ -22,18 +26,16 @@ public class UpdateArchiveService : _BaseService
 
     public record Response(int archiveId);
 
-    public UpdateArchiveService(
-        UserContext userContext,
-        ArchiveRepository archiveRepo)
-        : base(userContext)
-    {
-        _archiveRepo = archiveRepo;
-    }
-
+    /// <summary>
+    /// アーカイブの基本情報を更新する
+    /// </summary>
     public async Task<Response> ExecuteAsync(UpdateArchiveReq req)
     {
+        // 1. 検証
         await ValidateAsync(req);
-        int affected = await _archiveRepo.UpdateByKeyAsync(new TMemoArchive
+
+        // 2. 実行
+        await archiveRepo.UpdateByKeyAsync(new TMemoArchive
         {
             archive_id = req.archive_id,
             category = req.category,
@@ -42,15 +44,17 @@ public class UpdateArchiveService : _BaseService
             link_url = req.link_url,
             currency_unit = req.currency_unit
         });
+
         return new Response(req.archive_id);
     }
 
     private async Task ValidateAsync(UpdateArchiveReq req)
     {
-        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが無効です");
         BusinessException.ThrowIf(string.IsNullOrEmpty(req.title), "タイトルは必須です");
+
         await Task.CompletedTask;
     }
+
 }

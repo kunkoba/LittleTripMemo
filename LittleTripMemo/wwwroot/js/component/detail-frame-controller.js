@@ -142,18 +142,10 @@ const _DetailFrameCore = {
                 });
                 // 保存ボタン
                 this.btnSave.addEventListener("click", async () => {
-                    const detail = $DetailContent.GetFormEditData(); // フォームのデータを取得
-                    console.log("detail:", detail);
-                    // タイトル
-                    if (!detail.title) {
-                        const data = $DetailContent.GetFormEditData();
-                        const addressName = await $Util.GetAddressName(data.latitude, data.longitude, "jp");
-                        detail.title = addressName;
-                    }
-                    // 本文
-                    if (!detail.body) {
-                        detail.body = "簡易メモ";
-                    }
+                    // まずUI側の未入力項目を補完し、ユーザーの目に見える状態にする
+                    await $DetailContent.FillEmptyFieldsUI();
+                    // フォームのデータを取得
+                    const detail = $DetailContent.GetFormEditData();
                     // バリデーション実行 ---
                     const isValid = $DetailContent.Validate(detail);
                     if (!isValid) return; // 失敗時はここで中断（NoticeはValidate内で出している）

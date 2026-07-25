@@ -7,15 +7,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Public;
 
-/// <summary>
-/// 公開済み明細の登録・更新サービス
-/// </summary>
-public class UpdateDetailPubService : _BaseService
+/// <summary>公開済み明細の更新サービス</summary>
+public class UpdateDetailPubService(
+    UserContext userContext,
+    ITransactionProvider provider,
+    DetailPubRepository detailPubRepo,
+    ArchivePubRepository archivePubRepo
+) : _BaseService(userContext)
 {
-    private readonly ITransactionProvider _provider;
-    private readonly DetailPubRepository _detailPubRepo;
-    private readonly ArchivePubRepository _archivePubRepo;
-
     public record UpdateDetailPubReq(
         [Required] Guid login_user_id,
         [Required(ErrorMessage = "seqは必須です")][Range(0, int.MaxValue)] long seq,
@@ -35,34 +34,23 @@ public class UpdateDetailPubService : _BaseService
 
     public record Response(long seq);
 
-    public UpdateDetailPubService(
-        UserContext userContext,
-        ITransactionProvider provider,
-        DetailPubRepository detailPubRepo,
-        ArchivePubRepository archivePubRepo)
-        : base(userContext)
-    {
-        _provider = provider;
-        _detailPubRepo = detailPubRepo;
-        _archivePubRepo = archivePubRepo;
-    }
-
+    /// <summary>公開明細を更新し、親アーカイブの件数を再集計する</summary>
     public async Task<Response> ExecuteAsync(UpdateDetailPubReq req)
     {
         // 1. 検証
         await ValidateAsync(req);
 
-        // 2. 実行
-        using var tran = _provider.BeginTransaction();
+        // 2. 実行（一貫性保持のためトランザクションを使用）
+        using var tran = provider.BeginTransaction();
         try
         {
             var entity = MapToEntity(req);
 
-            // 更新
-            await _detailPubRepo.UpdateByKeyAsync(entity);
+            // 明細データの更新
+            await detailPubRepo.UpdateByKeyAsync(entity);
 
             // 3. 親（公開アーカイブ）の件数および更新日時をリフレッシュ
-            await _archivePubRepo.UpdateDetailCountAsync(req.archive_id);
+            await archivePubRepo.UpdateDetailCountAsync(req.archive_id);
 
             tran.Commit();
             return new Response(req.seq);
@@ -75,8 +63,7 @@ public class UpdateDetailPubService : _BaseService
 
     private async Task ValidateAsync(UpdateDetailPubReq req)
     {
-        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(req.archive_id == 0, "アーカイブIDが無効です");
         BusinessException.ThrowIf(req.seq == 0, "SeqIDが無効です");
 
@@ -98,7 +85,8 @@ public class UpdateDetailPubService : _BaseService
         weather_code = req.weather_code,
         link_url = req.link_url,
         memo_price = req.memo_price,
-        feel_type = req.feel_type, // ★追加漏れ注意
+        feel_type = req.feel_type,
         del_flg = false
     };
+
 }

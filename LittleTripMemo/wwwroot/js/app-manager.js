@@ -263,8 +263,10 @@ const AppManager = {
             await $Data.Access.GetUnMergeDetails({});
             (await $LocalDb.Detail.GetAll()).forEach(d => $Data.Store.UpdateDetail(d));
         } else if (mode === $Const.SCREEN_MODE.ARCHIVE && this.AppData.Context.IsLoggedIn) {
-            // 保存済みアーカイブモード：取得失敗時は作成モードへフォールバック
-            if (!await $Data.Access.GetArchiveDetails({ archive_id: aid })) {
+            if (await $Data.Access.GetArchiveDetails({ archive_id: aid })) {
+                // 取得成功時にタイトルを反映
+                $TopBar.ChangeTitle($Data.Store.GetArchive()?.title || "");
+            } else {
                 this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
             }
         } else if (mode === $Const.SCREEN_MODE.ARCHIVE_PUB && aid) {
@@ -273,9 +275,18 @@ const AppManager = {
                 if (this.AppData.Context.IsLoggedIn) {
                     await $Data.LocalDb.SetReactionsToLocalDb();
                 }
+                // 取得成功時にタイトルを反映
+                $TopBar.ChangeTitle($Data.Store.GetArchive()?.title || "");
             } else {
+                // ★未ログインならログイン要求
+                if (!this.AppData.Context.IsLoggedIn) {
+                    $Dialog.ShowLoginDialog();
+                    return;
+                }
                 this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
             }
+        } else if (mode === $Const.SCREEN_MODE.SEARCH) {
+            $Marker.Clear();
         }
         $UI.ChangeScreenMode();
         $Marker.ChangeScreenMode();

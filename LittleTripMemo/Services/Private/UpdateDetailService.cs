@@ -8,14 +8,15 @@ using System.ComponentModel.DataAnnotations;
 namespace LittleTripMemo.Services.Private;
 
 /// <summary>
-/// 公開済み明細の登録・更新サービス
+/// 秘密側の明細情報を更新するサービス
 /// </summary>
-public class UpdateDetailService : _BaseService
+public class UpdateDetailService(
+    UserContext userContext,
+    ITransactionProvider provider,
+    DetailRepository detailRepo,
+    ArchiveRepository archiveRepo
+) : _BaseService(userContext)
 {
-    private readonly ITransactionProvider _provider;
-    private readonly DetailRepository _detailRepo;
-    private readonly ArchiveRepository _archiveRepo;
-
     public record UpdateDetailReq(
         [Required] Guid login_user_id,
         [Required(ErrorMessage = "seqは必須です")][Range(0, int.MaxValue)] long seq,
@@ -35,35 +36,27 @@ public class UpdateDetailService : _BaseService
 
     public record Response(long seq);
 
-    public UpdateDetailService(
-        UserContext userContext,
-        ITransactionProvider provider,
-        DetailRepository detailRepo,
-        ArchiveRepository archiveRepo)
-        : base(userContext)
-    {
-        _provider = provider;
-        _detailRepo = detailRepo;
-        _archiveRepo = archiveRepo;
-    }
-
+    /// <summary>
+    /// 明細情報を更新し、紐づくアーカイブの統計情報をリフレッシュする
+    /// </summary>
     public async Task<Response> ExecuteAsync(UpdateDetailReq req)
     {
         // 1. 検証
         await ValidateAsync(req);
 
-        // 2. 実行
-        using var tran = _provider.BeginTransaction();
+        // 2. 実行（一貫性確保のためトランザクションを使用）
+        using var tran = provider.BeginTransaction();
         try
         {
             var entity = MapToEntity(req);
 
-            // 更新
-            await _detailRepo.UpdateByKeyAsync(entity);
+            // 更新処理
+            await detailRepo.UpdateByKeyAsync(entity);
 
-            if (req.archive_id > 0) { 
-                // 3. 親（公開アーカイブ）の件数および更新日時をリフレッシュ
-                await _archiveRepo.UpdateDetailCountAsync(req.archive_id);
+            if (req.archive_id > 0)
+            {
+                // 親（アーカイブ）の件数および更新日時をリフレッシュ
+                await archiveRepo.UpdateDetailCountAsync(req.archive_id);
             }
 
             tran.Commit();
@@ -77,8 +70,7 @@ public class UpdateDetailService : _BaseService
 
     private async Task ValidateAsync(UpdateDetailReq req)
     {
-        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
-        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ユーザーIDが無効です");
+        BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
         BusinessException.ThrowIf(req.seq == 0, "SeqIDが無効です");
 
         await Task.CompletedTask;
@@ -99,7 +91,7 @@ public class UpdateDetailService : _BaseService
         weather_code = req.weather_code,
         link_url = req.link_url,
         memo_price = req.memo_price,
-        feel_type = req.feel_type, // ★追加漏れ注意
+        feel_type = req.feel_type,
         del_flg = false
     };
 

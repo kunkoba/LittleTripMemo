@@ -419,6 +419,26 @@ const _DetailContentCore = {
         //
         return mergedData;
     },
+    // 【新規追加】UIの入力欄が空の場合にデフォルト値をセットする
+    async fillEmptyFieldsUI() {
+        // タイトルが空の場合：住所を取得して入力欄にセット
+        if (!this.editTitle.value.trim()) {
+            const lat = Number(this.editLat.value);
+            const lng = Number(this.editLng.value);
+            // 住所取得（非同期）
+            const addressName = await $Util.GetAddressName(lat, lng, "jp");
+            this.editTitle.value = addressName;
+            // 文字数カウントも更新
+            if (this.countTitle) this.countTitle.textContent = addressName.length;
+        }
+        // 本文が空の場合："簡易メモ" を入力欄にセット
+        if (!this.editBody.value.trim()) {
+            const defaultBody = "簡易メモ";
+            this.editBody.value = defaultBody;
+            // 文字数カウントも更新
+            if (this.countBody) this.countBody.textContent = defaultBody.length;
+        }
+    },
 };
 
 // 窓口
@@ -441,6 +461,7 @@ const DetailContentController = {
     },
     // DetailContentController (窓口) 内に追加
     Validate(detail) {
+        console.log("Validate:", detail);
         // 1. タイトル必須チェック
         if (!detail.title || detail.title.trim().length === 0) {
             $Notice.Warn("タイトルを入力してください。");
@@ -456,17 +477,6 @@ const DetailContentController = {
             return false;
         }
         // 5. URL形式チェック（入力されている場合のみ）
-        // if (detail.link_url && detail.link_url.trim().length > 0) {
-        //     try {
-        //         // 文字列がhttpから始まっているか等の簡易チェック
-        //         if (!detail.link_url.startsWith('http')) {
-        //             throw new Error();
-        //         }
-        //     } catch (e) {
-        //         $Notice.Warn("有効なURLを入力してください。");
-        //         return false;
-        //     }
-        // }
         if (detail.link_url && detail.link_url.trim().length > 0) {
             // 【修正点】新設した検証関数を通す
             if (!$Util.getSafeUrl(detail.link_url)) {
@@ -479,6 +489,10 @@ const DetailContentController = {
     // フォームに地点を設定
     SetPos(lat, lng){
         _DetailContentCore.setPos(lat, lng);
+    },
+    // 簡易入力処理
+    async FillEmptyFieldsUI() {
+        await _DetailContentCore.fillEmptyFieldsUI();
     },
 };
 

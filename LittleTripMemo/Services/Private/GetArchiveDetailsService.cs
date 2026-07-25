@@ -7,14 +7,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LittleTripMemo.Services.Private;
 
-/// <summary>
-/// 特定のアーカイブ（まとめ）の詳細情報と、紐づく明細一覧を取得するサービス
-/// </summary>
+/// <summary>特定のアーカイブ（まとめ）の詳細情報と、紐づく明細一覧を取得するサービス</summary>
 public class GetArchiveDetailsService(
     UserContext userContext,
     ArchiveRepository archiveRepository,
     DetailRepository detailRepository,
-    ArchivePubRepository archivePubRepository, // 注入が必要
+    ArchivePubRepository archivePubRepository,
     AppUserRepository appUserRepository
 ) : _BaseService(userContext)
 {
@@ -28,28 +26,25 @@ public class GetArchiveDetailsService(
         DtoUserProfile userProfile
     );
 
-    /// <summary>
-    /// アーカイブ詳細取得処理を実行する
-    /// </summary>
+    /// <summary>アーカイブ詳細取得と公開ステータスの判定</summary>
     public async Task<Response> ExecuteAsync(GetArchiveDetailsReq req)
     {
         // 1. バリデーション
         await ValidateAsync(req);
 
-        // 2. 存在チェック（冒頭で親データの存在を確認）
+        // 2. 存在チェック
         var archive = await archiveRepository.GetByKeyAsync(req.archive_id);
         BusinessException.ThrowIf(archive == null, $"指定されたまとめが見つかりません。(id: {req.archive_id})");
 
-        // 3. 明細の取得と存在チェック
+        // 3. 明細の取得
         var details = await detailRepository.GetByArchiveIdAsync(req.archive_id);
-        // リストが空の場合は異常（本来は明細0で自動解体されるため）
         BusinessException.ThrowIf(details == null, $"まとめの中に明細が見つかりません。(id: {req.archive_id})");
 
         // 4. 所有者情報の取得
         var ownerUser = await appUserRepository.GetByUserIdAsync(archive!.user_id);
         BusinessException.ThrowIf(ownerUser == null, $"まとめの所有者情報が見つかりません。(id: {req.archive_id})");
 
-        // 秘密側の編集画面で「今公開中ですよ」「非公開（限定URL）ですよ」と出すために必須
+        // 公開側（Pub）の状態を取得して DTO に反映
         var pub = await archivePubRepository.GetStatsByKeyAsync(req.archive_id);
         string status = PublicStatus.Nothing.ToString();
         if (pub != null)
@@ -58,39 +53,28 @@ public class GetArchiveDetailsService(
             archive.has_public_status = status;
         }
 
-        // 5. フラグセットと返却準備
+        // 5. フラグセット
         SetAppFlags(archive);
         SetAppFlags(details);
 
         var userProfile = new DtoUserProfile(
-            ownerUser!.user_id,
-            ownerUser.member_no,
-            ownerUser.user_category,
-            ownerUser.user_rank,
-            ownerUser.icon,
-            ownerUser.nick_name,
-            ownerUser.description,
+            ownerUser!.user_id, ownerUser.member_no, ownerUser.user_category, ownerUser.user_rank,
+            ownerUser.icon, ownerUser.nick_name, ownerUser.description,
             ownerUser.link_1, ownerUser.link_2, ownerUser.link_3,
             ownerUser.anonymous_flg,
             is_owner: (ownerUser.user_id == _user.login_user_id),
             is_ban: ownerUser.ban_flg,
-            ownerUser.click_stats,
-            ownerUser.info_stats, 
-            ownerUser.info_stats_pub,
-            ownerUser.report_count,
-            ownerUser.view_history
+            ownerUser.click_stats, ownerUser.info_stats, ownerUser.info_stats_pub,
+            ownerUser.report_count, ownerUser.view_history
         );
 
         return new Response(archive, details, userProfile);
     }
 
-    /// <summary>
-    /// 業務バリデーション
-    /// </summary>
+    /// <summary>業務バリデーション</summary>
     private async Task ValidateAsync(GetArchiveDetailsReq req)
     {
         BusinessException.ThrowIf(_user.login_user_id == Guid.Empty, "ログインが必要です");
-        BusinessException.ThrowIf(_user.table_id == 0, "テーブルIDが無効です");
         BusinessException.ThrowIf(req.archive_id <= 0, "アーカイブIDが不正です");
 
         await Task.CompletedTask;
