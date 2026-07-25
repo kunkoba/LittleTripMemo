@@ -162,8 +162,8 @@ const UI_Manager = {
 		// 初期処理
 		this.ChangeTheme($App.AppData.Owner.Theme);
 		// アイコンバー
-		$TopBar.Init();
-		$BotBar.Init();
+		$Bar.Init();
+		$Bar.Init();
 		// 詳細画面
 		$DetailFrame.Init();
 		$DetailContent.Init();
@@ -192,8 +192,8 @@ const UI_Manager = {
                 return;
         }
 		// アイコンバー
-		$TopBar.ChangeScreenMode();
-		$BotBar.ChangeScreenMode();
+		$Bar.ChangeScreenMode();
+		$Bar.ChangeScreenMode();
 		// 詳細画面
 		$DetailFrame.ChangeScreenMode();
 		$DetailContent.ChangeScreenMode();
@@ -211,8 +211,8 @@ const UI_Manager = {
 	},
 	// アイコンバーの開閉
 	ToggleIconBar(isShow){
-		$TopBar.ToggleRoot(isShow);
-		$BotBar.ToggleRoot(isShow);
+		$Bar.ToggleRoot(isShow);
+		$Bar.ToggleRoot(isShow);
 	},
 	// フォントサイズの変更
 	ChangeFontSize(size){
@@ -223,7 +223,7 @@ const UI_Manager = {
 	// 通知バッヂの更新
 	UpdateNoticeBadge() {
 		// 下段バーのバッヂ更新
-		$BotBar.UpdateNoticeBadge();
+		$Bar.UpdateNoticeBadge();
 		// ダイアログのバッヂ更新
 		$Dialog.UpdateNoticeBadgeDialog();
 	},

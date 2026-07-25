@@ -85,11 +85,15 @@
                 </div>
                 <!-- UI表示切替 -->
                 <div id="ui-map-switch-root" class="z-[1000] pointer-events-auto">
-                    <button id="btn-map-main-switch" class="w-16 h-8 rounded-full bg-slate-200 relative transition-colors shadow-md outline-none">
-                        <!-- スイッチの丸（OFF位置） -->
-                        <div class="js-dot absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-all shadow-sm flex items-center justify-center"></div>
-                        <!-- テキストラベル -->
-                        <span class="js-label absolute right-2.5 top-1/2 -translate-y-1/2 text-[0.7rem] font-black text-slate-400">OFF</span>
+                    <!-- ON状態の完全体ボタン -->
+                    <button id="btn-map-switch-on" class="hidden w-16 h-8 rounded-full bg-brand-5 relative shadow-md outline-none active:scale-95 transition-transform">
+                        <div class="absolute top-1 right-1 w-6 h-6 bg-white rounded-full shadow-sm"></div>
+                        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[0.7rem] font-black text-white">ON</span>
+                    </button>
+                    <!-- OFF状態の完全体ボタン -->
+                    <button id="btn-map-switch-off" class="hidden w-16 h-8 rounded-full bg-slate-300 relative shadow-md outline-none active:scale-95 transition-transform">
+                        <div class="absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-sm"></div>
+                        <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[0.7rem] font-black text-white">OFF</span>
                     </button>
                 </div>
             </div>
@@ -471,8 +475,8 @@
                         </button>
                     </div>
                     <!-- 地図検索・新規登録 -->
-                    <div id="bot-group-action" class="h-16 hidden items-center justify-center gap-4 pointer-events-auto">
-                        <button id="btn-search" class="mr-4 items-center justify-center shadow-md rounded-full transition-all duration-300 focus:outline-none shrink-0">
+                    <div id="bot-group-action" class="h-16 hidden items-center justify-center flex gap-4 pointer-events-auto">
+                        <button id="btn-search" class="items-center justify-center shadow-md rounded-full transition-all duration-300 focus:outline-none shrink-0">
                             🔎
                         </button>
                         <button id="btn-create" class="items-center justify-center shadow-md rounded-full transition-all duration-300 focus:outline-none shrink-0">
@@ -564,12 +568,15 @@
     // UI管理
     import UI from "./js/component/ui-manager.js";
     window.$UI = UI;
-    // 上部バー
-    import TopBar from "./js/component/top-bar-controller.js";
-    window.$TopBar = TopBar;
-    // 下部バー
-    import BotBar from "./js/component/bottom-bar-controller.js";
-    window.$BotBar = BotBar;
+    // // 上部バー
+    // import TopBar from "./js/component/top-bar-controller.js";
+    // window.$TopBar = TopBar;
+    // // 下部バー
+    // import BotBar from "./js/component/bottom-bar-controller.js";
+    // window.$BotBar = BotBar;
+    // バーUI
+    import Bar from "./js/component/bar-controller.js";
+    window.$Bar = Bar;
     // 詳細画面（フレーム）
     import DetailFrame from "./js/component/detail-frame-controller.js";
     window.$DetailFrame = DetailFrame;

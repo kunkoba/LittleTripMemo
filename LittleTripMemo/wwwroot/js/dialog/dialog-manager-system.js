@@ -631,7 +631,7 @@ export default {
                             this._core.close();
                             if (onUpdate) onUpdate();
                             // 下段バーのアイコンを更新
-                            $BotBar.UpdateUserIcon();
+                            $Bar.UpdateUserIcon();
                         })
                     }
                 ]

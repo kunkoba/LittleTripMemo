@@ -189,7 +189,7 @@ window.$Data = {
             if (data.systemInfo) {
                 $App.AppData.Owner.SystemInfo = data.systemInfo;
                 // 下段バーのアイコンを更新
-                $BotBar.UpdateUserIcon();
+                $Bar.UpdateUserIcon();
                 // 通知の未読判定とローカルDBの掃除を非同期で実行
                 $Warn.CatchAsync(async () => {
                     await $Data.LocalDb.CheckUnreadNotices();

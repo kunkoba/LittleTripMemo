@@ -189,7 +189,8 @@ const AppManager = {
             IsOnline: navigator.onLine,
             IsLoggedIn: false,
             TargetArchiveId: 0,
-            TargetSeq: 0
+            TargetSeq: 0,
+            IsMapSwitchOn: true,
         },
         Owner: {
             Plan: "Free",
@@ -262,7 +263,7 @@ const AppManager = {
         } else if (mode === $Const.SCREEN_MODE.ARCHIVE && this.AppData.Context.IsLoggedIn) {
             if (await $Data.Access.GetArchiveDetails({ archive_id: aid })) {
                 // 取得成功時にタイトルを反映
-                $TopBar.ChangeTitle($Data.Store.GetArchive()?.title || "");
+                $Bar.ChangeTitle($Data.Store.GetArchive()?.title || "");
             } else {
                 this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
             }
@@ -273,7 +274,7 @@ const AppManager = {
                     await $Data.LocalDb.SetReactionsToLocalDb();
                 }
                 // 取得成功時にタイトルを反映
-                $TopBar.ChangeTitle($Data.Store.GetArchive()?.title || "");
+                $Bar.ChangeTitle($Data.Store.GetArchive()?.title || "");
             } else {
                 // ★未ログインならログイン要求
                 if (!this.AppData.Context.IsLoggedIn) {

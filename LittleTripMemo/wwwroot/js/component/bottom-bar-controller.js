@@ -53,7 +53,7 @@ const _BottomCore = {
 					return;
 				}
 				const range = $Map.GetSearchRange(0.8);
-				const sortSetting = $TopBar.GetSortSetting();
+				const sortSetting = $Bar.GetSortSetting();
 				const params = { ...range, ...sortSetting, limit: 20 };
 				$Data.Clear();
 				const isSuccess = await $Data.Access.SearchByLocationPub(params);

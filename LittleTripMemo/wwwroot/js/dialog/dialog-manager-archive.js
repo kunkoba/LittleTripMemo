@@ -21,7 +21,7 @@ export default {
                 await $App.RefreshScreen();
             } else {
                 const archive = $Data.Store.GetArchive();
-                if (archive) $TopBar.ChangeTitle(archive.title);
+                if (archive) $Bar.ChangeTitle(archive.title);
             }
         })();
     },
@@ -918,7 +918,7 @@ export default {
                                 : await $Data.Access.UpdateArchivePub({ archive_id: archive.archive_id, ...updatedFields });
                             if (!isSuccess) return;
                             $Data.Store.UpdateArchive(updatedFields);
-                            $TopBar.ChangeTitle(updatedFields.title);
+                            $Bar.ChangeTitle(updatedFields.title);
                             $Notice.Info("保存しました。");
                             this._core.closeAll();
                             // if (onUpdate) onUpdate(); // 参照画面のDOMを最新化
