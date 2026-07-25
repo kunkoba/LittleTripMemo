@@ -85,20 +85,30 @@ export default {
     ShowUserMenu() {
         if (!$App.AppData.Context.IsLoggedIn) return this.ShowLoginDialog();
         const el = $Dom.GenerateTemplate('tpl-menu-user');
+        const profile = $App.AppData.Owner.SystemInfo.ownerProfile; // プロフィール取得
         const b = {
             profile: $Dom.QuerySelector('#btn-sys-user-profile', el),
             mail:    $Dom.QuerySelector('#btn-user-mail', el),
             config:  $Dom.QuerySelector('#btn-sys-user-config', el),
             reports: $Dom.QuerySelector('#btn-sys-my-report', el),
+            history: $Dom.QuerySelector('#btn-user-history', el),
         };
         // 新着バッヂ更新
         $UI.Generator.ApplyNewBadge(b.mail, $App.AppData.Context.UnreadMailCount > 0, 'label');
+        // ① 閲覧履歴が0件（または存在しない）場合はボタンを非表示にする
+        const hasHistory = profile.view_history && profile.view_history.length > 0;
+        $Dom.ToggleShow(b.history, hasHistory);
         // 各種イベント
         b.profile.onclick = () => this.ShowUserProfile($App.AppData.Owner.SystemInfo.ownerProfile, true);
         b.mail.onclick    = () => this.ShowUserMailList();
         b.config.onclick  = () => this.ShowUserSettingsMenu();
         b.reports.onclick = () => this.ShowMyReportList();
-        this._core.open({ title: "ユーザメニュー", content: el });
+        b.history.onclick = () => this.ShowViewHistory(profile.view_history);
+        //
+        this._core.open({ 
+            title: "ユーザメニュー", 
+            content: el 
+        });
     },
     // （ユーザ設定）ユーザー設定メニュー（第2階層）
     ShowUserSettingsMenu() {
@@ -443,6 +453,34 @@ export default {
                 $UI.Generator.LinkButton(viewLinks, item.val, params, isOwner);
             });
         };
+        // --- 匿名モード切り替えロジック ---
+        const anonArea = $Dom.QuerySelector('#view-profile-anon-area', el);
+        const btnAnon = $Dom.QuerySelector('#btn-profile-anon-toggle', el);
+        const txtAnon = $Dom.QuerySelector('#js-anon-status-text', el);
+        const dotAnon = $Dom.QuerySelector('.js-dot', btnAnon);
+        const updateAnonUI = (isOn) => {
+            btnAnon.classList.toggle('bg-brand-5', isOn);
+            btnAnon.classList.toggle('bg-slate-300', !isOn);
+            dotAnon.style.transform = isOn ? "translateX(24px)" : "translateX(0px)";
+            txtAnon.textContent = `匿名モード：${isOn ? 'ON' : 'OFF'}`;
+        };
+        if (isOwner) {
+            $Dom.ToggleShow(anonArea, true);
+            updateAnonUI(!!profile.anonymous_flg);
+            btnAnon.onclick = async () => {
+                const nextStatus = !profile.anonymous_flg;
+                const msg = nextStatus ? "匿名モードに設定しますか？" : "匿名モードを解除しますか？";
+                if (!await this.ShowConfirm({ title: "ANONYMOUS SETTING", message: msg })) return;
+                // 既存のプロフ情報をベースにフラグだけ書き換えて更新
+                const params = { ...profile, anonymous_flg: nextStatus };
+                if (await $Data.Access.UpdateProfile(params)) {
+                    profile.anonymous_flg = nextStatus;
+                    $Data.Store.UpdateProfile({ anonymous_flg: nextStatus });
+                    updateAnonUI(nextStatus);
+                    $Notice.Info("設定を更新しました");
+                }
+            };
+        }
         renderView();
 		const headerButtons = [];
         const isAdmin = $App.AppData.Owner.Plan === "Admin"; // 管理者判定
@@ -960,6 +998,66 @@ export default {
             size: 'lg',
             buttons: [],
             headerButtons: headerButtons
+        });
+    },
+    // 閲覧履歴画面の表示メソッドを新設
+    async ShowViewHistory(ids) {
+        // ② サーバーからアーカイブ情報を取得
+        const isSuccess = await $Data.Access.GetArchiveListByIds({ archive_ids: ids });
+        if (!isSuccess) return;
+        const archives = $Data.resData.archives || [];
+        const root = $Dom.GenerateTemplate("tpl-list-parent");
+        const PDS = $Const.PUBLIC_DATA_STATUS; // Nothing, Open, Close, Delete
+        archives.forEach(item => {
+            const child = $Dom.GenerateTemplate("tpl-list-child-archive");
+            // 基本情報の流し込み
+            $Dom.QuerySelector(".js-update-tim", child).textContent = $Util.FormatDate(item.update_tim);
+            $Dom.QuerySelector(".js-title", child).textContent = item.title;
+            $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
+            $Dom.QuerySelector(".js-count", child).textContent = item.detail_count || "0";
+            // ② has_public_status に対応したUI（バッジと枠線）の制御
+            const border = $Dom.QuerySelector(".js-item-border", child);
+            const countBadge = $Dom.QuerySelector(".js-count-badge", child);
+            const status = item.has_public_status;
+            // クラスのクリア
+            border.className = "js-item-border absolute left-0 top-0 bottom-0 w-1 ";
+            countBadge.className = "js-count-badge px-2.5 py-0.5 rounded-full text-[0.9rem] font-bold text-white italic tracking-tight ";
+            if (status === PDS.OPEN) {
+                border.classList.add("bg-brand-5");
+                countBadge.classList.add("bg-brand-5");
+            } else {
+                // Delete または Nothing（データ異常含む）
+                border.classList.add("bg-slate-800");
+                countBadge.classList.add("bg-slate-800");
+                child.style.opacity = "0.2";
+            }
+            // クリックイベント
+            child.onclick = async () => {
+                // ③ Open以外は詳細を開けないようにする
+                if (status !== PDS.OPEN) {
+                    $Notice.Warn("このまとめは現在、公開されていません。");
+                    return;
+                }
+                // ④ 詳細に飛ぶ前に確認ダイアログを表示
+                const isOk = await this.ShowConfirm({
+                    title: "OPEN ARCHIVE",
+                    message: `「${item.title}」を開きますか？`,
+                    label: "OPEN"
+                });
+                if (!isOk) return;
+                // 遷移実行
+                this._core.closeAll();
+                $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+                $App.AppData.Context.TargetArchiveId = item.archive_id;
+                await $App.RefreshScreen();
+            };
+            root.appendChild(child);
+        });
+        this._core.open({
+            title: "最近チェックしたまとめ",
+            content: root,
+            size: "lg",
+            help: "最近閲覧した「公開まとめ」の一覧です。\n※現在公開を停止しているものは開くことができません。"
         });
     },
 };

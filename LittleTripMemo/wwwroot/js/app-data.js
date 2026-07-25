@@ -34,6 +34,7 @@ const API_ENDPOINTS = {
     CloseArchive:           { method: 'post', url: '/api/Public/CloseArchive' },
     BulkSyncReactions:      { method: 'post', url: '/api/Public/BulkSyncReactions' },
     OpenLimitedArchive:     { method: 'post', url: '/api/Public/OpenLimitedArchive' },
+    GetArchiveListByIds:    { method: 'post', url: '/api/Public/GetArchiveListByIds' },
     // Sys
     UpsertFeedback:         { method: 'post', url: '/api/Sys/UpsertFeedback' },
     UpsertReport:           { method: 'post', url: '/api/Sys/UpsertReport' },

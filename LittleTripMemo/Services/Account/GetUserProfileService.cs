@@ -24,7 +24,9 @@ public class GetUserProfileService(
 
         // 2. 共通DTOへマッピング（member_no, user_category, user_rank を含む最新版）
         bool is_owner = (targetUser.user_id == _user.login_user_id);
-        bool hide = targetUser.anonymous_flg && !is_owner;
+        bool is_admin = _user.plan_type == PlanType.Admin.ToString();
+        // 管理者の場合は匿名設定でも非表示にしない
+        bool hide = targetUser.anonymous_flg && !is_owner && !is_admin;
 
         var profile = new DtoUserProfile(
             targetUser.user_id,

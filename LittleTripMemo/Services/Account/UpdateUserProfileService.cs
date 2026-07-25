@@ -19,6 +19,7 @@ public record UpdateUserReq(
     [Required] string nick_name,
     string description,
     string? user_category,
+    bool anonymous_flg,
     string link_1, string link_2, string link_3
 ) : ILoginUserRequest;
 
@@ -44,7 +45,8 @@ public record UpdateUserReq(
             user_category = req.user_category,
             link_1 = req.link_1,
             link_2 = req.link_2,
-            link_3 = req.link_3
+            link_3 = req.link_3,
+            anonymous_flg = req.anonymous_flg
         };
 
         await _appUserRepo.UpdateProfileAsync(app_user);

@@ -240,8 +240,10 @@ const MarkerController = {
     RefreshPointMarker() {
         const details = $Data.Store.GetDetails();
         if (!details) return;
-        // 描画前に日時順でソートを実行
-        $Data.Formatter.SortDetails(details);
+        // 地図検索モード以外の場合のみ、描画前に日時順でソートを実行
+        if ($App.AppData.Context.ScreenMode !== $Const.SCREEN_MODE.SEARCH) {
+            $Data.Formatter.SortDetails(details);
+        }
         this.Clear();
         _MarkerCore.generateArrowList();
         // マーカー生成

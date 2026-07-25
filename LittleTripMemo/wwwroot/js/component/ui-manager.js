@@ -87,9 +87,14 @@ const UI_Manager = {
 			if (type === 'button') {
 				el.onclick = async (e) => {
 					e.stopPropagation();
+                    // ★修正：匿名かつ自分以外（管理者以外）なら中断
+                    if (profile.anonymous_flg && !isOwner && $App.AppData.Owner.Plan !== "Admin") {
+                        $Notice.Warn("このユーザーは情報を公開していません");
+                        return;
+                    }
 					if (isOwner) {
 						// 自分の場合は保存済みのプロフを表示
-						$Dialog.ShowUserProfile(profile, true);
+						$Dialog.ShowUserProfile($App.AppData.Owner.SystemInfo.ownerProfile, true);
 					} else {
 						// 他人の場合はAPIで詳細を取得して表示
 						const isSuccess = await $Data.Access.GetUserProfile({ target_user_id: profile.user_id });

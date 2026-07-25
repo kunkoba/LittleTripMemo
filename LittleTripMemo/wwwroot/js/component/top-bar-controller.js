@@ -71,8 +71,9 @@ const _TopCore = {
                 if (this.sortFeel) {
                     const feelTypes = Object.values($Const.FEEL_TYPE);
                     this.sortFeel.innerHTML = feelTypes.map((f, idx) => `
-                        <button data-value="${f.val}" class="ui-btn h-full px-3 transition-colors flex items-center ${idx === 1 ? 'bg-brand-3' : 'bg-brand-0'}">
-                            <img src="${f.path}" class="w-6 h-6 object-contain pointer-events-none">
+                        <button data-value="${f.val}" class="ui-btn h-full px-4 transition-colors flex items-center 
+                            ${idx === 0 ? 'bg-brand-3' : 'bg-brand-0'} ${f.val == 0 ? 'hidden' : ''}">
+                            <img src="${f.path}" class="w-7 h-7 object-contain pointer-events-none">
                         </button>
                     `).join('');
                     this.sortFeel.addEventListener("click", (e) => {

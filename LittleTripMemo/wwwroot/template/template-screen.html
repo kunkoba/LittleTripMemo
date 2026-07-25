@@ -145,6 +145,13 @@
 <!-- 【ダイアログ子】アプリ情報 / プロフィール / アーカイブ -->
 <template id="tpl-view-profile">
 	<div class="relative min-h-full flex flex-col bg-white px-1">
+        <!-- 匿名設定エリア（オーナー表示時のみJSで表示制御） -->
+        <div id="view-profile-anon-area" class="hidden flex items-center gap-3 px-1 pb-3 border-b border-slate-200 mb-2">
+            <button id="btn-profile-anon-toggle" class="w-12 h-6 rounded-full bg-slate-300 relative transition-colors shrink-0 outline-none">
+                <div class="js-dot absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-all shadow-sm"></div>
+            </button>
+            <span id="js-anon-status-text" class="text-[0.9rem] font-bold text-slate-600">匿名モード：OFF</span>
+        </div>
         <!-- 上部：ステータス情報 (No. と レベル) -->
         <div class="flex justify-between items-baseline px-1 border-b border-slate-200 pb-2 mb-2">
             <div class="flex items-center gap-2">

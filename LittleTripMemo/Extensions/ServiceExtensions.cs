@@ -57,7 +57,7 @@ public static class ServiceExtensions
         services.AddScoped<EnsureLoginUserService>();
         services.AddScoped<WithdrawalUserService>();
 
-        // Private (User's Workspace)
+        // Private
         services.AddScoped<GetUnMergeDetailsService>();
         services.AddScoped<GetArchiveDetailsService>();
         services.AddScoped<GetArchiveListService>();
@@ -72,7 +72,7 @@ public static class ServiceExtensions
         services.AddScoped<UpdateDetailService>();
         services.AddScoped<RecreatePublicArchiveService>(); 
 
-        // Public (World Explorer)
+        // Public
         services.AddScoped<GetArchiveDetailsPubService>();
         services.AddScoped<SearchByLocationPubService>();
         services.AddScoped<UnpublishArchiveService>();
@@ -82,9 +82,10 @@ public static class ServiceExtensions
         services.AddScoped<UpdateDetailPubService>();
         services.AddScoped<BulkSyncReactionService>();
         services.AddScoped<AddCountQueueService>();
-        services.AddScoped <OpenLimitedArchiveService>();
+        services.AddScoped<OpenLimitedArchiveService>();
+        services.AddScoped<GetArchiveListByIdsService>();
 
-        // Sys (General)
+        // Sys
         services.AddScoped<GetSystemInfoService>();
         services.AddScoped<UpsertFeedbackService>();
         services.AddScoped<GetMyFeedbackService>();
@@ -93,7 +94,7 @@ public static class ServiceExtensions
         services.AddScoped<DeleteMyReportService>();
         services.AddScoped<GetMyUserNotificationsService>();
 
-        // Admin (Privileged)
+        // Admin
         services.AddScoped<GetAdminAllInfoService>();
         services.AddScoped<GetAllFeedbackService>();
         services.AddScoped<UpsertNotificationService>();

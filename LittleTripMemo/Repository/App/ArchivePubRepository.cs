@@ -249,7 +249,6 @@ public class ArchivePubRepository : _BaseRepository
         return await ExecuteAsync(sql, new { archiveId, isLimited, user_id = _user.login_user_id });
     }
 
-
     /// <summary>
     /// 公開解除（close）化
     /// </summary>
@@ -264,6 +263,17 @@ public class ArchivePubRepository : _BaseRepository
             WHERE archive_id = @archive_id
               AND user_id    = @user_id";
         return await ExecuteAsync(sql, new { archive_id = archiveId, user_id = _user.login_user_id });
+    }
+
+    /// <summary>
+    /// 閲覧履歴用まとめリスト
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<TMemoArchivePub>> GetAllByIdsAsync(IEnumerable<int> ids)
+    {
+        const string sql = "SELECT * FROM t_memo_archive_pub WHERE archive_id = ANY(@ids)";
+        return await QueryAsync<TMemoArchivePub>(sql, new { ids = ids.ToArray() });
     }
 
 }
