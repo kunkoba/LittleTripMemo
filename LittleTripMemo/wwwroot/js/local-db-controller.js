@@ -1,9 +1,11 @@
 // 現在のログインユーザーIDを取得（未ログイン時は 'anonymous'）
 const getUserId = () => {
-    if ($App.AppData.Owner.SystemInfo) {
-        return $App.AppData.Owner.SystemInfo.login_user_id;
+    const uid = $App.AppData.Owner.SystemInfo?.login_user_id;
+    // IDが空（未ログインまたは初期化前）ならエラーを投げて後続のDB処理を止める
+    if (!uid) {
+        throw new Error("[LocalDB] ユーザーIDが取得できていません！");
     }
-    return '';
+    return uid;
 };
 
 // IndexedDBの低レイヤー操作を担当する現場作業員（Core）

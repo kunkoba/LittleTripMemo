@@ -1,89 +1,76 @@
-// アプリ基盤
-const AppManager = {
-AppSettingKey: "little_trip_settings",
-    AppData: {
-        Context: {
-            ScreenMode: $Const.SCREEN_MODE.CREATE,
-            MarkerMode: $Const.MARKER_MODE.EMOJI,
-            IsOnline: navigator.onLine,
-            IsLoggedIn: false,
-            TargetArchiveId: 0,
-            TargetSeq: 0,
-        },
-        Owner: {
-            Plan: "Free",
-            Theme: null,
-            MapStyle: null,
-            GpsTrackingSec: 60,
-            Currency_unit: '円',
-            FontSize: 'standard',
-            LastLoginDate: null,
-            SystemInfo: null,
-            Token: null,
-        },
-        Admin: {
-            Notifications:[],
-            ReportSummary: [],
-            FeedbackList:[],
-            UserMailList: [],
-        },
-        Legal: {
-            TermsOfService: { body: "TermsOfService", update_tim: null },
-            PrivacyPolicy:  { body: "PrivacyPolicy",  update_tim: null },
-            License:        { body: "License",        update_tim: null },
-        },
+// --- 内部プロセス（プライベート） ---
+const _AppCore = {
+    settingsKey: "little_trip_settings",
+    // ビューポート制御（キーボード対策）とUI初期化を行う
+    async setupShell() {
+        // ビューポート制御（キーボード対策）
+        if (window.visualViewport) {
+            const root = document.getElementById('app-root');
+            const adjust = () => {
+                // 入力中（IME/キーボード表示中）はリサイズ処理をスキップ
+                if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
+                    return;
+                }
+                root.style.height = `${window.visualViewport.height}px`;
+                window.scrollTo(0, 0);
+            };
+            window.visualViewport.addEventListener('resize', adjust);
+            window.visualViewport.addEventListener('scroll', adjust);
+        }
+        // UI基盤初期化とテンプレート読込待機
+        $UI.Init();
+        await new Promise(resolve => {
+            const check = () => document.getElementById('tpl-dialog-error') ? resolve() : setTimeout(check, 30);
+            check();
+        });
     },
-    // iPhoneのキーボード対策（入力中を考慮）
-    _initViewport() {
-        if (!window.visualViewport) return;
-        const root = document.getElementById('app-root');
-        const adjust = () => {
-            // 入力中（inputやtextareaにフォーカスがある）なら制御をスキップ
-            const activeEl = document.activeElement;
-            const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
-            if (isTyping) return;
-            // キーボードが閉じていれば高さを固定し、ズレを戻す
-            root.style.height = `${window.visualViewport.height}px`;
-            window.scrollTo(0, 0);
-        };
-        // 各種イベントに紐付け
-        window.visualViewport.addEventListener('resize', adjust);
-        window.visualViewport.addEventListener('scroll', adjust);
-        // 入力終了（フォーカス外れ）の瞬間に再計算をかける
-        document.addEventListener('focusout', () => setTimeout(adjust, 100));
-        adjust();
+    // localStorageの設定復元 → URLパラメータ解析 → DB接続 の順で行う
+    async restoreLocal(AppData) {
+        // localStorage から設定と ID を復元
+        const saved = JSON.parse(localStorage.getItem(this.settingsKey) || '{}');
+        AppData.Owner.Theme = saved.theme;
+        AppData.Owner.MapStyle = $Map.MAP_STYLE[saved.mapStyleKey];
+        AppData.Owner.IsMapGrayscale = !!saved.isMapGrayscale;
+        AppData.Owner.GpsTrackingSec = saved.gpsTrackingSec ?? 0;
+        AppData.Owner.Currency_unit = saved.currency_unit || '円';
+        AppData.Owner.FontSize = saved.fontSize || 'standard';
+        AppData.Owner.Token = saved.token;
+        AppData.Owner.LastLoginDate = saved.lastLoginDate;
+        if (saved.loginUserId) {
+            AppData.Owner.SystemInfo = { login_user_id: saved.loginUserId };
+        }
+        // URLパラメータ解析
+        const params = new URLSearchParams(location.search);
+        const targetId = $Util.DecodeId(params.get("encodedId"));
+        const urlMode = params.get("mode");
+        AppData.Context.TargetArchiveId = targetId;
+        if (urlMode) {
+            // モード指定がある場合はそれを優先
+            AppData.Context.ScreenMode = urlMode;
+        } else {
+            // 指定が無い場合はターゲットIDの有無からモードを推定
+            AppData.Context.ScreenMode = targetId ? $Const.SCREEN_MODE.ARCHIVE_PUB : $Const.SCREEN_MODE.CREATE;
+        }
+        // 身分確定後にDB接続
+        await $LocalDb.Init();
     },
-    // 設定を保存
-    _saveSettings() {
-        localStorage.setItem(this.AppSettingKey, JSON.stringify({
-            theme: this.AppData.Owner.Theme,
-            mapStyleKey: this.AppData.Owner.MapStyle?.key,
-            isMapGrayscale: this.AppData.Owner.IsMapGrayscale,
-            gpsTrackingSec: this.AppData.Owner.GpsTrackingSec,
-            token: this.AppData.Owner.Token,
-            currency_unit: this.AppData.Owner.Currency_unit,
-            fontSize: this.AppData.Owner.FontSize,
-            lastLoginDate: this.AppData.Owner.LastLoginDate,
+    // 設定とIDの永続化
+    save(Owner) {
+        localStorage.setItem(this.settingsKey, JSON.stringify({
+            theme: Owner.Theme,
+            mapStyleKey: Owner.MapStyle?.key,
+            isMapGrayscale: Owner.IsMapGrayscale,
+            gpsTrackingSec: Owner.GpsTrackingSec,
+            token: Owner.Token,
+            currency_unit: Owner.Currency_unit,
+            fontSize: Owner.FontSize,
+            lastLoginDate: Owner.LastLoginDate,
+            loginUserId: Owner.SystemInfo?.login_user_id
         }));
-        // console.log("_saveSettings:", this.AppData.Owner);
     },
-    // 設定を読込
-    _loadSettings() {
-        const saved = JSON.parse(localStorage.getItem(this.AppSettingKey) || '{}');
-        if (saved.theme) this.AppData.Owner.Theme = saved.theme;
-        if (saved.mapStyleKey) this.AppData.Owner.MapStyle = $Map.MAP_STYLE[saved.mapStyleKey];
-        if (saved.isMapGrayscale) this.AppData.Owner.IsMapGrayscale = saved.isMapGrayscale;
-        if (saved.gpsTrackingSec !== undefined) this.AppData.Owner.GpsTrackingSec = saved.gpsTrackingSec;
-        if (saved.token) this.AppData.Owner.Token = saved.token;
-        if (saved.currency_unit) this.AppData.Owner.Currency_unit = saved.currency_unit;
-        if (saved.fontSize) this.AppData.Owner.FontSize = saved.fontSize;
-        if (saved.lastLoginDate) this.AppData.Owner.LastLoginDate = saved.lastLoginDate;
-        console.log("_loadSettings:", this.AppData.Owner);
-    },
-    // 定期タスクの定義と開始
-    _initPollingTasks() {
-        const checkSec = 1;
-        const gpsTrackingSec = $App.AppData.Owner.GpsTrackingSec;
+    // オフライン監視・GPS追従・データ同期などのポーリング処理をまとめて登録する
+    initPollingTasks() {
+        const checkSec = 10;
         const saveDetailSec = $Const.APP_CONFIG.SAVE_DETAIL_SEC;
         const saveReactionSec = $Const.APP_CONFIG.SAVE_REACTION_SEC;
         const activityCheckSec = 300;
@@ -91,444 +78,309 @@ AppSettingKey: "little_trip_settings",
         // オフライン監視
         $Polling.Add($Polling.TASKS.OFFLINE_CHECK, () => {
             const isOn = navigator.onLine;
-            $App.AppData.Context.IsOnline = isOn;    // オフライン状態を保持
+            $App.AppData.Context.IsOnline = isOn;
             if (isOn) {
-                // オンライン
+                // オンライン復帰時：通知を隠し、各同期タスクを再開
                 $Notice.Offline.Hide();
                 $Polling.Start($Polling.TASKS.DATA_DETAIL);
                 $Polling.Start($Polling.TASKS.DATA_REACTION);
                 $Polling.Start($Polling.TASKS.SYNC_ACTIVITY);
             } else {
-                // オフライン
+                // オフライン時：通知を表示し、各同期タスクを停止
                 $Notice.Offline.Show();
                 $Polling.Stop($Polling.TASKS.DATA_DETAIL);
                 $Polling.Stop($Polling.TASKS.DATA_REACTION);
                 $Polling.Stop($Polling.TASKS.SYNC_ACTIVITY);
             }
         }, checkSec);
-        // GPSトラッキング
-        if (gpsTrackingSec > 0) {
-            // 現在地追従（保存された秒数で登録）
-            $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
-                $Marker.RefreshCurrentLocation();
-            }, gpsTrackingSec);
-            $Polling.Start($Polling.TASKS.GPS_FOLLOW);
-        }
-        // データ送信処理
+        // GPS追従（初期登録）
+        $Polling.Add(
+            $Polling.TASKS.GPS_FOLLOW,
+            () => $Marker.RefreshCurrentLocation(),
+            $App.AppData.Owner.GpsTrackingSec || 60
+        );
+        // データ同期：地点メモ（詳細情報）
         $Polling.Add($Polling.TASKS.DATA_DETAIL, async () => {
-            if (!$App.AppData.Context.IsLoggedIn) return;
-            if (await $LocalDb.Detail.GetCount() === 0) return;
-            // 全て $Data.LocalDb に任せる
-            const isSuccess = await $Data.LocalDb.BulkSendDetails();
-            if (isSuccess) {
-                // 最新データをサーバーから再取得し、マーカーを再描画する
-                await this.RefreshScreen(); 
-                // 通知
-                const msg = "バックグラウンド同期は成功しました：明細メモ"
-                $Notice.Info(msg);
+            if (!$App.AppData.Context.IsLoggedIn || await $LocalDb.Detail.GetCount() === 0) {
+                return;
+            }
+            if (await $Data.LocalDb.BulkSendDetails()) {
+                await AppManager.RefreshScreen();
+                $Notice.Info("同期完了：地点メモ");
             }
         }, saveDetailSec);
-        // リアクションデータ送信処理
+        // データ同期：リアクション
         $Polling.Add($Polling.TASKS.DATA_REACTION, async () => {
-            if (!$App.AppData.Context.IsLoggedIn) return;
+            if (!$App.AppData.Context.IsLoggedIn) {
+                return;
+            }
             const unsent = await $LocalDb.Reaction.GetUnsentAll();
-            if (!unsent || unsent.length === 0) return;
-            // 全て $Data.LocalDb に任せる
-            const isSuccess = await $Data.LocalDb.BulkSendReactions();
-            if (isSuccess) {
-                // 通知
-                const msg = "バックグラウンド同期は成功しました：リアクション"
-                $Notice.Info(msg);
-                console.log(msg);
+            if (unsent?.length > 0 && await $Data.LocalDb.BulkSendReactions()) {
+                $Notice.Info("同期完了：リアクション");
             }
         }, saveReactionSec);
-        // ログインチェック
+        // 最終利用日の同期チェック（未ログイン扱いになっていないか確認）
         $Polling.Add($Polling.TASKS.SYNC_ACTIVITY, async () => {
-            if ($App.AppData.Context.IsLoggedIn) {
-                // ユーザ存在チェック＆最終ログイン日時設定
-                let isSuccess = await this.SyncActivityLog();
-                if (!isSuccess) {
-                    $Dialog.ShowLoginDialog();
-                    return;
-                }
+            if (!await this.syncActivityLog()) {
+                $Dialog.ShowLoginDialog();
             }
         }, activityCheckSec);
-        // 定期タスク開始-----
         $Polling.Start($Polling.TASKS.OFFLINE_CHECK);
     },
-    // 戦略：バックグラウンドでの自動更新（ユーザーへの確認なし）
-    _initServiceWorker() {
-        if (!('serviceWorker' in navigator)) return;
-        // バージョンをURLに付与することで、app-const.jsの更新時にブラウザへ新SWを検知させる
-        const swUrl = `./sw.js?v=${$Const.APP_INFO.VERSION}`;
-        navigator.serviceWorker.register(swUrl)
-            .then(reg => {
-                console.log('[SW] 登録完了:', reg.scope);
-                // 新しいSWが見つかった際、古いSWを待たずに即座に有効化させるための
-                // updatefoundイベント（sw.js側のskipWaitingと連動して速やかに更新を完了させる）
-                reg.onupdatefound = () => {
-                    const installingWorker = reg.installing;
-                    installingWorker.onstatechange = () => {
-                        if (installingWorker.state === 'installed') {
-                            if (navigator.serviceWorker.controller) {
-                                console.log('[SW] 新しいバージョンをダウンロードしました。次回の起動で反映されます。');
-                            }
-                        }
-                    };
-                };
-            })
-            .catch(err => {
-                console.error('[SW] 登録失敗:', err);
-            });
-        // 使用中に勝手に画面が変わって入力データが消えるのを防ぐため、
-        // controllerchange（自動リロード）の監視は行いません。
-    },
-    // 更新確認ダイアログの共通処理
-    async _confirmUpdate(worker) {
-        const isOk = await $Dialog.ShowConfirm({
-            title: "UPDATE",
-            message: "新しいバージョンが利用可能です。\n最新版に更新しますか？",
-            label: "UPDATE"
-        });
-        if (isOk) {
-            // sw.js側で作った窓口（message）に合図を送る
-            worker.postMessage({ type: 'SKIP_WAITING' });
+    // 最終利用日の同期
+    async syncActivityLog() {
+        if (!$App.AppData.Context.IsLoggedIn || !navigator.onLine) {
+            return true;
         }
+        const today = new Date().setHours(0, 0, 0, 0);
+        const last = $App.AppData.Owner.LastLoginDate
+            ? new Date($App.AppData.Owner.LastLoginDate).setHours(0, 0, 0, 0)
+            : 0;
+        // 既に当日分を同期済みなら何もしない
+        if (today <= last) {
+            return true;
+        }
+        if (await $Data.Access.EnsureLoginUser()) {
+            $App.AppData.Owner.LastLoginDate = $Util.FormatDate(today, 'YYYY-MM-DD');
+            this.save($App.AppData.Owner);
+            return true;
+        }
+        return false;
     },
-    // アプリ起動時フロー
-    async Init() {
-        console.log("★★★ App.Init ★★★");
-        // 1. UI基盤の準備（エラー画面を出せるように最初に行う）
-        this._initViewport();
-        $UI.Init();
-        // オフラインチェック
-        if (!navigator.onLine) {
+    // 法的情報（利用規約・プライバシーポリシー等）の差分更新
+    async refreshLegalConfigs() {
+        const localData = await $LocalDb.Legal.GetAll();
+        // ローカルの最終更新日時を各項目ごとに算出
+        const items = Object.values($Const.LEGAL_TYPE).map(key => ({
+            key: key,
+            last_sync_tim: localData.find(d => d.id === key)?.update_tim || "1900-01-01T00:00:00"
+        }));
+        if (!await $Data.Access.GetLegalConfigs({ items })) {
             return;
         }
-        // テンプレート待機（部品が届くまでメイン処理を待つ）
-        await new Promise(resolve => {
-            const check = () => document.getElementById('tpl-dialog-error') ? resolve() : setTimeout(check, 30);
-            check();
-        });
-        // 2. メインロジック
+        const results = $Data.resData.results || [];
+        let hasUpdate = false;
+        for (const res of results) {
+            if (res.value !== null) {
+                await $LocalDb.Legal.Save(res.key, res.value, res.update_tim, true);
+                hasUpdate = true;
+            }
+        }
+        if (hasUpdate) {
+            await $Data.LocalDb.CheckLegalUnread();
+        }
+    },
+    // サービスワーカー登録
+    registerSW() {
+        if (!('serviceWorker' in navigator)) {
+            return;
+        }
+        navigator.serviceWorker
+            .register(`./sw.js?v=${$Const.APP_INFO.VERSION}`)
+            .catch(e => console.error(e));
+    }
+};
+// --- 公開窓口 ---
+const AppManager = {
+    // アプリケーション全体の状態を保持するデータストア
+    AppData: {
+        Context: {
+            ScreenMode: $Const.SCREEN_MODE.CREATE,
+            IsOnline: navigator.onLine,
+            IsLoggedIn: false,
+            TargetArchiveId: 0,
+            TargetSeq: 0
+        },
+        Owner: {
+            Plan: "Free",
+            Theme: null,
+            MapStyle: null,
+            GpsTrackingSec: 0,
+            Currency_unit: '円',
+            FontSize: 'standard',
+            LastLoginDate: null,
+            SystemInfo: null,
+            Token: null
+        },
+        Admin: {
+            Notifications: [],
+            ReportSummary: [],
+            FeedbackList: [],
+            UserMailList: []
+        },
+        Legal: {
+            TermsOfService: null,
+            PrivacyPolicy: null,
+            License: null
+        }
+    },
+    // 初期化司令
+    // アプリ起動時の一連の初期化処理（描画基盤 → ローカル復元 → ログイン確認 →
+    // 画面描画 → ポーリング開始 → SW登録）をまとめて実行する
+    async Init() {
         try {
-            // --- 起動処理（Token復元とDB初期化） ---
-            {
-                this._loadSettings();
-                await $LocalDb.Init();
-                this.RefreshLegalConfigs();     // 規約類の同期を開始（awaitせずバックグラウンドで実行）
-                if (this.AppData.Owner.Token) {
-                    this.AppData.Context.IsLoggedIn = true;
-                    // 【修正点】失敗しても return せず、オフラインとして続行する
-                    try {
-                        await this.SyncActivityLog();
-                        await $Data.Access.GetSystemInfo();
-                    } catch (e) {
-                        console.warn("同期スキップ:", e.message);
-                    }
+            // Phase 1〜2: 描画基盤とローカル設定の復元
+            await _AppCore.setupShell();
+            await _AppCore.restoreLocal(this.AppData);
+            // トークンがあればログイン済みとして扱い、オンラインならサーバと同期
+            if (this.AppData.Owner.Token) {
+                this.AppData.Context.IsLoggedIn = true;
+                if (navigator.onLine) {
+                    await _AppCore.syncActivityLog();
+                    await $Data.Access.GetSystemInfo();
+                    _AppCore.save(this.AppData.Owner);
                 }
             }
-            // --- リクエストパラメータ取得（元のロジックそのまま） ---
-            {
-                const params = new URLSearchParams(location.search);
-                const urlMode = params.get("mode");
-                const targetArchiveId = $Util.DecodeId(params.get("encodedId"));
-                this.AppData.Context.TargetArchiveId = targetArchiveId;
-                if (urlMode) {
-                    this.AppData.Context.ScreenMode = urlMode;
-                } else {
-                    if (this.AppData.Context.TargetArchiveId) {
-                        this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
-                    } else {
-                        this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    }
-                }
-                // Token復元済みなので、ここで勝手にログイン画面が出ることはありません
-                if (!this.AppData.Context.TargetArchiveId && !this.AppData.Context.IsLoggedIn) {
-                    $Dialog.ShowLoginDialog();
-                    return;
-                }
+            // 見た目設定（テーマ・地図スタイル・フォントサイズ）を復元・適用
+            this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
+            this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD, this.AppData.Owner.IsMapGrayscale);
+            this.ChangeFontSize(this.AppData.Owner.FontSize);
+            // 画面描画
+            await this.RefreshScreen();
+            // 定期タスク（ポーリング）の登録・開始
+            _AppCore.initPollingTasks();
+            if (this.AppData.Owner.GpsTrackingSec > 0 && navigator.onLine) {
+                $Polling.Start($Polling.TASKS.GPS_FOLLOW);
             }
-            // --- メイン処理（元の設定反映ロジックそのまま） ---
-            {
-                this._initPollingTasks();
-                this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
-                this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD, this.AppData.Owner.IsMapGrayscale || false);
-                this.ChangeGpsTracking(this.AppData.Owner.GpsTrackingSec || 0)
-                this.ChangeCurrency(this.AppData.Owner.Currency_unit || '円')
-                this.ChangeFontSize(this.AppData.Owner.FontSize || 'standard');
+            // 未ログイン・共有リンクでもない・オンラインの場合はログインダイアログを表示
+            if (!this.AppData.Context.TargetArchiveId && !this.AppData.Context.IsLoggedIn && navigator.onLine) {
+                $Dialog.ShowLoginDialog();
             }
-            // --- 最終描画（通信エラーで死なないように保護） ---
-            try {
-                await this.RefreshScreen();
-            } catch (e) {
-                console.warn("描画データ取得失敗:", e.message);
-            }
-            this._initServiceWorker();
-            // $Marker.FocusToLocationMarker();
-        } catch (fatalErr) {
-            // 本当に致命的なエラー（プログラムのバグ等）のみ、エラー画面へ
-            console.error("Fatal Error:", fatalErr);
-            $Err.Handle(fatalErr);
+            _AppCore.registerSW();
+            _AppCore.refreshLegalConfigs();
+        } catch (e) {
+            $Err.Handle(e, 'fatal');
         }
     },
-    // 画面モード変更
+    // 画面再描画
+    // 現在のスクリーンモードに応じてデータを取得し直し、UI・マーカーを更新する
     async RefreshScreen() {
-        console.log("- RefreshScreen");
-        // データをクリア
         $Data.Clear();
-        // アーカイブID
-        const archiveId = this.AppData.Context.TargetArchiveId;
-        let isSuccess = false;
-        // モードごとにデータ取得
-        switch (this.AppData.Context.ScreenMode) {
-            case $Const.SCREEN_MODE.CREATE:
+        const mode = this.AppData.Context.ScreenMode;
+        const aid = this.AppData.Context.TargetArchiveId;
+        if (mode === $Const.SCREEN_MODE.CREATE && this.AppData.Context.IsLoggedIn) {
+            // 作成モード：未マージの地点メモをサーバ・ローカルDB両方から取得
+            await $Data.Access.GetUnMergeDetails({});
+            (await $LocalDb.Detail.GetAll()).forEach(d => $Data.Store.UpdateDetail(d));
+        } else if (mode === $Const.SCREEN_MODE.ARCHIVE && this.AppData.Context.IsLoggedIn) {
+            // 保存済みアーカイブモード：取得失敗時は作成モードへフォールバック
+            if (!await $Data.Access.GetArchiveDetails({ archive_id: aid })) {
+                this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+            }
+        } else if (mode === $Const.SCREEN_MODE.ARCHIVE_PUB && aid) {
+            // 公開アーカイブモード：取得成功時はリアクションもローカルDBへ反映
+            if (await $Data.Access.GetArchiveDetailsPub({ archive_id: aid })) {
                 if (this.AppData.Context.IsLoggedIn) {
-                    // 地点データ取得
-                    isSuccess = await $Data.Access.GetUnMergeDetails({});
+                    await $Data.LocalDb.SetReactionsToLocalDb();
                 }
-                break;
-            case $Const.SCREEN_MODE.ARCHIVE:
-                if (!archiveId) {
-                    // 不正な場合はログインダイアログを出して待機
-                    if (!this.AppData.Context.IsLoggedIn) $Dialog.ShowLoginDialog();
-                    this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    window.history.replaceState(null, '', window.location.pathname); // URLをクリア
-                    // return;
-                }
-                if (this.AppData.Context.IsLoggedIn) {
-                    isSuccess = await $Data.Access.GetArchiveDetails({ archive_id: archiveId });
-                    if (!isSuccess) {
-                        // this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    } else {
-                        const archive = $Data.Store.GetArchive();
-                        $TopBar.ChangeTitle(archive?.title || "");
-                    };
-                }
-                break;
-            case $Const.SCREEN_MODE.ARCHIVE_PUB:
-                if (!archiveId) {
-                    if (!this.AppData.Context.IsLoggedIn) $Dialog.ShowLoginDialog();
-                    this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    window.history.replaceState(null, '', window.location.pathname); // URLをクリア
-                    // this.RefreshScreen();
-                    // return;
-                }
-                isSuccess = await $Data.Access.GetArchiveDetailsPub({ archive_id: archiveId });
-                if (!isSuccess) {
-                    if (!this.AppData.Context.IsLoggedIn) {
-                        return;
-                    }
-                    this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
-                    window.history.replaceState(null, '', window.location.pathname); // エラー時にURLをクリア
-                } else {
-                    // 取得した直後にローカルDBへ同期
-                    if (this.AppData.Context.IsLoggedIn) {
-                        await $Data.LocalDb.SetReactionsToLocalDb();
-                    }
-                    const archivePub = $Data.Store.GetArchive();
-                    $TopBar.ChangeTitle(archivePub?.title || "");
-                };
-                break;
-            case $Const.SCREEN_MODE.SEARCH:
-                $Marker.Clear();
-                break;
-            default:
-                // 不正か？
-                console.error("不正ログイン！！")
-                $Dialog.ShowLoginDialog();
-                return;
+            } else {
+                this.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE;
+            }
         }
-        // ローカル㏈にデータがあれば吸い上げる
-        if (this.AppData.Context.IsLoggedIn && this.AppData.Context.ScreenMode == $Const.SCREEN_MODE.CREATE) {
-            await $Warn.CatchAsync(async () => {
-                const localDetails = await $LocalDb.Detail.GetAll();
-                if (localDetails && localDetails.length > 0) {
-                    localDetails.forEach(d => {
-                        $Data.Store.UpdateDetail(d);
-                    });
-                }
-            })();
-        }
-        // UIを更新
         $UI.ChangeScreenMode();
-        // マーカー更新
         $Marker.ChangeScreenMode();
-        //
-        console.log("- $App.RefreshScreen -> ", this.AppData.Context.ScreenMode);
     },
-    // サーバエラー処理
+    // サーバ通信エラー処理
+    // @param {Response} response - fetch のレスポンス（無い場合はサーバ未応答扱い）
+    // @returns {Promise<boolean>} 常に false（呼び出し元で失敗として扱わせるため）
     async HandleServerFailure(response) {
-        console.log(">>HandleServerFailure");
         $Notice.Loading.Hide();
+        // オフラインの場合はその旨だけ通知
+        if (!navigator.onLine) {
+            $Notice.Warn("オフライン中は機能が制限されます");
+            return false;
+        }
+        // 認証切れ（401）の場合はログアウト状態にしてログインダイアログを表示
+        if (response?.status === 401) {
+            this.AppData.Context.IsLoggedIn = false;
+            this.AppData.Owner.Token = null;
+            $Dialog.ShowLoginDialog();
+            return false;
+        }
+        // それ以外のエラー：レスポンス本文からメッセージを取得（失敗時はデフォルト文言）
+        let msg = "サーバが稼働していません";
         if (response) {
-            // ログインエラー (401)
-            if (response.status === 401) {
-                this.AppData.Owner.Token = null;
-                this.AppData.Context.IsLoggedIn = false;
-                $Dialog.ShowLoginDialog();
-                return;
-            } else {
-                // それ以外のサーバエラー（業務エラー含む）
-                const serverErr = await response.json();
-                console.error("serverErr:", serverErr);
-                const err = new Error(serverErr.message);
-                throw err;
-            }
-        } else {
-            // オフライン判定時のモード別コントロール
-            if (!navigator.onLine) {
-                $Notice.Warn("オフライン中は、機能が制限されます。");
-                return;
-            } else {
-                // サーバが稼働していない（おそらく）
-                const err = new Error("サーバが稼働していません。しばらくお待ちください。");
-                throw err;
+            try {
+                msg = (await response.json()).message || "通信エラー";
+            } catch (e) {
+                msg = "解析エラー";
             }
         }
+        $Notice.Error(msg);
+        return false;
     },
-    // ログイン処理
+    // ログイン実行
+    // Google認証でメールアドレスを取得し、Firebase経由でログイン処理を行う
+    // @returns {Promise<boolean>} ログイン成功時 true
     async ExecuteLoginFlow() {
         return await $Warn.CatchAsync(async () => {
-            $Notice.Info("ログイン中...");
             const email = await $Auth.GetVerifiedEmailByGoogle();
-            // const isSuccess = await $Data.Access.LoginFirebase(email);
-            const isSuccess = await $Data.Access.LoginFirebase({Email: email});
-            if (isSuccess) {
+            if (await $Data.Access.LoginFirebase({ Email: email })) {
                 this.AppData.Context.IsLoggedIn = true;
-                this._saveSettings();
-                $Notice.Info("ログインに成功しました！");
+                _AppCore.save(this.AppData.Owner);
                 return true;
             }
             return false;
         })();
     },
-    // ログアウト処理
+    // ログアウト
+    // Firebaseからサインアウトし、ローカルの認証状態をクリアする
     async Logout() {
         if (firebase.apps.length) {
             await firebase.auth().signOut();
         }
-        // 1. メモリ上の認証情報をクリア
         this.AppData.Context.IsLoggedIn = false;
         this.AppData.Owner.Token = null;
-        // 2. ローカルストレージを更新（Tokenがnullの状態で上書き保存される）
-        this._saveSettings();
-        // 3. 必要であればIndexedDBのキャッシュ等も消すが、基本は上記2つで次回の自動ログインは防げます。
-        console.log("Token destroyed and logged out.");
+        _AppCore.save(this.AppData.Owner);
     },
-    // 最終利用日をチェックし、必要があればサーバーへ通知する
-    async SyncActivityLog() {
-        // 未ログインまたはオフラインなら処理しない
-        if (!this.AppData.Context.IsLoggedIn || !this.AppData.Context.IsOnline) return;
-        //
-        // 1. 今日の日付（時刻00:00:00）のミリ秒を取得
-        const today = new Date().setHours(0, 0, 0, 0);
-        // 2. 前回の保存日を取得し、Dateに変換（nullなら 0 = 1970年扱いにする）
-        // これにより初回起動時も「今日 > 前回」が成立し、エラーにならず同期へ進む
-        const lastStr = this.AppData.Context.LastLoginDate;
-        const last = lastStr ? new Date(lastStr).setHours(0, 0, 0, 0) : 0;
-        // 3. 今日が保存日より後でなければ同期不要（すでに今日実行済み）
-        if (today <= last) return true;
-        // サーバー更新（ユーザチェックとログイン処理を同時にする）
-        const isSuccess = await $Data.Access.EnsureLoginUser();
-        if (isSuccess) {
-            // 成功時にローカルに保存することで、ローカルとサーバの最終更新日が一致する
-            this.AppData.Context.LastLoginDate = $Util.FormatDate(today, 'YYYY-MM-DD');
-            this._saveSettings(); // ローカルストレージへ永続化
-            $Notice.Info("最終ログイン日時は更新されました。");
-            return true;
-        }
-        return false;
-    },
-    // 規約・ポリシー類の差分チェックと同期（1日1回などの定期実行を想定）
-    async RefreshLegalConfigs() {
-        const MIN_DATE = "1900-01-01T00:00:00";
-        // 1. ローカルDBから現在の状態（日時のみ）を取得
-        const localData = await $LocalDb.Legal.GetAll();
-        // 2. リクエスト作成（データがなければ最小値をセット）
-        const targetKeys = Object.values($Const.LEGAL_TYPE);
-        const items = targetKeys.map(key => {
-            const local = localData.find(d => d.id === key);
-            return {
-                key: key,
-                last_sync_tim: local ? local.update_tim : MIN_DATE
-            };
-        });
-        // 3. サーバー照会
-        const isSuccess = await $Data.Access.GetLegalConfigs({ items });
-        if (!isSuccess) return;
-        // 4. 更新があった項目のみDB保存
-        const results = $Data.resData.results || [];
-        let hasUpdate = false;
-        for (const res of results) {
-            if (res.value !== null) {
-                // 本文がある＝更新あり。未読フラグ付きで保存
-                await $LocalDb.Legal.Save(res.key, res.value, res.update_tim, true);
-                hasUpdate = true;
-            }
-        }
-        // 5. 更新があればUIに通知（バッジ表示用フラグの更新など）
-        if (hasUpdate) {
-            // 自分でループしてフラグをチェック（_updateLegalUnreadStatus）するのではなく、
-            // 作法通り、データ管理側の判定ロジックを呼ぶだけにする
-            await $Data.LocalDb.CheckLegalUnread();
-        }
-    },
-    // 【ユーザ設定】カラーテーマ変更
-    ChangeTheme(theme){
+    // テーマ変更
+    ChangeTheme(theme) {
         this.AppData.Owner.Theme = theme;
-        this._saveSettings(); // 保存実行
+        _AppCore.save(this.AppData.Owner);
         $UI.ChangeTheme(theme);
     },
-    // 【ユーザ設定】カラーテーマ変更
-    ChangeMapStyle(style, isGray){
+    // 地図スタイル変更（グレースケール表示の切替も含む）
+    ChangeMapStyle(style, isGray) {
         this.AppData.Owner.MapStyle = style;
         this.AppData.Owner.IsMapGrayscale = isGray;
-        this._saveSettings(); // 保存実行
+        _AppCore.save(this.AppData.Owner);
         $Map.SetMapStyle(style, isGray);
     },
-    // 【ユーザ設定】追従設定の変更メソッド
+    // GPS追従間隔（秒）の変更。0以下の場合は追従を停止する
     ChangeGpsTracking(sec) {
-        const targetSec = parseInt(sec || 0);
-        this.AppData.Owner.GpsTrackingSec = targetSec;
-        // 一旦既存のタスクを停止
+        this.AppData.Owner.GpsTrackingSec = parseInt(sec || 0);
         $Polling.Stop($Polling.TASKS.GPS_FOLLOW);
-        // 秒数が1以上かつオンラインなら新しくタスクを開始
-        if (targetSec > 0 && this.AppData.Context.IsOnline) {
-            $Polling.Add($Polling.TASKS.GPS_FOLLOW, () => {
-                $Marker.RefreshCurrentLocation();
-            }, targetSec);
+        if (this.AppData.Owner.GpsTrackingSec > 0 && navigator.onLine) {
+            $Polling.Add(
+                $Polling.TASKS.GPS_FOLLOW,
+                () => $Marker.RefreshCurrentLocation(),
+                this.AppData.Owner.GpsTrackingSec
+            );
             $Polling.Start($Polling.TASKS.GPS_FOLLOW);
         }
-        this._saveSettings(); // ローカルストレージに永続化
+        _AppCore.save(this.AppData.Owner);
     },
-    // 【ユーザ設定】通貨単位の変更メソッド
+    // 通貨単位の変更
     ChangeCurrency(unit) {
         this.AppData.Owner.Currency_unit = unit;
-        this._saveSettings(); // 保存実行
+        _AppCore.save(this.AppData.Owner);
     },
-    // 【ユーザ設定】フォントサイズの変更メソッド
+    // フォントサイズの変更
     ChangeFontSize(size) {
         this.AppData.Owner.FontSize = size;
-        this._saveSettings(); // 保存実行
+        _AppCore.save(this.AppData.Owner);
         $UI.ChangeFontSize(size);
     },
-    // 【GPS】GPS追従の一時停止
+    // GPS追従を一時停止する
     PauseGpsTracking() {
         $Polling.Stop($Polling.TASKS.GPS_FOLLOW);
-        console.log("GPS追従 >> 一時停止.");
     },
-    // 【GPS】GPS追従の再開（設定が0より大きい場合のみ）
+    // GPS追従を再開する（設定が有効かつオンライン時のみ）
     ResumeGpsTracking() {
-        if (this.AppData.Owner.GpsTrackingSec > 0 && this.AppData.Context.IsOnline) {
+        if (this.AppData.Owner.GpsTrackingSec > 0 && navigator.onLine) {
             $Polling.Start($Polling.TASKS.GPS_FOLLOW);
-            console.log("GPS追従 >> 再開");
         }
     }
 };
-
-// DOM読み込み後にアプリ起動
 document.addEventListener('DOMContentLoaded', () => AppManager.Init());
-
-// Public
 export default AppManager;
