@@ -40,13 +40,25 @@
             <div class="text-[0.9rem] font-bold text-slate-900 js-time tracking-wider bg-brand-0 px-1"></div>
         </div>
         <div class="ml-2 w-full bg-white relative overflow-hidden flex flex-col items-start gap-2">
-            <div class="js-index-badge absolute top-0 right-0 w-7 h-7 rounded-full bg-brand-4 text-white font-bold text-[0.9rem] flex items-center justify-center  z-20"></div>
-            <button class="js-btn-detach hidden absolute top-2 right-10 w-7 h-7 rounded-full bg-white border  text-slate-600 flex items-center justify-center  z-20 hover:bg-slate-100 active:scale-95 transition-all text-[0.9rem]">🗑</button>
+            <!-- 右上アクショングループ（絶対配置で一括管理） -->
+            <div class="absolute top-2 right-2 flex items-center gap-4 z-20">
+                <!-- 削除ボタン（順序：左） -->
+                <button class="js-btn-detach hidden w-7 h-7 bg-white text-slate-600 flex items-center justify-center hover:bg-slate-100 active:scale-95 transition-all text-[0.9rem]">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
+                </button>
+                <!-- Feelアイコン（順序：中央） -->
+                <img src="" class="js-feel-image hidden w-7 h-7 object-contain">
+                <!-- 番号バッジ（順序：右） -->
+                <div class="js-index-badge w-7 h-7 rounded-full bg-brand-4 text-white font-bold text-[0.9rem] flex items-center justify-center"></div>
+            </div>
+            <!-- タイトル -->
             <div class="border-l-4 border-brand-3 pl-2 py-2 w-full mt-2">
                 <div class="js-title text-[1rem] font-bold text-slate-900 break-words"></div>
             </div>
+            <!-- 金額 -->
             <div class="js-price-wrapper pl-3 flex items-baseline italic w-full hidden"><span class="js-price text-[1rem] font-bold italic "></span><span class="js-price-unit text-[0.9rem] font-bold text-slate-600 ml-1.5 uppercase"></span></div>
-            <div class="js-body text-[0.9rem] text-slate-900 whitespace-pre-wrap break-words w-full leading-[1.8]"></div>
+            <!-- 本文 -->
+            <div class="js-body text-[0.9rem] text-slate-900 whitespace-pre-wrap break-words w-full leading-[1.8] mb-4"></div>
         </div>
     </div>
 </template>
@@ -71,40 +83,6 @@
         <div class="js-title text-[1rem] font-bold text-slate-900 truncate mb-1"></div>
         <!-- 4. 本文 (2行まで許容) -->
         <div class="js-body text-[0.9rem] text-slate-600 line-clamp-2  mb-3"></div>
-        <!-- 5. 金額表示（既存ロジック用） -->
-        <div class="js-price-wrapper hidden flex items-baseline gap-1 mb-3 bg-slate-50 w-fit px-2 py-0.5 rounded-md border ">
-            <span class="js-memo-price text-[0.9rem] font-bold italic"></span>
-            <span class="js-memo-currency text-[0.9rem] font-bold text-slate-600"></span>
-        </div>
-        <!-- 6. フッター：リアクション統計 ＆ 更新日 -->
-        <div class="flex justify-between items-end mt-auto pt-2 border-t border-slate-50">
-            <div class="flex gap-2.5">
-                <div class="flex items-center gap-1">
-                    <span class="js-icon-funny kb-icon-emoji-sm"></span>
-                    <span class="js-count-funny text-[1rem] font-bold text-slate-600">
-                        0
-                    </span>
-                </div>
-                <div class="flex items-center gap-1">
-                    <span class="js-icon-love kb-icon-emoji-sm"></span>
-                    <span class="js-count-love text-[1rem] font-bold text-slate-600">
-                        0
-                    </span>
-                </div>
-                <div class="flex items-center gap-1">
-                    <span class="js-icon-surprise kb-icon-emoji-sm"></span>
-                    <span class="js-count-surprise text-[1rem] font-bold text-slate-600">
-                        0
-                    </span>
-                </div>
-                <div class="flex items-center gap-1">
-                    <span class="js-icon-sad kb-icon-emoji-sm"></span>
-                    <span class="js-count-sad text-[1rem] font-bold text-slate-600">
-                        0
-                    </span>
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 

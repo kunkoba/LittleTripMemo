@@ -11,6 +11,7 @@ export default {
             merge:       $Dom.QuerySelector('#btn-app-merge', el),
             search:      $Dom.QuerySelector('#btn-app-search', el),
             create:      $Dom.QuerySelector('#btn-app-create', el),
+            jumpUrl:     $Dom.QuerySelector('#btn-app-jump-url', el),
         };
         const mode = $App.AppData.Context.ScreenMode;
         const isArchive = (mode === $Const.SCREEN_MODE.ARCHIVE || mode === $Const.SCREEN_MODE.ARCHIVE_PUB);
@@ -32,6 +33,7 @@ export default {
             $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.CREATE; 
             $App.RefreshScreen(); 
         };
+        b.jumpUrl.onclick = () => this.ShowJumpByUrl();
         // 画面を開く
         const help = [
             "地点メモ関連の操作を行います",
@@ -231,5 +233,34 @@ export default {
                 { label: "OK", handler: () => { if (onOk) onOk(txtCode.textContent); this._core.close(); } }
             ]]
         });
+    },
+    // 共有URL入力・解析・ジャンプ
+    ShowJumpByUrl() {
+        const el = $Dom.GenerateTemplate('tpl-dialog-url-jump');
+        const input = $Dom.QuerySelector('#js-jump-url-input', el);
+        const btn = $Dom.QuerySelector('#btn-js-jump-exec', el);
+        let targetId = null;
+        // リアルタイム解析ロジック
+        input.oninput = () => {
+            const val = input.value.trim();
+            try {
+                // URLとして解析（encodedIdパラメータを抽出）
+                const url = new URL(val);
+                targetId = $Util.DecodeId(url.searchParams.get("encodedId"));
+            } catch (e) { targetId = null; }
+            // IDが見つかった場合のみボタンを活性化
+            const isValid = !!targetId;
+            btn.disabled = !isValid;
+            btn.classList.toggle('opacity-50', !isValid);
+        };
+        btn.onclick = async () => {
+            if (!targetId) return;
+            if (!await this.ShowConfirm({ title: "JUMP", message: "このまとめへ移動しますか？" })) return;
+            this._core.closeAll();
+            $App.AppData.Context.ScreenMode = $Const.SCREEN_MODE.ARCHIVE_PUB;
+            $App.AppData.Context.TargetArchiveId = targetId;
+            await $App.RefreshScreen();
+        };
+        this._core.open({ title: "共有URLジャンプ", content: el });
     },
 };

@@ -49,8 +49,14 @@ export default {
             }
             // --- アイテム本体の描画（ここからは既存維持） ---
             const child = $Dom.GenerateTemplate("tpl-timeline-item");
+            // 番号バッジの反映
             const indexBadge = $Dom.QuerySelector(".js-index-badge", child);
             if (indexBadge) indexBadge.textContent = (index + 1);
+            // Feelアイコンの反映
+            const feelImg = $Dom.QuerySelector(".js-feel-image", child);
+            feelImg.src = $Util.GetFeelIconPath(item.feel_type);
+            $Dom.ToggleShow(feelImg, true);
+            // 基本情報の反映
             $Dom.QuerySelector(".js-time", child).textContent = item.memo_time || "";
             $Dom.QuerySelector(".js-face", child).textContent = item.face_emoji || '😀';
             $Dom.QuerySelector(".js-title", child).textContent = item.title || "No Title";
@@ -109,34 +115,34 @@ export default {
             const dateContainer = $Dom.QuerySelector(".js-date-container", child);
             // dateContainer.innerHTML = "";
             $UI.Generator.MemoDateFormatter(dateContainer, item);
-            // --- 3. リアクション統計の反映 ---
-            $Dom.QuerySelector(".js-icon-funny", child).textContent = rt.FUNNY.emoji;
-            $Dom.QuerySelector(".js-count-funny", child).textContent = item.count_funny || 0;
-            $Dom.QuerySelector(".js-icon-love", child).textContent = rt.LOVE.emoji;
-            $Dom.QuerySelector(".js-count-love", child).textContent = item.count_love || 0;
-            $Dom.QuerySelector(".js-icon-surprise", child).textContent = rt.SURPRISE.emoji;
-            $Dom.QuerySelector(".js-count-surprise", child).textContent = item.count_surprise || 0;
-            $Dom.QuerySelector(".js-icon-sad", child).textContent = rt.SAD.emoji;
-            $Dom.QuerySelector(".js-count-sad", child).textContent = item.count_sad || 0;
-            // --- 4. 金額エリアの制御（既存ロジック） ---
-            const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
-            const priceEl = $Dom.QuerySelector(".js-memo-price", child);
-            const currencyEl = $Dom.QuerySelector(".js-memo-currency", child);
-            const price = Number(item.memo_price || 0);
-            if (price !== 0) {
-                $Dom.ToggleShow(priceWrapper, true);
-                let displayCurrency = item.currency_unit || 'JPY';
-                if (item.archive_id > 0) {
-                    const arc = $Data.Store.GetArchiveList()?.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
-                    if (arc?.currency_unit) displayCurrency = arc.currency_unit;
-                }
-                currencyEl.textContent = displayCurrency;
-                if (price > 0) {
-                    priceEl.textContent = `+${price.toLocaleString()}`; priceEl.classList.add("text-blue-500");
-                } else {
-                    priceEl.textContent = price.toLocaleString(); priceEl.classList.add("text-red-500");
-                }
-            }
+            // // --- 3. リアクション統計の反映 ---
+            // $Dom.QuerySelector(".js-icon-funny", child).textContent = rt.FUNNY.emoji;
+            // $Dom.QuerySelector(".js-count-funny", child).textContent = item.count_funny || 0;
+            // $Dom.QuerySelector(".js-icon-love", child).textContent = rt.LOVE.emoji;
+            // $Dom.QuerySelector(".js-count-love", child).textContent = item.count_love || 0;
+            // $Dom.QuerySelector(".js-icon-surprise", child).textContent = rt.SURPRISE.emoji;
+            // $Dom.QuerySelector(".js-count-surprise", child).textContent = item.count_surprise || 0;
+            // $Dom.QuerySelector(".js-icon-sad", child).textContent = rt.SAD.emoji;
+            // $Dom.QuerySelector(".js-count-sad", child).textContent = item.count_sad || 0;
+            // // --- 4. 金額エリアの制御（既存ロジック） ---
+            // const priceWrapper = $Dom.QuerySelector(".js-price-wrapper", child);
+            // const priceEl = $Dom.QuerySelector(".js-memo-price", child);
+            // const currencyEl = $Dom.QuerySelector(".js-memo-currency", child);
+            // const price = Number(item.memo_price || 0);
+            // if (price !== 0) {
+            //     // $Dom.ToggleShow(priceWrapper, true);
+            //     let displayCurrency = item.currency_unit || 'JPY';
+            //     if (item.archive_id > 0) {
+            //         const arc = $Data.Store.GetArchiveList()?.find(a => a.archive_id === item.archive_id) || $Data.Store.GetArchive();
+            //         if (arc?.currency_unit) displayCurrency = arc.currency_unit;
+            //     }
+            //     currencyEl.textContent = displayCurrency;
+            //     if (price > 0) {
+            //         priceEl.textContent = `+${price.toLocaleString()}`; priceEl.classList.add("text-blue-500");
+            //     } else {
+            //         priceEl.textContent = price.toLocaleString(); priceEl.classList.add("text-red-500");
+            //     }
+            // }
             // マーカー選択イベント
             child.onclick = () => { this._core.closeAll(); $Marker.SelectMarker(index); };
             el.appendChild(child);

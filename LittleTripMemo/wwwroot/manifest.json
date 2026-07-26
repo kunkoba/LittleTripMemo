@@ -5,7 +5,11 @@
   "description": "「その日、その時、その場所の思い出」をひとまとめに！",
   "id": "/index.html",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#0ea5e9",
