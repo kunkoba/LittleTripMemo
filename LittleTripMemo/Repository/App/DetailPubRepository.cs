@@ -180,11 +180,13 @@ public class DetailPubRepository : _BaseRepository
         {
             if (feelType.HasValue && feelType < 0)
             {
-                orderBy = "d.feel_type ASC";
+                //orderBy = "d.feel_type ASC";
+                whereClause += $" AND d.feel_type < 0";
             }
             else
             {
-                orderBy = "d.feel_type DESC";
+                //orderBy = "d.feel_type DESC";
+                whereClause += $" AND d.feel_type > 0";
             }
         }
 

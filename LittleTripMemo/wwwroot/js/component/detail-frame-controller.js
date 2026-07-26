@@ -394,8 +394,9 @@ const DetailFrameController = {
         const isPublic = $App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.ARCHIVE_PUB || detail?.is_public === true;
         if (isNew) {
             // 1. 新規入力時
-            $DetailContent.RenderDetail(null, true); // 編集モードで描画
-            $Dom.ToggleShow(_DetailFrameCore.groupEdit, true); // ★追加
+            $DetailContent.RenderDetail(null, true);
+            $Dom.ToggleShow(_DetailFrameCore.groupEdit, true);
+            $Dom.ToggleShow(_DetailFrameCore.groupSearchAction, false);
             $Dom.ToggleShow(_DetailFrameCore.btnCurrent, true);
             $Dom.ToggleShow(_DetailFrameCore.btnEdit, false);
             $Dom.ToggleShow(_DetailFrameCore.btnReport, false);
@@ -404,7 +405,7 @@ const DetailFrameController = {
             $Dom.ToggleShow(_DetailFrameCore.btnCancel, true);
             $Dom.ToggleShow(_DetailFrameCore.groupMove, false);
             $Dom.ToggleShow(_DetailFrameCore.groupReaction, false);
-            $Dom.ToggleShow(_DetailFrameCore.footer, true);    // ★フッター自体は表示
+            $Dom.ToggleShow(_DetailFrameCore.footer, true);
         } else {
             // 2. 既存データ参照時
             const isSearch = $App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH;
