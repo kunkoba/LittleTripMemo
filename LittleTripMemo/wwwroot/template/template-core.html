@@ -32,7 +32,7 @@
                 </div>
             </div>
             <!-- コンテンツエリア：基本の背景色が必要な場合はここもJSで指定 -->
-            <div id="dialog-content" class="flex-1 overflow-y-auto pr-2 flex flex-col m-4 relative p-1"></div>
+            <div id="dialog-content" class="flex-1 overflow-y-auto pr-2 flex flex-col m-4 relative"></div>
             <!-- フッター：背景色と枠線のクラスを削除 -->
             <div id="dialog-button-container" class="z-[900] shrink-0 flex flex-col gap-3 p-4"></div>
         </div>
@@ -554,12 +554,14 @@
 <!-- 【追加】まとめ一覧用フィルタスイッチ -->
 <template id="tpl-archive-list-filter">
     <div class="flex gap-2 px-1 py-1 pt-3 bg-white">
+        <!-- PRIVATE: 最初から黒背景・影付きで定義 -->
         <button id="btn-list-filter-pvt" data-pub="false" 
-            class="js-filter-btn flex-1 flex items-center justify-center gap-2 h-10 rounded-full font-black text-[0.9rem] transition-all active:scale-95 border-2">
+            class="js-filter-btn flex-1 flex items-center justify-center gap-2 h-10 rounded-full font-black text-[0.9rem] transition-all active:scale-95 border-2 shadow-md bg-slate-900 text-white border-slate-900">
             <span>🔒</span> PRIVATE
         </button>
+        <!-- PUBLIC: 最初からブランドカラー・影付きで定義 -->
         <button id="btn-list-filter-pub" data-pub="true" 
-            class="js-filter-btn flex-1 flex items-center justify-center gap-2 h-10 rounded-full font-black text-[0.9rem] transition-all active:scale-95 border-2">
+            class="js-filter-btn flex-1 flex items-center justify-center gap-2 h-10 rounded-full font-black text-[0.9rem] transition-all active:scale-95 border-2 shadow-md bg-brand-5 text-white border-brand-5">
             <span>◎</span> PUBLIC
         </button>
     </div>

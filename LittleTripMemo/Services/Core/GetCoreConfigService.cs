@@ -4,23 +4,27 @@ using LittleTripMemo.Repository.Core;
 
 namespace LittleTripMemo.Services.Core;
 
-public class GetCoreConfigService : _BaseService
+/// <summary>
+/// システム設定（SYSTEMカテゴリー）の一覧を取得するサービス
+/// </summary>
+public class GetCoreConfigService(
+    UserContext user,
+    CoreConfigRepository coreRepo
+) : _BaseService(user)
 {
-    private readonly CoreConfigRepository _coreRepo;
-
     public record Response(IEnumerable<dynamic> configs);
 
-    public GetCoreConfigService(UserContext user, CoreConfigRepository coreRepo) : base(user)
-    {
-        _coreRepo = coreRepo;
-    }
-
+    /// <summary>
+    /// 管理者向けにシステム設定一覧を返却する
+    /// </summary>
     public async Task<Response> ExecuteAsync()
     {
+        // 1. 検証
         await ValidateAsync();
 
-        // カテゴリー「SYSTEM」の設定一覧を取得
-        var result = await _coreRepo.GetConfigsByCategoryAsync("SYSTEM");
+        // 2. 実行
+        var result = await coreRepo.GetConfigsByCategoryAsync("SYSTEM");
+
         return new Response(result);
     }
 
@@ -28,6 +32,7 @@ public class GetCoreConfigService : _BaseService
     {
         // 管理者権限チェック
         BusinessException.ThrowIf(_user.plan_type != PlanType.Admin.ToString(), "管理者権限が必要です");
+
         await Task.CompletedTask;
     }
 

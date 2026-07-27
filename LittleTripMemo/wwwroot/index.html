@@ -345,14 +345,15 @@
                 </div>
                 <!-- 詳細パネルのフッター (固定) -->
                 <div id="detail-footer-id" class="shrink-0 px-4 pb-6 pt-4 bg-slate-50 border z-10">
-                    <!-- 追加：編集用ボタングループ -->
+                    <!-- 編集用ボタングループ -->
                     <div id="detail-group-edit" class="hidden flex gap-4 mb-4">
                         <button id="detail-btn-cancel" type="button" class="flex-1 bg-slate-400 text-white font-bold text-[1rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">CANCEL</button>
                         <button id="detail-btn-save"   type="button" class="flex-1 bg-brand-5   text-white font-bold text-[1rem] h-12 rounded-[1rem] shadow-md uppercase active:scale-95 transition-transform">SAVE</button>
                     </div>
-                    <!-- ★新設：検索結果からのアーカイブ遷移用ボタン -->
+                    <!-- 検索結果からのアーカイブ遷移用ボタン -->
                     <div id="detail-group-search-action" class="hidden mb-4">
-                        <button id="detail-btn-jump-archive" type="button" class="w-full bg-brand-5 text-white font-bold text-[0.9rem] h-12 rounded-[1rem] shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 px-4">
+                        <button id="detail-btn-jump-archive" type="button" 
+                            class="w-full bg-brand-5 text-white font-bold text-[1rem] h-12 rounded-[1rem] shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 px-4">
                             <span class="text-[1.2rem] shrink-0">🗂️</span> 
                             <!-- タイトル流し込み用span（長すぎる場合は...で省略） -->
                             <span id="detail-jump-archive-title" class="truncate">VIEW ARCHIVE</span>
@@ -435,7 +436,7 @@
                 <!-- メニューグループ -->
                 <div class="flex justify-center">
                     <div id="bot-group-menu" 
-                        class="h-12 max-w-[300px] gap-16 flex items-center justify-center bg-brand-1 rounded-full px-6 py-1 shadow-md pointer-events-auto">
+                        class="h-12 gap-16 flex items-center justify-center bg-brand-1 rounded-full px-6 py-1 shadow-md pointer-events-auto">
                         <!-- システムメニュー -->
                         <button id="btn-sys-menu" class="relative kb-icon-emoji-lg">
                             ⚙️

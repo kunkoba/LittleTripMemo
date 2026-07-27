@@ -43,7 +43,7 @@ export default {
                 const header = $Dom.GenerateTemplate("tpl-timeline-date");
                 const container = $Dom.QuerySelector(".js-date-container", header);
                 // 【修正箇所】新部品を呼び出し。ヘッダーなので時刻は表示しないよう null を渡す
-                $UI.Generator.MemoDateFormatter(container, { ...item, memo_time: null });
+                $UI.Generator.MemoDateFormatter(container, { ...item, memo_time: null }, 'lg');
                 listContainer.appendChild(header);
                 currentBreakKey = breakKey;
             }
@@ -276,19 +276,14 @@ export default {
         const render = () => {
             listContainer.innerHTML = "";
             const query = filterText.toLowerCase().trim();
-            // ボタンの見た目制御（classListを使用）
+            // ボタンの見た目制御：選択中なら不透明、それ以外は10%の半透明
             $Dom.QuerySelectorAll('.js-filter-btn', filterToggle).forEach(btn => {
-                const isBtnPub = (btn.dataset.pub === "true");
-                const isActive = (isBtnPub === isShowPublic);
+                const isActive = (btn.dataset.pub === "true") === isShowPublic;
+                btn.classList.toggle('opacity-100', isActive);
+                btn.classList.toggle('opacity-10', !isActive);
+                // 影も不要であれば toggle('shadow-md', isActive) も削除
                 btn.classList.toggle('shadow-md', isActive);
-                btn.classList.remove('bg-slate-900', 'bg-brand-5', 'text-white', 'text-white', 'border-slate-100', 'text-slate-300', 'bg-white');
-                if (isActive) {
-                    btn.classList.add(isBtnPub ? 'bg-brand-5' : 'bg-slate-900');
-                    btn.classList.add(isBtnPub ? 'text-white' : 'text-white');
-                    btn.classList.add('border-transparent');
-                } else {
-                    btn.classList.add('bg-white', 'border-slate-100', 'text-slate-300');
-                }
+                btn.style.pointerEvents = isActive ? 'none' : 'auto'; // 選択中を再度押せなくする
             });
             // フィルタ実行
             const filtered = archives.filter(item => {
@@ -306,7 +301,17 @@ export default {
                 $Dom.QuerySelector(".js-title", child).textContent = item.title;
                 $Dom.QuerySelector(".js-memo", child).textContent = item.memo || "";
                 $Dom.QuerySelector(".js-count", child).textContent = item.detail_count || "0";
-                const colorClass = isShowPublic ? (item.closed_flg ? "bg-slate-400" : "bg-brand-5") : "bg-slate-800";
+                // ステータスに応じた色分け
+                let colorClass = "bg-slate-800"; // デフォルト：非公開（黒）
+                if (isShowPublic) {
+                    if (item.closed_flg) {
+                        colorClass = "bg-slate-400"; // 非公開中（グレー）
+                    } else if (item.limited_open_flg) {
+                        colorClass = "bg-orange-400"; // 限定公開中（オレンジ）
+                    } else {
+                        colorClass = "bg-brand-5"; // 公開中（テーマカラー）
+                    }
+                }
                 $Dom.QuerySelector(".js-item-border", child).classList.add(colorClass);
                 $Dom.QuerySelector(".js-count-badge", child).classList.add(colorClass);
                 child.onclick = () => {

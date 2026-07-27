@@ -168,8 +168,8 @@ window.$Data = {
             if (data.archive) this._rawData.archive = data.archive;
             if (data.myReactions) this._rawData.myReactions = data.myReactions;
             if (data.details) {
-                // 保存直前に表示用ルールを適用（生データを直接書き換える）
-                $Data.Formatter.ApplyDisplayRules(data.details);
+                // // 保存直前に表示用ルールを適用（生データを直接書き換える）
+                // $Data.Formatter.ApplyDisplayRules(data.details);
                 // 各明細に「取得時点の自分の状態」を紐付けて、後の計算（差分抽出）に備える
                 const myRes = data.myReactions || [];
                 data.details.forEach(d => {
@@ -275,14 +275,14 @@ window.$Data = {
                         lastDate = d.memo_date;
                     }
                     d.display_day = dayCounter;
-                    // 他人のデータなら「〇月上旬 1day」「2day」等の形式にマスク
-                    if (!d.is_owner) {
-                        if (dayCounter === 1) {
-                            d.memo_date = isMultiDay ? `${baseMask} 1 Day` : baseMask;
-                        } else {
-                            d.memo_date = `${dayCounter} Day`;
-                        }
-                    }
+                    // // 他人のデータなら「〇月上旬 1day」「2day」等の形式にマスク
+                    // if (!d.is_owner) {
+                    //     if (dayCounter === 1) {
+                    //         d.memo_date = isMultiDay ? `${baseMask} 1 Day` : baseMask;
+                    //     } else {
+                    //         d.memo_date = `${dayCounter} Day`;
+                    //     }
+                    // }
                 });
             } else {
                 // ■ B. 地図検索・作成モード（サーバーの順序を維持）
@@ -290,10 +290,10 @@ window.$Data = {
                 details.forEach((d, index) => {
                     d.no = index + 1;
                     d.display_day = 0; // 検索データにDayの概念はない
-                    // 他人のデータなら「〇月上旬」の単純マスクのみ適用
-                    if (!d.is_owner) {
-                        d.memo_date = this._getMask(d.memo_date);
-                    }
+                    // // 他人のデータなら「〇月上旬」の単純マスクのみ適用
+                    // if (!d.is_owner) {
+                    //     d.memo_date = this._getMask(d.memo_date);
+                    // }
                 });
             }
         },

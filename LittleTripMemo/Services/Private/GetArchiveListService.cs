@@ -63,6 +63,7 @@ public class GetArchiveListService(
             del_flg = x.del_flg,
             create_tim = x.create_tim,
             update_tim = x.update_tim,
+            limited_open_flg = x.limited_open_flg,
             is_public = true,
             is_owner = x.is_owner,
             detail_count = x.detail_count,

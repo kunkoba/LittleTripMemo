@@ -139,7 +139,17 @@ const UI_Manager = {
 			}
 			// 2. データの流し込み（Formatterで加工済みの値を信頼して代入）
 			const mainText = $Dom.QuerySelector(".js-main-text", el);
-			mainText.textContent = detail.memo_date;
+			let dateText = detail.memo_date;
+			if (!detail.is_owner && dateText) {
+				const mask = $Data.Formatter._getMask(dateText);
+				// まとめ表示中かつDay設定がある場合
+				if (detail.display_day > 0) {
+					dateText = (detail.display_day === 1) ? `${mask} 1 Day` : `${detail.display_day} Day`;
+				} else {
+					dateText = mask;
+				}
+			}
+			mainText.textContent = dateText;
 			const timeEl = $Dom.QuerySelector(".js-time-text", el);
 			if (detail.memo_time) {
 				timeEl.textContent = detail.memo_time;

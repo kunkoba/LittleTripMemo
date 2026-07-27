@@ -308,37 +308,6 @@ const _DetailFrameCore = {
     // リアクションのカウントと状態を反映する
     async renderReactions_2(detail) {
         if (!detail) return;
-        const myLocal = await $LocalDb.Reaction.Get(detail.archive_id, detail.seq) || {};
-        Object.values($Const.REACTION_TYPE).forEach(type => {
-            const btn = this.reactionButtons[type.id];
-            if (!btn) return;
-            // 2. 集計ロジック：
-            // [表示数] = [サーバー総数] - [サーバー時の自分の状態(0or1)] + [ローカルの自分の状態(0or1)]
-            const prop = type.prop; // 'has_funny' 等
-            const serverProp = prop.replace('has_', 'server_has_'); // 'server_has_funny'
-            const countProp = prop.replace('has_', 'count_');       // 'count_funny'
-            const serverTotal = Number(detail[countProp] || 0);
-            const serverMe    = detail[serverProp] ? 1 : 0;
-            const localMe     = myLocal[prop] ? 1 : 0;
-            const displayCount = serverTotal - serverMe + localMe;
-            // 3. UI反映
-            const countEl = $Dom.QuerySelector('.js-count', btn);
-            countEl.textContent = displayCount;
-            // 自分の選択状態を反映
-            const isActive = myLocal[type.prop];
-            btn.classList.toggle('bg-white', isActive);
-            btn.classList.toggle('border-brand-5', isActive);
-            btn.classList.toggle('shadow-md', isActive);
-            btn.classList.toggle('bg-slate-50', !isActive);
-            btn.classList.toggle('border-transparent', !isActive);
-            btn.classList.toggle('shadow-sm', !isActive);
-            countEl.classList.toggle('text-brand-5', isActive);
-            countEl.classList.toggle('text-slate-600', !isActive);
-        });
-    },
-    // リアクションのカウントと状態を反映する
-    async renderReactions(detail) {
-        if (!detail) return;
         const isSearch = $App.AppData.Context.ScreenMode === $Const.SCREEN_MODE.SEARCH;
         // 検索時はローカルDBを参照せず、読み取り専用として扱う
         const myLocal = isSearch ? {} : (await $LocalDb.Reaction.Get(detail.archive_id, detail.seq) || {});
@@ -370,7 +339,50 @@ const _DetailFrameCore = {
             btn.classList.toggle('border-transparent', !isActive);
             btn.classList.toggle('shadow-sm', !isActive);
             countEl.classList.toggle('text-brand-5', isActive);
-            countEl.classList.toggle('text-slate-600', !isActive);
+            countEl.classList.toggle('text-slate-400', !isActive);
+        });
+    },
+    // リアクションのカウントと状態を反映する
+    async renderReactions(detail) {
+        if (!detail) return;
+        // 1. 押せるかどうかの判定（自分以外の投稿 且つ 検索モード以外）
+        const isClickable = !detail.is_owner && $App.AppData.Context.ScreenMode !== $Const.SCREEN_MODE.SEARCH;
+        // ローカルDBから自分のリアクション状態を取得
+        const myLocal = await $LocalDb.Reaction.Get(detail.archive_id, detail.seq) || {};
+        Object.values($Const.REACTION_TYPE).forEach(type => {
+            const btn = this.reactionButtons[type.id];
+            if (!btn) return;
+            // ボタン自体のクリック可否（HTML属性）を制御
+            btn.disabled = !isClickable;
+            // 2. 集計ロジック：
+            // [表示数] = [サーバー総数] - [サーバー時の自分の状態(0or1)] + [ローカルの自分の状態(0or1)]
+            const prop = type.prop; // 'has_funny' 等
+            const serverProp = prop.replace('has_', 'server_has_'); // 'server_has_funny'
+            const countProp = prop.replace('has_', 'count_');       // 'count_funny'
+            const serverTotal = Number(detail[countProp] || 0);
+            const serverMe    = detail[serverProp] ? 1 : 0;
+            const localMe     = myLocal[prop] ? 1 : 0;
+            const displayCount = serverTotal - serverMe + localMe;
+            // カウント数値の反映
+            const countEl = $Dom.QuerySelector('.js-count', btn);
+            if (countEl) {
+                countEl.textContent = displayCount;
+            }
+            // 自分の選択状況
+            const isActive = !!myLocal[prop];
+            // 3. UIクラスの反映（指定の4ルールに基づく制御）
+            // ① 押せる → 影付き / ② 押せない → 影ナシ
+            btn.classList.remove('shadow-sm'); // 初期作成時の影クラスを除去して競合防止
+            btn.classList.toggle('shadow-md', isClickable);
+            btn.classList.toggle('shadow-none', !isClickable);
+            // ③ 自分は押してない → 枠線なし / ④ 自分が押している → 枠線あり（テーマカラー）
+            btn.classList.toggle('border-brand-5', isActive);
+            btn.classList.toggle('border-transparent', !isActive);
+            // カウント数値の文字色切り替え（選択時はテーマカラー）
+            if (countEl) {
+                countEl.classList.toggle('text-brand-5', isActive);
+                countEl.classList.toggle('text-slate-600', !isActive);
+            }
         });
     },
     // リアクションボタンクリック

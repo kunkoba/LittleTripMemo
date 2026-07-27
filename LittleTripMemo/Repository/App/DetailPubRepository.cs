@@ -167,11 +167,11 @@ public class DetailPubRepository : _BaseRepository
         {
             var (colName, orderQuery) = reactionType switch
             {
-                1 => ("count_funny", "d.count_funny DESC"),
-                2 => ("count_love", "d.count_love DESC"),
+                1 => ("count_funny",    "d.count_funny DESC"),
+                2 => ("count_love",     "d.count_love DESC"),
                 3 => ("count_surprise", "d.count_surprise DESC"),
-                4 => ("count_sad", "d.count_sad DESC"),
-                _ => ("count_funny", "d.count_funny DESC")
+                4 => ("count_sad",      "d.count_sad DESC"),
+                _ => ("count_funny",    "d.count_funny DESC")
             };
             orderBy = orderQuery;
             whereClause += $" AND d.{colName} > 0";
