@@ -73,11 +73,7 @@ HTMLレイアウトについて
 
 ★修正したい
 ・メモの最初と最後にコメント画面
-・ログイン画面に画像
 ・明細登録件数に制限をかける（20～99件）
-・リンク起動ボタンの改修
-　・直接起動かgoogle経由かを選択制にする
-・ユーザに紐づく公開まとめ一覧
 ・★ユーザフォロー機能
 ・★お気に入り登録機能
 　・まとめ、地点メモ
@@ -99,6 +95,18 @@ HTMLレイアウトについて
 　・ログイン禁止
 　・書き込み禁止
 　・リリースモードとデバッグモードの切り分け
+
+
+
+★現状を整理する
+・asp
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo
+・フロントエンド
+C:\Users\Owner\Desktop\_Net\ASP\LittleTripMemo\LittleTripMemo\wwwroot
+・postgres
+？？？
+・Docker
+？？？
 
 
 

@@ -218,35 +218,43 @@ const AppManager = {
     // アプリ起動時の一連の初期化処理（描画基盤 → ローカル復元 → ログイン確認 → 画面描画 → ポーリング開始 → SW登録）をまとめて実行する
     async Init() {
         try {
-            // Phase 1〜2: 描画基盤とローカル設定の復元
-            await _AppCore.setupShell();
-            await _AppCore.restoreLocal(this.AppData);
-            // トークンがあればログイン済みとして扱い、オンラインならサーバと同期
-            if (this.AppData.Owner.Token) {
-                this.AppData.Context.IsLoggedIn = true;
-                if (navigator.onLine) {
-                    await _AppCore.syncActivityLog();
-                    await $Data.Access.GetSystemInfo();
-                    _AppCore.save(this.AppData.Owner);
+            // 描画基盤とローカル設定の復元
+            {
+                await _AppCore.setupShell();
+                await _AppCore.restoreLocal(this.AppData);
+                // トークンがあればログイン済みとして扱い、オンラインならサーバと同期
+                if (this.AppData.Owner.Token) {
+                    this.AppData.Context.IsLoggedIn = true;
+                    if (navigator.onLine) {
+                        await _AppCore.syncActivityLog();
+                        await $Data.Access.GetSystemInfo();
+                        _AppCore.save(this.AppData.Owner);
+                    }
                 }
             }
             // 見た目設定（テーマ・地図スタイル・フォントサイズ）を復元・適用
-            this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
-            this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD, this.AppData.Owner.IsMapGrayscale);
-            this.ChangeFontSize(this.AppData.Owner.FontSize);
-            // 画面描画
-            await this.RefreshScreen();
+            {
+                this.ChangeTheme(this.AppData.Owner.Theme || $UI.UI_THEME.BLUE);
+                this.ChangeMapStyle(this.AppData.Owner.MapStyle || $Map.MAP_STYLE.STANDARD, this.AppData.Owner.IsMapGrayscale);
+                this.ChangeFontSize(this.AppData.Owner.FontSize);
+                // 画面描画
+                await this.RefreshScreen();
+            }
             // 定期タスク（ポーリング）の登録・開始
-            _AppCore.initPollingTasks();
-            if (this.AppData.Owner.GpsTrackingSec > 0 && navigator.onLine) {
-                $Polling.Start($Polling.TASKS.GPS_FOLLOW);
+            {
+                _AppCore.initPollingTasks();
+                if (this.AppData.Owner.GpsTrackingSec > 0 && navigator.onLine) {
+                    $Polling.Start($Polling.TASKS.GPS_FOLLOW);
+                }
             }
             // 未ログイン・共有リンクでもない・オンラインの場合はログインダイアログを表示
             if (!this.AppData.Context.TargetArchiveId && !this.AppData.Context.IsLoggedIn && navigator.onLine) {
                 $Dialog.ShowLoginDialog();
             }
+            // その他
             _AppCore.registerSW();
             _AppCore.refreshLegalConfigs();
+            $Data.Access.EnsureLoginUser();
         } catch (e) {
             $Err.Handle(e, 'fatal');
         }
